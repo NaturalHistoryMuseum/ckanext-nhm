@@ -1,0 +1,13 @@
+{% extends "keemu-record/base.html" %}
+{% from 'macros/record.html' import field_row %}
+
+{% block record_data %}
+
+    <table>
+
+        {{ field_row('Name', rec['name']) }}
+        {{ field_row('Kind', rec['kind']) }}
+
+    </table>
+
+{% endblock %}

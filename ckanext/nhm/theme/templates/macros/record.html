@@ -1,0 +1,18 @@
+{% macro field_label_value(label, value) -%}
+    <strong>{{label}}</strong> {{value}}
+{%- endmacro %}
+
+{% macro field_row(label, value, display_none = True) -%}
+
+    {% if value or display_none: %}
+        <tr>
+        <td><strong>{{label}}:</strong></td>
+        <td>
+        {% if value: %}
+            {{value}}
+        {% endif %}
+        </td>
+        </tr>
+    {% endif %}
+
+{%- endmacro %}

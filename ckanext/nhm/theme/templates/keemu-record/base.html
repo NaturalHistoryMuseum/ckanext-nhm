@@ -1,0 +1,54 @@
+{% from 'macros/keemu-record.html' import taxonomy, multimedia, site, collection_event, link_for_record %}
+
+{% extends "record/base.html" %}
+
+{% set record_name = h.keemu_record_display_name(c.record) %}
+
+{% block record_content %}
+
+    {% block record_data %}
+    {% endblock %}
+
+     {% if rec['associated_records']: %}
+        <strong>Associated specimens</strong>
+        <ul>
+            {% for associated_record in rec['associated_records']: %}
+                <li>
+                    {% link_for h.record_display_name(associated_record)|truncate(40), controller='ckanext.nhm.controllers.keemu_record:KeEMuRecordController', action='view', id=pkg.name, resource_id=res.id, record_id=associated_record.irn %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% block multimedia %}
+        {% if rec['multimedia']: %}
+            <div class="multimedia">
+                {{ multimedia(rec['multimedia']) }}
+            </div>
+        {% endif %}
+    {% endblock %}
+
+{% endblock %}
+
+{% block record_additional_information_rows %}
+
+    <tr>
+        <th scope="row">{{ _('Last updated') }}</th>
+        <td>{{ h.render_datetime(rec._modified) or _('unknown') }}</td>
+    </tr>
+    <tr>
+        <th scope="row">{{ _('Created') }}</th>
+        <td>{{ h.render_datetime(rec._created) or _('unknown') }}</td>
+    </tr>
+    <tr>
+        <th scope="row">{{ _('Last updated in KE EMu') }}</th>
+        <td>{{ h.keemu_render_datetime(c.record.ke_date_modified) or _('unknown') }}</td>
+    </tr>
+    <tr>
+        <th scope="row">{{ _('Created in KE EMu') }}</th>
+        <td>{{ h.keemu_render_datetime(c.record.ke_date_inserted) or _('unknown') }}</td>
+    </tr>
+
+    {{ super() }}
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% from 'macros/keemu-record.html' import stratigraphy %}
+{% extends "keemu-record/specimen.html" %}
+
+{% block class_fields %}
+
+{% endblock %}
+
+{% block relationship_fields %}
+
+    {{ super() }}
+
+    {% if rec['stratigraphy_rel']: %}
+        {{ stratigraphy(rec['stratigraphy_rel']) }}
+    {% endif %}
+
+    {% if rec['stratigraphy_units']: %}
+
+        <table>
+
+        {% for group, stratigraphy_units in rec['stratigraphy_units'].items(): %}
+
+            <tbody>
+                <tr><th scope="rowgroup" colspan="2">{{ group }}</th></tr>
+                <tr><th>&nbsp;</th><th>From</th><th>To</th></tr>
+
+                {% for type, units in stratigraphy_units.items(): %}
+                    <tr>
+                        <td>{{type}}</td>
+                        <td>{{units["from"]}}</td>
+                        <td>{{units["to"]}}</td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        {% endfor %}
+
+        </table>
+
+    {% endif %}
+
+{% endblock %}

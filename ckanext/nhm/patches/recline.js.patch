@@ -1,0 +1,8 @@
+4075,4078d4074
+-     this.model.fetch()
+-       .fail(function(error) {
+-         self.notify({message: error.message, category: 'error', persist: true});
+-       });
+
+# Need to remove recline.js.min to get this to work.
+# This is only temporary.

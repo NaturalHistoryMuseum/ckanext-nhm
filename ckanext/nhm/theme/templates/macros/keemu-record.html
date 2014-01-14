@@ -1,0 +1,248 @@
+{% from 'macros/record.html' import field_label_value, field_row %}
+
+{% macro taxonomy(data) -%}
+    <uL>
+        {% if data.scientific_name: %}
+        <li> {{field_label_value('Scientific name', data.scientific_name)}}</li>
+        {% endif %}
+
+        {% if data.kingdom: %}
+        <li> {{field_label_value('Kingdom:', data.kingdom)}}</li>
+        {% endif %}
+
+        {% if data.phylum: %}
+         <li> {{field_label_value('Pylum:', data.phylum)}}</li>
+        {% endif %}
+
+        {% if data.taxonomic_class: %}
+         <li> {{field_label_value('Class:', data.taxonomic_class)}}</li>
+        {% endif %}
+
+        {% if data.order: %}
+         <li> {{field_label_value('Order:', data.order)}}</li>
+        {% endif %}
+
+        {% if data.suborder: %}
+         <li> {{field_label_value('Suborder:', data.suborder)}}</li>
+        {% endif %}
+
+        {% if data.superfamily: %}
+         <li> {{field_label_value('Superfamily:', data.superfamily)}}</li>
+        {% endif %}
+
+        {% if data.family: %}
+         <li> {{field_label_value('Family:', data.family)}}</li>
+        {% endif %}
+
+        {% if data.subfamily: %}
+         <li> {{field_label_value('Subfamily:', data.subfamily)}}</li>
+        {% endif %}
+
+        {% if data.genus: %}
+         <li> {{field_label_value('Genus:', data.genus)}}</li>
+        {% endif %}
+
+        {% if data.subgenus: %}
+         <li> {{field_label_value('Subgenus:', data.subgenus)}}</li>
+        {% endif %}
+
+        {% if data.species: %}
+         <li> {{field_label_value('Species:', data.species)}}</li>
+        {% endif %}
+
+        {% if data.subspecies: %}
+         <li> {{field_label_value('Subspecies:', data.subspecies)}}</li>
+        {% endif %}
+
+        {% if data.validity: %}
+         <li> {{field_label_value('Validity:', data.validity)}}</li>
+        {% endif %}
+
+        {% if data.rank: %}
+         <li> {{field_label_value('Rank:', data.rank)}}</li>
+        {% endif %}
+
+        {% if data.scientific_name_author: %}
+         <li> {{field_label_value('Scientific name author:', data.scientific_name_author)}}</li>
+        {% endif %}
+
+        {% if data.scientific_name_author_year: %}
+         <li> {{field_label_value('Scientific name author year:', data.scientific_name_author_year)}}</li>
+        {% endif %}
+
+        {% if data.currently_accepted_name: %}
+         <li> {{field_label_value('Currently accepted name:', data.currently_accepted_name)}}</li>
+        {% endif %}
+    </uL>
+
+{%- endmacro %}
+
+{% macro multimedia(data) -%}
+    <ul>
+        {% for media in data: %}
+
+            <li style="display:inline-block">
+
+                {% if media.mime_type == "image": %}
+                    <img width="200" height="150" src="http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn={{media.irn}}&amp;image=yes&amp;width=200" alt="{{media.title}} " width="200">
+                {% else: %}
+                    <span class="file file-mime-{{ media.mime_type }} file-format-{{ media.mime_format }}">{{media.title}}</span>
+                {% endif %}
+
+            </li>
+
+        {% endfor %}
+
+    </ul>
+
+{%- endmacro %}
+
+{% macro material_detail(data) -%}
+
+        <table>
+            <tr><th>Count</th><th>Sex</th><th>Stage</th><th>Types</th><th>Primary type number</th></tr>
+            {% for detail in data: %}
+                <tr>
+
+                    <td>
+                    {% if detail.count: %}
+                        {{detail.count}}
+                    {% endif %}
+                    </td>
+
+                    <td>
+                    {% if detail.sex: %}
+                        {{detail.sex}}
+                    {% endif %}
+                    </td>
+
+                    <td>
+                    {% if detail.stage: %}
+                        {{detail.stage}}
+                    {% endif %}
+                    </td>
+
+                    <td>
+                    {% if detail.types: %}
+                        {{detail.types}}
+                    {% endif %}
+                    </td>
+
+                    <td>
+                    {% if detail.primary_type_number: %}
+                        {{detail.primary_type_number}}
+                    {% endif %}
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+
+{%- endmacro %}
+
+{% macro site(data) -%}
+
+         <table>
+
+            {{ field_row('Continent', data.continent, False) }}
+            {{ field_row('Country', data.country, False) }}
+            {{ field_row('State province', data.state_province, False) }}
+            {{ field_row('County', data.county, False) }}
+            {{ field_row('Locality', data.locality, False) }}
+            {{ field_row('tmp_locality', data.tmp_locality, False) }}
+            {{ field_row('Vice county', data.vice_county, False) }}
+            {{ field_row('Parish', data.parish, False) }}
+            {{ field_row('Town', data.town, False) }}
+            {{ field_row('Nearest named place', data.nearest_named_place, False) }}
+            {{ field_row('Ocean', data.ocean, False) }}
+            {{ field_row('Island group', data.island_group, False) }}
+            {{ field_row('Island', data.island, False) }}
+            {{ field_row('Water body', data.water_body, False) }}
+            {{ field_row('River basin', data.river_basin, False) }}
+            {{ field_row('Geodetic datum', data.geodetic_datum, False) }}
+            {{ field_row('Georeferencing method', data.georef_method, False) }}
+            {{ field_row('Latitude', data.latitude, False) }}
+            {{ field_row('Decimal latitude', data.decimal_latitude, False) }}
+            {{ field_row('Longitude', data.longitude, False) }}
+            {{ field_row('Decimal longitude', data.decimal_longitude, False) }}
+            {{ field_row('Minimum elevation (meters)', data.minimum_elevation_in_meters, False) }}
+            {{ field_row('Maximum elevation (meters)', data.maximum_elevation_in_meters, False) }}
+            {{ field_row('Minimum depth (meters)', data.minimum_depth_in_meters, False) }}
+            {{ field_row('Maximum depth (meters)', data.maximum_depth_in_meters, False) }}
+            {{ field_row('Mineral complex', data.mineral_complex, False) }}
+            {{ field_row('Mine', data.mine, False) }}
+            {{ field_row('Mining district', data.mining_district, False) }}
+            {{ field_row('Tectonic province', data.tectonic_province, False) }}
+            {{ field_row('Geology region', data.geology_region, False) }}
+
+         </table>
+
+{%- endmacro %}
+
+
+{% macro collection_event(data) -%}
+
+         <table>
+
+            {% if data.date_collected_from: %}
+                <tr>
+                    <td><strong>Collected from:</strong></td>
+                    <td>
+                        {% if data.time_collected_from: %}
+                            {{data.time_collected_from}}
+                        {% endif %}
+
+                    {{data.date_collected_from}}
+
+                    </td>
+                </tr>
+            {% endif %}
+
+            {% if data.date_collected_to: %}
+                <tr>
+                    <td><strong>Collected to:</strong></td>
+                    <td>
+                        {% if data.time_collected_to: %}
+                            {{data.time_collected_to}}
+                        {% endif %}
+
+                    {{data.date_collected_to}}
+
+                    </td>
+                </tr>
+            {% endif %}
+
+            {{ field_row('Collection event code', data.collection_event_code, False) }}
+            {{ field_row('Collection method', data.collection_method, False) }}
+            {{ field_row('Depth from (metres)', data.depth_from_metres, False) }}
+            {{ field_row('Depth from (feet)', data.depth_from_feet, False) }}
+            {{ field_row('Depth from (fathoms)', data.depth_from_fathoms, False) }}
+            {{ field_row('Depth to (metres)', data.depth_to_metres, False) }}
+            {{ field_row('Depth to (feet)', data.depth_to_feet, False) }}
+            {{ field_row('Depth to (fathoms)', data.depth_to_fathoms, False) }}
+            {{ field_row('Expedition start date', data.expedition_start_date, False) }}
+            {{ field_row('Expedition name', data.expedition_name, False) }}
+            {{ field_row('Vessel name', data.vessel_name, False) }}
+            {{ field_row('Vessel type', data.vessel_type, False) }}
+            {{ field_row('Geological details', data.geological_details, False) }}
+            {{ field_row('Geological features', data.geological_features, False) }}
+            {{ field_row('Geological lithology', data.geological_lithology, False) }}
+
+         </table>
+
+{%- endmacro %}
+
+{% macro stratigraphy(data) -%}
+
+        <table>
+
+            {{ field_row('Region', data.region, False) }}
+            {{ field_row('Subdivision', data.subdivision, False) }}
+            {{ field_row('Taxonomic group', data.taxonomic_group, False) }}
+            {{ field_row('Biozone', data.biozone, False) }}
+            {{ field_row('Sedimentology', data.sedimentology, False) }}
+            {{ field_row('Sedimentary facies', data.sedimentary_facies, False) }}
+
+        </table>
+
+{%- endmacro %}

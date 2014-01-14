@@ -1,0 +1,19 @@
+{% extends "page.html" %}
+{% set homepage_style = ( g.homepage_style or '1' ) %}
+
+{% block subtitle %}{{ _("Welcome") }}{% endblock %}
+
+{% block maintag %}{% endblock %}
+{% block toolbar %}{% endblock %}
+
+{% block content %}
+  <div class="homepage layout-3">
+    <div class="container">
+      {{ self.flash() }}
+    </div>
+    {% block primary_content %}
+      <!-- Anything apart from layout 3 will error trying to load organisations & groups -->
+      {% snippet "home/layout3.html" %}
+    {% endblock %}
+  </div>
+{% endblock %}

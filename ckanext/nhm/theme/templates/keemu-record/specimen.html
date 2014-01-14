@@ -1,0 +1,122 @@
+{% from 'macros/keemu-record.html' import taxonomy, site, collection_event %}
+{% from 'macros/record.html' import field_row %}
+
+{% extends "keemu-record/base.html" %}
+
+{% block record_data %}
+
+    <table>
+
+        {% block core_fields %}
+
+            {{ field_row('Department', rec['collection_department']) }}
+            {{ field_row('Sub department', rec['collection_sub_department']) }}
+            {{ field_row('Specimen unit', rec['specimen_unit']) }}
+            {{ field_row('Catalogue number', rec['catalogue_number']) }}
+            {{ field_row('Record type', rec['type']) }}
+            {{ field_row('Kind of object', rec['kind_of_object']) }}
+            {{ field_row('Preservation', rec['preservation']) }}
+            {{ field_row('Preparation type', rec['preparation_type']) }}
+            {{ field_row('Verbatim label data', rec['verbatim_label_data']) }}
+            {{ field_row('Donor name', rec['donor_name']) }}
+            {{ field_row('Date catalogued', rec['date_catalogued']) }}
+            {{ field_row('Kind of collection', rec['kind_of_collection']) }}
+            {{ field_row('Curation unit', rec['curation_unit']) }}
+            {{ field_row('Registration code', rec['registration_code']) }}
+            {{ field_row('Type status', rec['type_status']) }}
+            {{ field_row('Date identified', rec['date_identified']) }}
+            {{ field_row('Internal identifier', rec['irn']) }}
+
+        {% endblock %}
+
+        {% block class_fields %}
+            {% for label, value in rec['class_fields'].items(): %}
+                {{ field_row(label, value) }}
+            {% endfor %}
+        {% endblock %}
+
+    </table>
+
+    {% block relationship_fields %}
+
+        {% if rec['associated_specimens']: %}
+            {% for type, associated_specimens in rec['associated_specimens'].items(): %}
+                <strong>{{ type }}:</strong>
+
+                {% for associated_specimen in associated_specimens: %}
+
+                    {% link_for h.keemu_record_display_name(associated_specimen)|truncate(40), controller='ckanext.nhm.controllers.keemu_record:KeEMuRecordController', action='view', id=pkg.name, resource_id=res.id, record_id=associated_specimen.irn %}</td>
+
+                {% endfor %}
+
+            {% endfor %}
+        {% endif %}
+
+        {% if rec['specimen_taxonomy']: %}
+            {% for determination in rec['specimen_taxonomy']: %}
+                {{ taxonomy(determination.taxonomy) }}
+            {% endfor %}
+        {% endif %}
+
+        {% if rec['site_rel']: %}
+            {{ site(rec['site_rel']) }}
+        {% endif %}
+
+        {% if rec['collection_event_rel']: %}
+            {{ collection_event(rec['collection_event_rel']) }}
+        {% endif %}
+
+        {% if rec['sex_stage']: %}
+            <table>
+            <caption>Sex stage</caption>
+            <tr><th>Count</th><th>Sex</th><th>Stage</th></tr>
+
+            {% for detail in rec['sex_stage']: %}
+                <tr>
+                    <td>
+                    {% if detail.count: %}
+                        {{detail.count}}
+                    {% endif %}
+                    </td>
+
+                    <td>
+                    {% if detail.sex: %}
+                        {{detail.sex}}
+                    {% endif %}
+                    </td>
+
+                    <td>
+                    {% if detail.stage: %}
+                        {{detail.stage}}
+                    {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endif %}
+
+        {% if rec['other_numbers']: %}
+            <table>
+            <caption>Other numbers</caption>
+                {% for number in rec['other_numbers']: %}
+                    <tr>
+                        <td>
+                        {% if number.kind: %}
+                            {{number.kind}}
+                        {% endif %}
+                        </td>
+
+                        <td>
+                        {% if number.value: %}
+                            {{number.value}}
+                        {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+             </table>
+        {% endif %}
+
+    {% endblock %}
+
+{% endblock %}
+
