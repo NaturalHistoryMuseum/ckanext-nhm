@@ -358,8 +358,9 @@ class StratigraphicUnitAssociation(BaseMixin, Base):
     unit_id = Column(Integer, ForeignKey(StratigraphicUnitModel.id), primary_key=True, nullable=False)
     types = [i[3:].lower() for group in STRATIGRAPHIC_UNIT_TYPES.values() for i in group]
 
-    type = Column(Enum(*types, name='type'), primary_key=True, nullable=False)
-    direction = Column(Enum('from', 'to', name='direction'), primary_key=True, nullable=False)  # From / to
+    # TODO: Change to stratigraphic type
+    type = Column(Enum(*types, name='type', schema=KEEMU_SCHEMA), primary_key=True, nullable=False)
+    direction = Column(Enum('from', 'to', name='direction', schema=KEEMU_SCHEMA), primary_key=True, nullable=False)  # From / to
 
     # bidirectional attribute/collection of "specimen"/"determinations"
     stratigraphy = relationship(StratigraphyModel, backref=backref("stratigraphic_unit", cascade="all, delete-orphan"))
@@ -733,7 +734,7 @@ class HostParasiteAssociation(BaseMixin, Base):
 
     parasite_card_irn = Column(Integer, ForeignKey(ParasiteCardModel.irn), primary_key=True)
     taxonomy_irn = Column(Integer, ForeignKey(TaxonomyModel.irn), primary_key=True)
-    parasite_host = Column(Enum('host', 'parasite', name='parasite_host'), primary_key=True, nullable=False)
+    parasite_host = Column(Enum('host', 'parasite', name='parasite_host', schema=KEEMU_SCHEMA), primary_key=True, nullable=False)
     stage = Column(String)
 
     # bidirectional attribute/collection of parasite taxonomy
