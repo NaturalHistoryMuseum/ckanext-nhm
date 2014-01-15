@@ -214,18 +214,22 @@ class KEEMuImportCommand(cli.CkanCommand):
 
         datastore_write_url = cli.parse_db_config('ckan.datastore.write_url')
 
-        # Create the actual DB schema
-        self.datastore_db_engine.execute(sqlalchemy.text(u'CREATE SCHEMA IF NOT EXISTS %s AUTHORIZATION %s' % (KEEMU_SCHEMA, datastore_write_url['db_user'])))
+        # Create the actual DB schema if it doesn't already exist
+        # CREATE SCHEMA IF NOT EXISTS is PG 9.3
+        result = self.datastore_db_engine.execute(sqlalchemy.text(u'SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = \'%s\')' % KEEMU_SCHEMA))
 
-        # Grant read access to the datastore_read_url user
-        #datastore_read_url = cli.parse_db_config('ckan.datastore.read_url')
-
-        # TODO: Only working if run in DB. Need to fix
-        #self.datastore_db_engine.execute(sqlalchemy.text(u'GRANT USAGE ON SCHEMA %s TO %s' % (KEEMU_SCHEMA, datastore_read_url['db_user'])))
-        #self.datastore_db_engine.execute(sqlalchemy.text(u'GRANT SELECT ON ALL TABLES IN SCHEMA %s TO %s' % (KEEMU_SCHEMA, datastore_read_url['db_user'])))
-
-        # And create the tables
-        Base.metadata.create_all(self.datastore_db_engine)
+        if not result.scalar():
+            self.datastore_db_engine.execute(sqlalchemy.text(u'CREATE SCHEMA %s AUTHORIZATION %s' % (KEEMU_SCHEMA, datastore_write_url['db_user'])))
+        #
+        # # Grant read access to the datastore_read_url user
+        # #datastore_read_url = cli.parse_db_config('ckan.datastore.read_url')
+        #
+        # # TODO: Only working if run in DB. Need to fix
+        # #self.datastore_db_engine.execute(sqlalchemy.text(u'GRANT USAGE ON SCHEMA %s TO %s' % (KEEMU_SCHEMA, datastore_read_url['db_user'])))
+        # #self.datastore_db_engine.execute(sqlalchemy.text(u'GRANT SELECT ON ALL TABLES IN SCHEMA %s TO %s' % (KEEMU_SCHEMA, datastore_read_url['db_user'])))
+        #
+        # # And create the tables
+        # Base.metadata.create_all(self.datastore_db_engine)
 
     def _parse_keemu(self, import_file):
         """
