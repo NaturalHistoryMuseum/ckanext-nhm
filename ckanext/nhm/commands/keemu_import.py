@@ -228,8 +228,8 @@ class KEEMuImportCommand(cli.CkanCommand):
         # #self.datastore_db_engine.execute(sqlalchemy.text(u'GRANT USAGE ON SCHEMA %s TO %s' % (KEEMU_SCHEMA, datastore_read_url['db_user'])))
         # #self.datastore_db_engine.execute(sqlalchemy.text(u'GRANT SELECT ON ALL TABLES IN SCHEMA %s TO %s' % (KEEMU_SCHEMA, datastore_read_url['db_user'])))
         #
-        # # And create the tables
-        # Base.metadata.create_all(self.datastore_db_engine)
+        # And create the tables
+        Base.metadata.create_all(self.datastore_db_engine)
 
     def _parse_keemu(self, import_file):
         """
@@ -830,7 +830,3 @@ class KEEMuImportCommand(cli.CkanCommand):
 
         if status:
             log.info(status)
-
-
-
-
