@@ -38,7 +38,8 @@ class KEEMuImportCommand(cli.CkanCommand):
     '''
     Commands:
         paster keemu import-taxonomy -c <config>
-        paster keemu import-catalogue -c /var/www/data.nhm/development.ini
+        paster keemu import-catalogue -c /etc/ckan/default/development.ini
+        paster --plugin=ckanext-nhm keemu build-dataset -c /etc/ckan/default/development.ini
 
     Where:
         <config> = path to your ckan config file
@@ -206,6 +207,17 @@ class KEEMuImportCommand(cli.CkanCommand):
                 select_sql = views_config.get(resource_name, 'sql').format(schema=KEEMU_SCHEMA)
                 create_sql = sqlalchemy.text('CREATE TABLE "{id}" AS {select_sql}'.format(id=resource_id, select_sql=select_sql))
                 self.datastore_db_engine.execute(create_sql)
+
+                # Hacky fix for adding _full_text column
+                # TODO: Either integrate this properly, or use API when DwC has been implemented
+                self.datastore_db_engine.execute(u'ALTER TABLE "{id}" ADD COLUMN _full_text tsvector'.format(id=resource_id))
+
+                # Get all text fields
+                text_columns = self.datastore_db_engine.execute(sqlalchemy.text(u'SELECT STRING_AGG(QUOTE_IDENT(column_name), \', \') FROM information_schema.columns WHERE table_name = \'{id}\' and data_type = \'character varying\''.format(id=resource_id))).scalar()
+
+                # Populate _full_text with all text fields
+                self.datastore_db_engine.execute(sqlalchemy.text(u'UPDATE "{id}" set _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY[{text_columns}], \' \'))'.format(id=resource_id, text_columns=text_columns)))
+
 
     def create_schema(self):
 

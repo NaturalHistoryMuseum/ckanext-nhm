@@ -52,9 +52,18 @@ class NHMPlugin(p.SingletonPlugin):
                             controller='ckanext.nhm.controllers.keemu_record:KeEMuRecordController',
                             action='view', id=package.name)
 
+        # TODO: Rename id =>  dataset_id
+
         # Add default view record controller
         map.connect('record', '/dataset/{id}/resource/{resource_id}/record/{record_id}',
                     controller='ckanext.nhm.controllers.record:RecordController',
+                    action='view')
+
+
+        # Add map controller
+        # TODO: Remove map controller (OKF)
+        map.connect('map', '/map/{resource_id}',
+                    controller='ckanext.nhm.controllers.map:MapController',
                     action='view')
 
         return map
