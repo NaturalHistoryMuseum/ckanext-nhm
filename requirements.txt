@@ -4,6 +4,7 @@ FormAlchemy==1.4.3
 FormEncode==1.2.6
 Genshi==0.6
 Jinja2==2.6
+-e git+https://github.com/NaturalHistoryMuseum/KEParser.git@10f9edc24d19a04d266590f2d1096ad21ed404f3#egg=KEParser
 Mako==0.8.1
 MarkupSafe==0.18
 Pairtree==0.7.1-T
