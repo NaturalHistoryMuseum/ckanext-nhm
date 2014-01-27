@@ -2,7 +2,7 @@ import pylons
 import ckan.plugins as p
 import ckan.model as model
 from ckan.common import c
-from ckanext.nhm.logic.action import resource_exists, record_get
+import ckanext.nhm.logic.action as action
 from ckanext.nhm.model import setup as setup_model
 import ckanext.nhm.lib.helpers as nhmhelpers
 
@@ -20,7 +20,6 @@ class ThemePlugin(p.SingletonPlugin):
         p.toolkit.add_template_directory(config, 'theme/templates')
         p.toolkit.add_public_directory(config, 'theme/public')
         p.toolkit.add_resource('theme/public', 'nhm-theme')
-
 
 
 class NHMPlugin(p.SingletonPlugin):
@@ -71,8 +70,9 @@ class NHMPlugin(p.SingletonPlugin):
     def get_actions(self):
 
         return {
-            'resource_exists':  resource_exists, # Wrapper around private _resource_exists
-            'record_get':  record_get,
+            'resource_exists':  action.resource_exists, # Wrapper around private _resource_exists
+            'record_get':  action.record_get,
+            'map_get':  action.map_get,
             }
 
     def get_helpers(self):
