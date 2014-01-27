@@ -5,6 +5,7 @@ from ckan.common import c
 import ckanext.nhm.logic.action as action
 from ckanext.nhm.model import setup as setup_model
 import ckanext.nhm.lib.helpers as nhmhelpers
+import sqlalchemy.exc
 
 import ckan.logic as logic
 get_action = logic.get_action
@@ -42,14 +43,19 @@ class NHMPlugin(p.SingletonPlugin):
     ## IRoutes
     def before_map(self, map):
 
-        package = model.Package.get(pylons.config['nhm.keemu_dataset_name'])
+        try:
 
-        if package:
-            for pkg_id in [package.id, package.name]:
-                # Add default view record controller
-                map.connect('record', '/dataset/%s/resource/{resource_id}/record/{record_id}' % pkg_id,
-                            controller='ckanext.nhm.controllers.keemu_record:KeEMuRecordController',
-                            action='view', id=package.name)
+            package = model.Package.get(pylons.config['nhm.keemu_dataset_name'])
+            
+            if package:
+                for pkg_id in [package.id, package.name]:
+                    # Add default view record controller
+                    map.connect('record', '/dataset/%s/resource/{resource_id}/record/{record_id}' % pkg_id,
+                                controller='ckanext.nhm.controllers.keemu_record:KeEMuRecordController',
+                                action='view', id=package.name)
+        except sqlalchemy.exc.ProgrammingError:
+            # TODO - This breaks init db
+            pass
 
         # TODO: Rename id =>  dataset_id
 
