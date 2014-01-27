@@ -50,3 +50,13 @@ def record_get(context, data_dict):
         return search_result['records'].pop()
     except IndexError:
         pass
+
+
+def map_get(context, data_dict):
+    """
+    Get map tile via API?
+    @param context:
+    @param data_dict:
+    @return:
+    """
+    pass
