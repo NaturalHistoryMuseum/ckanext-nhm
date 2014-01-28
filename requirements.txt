@@ -27,6 +27,7 @@ apachemiddleware==0.1.1
 argparse==1.2.1
 billiard==3.3.0.13
 celery==3.1.7
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-map.git#egg=ckanext-map
 decorator==3.4.0
 distribute==0.6.34
 fanstatic==0.12
