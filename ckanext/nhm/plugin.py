@@ -20,8 +20,6 @@ class ThemePlugin(p.SingletonPlugin):
     def update_config(self, config):
         p.toolkit.add_template_directory(config, 'theme/templates')
         p.toolkit.add_public_directory(config, 'theme/public')
-        p.toolkit.add_resource('theme/public', 'nhm-theme')
-
 
 class NHMPlugin(p.SingletonPlugin):
     """
@@ -77,8 +75,7 @@ class NHMPlugin(p.SingletonPlugin):
 
         return {
             'resource_exists':  action.resource_exists, # Wrapper around private _resource_exists
-            'record_get':  action.record_get,
-            'map_get':  action.map_get,
+            'record_get':  action.record_get
             }
 
     def get_helpers(self):
