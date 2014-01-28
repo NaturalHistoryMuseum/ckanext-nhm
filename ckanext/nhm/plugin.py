@@ -62,13 +62,6 @@ class NHMPlugin(p.SingletonPlugin):
                     controller='ckanext.nhm.controllers.record:RecordController',
                     action='view')
 
-
-        # Add map controller
-        # TODO: Remove map controller (OKF)
-        map.connect('map', '/map/{resource_id}',
-                    controller='ckanext.nhm.controllers.map:MapController',
-                    action='view')
-
         return map
 
     def get_actions(self):
