@@ -5,7 +5,7 @@ from ckan.common import OrderedDict, _, json, request, c, g, response
 from ckan.lib.render import find_template
 from sqlalchemy.orm.exc import NoResultFound
 from ckanext.nhm.db import _get_engine, _make_session
-from ckanext.nhm.model.keemu import *
+from ke2sql.model.keemu import *
 from ckanext.nhm.controllers.record import RecordController
 from sqlalchemy.orm import class_mapper, RelationshipProperty as SQLAlchemyRelationshipProperty
 

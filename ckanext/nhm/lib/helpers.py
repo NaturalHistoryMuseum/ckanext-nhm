@@ -45,21 +45,8 @@ def keemu_record_display_name(record):
 
 
 def keemu_render_datetime(datetime_):
-    # Get the name to display for a record
+    # Datetime formatter
 
     # Convert data to datetime
     datetime_ = datetime.combine(datetime_, datetime.min.time())
     return formatters.localised_nice_date(datetime_, show_date=True)
-
-
-def get_file_storage_key(url):
-
-    # Get file key for a URL
-
-    url = urllib.unquote(url)
-    return '/'.join(url.split('/')[-2:])
-
-
-def ensure_list(value):
-    # Ensure a variable is a list & convert to a list if it's not
-    return value if isinstance(value, list) else [value]

@@ -3,7 +3,6 @@ import ckan.plugins as p
 import ckan.model as model
 from ckan.common import c
 import ckanext.nhm.logic.action as action
-from ckanext.nhm.model import setup as setup_model
 import ckanext.nhm.lib.helpers as nhmhelpers
 import sqlalchemy.exc
 
@@ -28,16 +27,9 @@ class NHMPlugin(p.SingletonPlugin):
         Set up NHM (CKAN) model
 
     """
-    p.implements(p.IConfigurable, inherit=True)
     p.implements(p.IRoutes, inherit=True)
     p.implements(p.IActions)
     p.implements(p.ITemplateHelpers)
-
-    ## IConfigurable
-    def configure(self, config):
-        #  Create tables
-        setup_model()
-
     ## IRoutes
     def before_map(self, map):
 
