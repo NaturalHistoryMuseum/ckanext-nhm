@@ -30,7 +30,7 @@ setup(
             nhm_record = ckanext.nhm.plugin:RecordPlugin
 
 	    [paste.paster_command]
-            keemu=ckanext.nhm.commands.keemu_import:KEEMuImportCommand
+            keemu=ckanext.nhm.commands.keemu:KEEMuCommand
 
 	""",
 )
