@@ -1,3 +1,4 @@
+import sys
 import re
 import ckan.model as model
 import ckan.logic as logic
@@ -6,13 +7,14 @@ import ckan
 import os
 
 import ConfigParser
+import yaml
 
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
 import pylons
 import logging
 from datetime import datetime
-from ckanext.nhm.db import _get_engine
+from ckanext.datastore.db import _get_engine
 from ke2sql import config as ke2sql_config
 
 log = logging.getLogger(__name__)
@@ -39,6 +41,8 @@ class KEEMuCommand(cli.CkanCommand):
             print KEEMuCommand.__doc__
             return
 
+        self._load_config()
+
         cmd = self.args[0]
 
         if cmd == 'build-dataset':
@@ -58,13 +62,12 @@ class KEEMuCommand(cli.CkanCommand):
         KE EMu datastore should be at the same point
         """
 
-        self._load_config()
+        # Load the dataset definitions
+        f = open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'datasets.yaml'))
+        datasets = yaml.safe_load(f)
 
         keemu_schema = ke2sql_config.get('database', 'schema')
         keemu_dataset_name = pylons.config['nhm.keemu_dataset_name']
-
-        views_config = ConfigParser.ConfigParser()
-        views_config.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'datasets.cfg'))
 
         engine = _get_engine({'connection_url': pylons.config['ckan.datastore.write_url']})
 
@@ -74,11 +77,12 @@ class KEEMuCommand(cli.CkanCommand):
 
         try:
 
-            dataset = logic.get_action('package_show')(context, {'id': keemu_dataset_name})
+            # Try and load the KE EMu package
+            package = logic.get_action('package_show')(context, {'id': keemu_dataset_name})
 
         except logic.NotFound:
 
-            # If dataset doesn't exists, create it
+            # KE EMu package not found; create it
 
             # Error adds dataset_show to __auth_audit: remove it
             context['__auth_audit'] = []
@@ -86,7 +90,7 @@ class KEEMuCommand(cli.CkanCommand):
             # TODO: More metadata. Create date etc.,
             # TODO: Read file produced date
 
-            dataset_params = {
+            package_params = {
                 'author': None,
                 'author_email': None,
                 'license_id': u'other-open',
@@ -100,58 +104,53 @@ class KEEMuCommand(cli.CkanCommand):
 
             try:
                 # Create the dataset
-                dataset = logic.get_action('package_create')(context, dataset_params)
+                package = logic.get_action('package_create')(context, package_params)
             except Exception:
                 raise
 
         except ProgrammingError, e:
             raise
 
-        # Build a temporary table of determinations, which uses part's and egg's parents
+        # Build a temporary table of determinations, which uses part's parents
 
         # Drop and create
         engine.execute(sqlalchemy.text('DROP TABLE IF EXISTS tmp_determination'.format(schema=keemu_schema)))
-        engine.execute(sqlalchemy.text('CREATE TEMP TABLE tmp_determination '
-                                                         'AS '
-                                                            '(SELECT DISTINCT ON(d.specimen_irn) specimen_irn, taxonomy_irn '
-                                                            'FROM {schema}.determination d '
-                                                            'INNER JOIN {schema}.specimen s ON s.irn = d.specimen_irn ORDER BY d.specimen_irn, filed_as DESC) '
-                                                         'UNION '
-                                                            '(SELECT DISTINCT ON(s.irn) s.irn as specimen_irn, taxonomy_irn '
-                                                            'FROM {schema}.SPECIMEN s '
-                                                            'INNER JOIN {schema}.part p ON p.irn = s.irn '
-                                                            'INNER JOIN {schema}.determination d ON p.parent_irn = d.specimen_irn '
-                                                            'WHERE NOT EXISTS (SELECT 1 FROM {schema}.determination WHERE specimen_irn = s.irn) '
-                                                            'ORDER BY s.irn, filed_as DESC) '
-                                                        'UNION '
-                                                            '(SELECT DISTINCT ON(s.irn) s.irn as specimen_irn, taxonomy_irn '
-                                                            'FROM {schema}.specimen s '
-                                                            'INNER JOIN {schema}.egg e ON e.irn = s.irn '
-                                                            'INNER JOIN {schema}.determination d ON e.parent_irn = d.specimen_irn '
-                                                            'WHERE NOT EXISTS (SELECT 1 FROM {schema}.determination WHERE specimen_irn = s.irn) '
-                                                            'ORDER BY s.irn, filed_as DESC)'.format(schema=keemu_schema)))
-
+        engine.execute(sqlalchemy.text("""CREATE TEMP TABLE tmp_determination
+                                             AS
+                                                (SELECT DISTINCT ON(d.specimen_irn) specimen_irn, taxonomy_irn
+                                                FROM {schema}.determination d
+                                                INNER JOIN {schema}.specimen s ON s.irn = d.specimen_irn ORDER BY d.specimen_irn, filed_as DESC)
+                                             UNION
+                                                (SELECT DISTINCT ON(s.irn) s.irn as specimen_irn, taxonomy_irn
+                                                FROM {schema}.SPECIMEN s
+                                                INNER JOIN {schema}.part p ON p.irn = s.irn
+                                                INNER JOIN {schema}.determination d ON p.parent_irn = d.specimen_irn
+                                                WHERE NOT EXISTS (SELECT 1 FROM {schema}.determination WHERE specimen_irn = s.irn)
+                                                ORDER BY s.irn, filed_as DESC)
+                                        """.format(schema=keemu_schema)))
 
         # Get all existing resources keyed by name
-        existing_resources = {r['name']: r for r in dataset['resources']}
+        existing_datasets = {r['name']: r for r in package['resources']}
 
-        # Loop through
-        for resource_name in views_config.sections():
+        for name, dataset in datasets.items():
+
+            sys.stdout.write('Rebuilding dataset %s:' % name)
+            sys.stdout.flush()
 
             try:
 
-                resource_id = existing_resources[resource_name]['id']
+                resource_id = existing_datasets[name]['id']
 
             except KeyError:  # We don't have a datastore resource so create one
 
-                log.info('Creating datastore %s.' % resource_name)
+                log.info('Creating datastore %s.' % name)
 
                 datastore_params = {
                     'records': [],
                     'resource': {
-                        'package_id': dataset['id'],
-                        'name': resource_name,
-                        'description': views_config.get(resource_name, 'description'),
+                        'package_id': package['id'],
+                        'name': name,
+                        'description': dataset['description'],
                     }
                 }
 
@@ -161,7 +160,7 @@ class KEEMuCommand(cli.CkanCommand):
             else:
 
                 # Resource already exists - need to update last modified date
-                resource = existing_resources[resource_name]
+                resource = existing_datasets[name]
                 resource['last_modified'] = datetime.now()
                 logic.get_action('resource_update')(context, resource)
 
@@ -169,14 +168,11 @@ class KEEMuCommand(cli.CkanCommand):
 
                 # Delete & recreate the tables, building them from the ME EMu source tables
 
-                print 'Rebuilding dataset %s.' % resource_name
-
                 # Delete the existing table (in the datastore)
-                delete_sql = sqlalchemy.text(u'DROP TABLE IF EXISTS "%s"' % resource_id)
-                engine.execute(delete_sql)
+                engine.execute(sqlalchemy.text(u'DROP TABLE IF EXISTS "%s"' % resource_id))
 
                 # And recreate the table
-                select_sql = views_config.get(resource_name, 'sql').format(schema=keemu_schema)
+                select_sql = dataset['sql'].format(schema=keemu_schema)
                 create_sql = sqlalchemy.text('CREATE TABLE "{id}" AS {select_sql}'.format(id=resource_id, select_sql=select_sql))
                 engine.execute(create_sql)
 
@@ -190,4 +186,4 @@ class KEEMuCommand(cli.CkanCommand):
                 # Populate _full_text with all text fields
                 engine.execute(sqlalchemy.text(u'UPDATE "{id}" set _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY[{text_columns}], \' \'))'.format(id=resource_id, text_columns=text_columns)))
 
-
+                print ' SUCCESS'
