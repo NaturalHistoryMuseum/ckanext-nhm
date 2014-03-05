@@ -42,15 +42,13 @@ class NHMPlugin(p.SingletonPlugin):
                     # Add default view record controller
                     map.connect('record', '/dataset/%s/resource/{resource_id}/record/{record_id}' % pkg_id,
                                 controller='ckanext.nhm.controllers.keemu_record:KeEMuRecordController',
-                                action='view', id=package.name)
+                                action='view', package_name=package.name)
         except sqlalchemy.exc.ProgrammingError:
             # TODO - This breaks init db
             pass
 
-        # TODO: Rename id =>  dataset_id
-
         # Add default view record controller
-        map.connect('record', '/dataset/{id}/resource/{resource_id}/record/{record_id}',
+        map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
                     controller='ckanext.nhm.controllers.record:RecordController',
                     action='view')
 

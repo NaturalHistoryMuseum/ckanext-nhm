@@ -50,3 +50,4 @@ def keemu_render_datetime(datetime_):
     # Convert data to datetime
     datetime_ = datetime.combine(datetime_, datetime.min.time())
     return formatters.localised_nice_date(datetime_, show_date=True)
+

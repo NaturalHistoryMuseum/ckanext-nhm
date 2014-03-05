@@ -21,7 +21,9 @@ class RecordController(base.BaseController):
     """
     Controller for displaying an individual record
     """
-    def _load_record(self, package_name, resource_id, record_id):
+
+    @staticmethod
+    def _get_record(package_name, resource_id, record_id):
 
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
@@ -37,9 +39,15 @@ class RecordController(base.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
-        return get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
+        # Try and get the record
+        record = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
 
-    def view(self, id, resource_id, record_id):
+        if not record:
+            abort(404, _('Record not found'))
+
+        return record
+
+    def view(self, package_name, resource_id, record_id):
 
         """
         View an individual record
@@ -49,11 +57,7 @@ class RecordController(base.BaseController):
         :return: html
         """
         # Try and get the record
-        c.record_dict = self._load_record(id, resource_id, record_id)
-
-        if not c.record_dict:
-            abort(404, _('Record not found'))
-
+        c.record_dict = self._get_record(package_name, resource_id, record_id)
         return p.toolkit.render('record/view.html')
 
 
