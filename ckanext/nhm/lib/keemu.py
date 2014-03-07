@@ -30,9 +30,11 @@ from sqlalchemy import and_
 from ckanext.nhm.lib.db import get_datastore_session, CreateTableAs
 import csv
 import sqlalchemy
+import itertools
 
 INSTITUTION_CODE = 'NHMUK'
 IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
+IMAGE_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
 Base = declarative_base()
 
@@ -40,8 +42,17 @@ class Datastore(Base):
 
     __table__ = CatalogueModel.__table__
 
-    institution_code = column_property(literal_column("'%s'" % INSTITUTION_CODE).label('institution_code'))
-    global_unique_identifier = column_property(cast(CatalogueModel.__table__.c.irn, String))
+     # Store the images and URL directly in the datastore, so we don't have to hack around with the API
+    multimedia = column_property(
+        select([
+            func.array_to_string(
+                func.array_agg(
+                    # TODO: Add case to handle videos
+                    func.format(IMAGE_URL, catalogue_multimedia.c.multimedia_irn)), '; ')
+            ]
+        ).where(catalogue_multimedia.c.catalogue_irn == CatalogueModel.irn)
+    )
+
 
 
 class DwC(Base):
@@ -223,49 +234,114 @@ class DwC(Base):
     )
 
 
-def _keemu_datastore_query():
+def keemu_init_datastore(datastore_resource_id, query):
+    """
+    Create a table in the datastore using datastore query
+    If table exists, it will be destroyed
+    CREATE TABLE [datastore_table] as [SQL]
+    """
+    session = get_datastore_session()
+    # Drop the table if it already exists
+    session.execute(sqlalchemy.text(u'DROP TABLE IF EXISTS "%s"' % datastore_resource_id))
+    session.execute(CreateTableAs(datastore_resource_id, query))
+    # Hack to add _full_text field
+    # CKAN would handle this, but the API is slow when adding 3.5 million records
+    session.execute(u'ALTER TABLE "{table}" ADD COLUMN _full_text tsvector'.format(table=datastore_resource_id))
+    # Get all text fields we want to index
+    text_columns = session.execute(sqlalchemy.text(u'SELECT STRING_AGG(QUOTE_IDENT(column_name), \', \') FROM information_schema.columns WHERE table_name = \'{table}\' and data_type = \'character varying\''.format(table=datastore_resource_id))).scalar()
+    # Populate _full_text with all text fields
+    session.execute(sqlalchemy.text(u'UPDATE "{table}" set _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY[{text_columns}], \' \'))'.format(table=datastore_resource_id, text_columns=text_columns)))
+    session.commit()
+
+
+def _keemu_collection_datastore_query():
     """
     Convert data from KE EMu into flat datastore record
     """
 
     # Use a select so we can use CreateTableAs which requires Select
     # We also don't want any of the ORM functionality
-    # TODO: This query
-    query = select([
-        CatalogueModel.__table__,
-        SpecimenModel.__table__
-    ]).select_from(
-        CatalogueModel.__table__.join(SpecimenModel.__table__, SpecimenModel.__table__.c.irn==CatalogueModel.__table__.c.irn, True)
-    ).limit(1)
 
-    print query
+    specimen = SpecimenModel.__table__
+    site = SiteModel.__table__
+    collection_event = CollectionEventModel.__table__
+    botany = BotanySpecimenModel.__table__
 
+    # Create a list of columns we want to retrieve
+    columns = []
+
+    def _field_filter(field):
+        if 'irn' in field.name:
+            return False
+
+        if field.name.startswith('_'):
+            return False
+
+        return True
+
+    # Loop through all the fields, applying _field_filter to remove the fields we don't want
+    for table in [specimen, site, collection_event]:
+        columns.append(itertools.ifilter(_field_filter, getattr(table, 'c')))
+
+    columns = list(itertools.chain.from_iterable(columns))
+
+    # Add the IRN as the _id field
+    columns.append(specimen.c.irn.label('_id'))
+
+    # TODO: Add more columns here
+
+    # Chain all the columns together into one list
+    query = select(columns)
+
+    query = query.select_from(specimen
+                              .outerjoin(site, site.c.irn == specimen.c.site_irn)
+                              .outerjoin(collection_event, collection_event.c.irn == specimen.c.collection_event_irn)
+                              .outerjoin(botany, botany.c.irn == specimen.c.irn)
+                              )
+
+    # TODO: TEMP - Remove this
+    # query = query.limit(1)
     return query
 
+def _keemu_artefacts_datastore_query():
 
+    tbl_datastore = Datastore.__table__
+    tbl_artefact = ArtefactModel.__table__
 
-def keemu_datastore_create_table(datastore_table):
+    query = select([
+        tbl_datastore.c.irn.label('_id'),
+        Datastore.multimedia.label('Images'),
+        tbl_artefact.c.kind,
+        tbl_artefact.c.name,
+    ])
+
+    query = query.select_from(tbl_datastore.join(tbl_artefact, tbl_artefact.c.irn == tbl_datastore.c.irn))
+    return query
+
+def keemu_init_collection_datastore(datastore_resource_id):
     """
-    Create a table in the datastore using datastore query
-    CREATE TABLE [datastore_table] as [SQL]
+    Create table for the collection datastore
     """
+    query = _keemu_collection_datastore_query()
+    keemu_init_datastore(datastore_resource_id, query)
 
-    # _keemu_datastore_query()
+def keemu_init_artefacts_datastore(datastore_resource_id):
+    """
+    Create table for the artefacts datastore
+    """
+    query = _keemu_artefacts_datastore_query()
+    keemu_init_datastore(datastore_resource_id, query)
 
-    session = get_datastore_session()
-    # Drop the table if it already exists
-    session.execute(sqlalchemy.text(u'DROP TABLE IF EXISTS "%s"' % datastore_table))
-    session.execute(CreateTableAs(datastore_table, _keemu_datastore_query()))
-    # Hack to add _full_text field
-    # CKAN would handle this, but the API is slow when adding 3.5 million records
-    # session.execute(u'ALTER TABLE "{table}" ADD COLUMN _full_text tsvector'.format(table=datastore_table))
-    # # Get all text fields we want to index
-    # text_columns = session.execute(sqlalchemy.text(u'SELECT STRING_AGG(QUOTE_IDENT(column_name), \', \') FROM information_schema.columns WHERE table_name = \'{table}\' and data_type = \'character varying\''.format(table=datastore_table))).scalar()
-    # # # Populate _full_text with all text fields
-    # session.execute(sqlalchemy.text(u'UPDATE "{table}" set _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY[{text_columns}], \' \'))'.format(table=datastore_table, text_columns=text_columns)))
-    # session.commit()
+def keemu_update_collection_datastore(datastore_table):
+    """
+    Update collection datastore
+    """
+    pass
 
-def keemu_update_datastore(datastore_table):
+def keemu_update_artefact_datastore(datastore_table):
+    """
+    Update artefact datastore
+    """
     pass
 
 def _keemu_darwin_core_query():
