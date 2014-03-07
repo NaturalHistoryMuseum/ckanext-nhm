@@ -3,7 +3,9 @@ import ckan.logic as logic
 import ckan.lib.cli as cli
 import pylons
 import logging
-from ckanext.nhm.lib.keemu import keemu_datastore_create_table
+from ckanext.nhm.lib.keemu import keemu_init_collection_datastore, keemu_init_artefacts_datastore
+from itertools import chain
+import sys
 
 log = logging.getLogger(__name__)
 
@@ -32,92 +34,115 @@ class KEEMuCommand(cli.CkanCommand):
         self._load_config()
 
         cmd = self.args[0]
+        func = cmd.replace('-', '_')
 
-        if cmd in ['create-dataset', 'update-dataset']:
-
-            f = cmd.replace('-', '_')
-            result = getattr(self, f)()
-
-            if self.verbose:
-                print result
-
+        if not func.startswith('_') and hasattr(self, func):
+            getattr(self, func)()
         else:
             print 'Command "%s" not recognized' % (cmd,)
             print self.usage
             log.error('Command "%s" not recognized' % (cmd,))
             return
 
-    def create_dataset(self):
-
+    def _setup_datastore(self, package_params, resource_params):
         """
-        Initiate the KE EMu dataset - creating the dataset and copying the KE EMu data into it
+        Setup the CKAN datastore
+        Return the datastore_resource_id
         """
-
         # Set up API context
         user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
         context = {'model': model, 'session': model.Session, 'user': user['name'], 'extras_as_string': True}
-        keemu_dataset_name = pylons.config['nhm.keemu_dataset_name']
 
-        # FIXME: Temp
-        import random
-        import string
+        default_package_params = {
+            'author': None,
+            'author_email': None,
+            'license_id': u'other-open',
+            'maintainer': None,
+            'maintainer_email': None,
+            'resources': [],
+        }
 
-        char_set = string.ascii_lowercase + string.digits
-        keemu_dataset_name = ''.join(random.sample(char_set*6, 6))
+        #  Merge package params with default params
+        package_params = dict(chain(default_package_params.iteritems(), package_params.iteritems()))
 
-        # For the initial dataset
         try:
 
             # Try and load the KE EMu package
-            package = logic.get_action('package_show')(context, {'id': keemu_dataset_name})
-            # If package already exists, skip
-            return 'KE EMu dataset already exists: SKIPPING'
+            package = logic.get_action('package_show')(context, {'id': package_params['name']})
+            datastore_resource_id = package['resources'][0]['id']
 
         except logic.NotFound:
 
             # KE EMu package not found; create it
-
             # Error adds dataset_show to __auth_audit: remove it
             context['__auth_audit'] = []
-
-            package_params = {
-                'author': None,
-                'author_email': None,
-                'license_id': u'other-open',
-                'name': keemu_dataset_name,
-                'maintainer': None,
-                'maintainer_email': None,
-                'notes': u'Specimen records from the Natural History Museum\'s collection',
-                'resources': [],
-                'title': "Specimen catalogue",
-            }
-
-            # Try to create the dataset
             package = logic.get_action('package_create')(context, package_params)
 
-            # Create the datastore
+            resource_params['package_id'] = package['id']
+
             datastore_params = {
                 'records': [],
-                'resource': {
-                    'package_id': package['id'],
-                    'name': 'Collection',
-                    'description': 'Collection',
-                }
+                'resource': resource_params
             }
 
-            #  Try to create the datastore (this method associates a datastore table directly with a dataset
             datastore = logic.get_action('datastore_create')(context, datastore_params)
+            datastore_resource_id = datastore['resource_id']
 
-            # And create the datastore table
-            keemu_datastore_create_table(datastore['resource_id'])
+        return datastore_resource_id
 
-            print datastore['resource_id']
+    def init_collection_dataset(self):
 
+        """
+        Initiate the KE EMu datasets - creating the dataset and copying the KE EMu data into it
+        """
 
-        return 'Creating KE EMu dataset: SUCCESS'
+        # TODO: We need copy for this
+        package_params = {
+            'name': pylons.config['nhm.keemu_dataset_name'] + '4',
+            'notes': u'Specimen records from the Natural History Museum\'s collection',
+            'title': "Collection"
+        }
 
+        resource_params = {
+            'name': 'Collection',
+            'description': 'Collection',
+        }
 
-    def update_dataset(self):
+        dataset_resource_id = self._setup_datastore(package_params, resource_params)
+
+        print 'Using dataset resource: %s' % dataset_resource_id
+
+        keemu_init_collection_datastore(dataset_resource_id)
+
+        print 'Created KE EMu collection dataset: SUCCESS'
+
+    def init_artefact_dataset(self):
+
+        """
+        Initiate the KE EMu datasets - creating the dataset and copying the KE EMu data into it
+        """
+
+        # TODO: We need copy for this
+        package_params = {
+            'name': 'nhm-artefacts',
+            'notes': u'Artefacts from the Natural History Museum\'s collection',
+            'title': "Artefacts"
+        }
+
+        resource_params = {
+            'name': 'Artefacts',
+            'description': 'Artefacts',
+        }
+
+        dataset_resource_id = self._setup_datastore(package_params, resource_params)
+
+        print 'Using dataset resource: %s' % dataset_resource_id
+
+        keemu_init_artefacts_datastore(dataset_resource_id)
+
+        print 'Created KE EMu artefact dataset: SUCCESS'
+
+    def update_collection_dataset(self):
         """
         KE EMu update has run - update the CKAN dataset
         """
