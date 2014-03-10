@@ -446,7 +446,8 @@ def keemu_get_darwin_core(irn):
 
     query = _keemu_darwin_core_query()
     query = query.filter(CatalogueModel.irn == irn)
-    return query.one()
+    # Return record as a dict
+    return query.one().__dict__
 
 def keemu_export_darwin_core(outfile):
     """

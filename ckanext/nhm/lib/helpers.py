@@ -12,6 +12,9 @@ from webhelpers.number import format_data_size
 log = logging.getLogger(__name__)
 
 def get_site_statistics():
+    """
+    TEMP: Just to put some stats on the home page
+    """
     stats = {}
     stats['dataset_count'] = logic.get_action('package_search')(
         {}, {"rows": 1})['count']
@@ -26,6 +29,8 @@ def get_site_statistics():
 
 def record_display_name(record):
     # Get the name to display for a record
+    # TODO: Need to have a form for adding what field to use
+    # TODO: Remove
 
     return record.get('title', None) or record.get('name', None) or 'Record %s' % record.get('_id', 'Unknown')
 
