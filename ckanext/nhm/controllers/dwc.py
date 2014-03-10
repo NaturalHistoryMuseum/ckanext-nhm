@@ -18,10 +18,9 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
 
-
-class RecordController(base.BaseController):
+class DarwinCoreController(base.BaseController):
     """
-    Controller for displaying an individual record
+    Controller for displaying KE EMu records as DwC
     """
     def view(self, package_name, resource_id, record_id):
 
@@ -41,21 +40,16 @@ class RecordController(base.BaseController):
             # required for nav menu
             c.pkg = context['package']
             c.pkg_dict = c.package
-            c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
+            c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id, 'dwc': True})
+
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
-        # Try and use a template file based on the resource name
-        template_file = 'record/%s.html' % c.resource['name'].lower()
+        return p.toolkit.render('dwc/view.html')
 
-        print template_file
 
-        if not find_template(template_file):
-            # If we don;t have a specific template file, use the generic one
-            template_file = 'record/view.html'
 
-        return p.toolkit.render(template_file)
 
 
