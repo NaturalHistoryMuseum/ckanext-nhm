@@ -1,0 +1,62 @@
+{% from 'macros/record.html' import field_row %}
+{% extends "package/base.html" %}
+
+{% set rec = c.record_dict  %}
+{% set res = c.resource %}
+{% set pkg = c.pkg_dict or pkg_dict %}
+
+{% set record_name = h.record_display_name(c.record_dict) %}
+
+{% block head_extras -%}
+  {{ super() }}
+  <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_name }} - {{ g.site_title }}">
+{% endblock -%}
+
+{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{record_name}} {% endblock %}
+
+{% block breadcrumb_content_selected %}{% endblock %}
+
+{% block breadcrumb_content %}
+  {{ super() }}
+  <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
+  <li class="active"><a href="">{{ record_name|truncate(30) }}</a></li>
+{% endblock %}
+
+{% block pre_primary %}
+    <section class="module module-resource">
+        <div class="module-content">
+            <div class="actions">
+                <ul>
+                    <li><a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"><i class="icon-download"></i> {{ _('Download') }}</a></li>
+                </ul>
+            </div>
+
+            <h1 class="page-heading">DWC{{ record_name|truncate(50) }}</h1>
+
+            <div class="record-content">
+            {% block record_content %}
+
+                <p>DWC View</p>
+
+            {% endblock %}
+
+            </div>
+
+        </div>
+    </section>
+{% endblock %}
+
+{% block primary_content %}
+    {% block record_additional_information %}
+
+
+    {% endblock %}
+{% endblock %}
+
+{% block secondary_content %}
+
+  {% block resource_license %}
+    {% snippet "snippets/social.html" %}
+  {% endblock %}
+
+{% endblock %}
