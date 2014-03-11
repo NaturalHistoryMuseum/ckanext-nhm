@@ -4,10 +4,10 @@ import ckanext.nhm.logic.schema as nhm_schema
 import ckan.logic as logic
 import ckan.model as model
 from ckan.common import c
-from ckanext.nhm.lib.keemu import keemu_get_darwin_core
+from ckan.logic.auth import get_resource_object
+from ckanext.nhm.lib.keemu import KeEMuSpecimensDatastore
+from ckanext.nhm.logic import NotDarwinCore
 
-
-NotFound = logic.NotFound
 get_action = logic.get_action
 _get_or_bust = logic.get_or_bust
 _validate = ckan.lib.navl.dictization_functions.validate
@@ -28,10 +28,16 @@ def record_get(context, data_dict):
     if errors:
         raise p.toolkit.ValidationError(errors)
 
-    if data_dict.get('dwc', True):
-        # Retrieve DwC record
-        # TODO: Return an error if dataset is not a DwC one
-        record = keemu_get_darwin_core(data_dict['record_id'])
+    if data_dict.get('dwc', False):
+
+        # Only KE EMu specimen records are DwC enabled - ensure this resource has the correct resource_type
+        resource = get_resource_object(context, {'id': data_dict['resource_id']})
+
+        if not resource.resource_type == KeEMuSpecimensDatastore.resource_type: raise NotDarwinCore("No Darwin Core record")
+
+        specimen_datastore = KeEMuSpecimensDatastore()
+        record = specimen_datastore.dwc_get_record(data_dict['record_id'])
+
     else:
 
         # Retrieve datastore record
