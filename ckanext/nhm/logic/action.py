@@ -8,9 +8,11 @@ from ckan.logic.auth import get_resource_object
 from ckanext.nhm.lib.keemu import KeEMuSpecimensDatastore
 from ckanext.nhm.logic import NotDarwinCore
 
+NotFound = logic.NotFound
 get_action = logic.get_action
 _get_or_bust = logic.get_or_bust
 _validate = ckan.lib.navl.dictization_functions.validate
+
 
 def record_get(context, data_dict):
 
