@@ -15,9 +15,7 @@ def get_datastore_session():
     """
     Get a datastore session to use with SQLA ORM
     """
-    # TODO: Change this
-    # data_dict = {'connection_url': pylons.config['ckan.datastore.write_url']}
-    data_dict = {'connection_url': 'postgresql://ckan_default:asdf@localhost/datastore_default'}
+    data_dict = {'connection_url': pylons.config['ckan.datastore.write_url']}
     engine = _get_engine(data_dict)
     session = sessionmaker(bind=engine)
     return session()
