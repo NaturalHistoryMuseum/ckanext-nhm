@@ -43,7 +43,7 @@ class RecordController(base.BaseController):
             c.pkg = context['package']
             c.pkg_dict = c.package
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
-        except (NotFound, NotDarwinCore):  # Should never be DwC
+        except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
