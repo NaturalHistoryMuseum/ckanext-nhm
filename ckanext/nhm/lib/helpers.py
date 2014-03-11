@@ -12,9 +12,7 @@ from webhelpers.number import format_data_size
 log = logging.getLogger(__name__)
 
 def get_site_statistics():
-    """
-    TEMP: Just to put some stats on the home page
-    """
+    # TODO: TEMP: Just to put some stats on the home page
     stats = {}
     stats['dataset_count'] = logic.get_action('package_search')(
         {}, {"rows": 1})['count']
