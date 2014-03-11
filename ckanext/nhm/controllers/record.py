@@ -3,7 +3,7 @@ import ckan.logic as logic
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins as p
-from ckan.common import OrderedDict, _, json, request, c, g, response
+from ckan.common import _, c
 import logging
 from ckan.lib.render import find_template
 from ckanext.nhm.logic import NotDarwinCore
@@ -43,10 +43,8 @@ class RecordController(base.BaseController):
             c.pkg = context['package']
             c.pkg_dict = c.package
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
-        except NotFound:
+        except (NotFound, NotDarwinCore):  # Should never be DwC
             abort(404, _('Resource not found'))
-        except NotDarwinCore:
-            abort(404, _('Not a DarwinCore record'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
