@@ -6,6 +6,7 @@ import ckan.plugins as p
 from ckan.common import OrderedDict, _, json, request, c, g, response
 import logging
 from ckan.lib.render import find_template
+from ckanext.nhm.logic import NotDarwinCore
 
 log = logging.getLogger(__name__)
 
@@ -44,13 +45,13 @@ class RecordController(base.BaseController):
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
         except NotFound:
             abort(404, _('Resource not found'))
+        except NotDarwinCore:
+            abort(404, _('Not a DarwinCore record'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         # Try and use a template file based on the resource name
         template_file = 'record/%s.html' % c.resource['name'].lower()
-
-        print template_file
 
         if not find_template(template_file):
             # If we don;t have a specific template file, use the generic one
