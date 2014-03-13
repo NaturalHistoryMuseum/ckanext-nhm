@@ -4,7 +4,8 @@
 Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
-from ke2sql.model.keemu import CatalogueModel, SpecimenModel, OtherNumbersModel, SiteModel, CollectionEventModel, TaxonomyModel, SexStageModel, BotanySpecimenModel, ArtefactModel, IndexLotModel
+from ke2sql.model.keemu import *
+
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia
 from ke2sql.model.views import SpecimenTaxonomyView
 from sqlalchemy.ext.declarative import declarative_base
@@ -146,8 +147,8 @@ class KeEMuDatastore(object):
         """
         Update the datastore
         """
-        # TODO: Update
-        print 'update'
+        # TODO: Update - at the moment this just drops and recreates
+        self.create()
 
 
 class KeEMuSpecimensDatastore(KeEMuDatastore):
@@ -339,6 +340,18 @@ class KeEMuIndexlotDatastore(KeEMuDatastore):
 
         tbl_datastore = Datastore.__table__
         tbl_indexlot = IndexLotModel.__table__
+        tbl_indexlot_material = IndexLotMaterialModel.__table__
+
+
+        subq_material = select([
+            func.array(
+                tbl_indexlot_material.c.count,
+                tbl_indexlot_material.c.sex,
+                tbl_indexlot_material.c.types,
+                tbl_indexlot_material.c.stage,
+                tbl_indexlot_material.c.primary_type_number
+            )
+        ]).where(tbl_indexlot_material.c.irn == CatalogueModel.irn)
 
         query = select([
             tbl_datastore.c.irn.label('_id'),
@@ -348,6 +361,7 @@ class KeEMuIndexlotDatastore(KeEMuDatastore):
             tbl_indexlot.c.media.label('Media'),
             tbl_indexlot.c.kind_of_material.label('Kind of material'),
             tbl_indexlot.c.kind_of_media.label('Kind of media'),
+            subq_material.label('Material detail')
         ])
 
         query = query.select_from(tbl_datastore.join(tbl_indexlot, tbl_indexlot.c.irn == tbl_datastore.c.irn))
@@ -581,7 +595,21 @@ class DwC(Base):
 
 
 if __name__ == '__main__':
-    pass
-    # TODO: Remove
+
+    from sqlalchemy.orm import sessionmaker
+    from ckanext.datastore.db import _get_engine
+    data_dict = {'connection_url': 'postgresql://ckan_default:asdf@localhost/datastore2'}
+    engine = _get_engine(data_dict)
+    session = sessionmaker(bind=engine)()
+
+    datastore = KeEMuIndexlotDatastore()
+    q = datastore.datastore_query()
+    q = q.where(IndexLotModel.__table__.c.irn == 1148875)
+    q = q.limit(1)
+
+    result = session.execute(q)
+
+    print result.fetchall()
+
     # r = keemu_get_darwin_core(1)
     # print r
