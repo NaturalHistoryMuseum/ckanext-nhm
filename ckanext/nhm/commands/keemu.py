@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 class KEEMuCommand(cli.CkanCommand):
     '''
     Commands:
-        paster --plugin=ckanext-nhm keemu build-dataset -c /etc/ckan/default/development.ini
+        paster --plugin=ckanext-nhm keemu create-datasets -c /etc/ckan/default/development.ini
 
     Where:
         <config> = path to your ckan config file
@@ -31,9 +31,9 @@ class KEEMuCommand(cli.CkanCommand):
 
         cmd = self.args[0]
 
-        if cmd in ['create-datasets', 'update-datasets']:
+        if cmd == 'create-datasets':
 
-            #  Method to run on the datastore cls - create or update
+            #  Method to run on the datastore cls - create
             method = cmd.replace('-datasets', '')
 
             for cls in KeEMuDatastore.__subclasses__():
