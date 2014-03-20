@@ -4,6 +4,7 @@
 Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
+import sys
 from ke2sql.model.keemu import *
 
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia
@@ -19,7 +20,7 @@ from sqlalchemy.sql.expression import cast
 from sqlalchemy import literal_column
 from sqlalchemy import case
 from sqlalchemy import and_
-from ckanext.nhm.lib.db import get_datastore_session, CreateTableAs
+from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect
 import csv
 import sqlalchemy
 import itertools
@@ -27,13 +28,26 @@ import abc
 import ckan.model as model
 import ckan.logic as logic
 from itertools import chain
+from sqlalchemy import union_all
+import inspect
+from collections import OrderedDict
+from sqlalchemy.schema import MetaData
+from sqlalchemy import desc
 
 # TODO: replace / add to DwC
 INSTITUTION_CODE = 'NHMUK'
 IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
 IMAGE_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
+MULTIMEDIA_URL = 'http://URL/%s'
+
+VIEW = 'VIEW'
+MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
+TABLE = 'TABLE'
 
 Base = declarative_base()
+
+# TODO: create_base_tables()
+# The base table has all fields, so view is base.*: overkill?
 
 class KeEMuDatastore(object):
     """
@@ -56,6 +70,12 @@ class KeEMuDatastore(object):
     def __init__(self):
         self.session = get_datastore_session()
 
+
+        # data_dict = {'connection_url': 'postgresql://ckan_default:asdf@localhost/datastore_default'}
+        #
+        # self.engine = _get_engine(data_dict)
+        # self.session = sessionmaker(bind=self.engine)
+
     @abc.abstractproperty
     def name(self):
         return None
@@ -75,12 +95,58 @@ class KeEMuDatastore(object):
         """
         return None
 
+    def get_views(self):
+        return []
+
+    def view_exists(self, view_name):
+        return self.session.execute("SELECT EXISTS (select 1 from pg_class where relname = '{view_name}')".format(view_name=view_name)).scalar()
+
+    def create_views(self):
+
+        for view in self.get_views():
+
+            # Does this object already exist?
+            if self.view_exists(view['name']):
+
+                if view['type'] is VIEW:
+                    # If it's just a view and already exists, do nothing
+                    print 'View %s already exists: SKIPPING' % view['name']
+                    continue
+
+                elif view['type'] is MATERIALIZED_VIEW:
+                    # If the mat view already exists, refresh it
+                    print 'Materialized view %s already exists: REFRESHING' % view['name']
+                    self.session.execute(text('REFRESH MATERIALIZED VIEW {view_name}'.format(view_name=view['name'])))
+                    continue
+
+                else:
+                    # Drop the table
+                    self.session.execute('DROP TABLE IF EXISTS {view_name}'.format(view_name=view['name']))
+
+            print 'Creating view %s' % view['name']
+
+            c = CreateAsSelect(view['name'], view['func'](), view['type'])
+            self.session.execute(c)
+
+            print 'Adding index to view %s' % view['name']
+
+            # And add a primary key for materialized and view
+            if view['type'] is MATERIALIZED_VIEW:
+                self.session.execute(text('CREATE UNIQUE INDEX {view_name}_irn_idx ON {view_name} (irn)'.format(view_name=view['name'])))
+            elif view['type'] is TABLE:
+                self.session.execute(text('ALTER TABLE {view_name} ADD PRIMARY KEY (irn)'.format(view_name=view['name'])))
+
+            print 'Creating view %s: SUCCESS' % view['name']
+
+            self.session.commit()
+
     def create_package(self, context):
         """
         Setup the CKAN datastore
-        Return the datastore_resource_id
+        Return the package
+        @param context:
+        @return: package
         """
-
         #  Merge package params with default params
         params = dict(chain(self.default_package_params.iteritems(), self.package.iteritems()))
 
@@ -135,36 +201,54 @@ class KeEMuDatastore(object):
         print 'Creating datastore %s' % resource_id
 
         # Drop the table created by CKAN - we're going to replace it with a Materialised view
-        # CHeck if table exists before dropping - need to manually check existence, as we will get an error if it's already a view
+        # Check if table exists before dropping
+        # Need to manually check existence, as we will get an error if it's already a view
         if self.session.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '{resource_id}')".format(resource_id=resource_id)).scalar():
             self.session.execute('DROP TABLE "{resource_id}"'.format(resource_id=resource_id))
 
-        # Delete the view if it exists
-        self.session.execute('DROP MATERIALIZED VIEW IF EXISTS "{resource_id}"'.format(resource_id=resource_id))
-
-        # Create some types used across queries
+        # Create some types used across all queries
         if not self.session.execute('SELECT EXISTS (select 1 from pg_type where typname = \'multimedia_t\')').scalar():
             self.session.execute('CREATE TYPE multimedia_t AS (url int, mime_type text, title text)')
 
-        # Create the view
-        self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS ({query})'.format(resource_id=resource_id, query=self.datastore_query()))
+        # Create any views need to build the query
+        self.create_views()
 
-        # Create index on the view
-        self.session.execute('CREATE UNIQUE INDEX "{resource_id}_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id))
+        # The source table which will be behind the materialised view
+        source_table = '_source_%s' % resource_id
 
-        # TODO: Shall we add other indexes? Scientific name?
+        self.session.execute('DROP TABLE IF EXISTS "{source_table}"'.format(source_table=source_table))
+
+        c = CreateAsSelect(source_table, self.datastore_query())
+        self.session.execute(c)
+
+        print 'SUCCESS'
+
+        # TODO: Full text
+        # TODO: DwC Dates
+        # TODO: Check all data and fields
+        # TODO: Add more to dynamic properties
+
+        # At this point, all of the source tables are in place
+        # So create or refresh the materialised view
+        if self.view_exists(resource_id):
+
+            # Just refresh the materialised view
+            # This was there will be no downtime for the front end user
+            # Table will be unresponsive for the ~1 second it takes to refresh
+            self.session.execute(text('REFRESH MATERIALIZED VIEW "{resource_id}"'.format(resource_id=resource_id)))
+
+        else:
+
+            # Create the view
+            self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS (SELECT * FROM {source_table})'.format(resource_id=resource_id, source_table=source_table))
+            # Create index on the view
+            self.session.execute('CREATE UNIQUE INDEX "{resource_id}_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id))
+
+        # TODO: Add other indexes? Scientific name?
 
         self.session.commit()
 
         print 'Created datastore %s: SUCCESS' % self.name
-
-    def update(self):
-        """
-        Update the datastore
-        """
-        # TODO: Update - at the moment this just drops and recreates. Need to refresh mat views
-        self.create()
-
 
 
 class KeEMuSpecimensDatastore(KeEMuDatastore):
@@ -178,349 +262,522 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'title': "Collection"
     }
 
-    def datastore_query(self):
+    views = {}
 
-        # TODO: Create tables in the background, then create view. Minimal downtime
-        # TODO: Move on complete determ stuff to here too.
+    def get_views(self):
 
-        # Build a table containing all specimen data
+        return [
+            {
+                'name': '_geological_context_v',
+                'func': self._geological_context_view,
+                'type': TABLE  # Use a table where we want to add individual fields - primary key can be used in group clause
+            },
+            {
+                'name': '_associated_records_v',
+                'func': self._associated_records_view,
+                'type': VIEW
+            },
+            {
+                'name': '_taxonomy_v',
+                'func': self._taxonomy_view,
+                'type': TABLE
+            },
+            {
+                'name': '_dynamic_properties_v',
+                'func': self._dynamic_properties_view,
+                'type': TABLE
+            },
+        ]
 
-        # create materialized view v_specimen_type as select irn, type from catalogue c where exists (select 1 from specimen where irn = c.irn);
+    def datastore_query(self, force_rebuild=False):
 
-        # CREATE UNIQUE INDEX irn_idx ON v_specimen_type (irn);
-        # CREATE INDEX type_idx ON v_specimen_type (type);
+        q = self._dwc_query()
 
-        # models = [SpecimenModel, PartModel, DNAPrepModel, ParasiteCardModel, EggModel, FieldNotebookModel, NestModel, SilicaGelSpecimenModel, BotanySpecimenModel, PalaeontologySpecimenModel, MineralogySpecimenModel, MeteoritesSpecimenModel]
+        # Add the dynamic properties field and joins
+        # Needs to go here to prevent self referential queries in _dwc_query
+        metadata = MetaData(self.session.bind)
+        _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
+        q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
+        q = q.column(_dynamic_properties_v.c.properties)
+        q = q.group_by(_dynamic_properties_v.c.irn)
 
-        from sqlalchemy.orm import class_mapper
+        return q
 
-        # for model in models:
-        #     for col in model.__table__.columns:
-        #
-        #         if col.key in ['irn']:
-        #             continue
-        #
-        #         print '%s,' % col
+    def _dynamic_properties_view(self):
 
-        # columns = list(itertools.chain.from_iterable(model.__table__.columns for model in models))
-        #
-        # for c in columns:
-        #     print c.name
-        #
-        # raise SystemExit
+        qs = []
 
-        # TODO: alter user bubba set work_mem='500MB';
+        for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
 
+        # for model in itertools.chain([SpecimenModel]):
 
-        schema = 'keemu'
+            if model is StubModel:
+                continue
 
-        # Build a table with the current determination to use for each specimen
-        # For part specimens, uses the parent record
+            # Get all columns not mapped to dwc
+            columns = self.dwc_get_unmapped(model)
 
-        print 'Creating tmp_specimen_taxonomy table'
+            # Get a list of all tables
+            # Specimen, Site and Collection events will be handled separately
+            tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__]])
 
-        self.session.execute(text('DROP TABLE IF EXISTS {schema}.tmp_specimen_taxonomy'.format(schema=schema)))
+            # Create a type name based on the tables used (site and collection event are universal so are excluded)
+            # CREATE TYPE name_t AS (f1 int, f2 text, f3 text)
+            type_name = '_'.join(t.name for t in tables) + '_ty'
+            type_cols = ', '.join('%s %s' % (c.name, c.type) for c in columns)
 
-        # TODO: This should only select the first determination. Limit isn't working
-        self.session.execute(text(
-            """
-            CREATE TABLE {schema}.tmp_specimen_taxonomy AS
-                    (SELECT DISTINCT ON(d.specimen_irn) specimen_irn, taxonomy_irn
-                    FROM {schema}.determination d
-                    INNER JOIN keemu.specimen s ON s.irn = d.specimen_irn
-                    ORDER BY d.specimen_irn, filed_as DESC LIMIT 1)
-                UNION
-                    (SELECT DISTINCT ON(s.irn) s.irn as specimen_irn, taxonomy_irn
-                    FROM {schema}.SPECIMEN s
-                    INNER JOIN keemu.part p ON p.irn = s.irn
-                    INNER JOIN keemu.determination d ON p.parent_irn = d.specimen_irn
-                    WHERE NOT EXISTS (SELECT 1 FROM keemu.determination WHERE specimen_irn = s.irn)
-                    ORDER BY s.irn, filed_as DESC LIMIT 1)
-            """.format(schema=schema)
-        ))
+            # Drop type if it exists - this code is only called on rebuilding, so no overhead
+            self.session.execute('DROP TYPE IF EXISTS {type_name}'.format(type_name=type_name))
+            self.session.execute('CREATE TYPE {type_name} AS ({type_cols})'.format(type_name=type_name, type_cols=type_cols))
 
-        # Add primary key
-        self.session.execute(text('ALTER TABLE {schema}.tmp_specimen_taxonomy ADD PRIMARY KEY (specimen_irn)'.format(schema=schema)))
+            q = select([
+                SpecimenModel.__table__.c.irn,
+                func.array_to_json(
+                    func.array_agg(
+                        # Doesn't seem to be an easy way to specify row::type, so am just using a literal
+                        literal_column('row(%s)::%s' % (', '.join('%s' % c for c in columns), type_name))
+                    )
+                ).label('properties')
+            ])
 
-        print 'Creating tmp_specimen table'
+            # Build select from (for the joins)
+            select_from = SpecimenModel.__table__
+            for table in tables:
+                select_from = select_from.join(table, table.c.irn == SpecimenModel.__table__.c.irn)
 
-        self.session.execute('DROP TABLE IF EXISTS {schema}.tmp_specimen'.format(schema=schema))
+            # Add joins to events and sites
+            select_from = select_from.outerjoin(SiteModel, SiteModel.__table__.c.irn == SpecimenModel.__table__.c.site_irn)
+            select_from = select_from.outerjoin(CollectionEventModel, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
 
-        # Create a table containing all specimen data
-        self.session.execute(
-            """
-            CREATE TABLE {schema}.tmp_specimen AS
-                (SELECT
-                    specimen.irn as _id,
-                    specimen.collection_department,
-                    specimen.collection_sub_department,
-                    specimen.specimen_unit,
-                    specimen.curation_unit,
-                    specimen.catalogue_number,
-                    specimen.preservation,
-                    specimen.verbatim_label_data,
-                    specimen.donor_name,
-                    specimen.date_catalogued,
-                    specimen.kind_of_collection,
-                    specimen.specimen_count,
-                    specimen.preparation,
-                    specimen.preparation_type,
-                    specimen.weight,
-                    specimen.registration_code,
-                    specimen.type_status,
-                    specimen.date_identified_day,
-                    specimen.date_identified_month,
-                    specimen.date_identified_year,
-                    specimen.identification_qualifier,
-                    specimen.identified_by,
-                    specimen.site_irn,
-                    specimen.collection_event_irn,
+            q = q.select_from(select_from)
 
-                    part.parent_irn,
-                    part.part_type,
+            # Only select a particular type - this does mean more and a slower query - but ensures data is correct
+            q = q.where(CatalogueModel.__table__.c.type == model.__mapper_args__['polymorphic_identity'])
 
-                    dna_preparation.extraction_method,
-                    dna_preparation.resuspended_in,
-                    dna_preparation.total_volume,
+            q = q.group_by(SpecimenModel.__table__.c.irn)
 
-                    parasite_card.barcode,
+            # Create list of queries we'll union_all later
+            qs.append(q)
 
-                    egg.clutch_size,
-                    egg.set_mark,
+        return union_all(*qs)
 
-                    nest.nest_shape,
-                    nest.nest_site,
+    @staticmethod
+    def _geological_context_view():
+        """
+        Create a view of DwC geological context fields
+        Based on stratigraphic_unit stratigraphy_stratigraphic_unit
+        """
+        contexts = OrderedDict()
+        contexts['earliestEonOrLowestEonothem'] = {'direction': 'from', 'stratigraphic_type': 'eon'}
+        contexts['latestEonOrHighestEonothem'] = {'direction': 'to', 'stratigraphic_type': 'eon'}
 
-                    silica_gel.population_code,
+        contexts['earliestEraOrLowestErathem'] = {'direction': 'from', 'stratigraphic_type': 'era'}
+        contexts['earliestEraOrLowestErathem'] = {'direction': 'to', 'stratigraphic_type': 'era'}
 
-                    botany.exsiccati,
-                    botany.exsiccati_number,
-                    botany.site_description,
-                    botany.plant_description,
-                    botany.habitat_verbatim,
-                    botany.cultivated,
-                    botany.plant_form,
+        contexts['earliestPeriodOrLowestSystem'] = {'direction': 'from', 'stratigraphic_type': 'period'}
+        contexts['latestPeriodOrHighestSystem'] = {'direction': 'to', 'stratigraphic_type': 'period'}
 
-                    palaeontology.catalogue_description,
-                    palaeontology.stratigraphy_irn,
+        contexts['earliestEpochOrLowestSeries'] = {'direction': 'from', 'stratigraphic_type': 'epoch'}
+        contexts['latestEpochOrHighestSeries'] = {'direction': 'to', 'stratigraphic_type': 'epoch'}
 
-                    mineralogy.date_registered,
-                    mineralogy.identification_as_registered,
-                    mineralogy.occurrence,
-                    mineralogy.commodity,
-                    mineralogy.deposit_type,
-                    mineralogy.texture,
-                    mineralogy.identification_variety,
-                    mineralogy.identification_other,
-                    mineralogy.host_rock,
+        contexts['earliestEonOrLowestEonothem'] = {'direction': 'from', 'stratigraphic_type': 'eon'}
+        contexts['latestEonOrHighestEonothem'] = {'direction': 'to', 'stratigraphic_type': 'eon'}
 
-                    meteorite.meteorite_type,
-                    meteorite.meteorite_group,
-                    meteorite.chondrite_achondrite,
-                    meteorite.meteorite_class,
-                    meteorite.pet_type,
-                    meteorite.pet_sub_type,
-                    meteorite.recovery,
-                    meteorite.recovery_date,
-                    meteorite.recovery_weight
-                FROM {schema}.specimen
-                    LEFT OUTER JOIN {schema}.part ON part.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.dna_preparation ON dna_preparation.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.parasite_card ON parasite_card.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.egg ON egg.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.nest ON nest.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.silica_gel ON silica_gel.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.botany ON botany.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.palaeontology ON palaeontology.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.mineralogy ON mineralogy.irn = specimen.irn
-                    LEFT OUTER JOIN {schema}.meteorite ON meteorite.irn = specimen.irn
-                )
-            """.format(schema=schema))
+        contexts['earliestAgeOrLowestStage'] = {'direction': 'from', 'stratigraphic_type': 'stage'}
+        contexts['latestAgeOrHighestStage'] = {'direction': 'to', 'stratigraphic_type': 'stage'}
 
-        print 'Indexing tmp_specimen table'
+        # TODO: There are other zones
+        contexts['lowestBiostratigraphicZone'] = {'direction': 'from', 'stratigraphic_type': 'zone'}
+        contexts['highestBiostratigraphicZone'] = {'direction': 'to', 'stratigraphic_type': 'zone'}
 
-        # Create index on tmp_specimen
-        self.session.execute('ALTER TABLE {schema}.tmp_specimen ADD PRIMARY KEY (_id)'.format(schema='keemu'))
+        contexts['group'] = {'stratigraphic_type': 'group'}
+        contexts['formation'] = {'stratigraphic_type': 'formation'}
+        contexts['member'] = {'stratigraphic_type': 'member'}
+        contexts['bed'] = {'stratigraphic_type': 'bed'}
 
-        # Create types
-        if not self.session.execute('SELECT EXISTS (select 1 from pg_type where typname = \'other_numbers_t\')').scalar():
+        cols = [PalaeontologySpecimenModel.irn]
 
-            self.session.execute(
-                """
-                CREATE TYPE other_numbers_t
-                AS (kind text, value text)
-                """
-            )
+        for label, params in contexts.items():
 
-        if not self.session.execute('SELECT EXISTS (select 1 from pg_type where typname = \'sex_stage_t\')').scalar():
+            sub_q = select([
+                func.array_to_string(
+                    func.array_agg(
+                        StratigraphicUnitModel.name
+                    ), '; ')
+            ])
 
-            self.session.execute(
-                """
-                CREATE TYPE sex_stage_t
-                AS (count int, sex text, stage text)
-                """
-            )
+            sub_q = sub_q.select_from(StratigraphicUnitModel.__table__.join(StratigraphicUnitAssociation.__table__, StratigraphicUnitModel.__table__.c.id == StratigraphicUnitAssociation.__table__.c.unit_id))
 
-        if not self.session.execute('SELECT EXISTS (select 1 from pg_type where typname = \'host_parasite_t\')').scalar():
+            sub_q = sub_q.where(literal_column('%s=%s' % (StratigraphicUnitAssociation.__table__.c.stratigraphy_irn, PalaeontologySpecimenModel.__table__.c.stratigraphy_irn)))
 
-            self.session.execute(
-                """
-                CREATE TYPE host_parasite_t
-                AS (parasite_host text, stage text, irn int)
-                """
-            )
+            for key, value in params.items():
+                sub_q = sub_q.where(getattr(StratigraphicUnitAssociation, key) == value)
 
-        # Create the query for the materialised view
-        # I'm not using the full determination - just the current to keep this a little bit simpler
-        # There are still a lot of fields, but many will be hidden in the front end - and only visible fields will downloaded
-        query = """
-                SELECT tmp.*,
-                    t.*,
-                    si.continent,
-                    si.country,
-                    si.state_province,
-                    si.county,
-                    si.locality,
-                    si.vice_county,
-                    si.parish,
-                    si.town,
-                    si.nearest_named_place,
-                    si.ocean,
-                    si.island_group,
-                    si.island,
-                    si.lake,
-                    si.river_basin,
-                    si.geodetic_datum,
-                    si.georef_method,
-                    si.latitude,
-                    si.decimal_latitude,
-                    si.longitude,
-                    si.decimal_longitude,
-                    si.minimum_elevation_in_meters,
-                    si.maximum_elevation_in_meters,
-                    si.minimum_depth_in_meters,
-                    si.maximum_depth_in_meters,
-                    si.mineral_complex,
-                    si.mine,
-                    si.mining_district,
-                    si.tectonic_province,
-                    si.geology_region,
-                    ce.date_collected_from,
-                    ce.time_collected_from,
-                    ce.date_collected_to,
-                    ce.time_collected_to,
-                    ce.collection_event_code,
-                    ce.collection_method,
-                    ce.depth_from_metres,
-                    ce.depth_to_metres,
-                    ce.expedition_start_date,
-                    ce.expedition_name,
-                    ce.vessel_name,
-                    ce.vessel_type,
-                    ce.collector_name,
-                    ce.collector_number,
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(mm.irn, mm.mime_type, mm.title)::multimedia_t
-                            )
-                        )
-                    ) as "multimedia",
-                    ARRAY_AGG(car.associated_irn) AS associated,
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(o.kind, o.value)::other_numbers_t
-                            )
-                        )
-                    ) as "other_numbers",
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(ss.count, ss.sex, ss.stage)::sex_stage_t
-                            )
-                        )
-                    ) as "sex_stage",
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(hp.parasite_host, hp.stage, hp_t.irn)::host_parasite_t
-                            )
-                        )
-                    ) as "host_parasite"
-                FROM {schema}.tmp_specimen tmp
-                LEFT OUTER JOIN {schema}.site si ON si.irn = tmp.site_irn
-                LEFT OUTER JOIN {schema}.collection_event ce ON ce.irn = tmp.collection_event_irn
-                LEFT OUTER JOIN {schema}.catalogue_multimedia cmm ON cmm.catalogue_irn = tmp._id
-                  LEFT OUTER JOIN {schema}.multimedia mm ON mm.irn = cmm.multimedia_irn
-                LEFT OUTER JOIN {schema}.catalogue_associated_record car ON car.catalogue_irn = tmp._id
-                LEFT OUTER JOIN {schema}.other_numbers o ON o.irn = tmp._id
-                LEFT OUTER JOIN {schema}.specimen_sex_stage sss ON sss.specimen_irn = tmp._id
-                  LEFT OUTER JOIN {schema}.sex_stage ss ON ss.id = sss.sex_stage_id
-                LEFT OUTER JOIN {schema}.tmp_specimen_taxonomy tmp_t ON tmp_t.specimen_irn = tmp._id
-                  LEFT OUTER JOIN {schema}.taxonomy t ON t.irn = tmp_t.taxonomy_irn
-                LEFT OUTER JOIN {schema}.host_parasite hp ON hp.parasite_card_irn = tmp._id
-                  LEFT OUTER JOIN {schema}.taxonomy hp_t ON hp_t.irn = hp.taxonomy_irn
-                LEFT OUTER JOIN {schema}.stratigraphy s ON s.irn = tmp.stratigraphy_irn
-                  LEFT OUTER JOIN {schema}.stratigraphy_stratigraphic_unit ssu ON ssu.stratigraphy_irn = s.irn
-                    LEFT OUTER JOIN {schema}.stratigraphic_unit su ON su.id = ssu.unit_id
-                GROUP BY tmp._id, si.irn, ce.irn, t.irn
-                """.format(schema=schema)
+            cols.append(sub_q.label(label))
 
-        return query
+        q = select(cols)
 
-    def dwc_query(self):
+        return q
+
+    @staticmethod
+    def _associated_records_view():
+        """
+        Union associated records, and both ends of the part / parent relationship
+        """
+        qs = [
+            select([
+                catalogue_associated_record.c.catalogue_irn.label('irn'),
+                catalogue_associated_record.c.associated_irn.label('associated_irn')
+            ]).distinct(),
+            select([
+                PartModel.__table__.c.irn.label('irn'),
+                PartModel.__table__.c.parent_irn.label('associated_irn'),
+            ]).where(PartModel.__table__.c.parent_irn != None).distinct(),
+            select([
+                PartModel.__table__.c.parent_irn.label('irn'),
+                PartModel.__table__.c.irn.label('associated_irn'),
+            ]).where(PartModel.__table__.c.parent_irn != None).distinct()
+        ]
+
+        return union_all(*qs)
+
+    @staticmethod
+    def _taxonomy_view():
+
+        q = select([
+            Determination.specimen_irn.label('irn'),
+            TaxonomyModel.scientific_name,
+            TaxonomyModel.kingdom,
+            TaxonomyModel.phylum,
+            TaxonomyModel.taxonomic_class,
+            TaxonomyModel.order,
+            TaxonomyModel.suborder,
+            TaxonomyModel.family,
+            TaxonomyModel.subfamily,
+            TaxonomyModel.genus,
+            TaxonomyModel.subgenus,
+            TaxonomyModel.species,
+            TaxonomyModel.subspecies,
+            TaxonomyModel.rank,
+            TaxonomyModel.scientific_name_author,
+            TaxonomyModel.scientific_name_author_year,
+            func.concat_ws('; ',
+                TaxonomyModel.kingdom,
+                TaxonomyModel.phylum,
+                TaxonomyModel.order,
+                TaxonomyModel.suborder,
+                TaxonomyModel.superfamily,
+                TaxonomyModel.family,
+                TaxonomyModel.subfamily,
+                TaxonomyModel.genus,
+                TaxonomyModel.subgenus
+            ).label('HigherTaxon')
+        ])
+
+        # NB: Printing the query will not show DISTINCT ON: Need to compile print q.compile(dialect=postgresql.dialect())
+        q = q.distinct(Determination.specimen_irn)
+        q = q.select_from(Determination.__table__.join(TaxonomyModel.__table__, TaxonomyModel.__table__.c.irn == Determination.__table__.c.taxonomy_irn))
+        q = q.order_by(Determination.specimen_irn, desc(Determination.filed_as))
+
+        return q
+
+    def _dwc_query(self):
         """
         Query for converting data from KE EMu into DwC record
         Only datasets with this method will show a DwC view
         """
-        pass
+
+        # Reflected views
+        metadata = MetaData(self.session.bind)
+        # Annoyingly, sqlalchemy doesn't support reflection of materialised views
+        # See https://bitbucket.org/zzzeek/sqlalchemy/issue/2891/support-materialized-views-in-postgresql
+        # For now, need to use either TABLE or VIEW if reflection is needed
+        _geological_context_v = Table('_geological_context_v', metadata, autoload=True)
+        _associated_records_v = Table('_associated_records_v', metadata, autoload=True)
+        _taxonomy_v = Table('_taxonomy_v', metadata, autoload=True)
+
+        q = select([
+
+            # Catalogue model
+            CatalogueModel.irn,
+            CatalogueModel.ke_date_modified.label('modified'),
+            literal_column("'%s'::text" % INSTITUTION_CODE).label('InstitutionCode'),
+            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn),
+
+            # Other numbers
+            func.array_to_string(
+                func.array_agg(
+                    OtherNumbersModel.value
+                ), ';').label('OtherNumbers'),
+
+            # Specimen model
+            case(
+                [(SpecimenModel.collection_department == 'Entomology', 'BMNH(E)')],
+                else_=func.upper(func.substr(SpecimenModel.collection_department, 0, 4))
+            ).label('CollectionCode'),
+            SpecimenModel.catalogue_number.label('CatalogNumber'),
+            SpecimenModel.type_status.label('TypeStatus'),
+            SpecimenModel.date_identified_day.label('DayIdentified'),
+            SpecimenModel.date_identified_month.label('MonthIdentified'),
+            SpecimenModel.date_identified_year.label('YearIdentified'),
+            SpecimenModel.specimen_count.label('IndividualCount'),
+            SpecimenModel.preparation.label('Preparations'),
+            SpecimenModel.preparation_type.label('PreparationType'),
+            SpecimenModel.weight.label('ObservedWeight'),
+            SpecimenModel.identification_qualifier.label('IdentificationQualifier'),
+            SpecimenModel.identified_by.label('IdentifiedBy'),
+
+            # Sex stage
+            func.array_to_string(
+                func.array_agg(
+                    SexStageModel.sex
+                ), ';').label('Sex'),
+            func.array_to_string(
+                func.array_agg(
+                    SexStageModel.stage
+                ), ';').label('LifeStage'),
+
+            # Site model
+            SiteModel.continent.label('Continent'),
+            SiteModel.country.label('Country'),
+            SiteModel.state_province.label('StateProvince'),
+            SiteModel.county.label('County'),
+            SiteModel.locality.label('Locality'),
+            SiteModel.ocean.label('ContinentOcean'),
+            SiteModel.island_group.label('IslandGroup'),
+            SiteModel.island.label('Island'),
+            SiteModel.geodetic_datum.label('GeodeticDatum'),
+            SiteModel.georef_method.label('GeorefMethod'),
+            SiteModel.decimal_latitude.label('DecimalLatitude'),
+            SiteModel.decimal_longitude.label('DecimalLongitude'),
+            SiteModel.latitude.label('verbatimLatitude'),
+            SiteModel.longitude.label('verbatimLongitude'),
+            SiteModel.minimum_elevation_in_meters.label('MinimumElevationInMeters'),
+            SiteModel.maximum_elevation_in_meters.label('MaximumElevationInMeters'),
+            func.coalesce(
+                SiteModel.river_basin,
+                SiteModel.ocean,
+                SiteModel.lake
+            ).label('WaterBody'),
+            func.concat_ws('; ',
+               SiteModel.continent,
+               SiteModel.country,
+               SiteModel.state_province,
+               SiteModel.county,
+               SiteModel.nearest_named_place
+            ).label('HigherGeography'),
+
+            # CollectionEvent
+            CollectionEventModel.time_collected_from.label('StartTimeOfDay'),
+            CollectionEventModel.time_collected_to.label('EndTimeOfDay'),
+            CollectionEventModel.collection_event_code.label('FieldNumber'),
+            CollectionEventModel.collection_method.label('samplingProtocol'),
+            func.coalesce(
+                CollectionEventModel.collector_name,
+                CollectionEventModel.expedition_name
+            ).label('Collector'),
+            CollectionEventModel.collector_number.label('CollectorNumber'),
+            # These need to be parsed into StartYearCollected
+            CollectionEventModel.date_collected_from,
+            CollectionEventModel.date_collected_to,
+            func.coalesce(
+                CollectionEventModel.time_collected_from,
+                CollectionEventModel.time_collected_to
+            ).label('TimeOfDay'),
+            func.coalesce(
+                CollectionEventModel.depth_from_metres,
+                SiteModel.minimum_depth_in_meters
+            ).label('minimumDepthInMeters'),
+            func.coalesce(
+                CollectionEventModel.depth_to_metres,
+                SiteModel.maximum_depth_in_meters
+            ).label('maximumDepthInMeters'),
+
+            # Botany model
+            BotanySpecimenModel.habitat_verbatim.label('Habitat'),
+
+            # Multimedia
+            func.array_to_string(
+                func.array_remove(
+                    func.array_agg(
+                        func.format(MULTIMEDIA_URL, catalogue_multimedia.c.multimedia_irn)
+                    ),
+                MULTIMEDIA_URL % ''
+                ), ';').label('associatedMedia'),
+
+            # AssociatedRecords
+            func.array_to_string(
+                func.array_agg(
+                    _associated_records_v.c.associated_irn
+                )
+            , ';').label('AssociatedRecords'),
+
+            # Geological context
+            _geological_context_v.c.earliestEonOrLowestEonothem,
+            _geological_context_v.c.latestEonOrHighestEonothem,
+            _geological_context_v.c.earliestEraOrLowestErathem,
+            _geological_context_v.c.earliestPeriodOrLowestSystem,
+            _geological_context_v.c.latestPeriodOrHighestSystem,
+            _geological_context_v.c.earliestEpochOrLowestSeries,
+            _geological_context_v.c.latestEpochOrHighestSeries,
+            _geological_context_v.c.earliestAgeOrLowestStage,
+            _geological_context_v.c.latestAgeOrHighestStage,
+            _geological_context_v.c.lowestBiostratigraphicZone,
+            _geological_context_v.c.highestBiostratigraphicZone,
+            _geological_context_v.c.group,
+            _geological_context_v.c.formation,
+            _geological_context_v.c.member,
+
+            # Taxonomy
+            _taxonomy_v.c.scientific_name.label('scientificName'),
+            _taxonomy_v.c.kingdom.label('Kingdom'),
+            _taxonomy_v.c.phylum.label('Phylum'),
+            _taxonomy_v.c.taxonomic_class.label('Class'),
+            _taxonomy_v.c.order.label('Order'),
+            _taxonomy_v.c.suborder.label('Suborder'),
+            _taxonomy_v.c.family.label('Family'),
+            _taxonomy_v.c.subfamily.label('Subfamily'),
+            _taxonomy_v.c.genus.label('Genus'),
+            _taxonomy_v.c.subgenus.label('Subgenus'),
+            _taxonomy_v.c.species.label('Species'),
+            _taxonomy_v.c.subspecies.label('Subspecies'),
+            _taxonomy_v.c.rank.label('Rank'),
+            _taxonomy_v.c.scientific_name_author.label('ScientificName'),
+            _taxonomy_v.c.scientific_name_author_year.label('ScientificNameAuthorYear'),
+            _taxonomy_v.c.HigherTaxon
+
+        ])
+
+        # Add inner join to specimen
+        select_from = CatalogueModel.__table__.join(SpecimenModel.__table__, CatalogueModel.__table__.c.irn == SpecimenModel.__table__.c.irn)
+
+        #  Add outer joins to sites, collection events etc.,
+        select_from = select_from.outerjoin(SiteModel.__table__, SiteModel.__table__.c.irn == SpecimenModel.__table__.c.site_irn)
+        select_from = select_from.outerjoin(CollectionEventModel.__table__, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
+
+        # Botany is the only model with a DwC field
+        select_from = select_from.outerjoin(BotanySpecimenModel.__table__, BotanySpecimenModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
+
+        # Other numbers
+        select_from = select_from.outerjoin(OtherNumbersModel, OtherNumbersModel.__table__.c.irn == SpecimenModel.__table__.c.irn)
+
+        # Sex stage
+        select_from = select_from.outerjoin(specimen_sex_stage, specimen_sex_stage.c.specimen_irn == CatalogueModel.__table__.c.irn)
+        select_from = select_from.outerjoin(SexStageModel.__table__, SexStageModel.__table__.c.id == specimen_sex_stage.c.sex_stage_id)
+
+        # Multimedia
+        select_from = select_from.outerjoin(catalogue_multimedia, catalogue_multimedia.c.catalogue_irn == SpecimenModel.__table__.c.irn)
+
+        # Associated records
+        select_from = select_from.outerjoin(_associated_records_v, _associated_records_v.c.irn == SpecimenModel.__table__.c.irn)
+        #
+        # # Determination
+        select_from = select_from.outerjoin(_taxonomy_v, _taxonomy_v.c.irn == SpecimenModel.__table__.c.irn)
+
+        # Geological context
+        select_from = select_from.outerjoin(_geological_context_v, _geological_context_v.c.irn == SpecimenModel.__table__.c.irn)
+
+        q = q.select_from(select_from)
+
+        # Add group by clauses so my aggregates work
+        q = q.group_by(CatalogueModel.__table__.c.irn)
+        q = q.group_by(SpecimenModel.__table__.c.irn)
+        q = q.group_by(SiteModel.__table__.c.irn)
+        q = q.group_by(CollectionEventModel.__table__.c.irn)
+        q = q.group_by(BotanySpecimenModel.__table__.c.irn)
+        q = q.group_by(_geological_context_v.c.irn)
+        q = q.group_by(_taxonomy_v.c.irn)
+
+        q = q.where(CatalogueModel.type != 'stub')
+
+        return q
 
 
+    def dwc_get_mapped_columns(self):
+        """
+        Return a list of all columns in the DwC query
+        """
 
-                # si.continent,
-                # si.country,
-                # si.state_province,
-                # si.county,
-                # si.locality,
-                # si.vice_county,
-                # si.parish,
-                # si.town,
-                # si.nearest_named_place,
-                # si.ocean,
-                # si.island_group,
-                # si.island,
-                # si.lake,
-                # si.river_basin,
-                # si.geodetic_datum,
-                # si.georef_method,
-                # si.latitude,
-                # si.decimal_latitude,
-                # si.longitude,
-                # si.decimal_longitude,
-                # si.minimum_elevation_in_meters,
-                # si.maximum_elevation_in_meters,
-                # si.minimum_depth_in_meters,
-                # si.maximum_depth_in_meters,
-                # si.mineral_complex,
-                # si.mine,
-                # si.mining_district,
-                # si.tectonic_province,
-                # si.geology_region,
-                # ce.date_collected_from,
-                # ce.time_collected_from,
-                # ce.date_collected_to,
-                # ce.time_collected_to,
-                # ce.collection_event_code,
-                # ce.collection_method,
-                # ce.depth_from_metres,
-                # ce.depth_to_metres,
-                # ce.expedition_start_date,
-                # ce.expedition_name,
-                # ce.vessel_name,
-                # ce.vessel_type,
-                # ce.collector_name,
-                # ce.collector_number
+        dwc_q = self._dwc_query()
+        columns = []
+
+        for column in dwc_q._raw_columns:
+
+            try:
+                if isinstance(column._element, Column):
+                    columns.append(column._element)
+                else:
+
+                    # Get child columns (in func.* statements)
+                    for child in column._element.clause_expr.get_children():
+                        for clause in child.clauses:
+                            if isinstance(clause, Column):
+                                columns.append(clause)
+
+            except AttributeError:
+                # If we do not know the column._element, this is a complex Column - eg Case
+                # These will be added manually
+                pass
+
+        # Need to add SpecimenModel.collection_department by hand, as it's in a case
+        columns.append(SpecimenModel.collection_department)
+
+        return columns
+
+    def dwc_get_unmapped(self, model):
+        """
+        For a model, get all unmapped DwC fields
+        """
+
+        field_mappings = self.dwc_get_mapped_columns()
+
+        # Filter out DwC fields / IRN / Foreign Keys
+        def _field_filter(field):
+
+            if field in field_mappings:
+                return False
+
+            if 'irn' in field.key:
+                return False
+
+            if field.key.startswith('_'):
+                return False
+
+            return True
+
+        # Get all tables in this model (all have SIte & Collection Event)
+        tables = set([SiteModel.__table__, CollectionEventModel.__table__])
+
+        for cls in inspect.getmro(model):
+
+            try:
+                tables.add(cls.__table__)
+            except AttributeError:
+                # For tertiary objects, there will be no defined __table__
+                pass
+
+        return list(itertools.ifilter(_field_filter, itertools.chain.from_iterable([t.columns for t in tables])))
+
+    def def_list_all_unmapped(self):
+        """
+        Output a list of all unmapped fields
+        """
+        unmapped_fields = OrderedDict()
+
+        for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
+
+            for field in self.dwc_get_unmapped(model):
+
+                try:
+
+                    if model.__table__.name not in unmapped_fields[field.name]:
+                        unmapped_fields[field.name].append(model.__table__.name)
+
+                except KeyError:
+                    unmapped_fields[field.name] = [model.__table__.name]
+
+        for unmapped_field, models in unmapped_fields.items():
+            print '%s\t%s' % (unmapped_field, ';'.join(models))
 
 
 class KeEMuIndexlotDatastore(object):
@@ -659,422 +916,6 @@ class KeEMuArtefactDatastore(object):
 
 
 
-
-
-
-
-
-
-
-
-
-
-# class KeEMuSpecimensDatastore(object):
-#     """
-#     KE EMu specimens datastore
-#     """
-#     name = 'Specimens'
-#     description = 'Specimen records'
-#     resource_type = 'nhm-specimens'
-#     package = {
-#         'name': u'nhm-collection24',
-#         'notes': u'The Natural History Museum\'s collection',
-#         'title': "Collection"
-#     }
-#
-#     def datastore_query(self):
-#         """
-#         Query for building the KE EMu collections datastore
-#         """
-#         specimen = SpecimenModel.__table__
-#         site = SiteModel.__table__
-#         collection_event = CollectionEventModel.__table__
-#         botany = BotanySpecimenModel.__table__
-#
-#         # Create a list of columns we want to retrieve
-#         columns = []
-#
-#         def _field_filter(field):
-#             if 'irn' in field.name:
-#                 return False
-#
-#             if field.name.startswith('_'):
-#                 return False
-#
-#             return True
-#
-#         # Loop through all the fields, applying _field_filter to remove the fields we don't want
-#         for table in [specimen, site, collection_event]:
-#             columns.append(itertools.ifilter(_field_filter, getattr(table, 'c')))
-#
-#         columns = list(itertools.chain.from_iterable(columns))
-#
-#         # Add the IRN as the _id field
-#         columns.append(specimen.c.irn.label('_id'))
-#
-#         # TODO: Add more columns here
-#
-#         # Chain all the columns together into one list
-#         query = select(columns)
-#
-#         query = query.select_from(specimen
-#                                   .outerjoin(site, site.c.irn == specimen.c.site_irn)
-#                                   .outerjoin(collection_event, collection_event.c.irn == specimen.c.collection_event_irn)
-#                                   .outerjoin(botany, botany.c.irn == specimen.c.irn)
-#                                   )
-#
-#         # TODO: TEMP - Remove this
-#         query = query.limit(1)
-#         return query
-#
-#     def dwc_query(self):
-#         """
-#         Query for converting data from KE EMu into DwC record
-#         """
-#         session = get_datastore_session()
-#
-#         query = session.query(
-#             # Extra DwC fields
-#             DwC.institution_code,
-#             DwC.global_unique_identifier.label('GlobalUniqueIdentifier'),
-#             DwC.related_catalogue_item.label('RelatedCatalogedItems'),
-#             # Catalogue fields
-#             SpecimenModel.ke_date_modified.label('modified'),
-#             # Specimen fields
-#             SpecimenModel.catalogue_number.label('CatalogNumber'),
-#             SpecimenModel.type_status.label('TypeStatus'),
-#             SpecimenModel.date_identified_day.label('DayIdentified'),
-#             SpecimenModel.date_identified_month.label('MonthIdentified'),
-#             SpecimenModel.date_identified_year.label('YearIdentified'),
-#             DwC.other_numbers.label('OtherCatalogNumbers'),
-#             DwC.collection_code.label('CollectionCode'),
-#             # TODO: Put back after rerunning import
-#             # SpecimenModel.specimen_count.label('IndividualCount'),
-#             # SpecimenModel.preparation.label('Preparations'),
-#             # SpecimenModel.preparation_type.label('PreparationType'),
-#             # SpecimenModel.weight.label('ObservedWeight'),
-#             # SpecimenModel.identification_qualifier.label('IdentificationQualifier'),
-#             # SpecimenModel.identified_by.label('IdentifiedBy'),
-#             # Sites data
-#             SiteModel.continent.label('Continent'),
-#             SiteModel.country.label('Country'),
-#             SiteModel.state_province.label('StateProvince'),
-#             SiteModel.county.label('County'),
-#             SiteModel.locality.label('Locality'),
-#             SiteModel.ocean.label('ContinentOcean'),
-#             SiteModel.island_group.label('IslandGroup'),
-#             SiteModel.island.label('Island'),
-#             DwC.water_body.label('WaterBody'),
-#             SiteModel.geodetic_datum.label('GeodeticDatum'),
-#             SiteModel.georef_method.label('GeorefMethod'),
-#             SiteModel.decimal_latitude.label('DecimalLatitude'),
-#             SiteModel.decimal_longitude.label('DecimalLongitude'),
-#             SiteModel.minimum_elevation_in_meters.label('MinimumElevationInMeters'),
-#             SiteModel.maximum_elevation_in_meters.label('MaximumElevationInMeters'),
-#             DwC.higher_geography.label('HigherGeography'),
-#             # Collections event
-#             DwC.date_collected_from_year.label('StartYearCollected'),
-#             DwC.date_collected_from_month.label('StartMonthCollected'),
-#             DwC.date_collected_from_day.label('StartDayCollected'),
-#             DwC.date_collected_to_year.label('EndYearCollected'),
-#             DwC.date_collected_to_month.label('EndMonthCollected'),
-#             DwC.date_collected_to_day.label('EndDayCollected'),
-#             DwC.date_collected_year.label('YearCollected'),
-#             DwC.time_of_day.label('TimeOfDay'),
-#             CollectionEventModel.time_collected_from.label('StartTimeOfDay'),
-#             CollectionEventModel.time_collected_to.label('EndTimeOfDay'),
-#             CollectionEventModel.collection_event_code.label('FieldNumber'),
-#             CollectionEventModel.collection_method.label('samplingProtocol'),
-#             DwC.min_depth.label('minimumDepthInMeters'),
-#             DwC.max_depth.label('maximumDepthInMeters'),
-#             # DwC.collector.label('Collector'),
-#             CollectionEventModel.time_collected_to.label('CollectorNumber'),
-#             # Taxonomy data
-#             TaxonomyModel.scientific_name.label('ScientificName'),
-#             TaxonomyModel.kingdom.label('Kingdom'),
-#             TaxonomyModel.phylum.label('Phylum'),
-#             TaxonomyModel.taxonomic_class.label('Class'),
-#             TaxonomyModel.order.label('Order'),
-#             TaxonomyModel.family.label('Family'),
-#             TaxonomyModel.genus.label('Genus'),
-#             TaxonomyModel.subgenus.label('Subgenus'),
-#             TaxonomyModel.species.label('Species'),
-#             TaxonomyModel.subspecies.label('Subspecies'),
-#             TaxonomyModel.rank.label('taxonRank'),
-#             TaxonomyModel.scientific_name_author.label('ScientificNameAuthor'),
-#             TaxonomyModel.scientific_name_author_year.label('ScientificNameAuthorYear'),
-#             DwC.higher_taxon.label('HigherTaxon'),
-#             # Multimedia
-#             DwC.images.label('associatedMedia'),
-#             # Sex stage
-#             DwC.sex.label('Sex'),
-#             DwC.stage.label('LifeStage'),
-#             # Botany
-#             BotanySpecimenModel.__table__.c.habitat_verbatim.label('Habitat')
-#
-#         ).outerjoin(SpecimenModel.site)\
-#             .outerjoin(SpecimenModel.collection_event)\
-#             .outerjoin(SpecimenModel.site)\
-#             .outerjoin(BotanySpecimenModel.__table__)\
-#             .outerjoin(SpecimenTaxonomyView, SpecimenTaxonomyView.c.specimen_irn == SpecimenModel.irn)\
-#             .outerjoin(TaxonomyModel, TaxonomyModel.irn == SpecimenTaxonomyView.c.taxonomy_irn)\
-#
-#         return query
-#
-#     def dwc_get_record(self, irn):
-#         """
-#         Get a record as DwC
-#         """
-#         query = self.dwc_query()
-#         query = query.filter(CatalogueModel.irn == irn)
-#         # Return record as a dict
-#         return query.one().__dict__
-#
-#     def dwc_export(self, outfile):
-#         """
-#         Export as darwin core
-#         """
-#
-#         query = self.dwc_query()
-#         # TODO: Optimise this query. AT the moment I have to limit it to prevent memory timeouts
-#         query = query.limit(10)
-#         # TODO: yield_per?
-#
-#         # TODO: This is not working - and do we want to use PG COPY anyway?
-#         f = csv.writer(open(outfile, 'wb'))
-#         for record in query.all():
-#             f.writerow(record)
-#
-#
-#
-#
-# class KeEMuArtefactDatastore(object):
-#     """
-#     KE EMu artefacts datastore
-#     """
-#     name = 'Artefacts'
-#     description = 'Artefacts'
-#     package = {
-#         'name': u'nhm-artefacts',
-#         'notes': u'Artefacts from The Natural History Museum',
-#         'title': "Artefacts"
-#     }
-#
-#     def datastore_query(self):
-#
-#         tbl_datastore = Datastore.__table__
-#         tbl_artefact = ArtefactModel.__table__
-#
-#         query = select([
-#             tbl_datastore.c.irn.label('_id'),
-#             Datastore.multimedia.label('Images'),
-#             tbl_artefact.c.kind,
-#             tbl_artefact.c.name,
-#         ])
-#
-#         query = query.select_from(tbl_datastore.join(tbl_artefact, tbl_artefact.c.irn == tbl_datastore.c.irn))
-#         return query
-#
-#
-# # Query models
-#
-# class Datastore(Base):
-#
-#     __table__ = CatalogueModel.__table__
-#
-#      # Store the images and URL directly in the datastore, so we don't have to hack around with the API
-#     multimedia = column_property(
-#         select([
-#             func.array_to_string(
-#                 func.array_agg(
-#                     # TODO: Add case to handle videos
-#                     func.format(IMAGE_URL, catalogue_multimedia.c.multimedia_irn)), '; ')
-#             ]
-#         ).where(catalogue_multimedia.c.catalogue_irn == CatalogueModel.irn)
-#     )
-#
-# class DwC(Base):
-#
-#     # TODO: I would much prefer this to convert from the datastore
-#     # And then KE EMu database can be private (and include stuff like multimedia we wouldn't want to use)
-#
-#     __table__ = CatalogueModel.__table__
-#     # Add calculated fields etc.,
-#     institution_code = column_property(literal_column("'%s'" % INSTITUTION_CODE).label('institution_code'))
-#     global_unique_identifier = column_property(IDENTIFIER_PREFIX + cast(CatalogueModel.__table__.c.irn, String))
-#
-#     # Subquery property to get related catalogue items
-#     # http://stackoverflow.com/questions/7788288/sqlalchemy-subquery-for-suming-values-from-another-table
-#     related_catalogue_item = column_property(
-#         select([
-#             func.array_to_string(
-#                 func.array_agg(
-#                     func.format(IDENTIFIER_PREFIX + '%s', catalogue_associated_record.c.associated_irn)), '; ')
-#             ]
-#         ).where(catalogue_associated_record.c.catalogue_irn==CatalogueModel.irn)
-#     )
-#
-#     # Other numbers subquery
-#     other_numbers = column_property(
-#         select([
-#             func.array_to_string(
-#                 func.array_agg(OtherNumbersModel.value), '; ')
-#             ]
-#         ).where(OtherNumbersModel.irn==CatalogueModel.irn)
-#     )
-#
-#     # Collection code (based on department: Zoology: ZOO, Paleo: PAL, Botany: BOT, Entom: BMNH(E))
-#     # Warning: In KE EMu mineralogy has no collection code
-#     collection_code = column_property(
-#         case(
-#             [(SpecimenModel.collection_department == 'Entomology', 'BMNH(E)')],
-#             else_=func.upper(func.substr(SpecimenModel.collection_department, 0, 4))
-#         )
-#     )
-#
-#     # Water body uses lake > river basin > ocean
-#     # TODO: Add Lake
-#     water_body = column_property(
-#         func.coalesce(
-#             SiteModel.river_basin,
-#             SiteModel.ocean
-#         )
-#     )
-#
-#     # Extract months years etc.,
-#     date_collected_from_year = column_property(
-#         func.substring(CollectionEventModel.date_collected_from, '([0-9]{4})')
-#     )
-#
-#     date_collected_from_month = column_property(
-#         func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-([0-9]{2})')
-#     )
-#
-#     date_collected_from_day = column_property(
-#         func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-[0-9]{2}-([0-9]{2})')
-#     )
-#
-#     date_collected_to_year = column_property(
-#         func.substring(CollectionEventModel.date_collected_to, '([0-9]{4})')
-#     )
-#
-#     date_collected_to_month = column_property(
-#         func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-([0-9]{2})')
-#     )
-#
-#     date_collected_to_day = column_property(
-#         func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-[0-9]{2}-([0-9]{2})')
-#     )
-#
-#     # Use either collected from or if that's null, use to
-#     date_collected_year = column_property(
-#         func.coalesce(
-#             func.substring(CollectionEventModel.date_collected_from, '([0-9]{4})'),
-#             func.substring(CollectionEventModel.date_collected_to, '([0-9]{4})')
-#         )
-#     )
-#
-#     date_collected_month = column_property(
-#         func.coalesce(
-#             func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-([0-9]{2})'),
-#             func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-([0-9]{2})')
-#         )
-#     )
-#
-#     date_collected_day = column_property(
-#         func.coalesce(
-#             func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-[0-9]{2}-([0-9]{2})'),
-#             func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-[0-9]{2}-([0-9]{2})')
-#         )
-#     )
-#
-#     time_of_day = column_property(
-#         func.coalesce(
-#             CollectionEventModel.time_collected_from,
-#             CollectionEventModel.time_collected_to
-#         )
-#     )
-#
-#     # Use expedition name if collector name is null
-#     # TODO: Put back when rerun
-#     # collector = column_property(
-#     #     func.coalesce(
-#     #         CollectionEventModel.collector_name,
-#     #         CollectionEventModel.expedition_name
-#     #     )
-#     # )
-#
-#     # Use either Collection event depth or site depth
-#     min_depth = column_property(
-#         func.coalesce(
-#             CollectionEventModel.depth_from_metres,
-#             SiteModel.minimum_depth_in_meters
-#         )
-#     )
-#
-#         # Use either Collection event depth or site depth
-#     max_depth = column_property(
-#         func.coalesce(
-#             CollectionEventModel.depth_to_metres,
-#             SiteModel.maximum_depth_in_meters
-#         )
-#     )
-#
-#     sex = column_property(
-#         select([
-#             func.array_to_string(func.array_agg(SexStageModel.sex), '; ')
-#             ],
-#             from_obj=SexStageModel.__table__.join(specimen_sex_stage, SexStageModel.__table__.c.id == specimen_sex_stage.c.sex_stage_id)
-#         ).where(specimen_sex_stage.c.specimen_irn == CatalogueModel.irn).where(SexStageModel.sex != '')
-#     )
-#
-#     # KE EMu is using SexAge field for DarAgeClass, which isn't right
-#     # SexAge has values like 2 days etc., whereas it should be Juvenile etc.,
-#     # DarAgeClass could also map to this field, but DarLifeStage is a better fit
-#     stage = column_property(
-#         select([
-#             func.array_to_string(func.array_agg(SexStageModel.stage), '; ')
-#             ],
-#             from_obj=SexStageModel.__table__.join(specimen_sex_stage, SexStageModel.__table__.c.id == specimen_sex_stage.c.sex_stage_id)
-#         ).where(specimen_sex_stage.c.specimen_irn == CatalogueModel.irn).where(SexStageModel.stage != '')
-#     )
-#
-#     # Images
-#     images = column_property(
-#         select([
-#             func.array_to_string(
-#                 func.array_agg(
-#                     # TODO: Image URLS
-#                     func.format('http://URL/%s', catalogue_multimedia.c.multimedia_irn)), '; ')
-#             ]
-#         ).where(catalogue_multimedia.c.catalogue_irn==CatalogueModel.irn)
-#     )
-#
-#     # Make higher taxon list
-#     higher_taxon = column_property(
-#         func.concat_ws('; ', TaxonomyModel.kingdom,
-#                        TaxonomyModel.phylum,
-#                        TaxonomyModel.order,
-#                        TaxonomyModel.suborder,
-#                        TaxonomyModel.superfamily,
-#                        TaxonomyModel.family,
-#                        TaxonomyModel.subfamily,
-#                        TaxonomyModel.genus,
-#                        TaxonomyModel.subgenus
-#         )
-#     )
-#
-#     # Make higher taxon list
-#     higher_geography = column_property(
-#         func.concat_ws('; ', SiteModel.continent,
-#                        SiteModel.country,
-#                        SiteModel.state_province,
-#                        SiteModel.county,
-#                        SiteModel.nearest_named_place
-#         )
-#     )
-
-
 if __name__ == '__main__':
 
     from sqlalchemy.orm import sessionmaker
@@ -1084,12 +925,21 @@ if __name__ == '__main__':
     session = sessionmaker(bind=engine)()
 
     d = KeEMuSpecimensDatastore()
-    x = d.datastore_query()
+    d.create()
 
-    print x
+    # x = d._taxonomy_view()
+    # print x
+    # q =
 
-    result = session.execute(x)
-    # for row in result:
-    #     print row
+    # c = CreateAsSelect('dwc4', d.datastore_query())
+    # session.execute(c)
+    # session.commit()
 
-    session.commit()
+    #
+    # print x
+    #
+    # result = session.execute(x)
+    # # for row in result:
+    # #     print row
+    #
+
