@@ -8,7 +8,6 @@ import sys
 from ke2sql.model.keemu import *
 
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia
-from ke2sql.model.views import SpecimenTaxonomyView
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import mapper, column_property
 from sqlalchemy.sql.expression import select, join
@@ -240,11 +239,11 @@ class KeEMuDatastore(object):
         else:
 
             # Create the view
-            self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS (SELECT * FROM {source_table})'.format(resource_id=resource_id, source_table=source_table))
+            self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS (SELECT * FROM "{source_table}")'.format(resource_id=resource_id, source_table=source_table))
             # Create index on the view
             self.session.execute('CREATE UNIQUE INDEX "{resource_id}_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id))
 
-        # TODO: Add other indexes? Scientific name?
+            # TODO: Add other indexes? Scientific name?
 
         self.session.commit()
 
@@ -293,13 +292,17 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         q = self._dwc_query()
 
+        # TODO: It's dynamic properties breaking this.
+        # TODO: It doesn't need to be json. Just key=value.
+        # TODO: And how fast if stripped down to non null only. That will be tiny!!
+
         # Add the dynamic properties field and joins
         # Needs to go here to prevent self referential queries in _dwc_query
-        metadata = MetaData(self.session.bind)
-        _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
-        q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
-        q = q.column(_dynamic_properties_v.c.properties)
-        q = q.group_by(_dynamic_properties_v.c.irn)
+        # metadata = MetaData(self.session.bind)
+        # _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
+        # q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
+        # q = q.column(_dynamic_properties_v.c.properties)
+        # q = q.group_by(_dynamic_properties_v.c.irn)
 
         return q
 
@@ -499,7 +502,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         q = select([
 
             # Catalogue model
-            CatalogueModel.irn,
+            CatalogueModel.irn.label('_id'),
             CatalogueModel.ke_date_modified.label('modified'),
             literal_column("'%s'::text" % INSTITUTION_CODE).label('InstitutionCode'),
             func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn),
