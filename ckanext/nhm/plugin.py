@@ -19,9 +19,16 @@ class NHMPlugin(p.SingletonPlugin):
         View individual records in a dataset
         Set up NHM (CKAN) model
     """
+    p.implements(p.IConfigurable, inherit=True)
     p.implements(p.IRoutes, inherit=True)
     p.implements(p.IActions)
     p.implements(p.ITemplateHelpers)
+
+    def configure(self, config):
+        # TODO: Move adding mat views here?
+        pass
+
+
     ## IRoutes
     def before_map(self, map):
 
