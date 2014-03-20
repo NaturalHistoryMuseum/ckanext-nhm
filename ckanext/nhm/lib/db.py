@@ -26,18 +26,37 @@ def get_datastore_session():
     return session()
 
 
-class CreateTableAs(Executable, ClauseElement):
-    """
-    Compiler to use as CREATE TABLE [x] AS [SELECT]
-    Used to create the KE EMu datastore table
-    """
-    def __init__(self, table, select):
-        self.table = table
-        self.select = select
+# class CreateTableAs(Executable, ClauseElement):
+#     """
+#     Compiler to use as CREATE TABLE [x] AS [SELECT]
+#     Used to create the KE EMu datastore table
+#     """
+#     def __init__(self, table, select):
+#         self.table = table
+#         self.select = select
+#
+# @compiles(CreateTableAs)
+# def visit_create_table_as(element, compiler, **kw):
+#     return "CREATE TABLE \"%s\" AS (%s)" % (
+#         element.table,
+#         compiler.process(element.select)
+#     )
 
-@compiles(CreateTableAs)
-def visit_create_table_as(element, compiler, **kw):
-    return "CREATE TABLE \"%s\" AS (%s)" % (
-        element.table,
+
+
+class CreateAsSelect(Executable, ClauseElement):
+    """
+    Compiler to use as CREATE VIEW|TABLE [x] AS [SELECT]
+    """
+    def __init__(self, name, select, object_type="TABLE"):
+        self.name = name
+        self.select = select
+        self.object_type = object_type
+
+@compiles(CreateAsSelect)
+def visit_create_as_select(element, compiler, **kw):
+    return "CREATE %s \"%s\" AS (%s)" % (
+        element.object_type,
+        element.name,
         compiler.process(element.select)
     )
