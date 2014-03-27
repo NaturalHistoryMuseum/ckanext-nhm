@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import mapper, column_property
 from sqlalchemy.sql.expression import select, join
 from sqlalchemy.sql import expression, functions
+from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy import text
 from sqlalchemy import Table, Column, Integer, Float, String, ForeignKey, Boolean, Date, UniqueConstraint, Enum, DateTime, func
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -33,20 +34,13 @@ from collections import OrderedDict
 from sqlalchemy.schema import MetaData
 from sqlalchemy import desc
 
-# TODO: replace / add to DwC
-INSTITUTION_CODE = 'NHMUK'
-IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
-IMAGE_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
-MULTIMEDIA_URL = 'http://URL/%s'
+MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
 VIEW = 'VIEW'
 MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
 TABLE = 'TABLE'
 
 Base = declarative_base()
-
-# TODO: create_base_tables()
-# The base table has all fields, so view is base.*: overkill?
 
 class KeEMuDatastore(object):
     """
@@ -65,15 +59,12 @@ class KeEMuDatastore(object):
 
     resource_type = None
     session = None
+    # Fields to exclude from the _full_text index
+    index_field_blacklist = []
 
     def __init__(self):
         self.session = get_datastore_session()
-
-
-        # data_dict = {'connection_url': 'postgresql://ckan_default:asdf@localhost/datastore_default'}
-        #
-        # self.engine = _get_engine(data_dict)
-        # self.session = sessionmaker(bind=self.engine)
+        self.metadata = MetaData(self.session.bind)
 
     @abc.abstractproperty
     def name(self):
@@ -87,57 +78,18 @@ class KeEMuDatastore(object):
     def package(self):
         return None
 
-    @abc.abstractmethod
+    @abc.abstractproperty
     def datastore_query(self):
         """
         Return the select query to create the datastore
         """
         return None
 
-    def get_views(self):
-        return []
-
     def view_exists(self, view_name):
         return self.session.execute("SELECT EXISTS (select 1 from pg_class where relname = '{view_name}')".format(view_name=view_name)).scalar()
 
-    def create_views(self):
-
-        for view in self.get_views():
-
-            # Does this object already exist?
-            if self.view_exists(view['name']):
-
-                if view['type'] is VIEW:
-                    # If it's just a view and already exists, do nothing
-                    print 'View %s already exists: SKIPPING' % view['name']
-                    continue
-
-                elif view['type'] is MATERIALIZED_VIEW:
-                    # If the mat view already exists, refresh it
-                    print 'Materialized view %s already exists: REFRESHING' % view['name']
-                    self.session.execute(text('REFRESH MATERIALIZED VIEW {view_name}'.format(view_name=view['name'])))
-                    continue
-
-                else:
-                    # Drop the table
-                    self.session.execute('DROP TABLE IF EXISTS {view_name}'.format(view_name=view['name']))
-
-            print 'Creating view %s' % view['name']
-
-            c = CreateAsSelect(view['name'], view['func'](), view['type'])
-            self.session.execute(c)
-
-            print 'Adding index to view %s' % view['name']
-
-            # And add a primary key for materialized and view
-            if view['type'] is MATERIALIZED_VIEW:
-                self.session.execute(text('CREATE UNIQUE INDEX {view_name}_irn_idx ON {view_name} (irn)'.format(view_name=view['name'])))
-            elif view['type'] is TABLE:
-                self.session.execute(text('ALTER TABLE {view_name} ADD PRIMARY KEY (irn)'.format(view_name=view['name'])))
-
-            print 'Creating view %s: SUCCESS' % view['name']
-
-            self.session.commit()
+    def table_exists(self, table_name):
+        return self.session.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '{table_name}')".format(table_name=table_name)).scalar()
 
     def create_package(self, context):
         """
@@ -163,13 +115,16 @@ class KeEMuDatastore(object):
 
         return package
 
-    def create(self):
+    def create_datastore_resource(self):
         """
-        Create the datastore
+        Create the CKAN datastore resource
+        @return: resource_id
         """
-        # Set up API context
+
         user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
         context = {'model': model, 'session': model.Session, 'user': user['name'], 'extras_as_string': True}
+
+        # Create a package for the new datastore
         package = self.create_package(context)
 
         print 'Creating datastore %s' % self.name
@@ -197,35 +152,93 @@ class KeEMuDatastore(object):
             datastore = logic.get_action('datastore_create')(context, datastore_params)
             resource_id = datastore['resource_id']
 
-        print 'Creating datastore %s' % resource_id
+        print 'Creating datastore %s: SUCCESS' % resource_id
+
+        return resource_id
+
+    def build_source_table(self, resource_id, rebuild=True):
+        """
+        Build a table to use as a source for the materialised view
+
+        @param resource_id: CKAN UUID for the dataset resource
+        @return: SQLA object representing the source table
+        """
+        source_table_name = '_source_%s' % resource_id
+
+        datastore_query = self.datastore_query()
+
+        try:
+            source_table = Table(source_table_name, self.metadata, autoload=True)
+
+            # If exists, do we want to rebuild (only really used for debugging)
+            if rebuild:
+
+                # Source table exists
+                # Remove existing data
+                self.session.execute(text('TRUNCATE TABLE "{source_table_name}"'.format(source_table_name=source_table_name)))
+
+                # Ensure columns match
+                assert [c.key for c in datastore_query.c] == [c.key for c in source_table.c]
+
+                # INSERT INTO source_table (columns) (datastore_query)
+                q = source_table.insert().from_select(source_table.c, datastore_query)
+                self.session.execute(q)
+
+                print 'Updating source table: SUCCESS'
+
+        except NoSuchTableError:
+
+            # If table doesn't exist create it
+            q = CreateAsSelect(source_table_name, datastore_query)
+            self.session.execute(q)
+            self.session.commit()
+
+            # Reflect the new source table
+            source_table = Table(source_table_name, self.metadata, autoload=True)
+
+            print 'Creating source table: SUCCESS'
+
+        return source_table
+
+    def get_index_fields(self, source_table):
+        """
+        Concatenated list of text fields fields to include in _full_text index
+        @return: string
+        """
+
+        # Get the information schema table
+        information_schema = Table('columns', self.metadata, autoload=True, schema='information_schema')
+
+        q = select([
+            func.string_agg(func.quote_ident(information_schema.c.column_name), literal_column("', '"))
+            ])
+
+        q = q.where(information_schema.c.table_name == source_table.name)
+
+        # We only want varchar and text types
+        q = q.where(information_schema.c.data_type.in_(['character varying', 'text']))
+
+        if self.index_field_blacklist:
+            q = q.where(information_schema.c.column_name.notin_(self.index_field_blacklist))
+
+        return self.session.execute(q).scalar()
+
+    def materialize_resource(self, resource_id, source_table):
+        """
+        Create / refresh the materialised view of the dataset
+        @param resource_id: CKAN UUID for the dataset resource
+        @param source_table: SQLA table object
+        @return: None
+        """
 
         # Drop the table created by CKAN - we're going to replace it with a Materialised view
         # Check if table exists before dropping
         # Need to manually check existence, as we will get an error if it's already a view
-        if self.session.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '{resource_id}')".format(resource_id=resource_id)).scalar():
+        if self.table_exists(resource_id):
             self.session.execute('DROP TABLE "{resource_id}"'.format(resource_id=resource_id))
 
-        # Create some types used across all queries
-        if not self.session.execute('SELECT EXISTS (select 1 from pg_type where typname = \'multimedia_t\')').scalar():
-            self.session.execute('CREATE TYPE multimedia_t AS (url int, mime_type text, title text)')
-
-        # Create any views need to build the query
-        self.create_views()
-
-        # The source table which will be behind the materialised view
-        source_table = '_source_%s' % resource_id
-
-        self.session.execute('DROP TABLE IF EXISTS "{source_table}"'.format(source_table=source_table))
-
-        c = CreateAsSelect(source_table, self.datastore_query())
-        self.session.execute(c)
-
-        print 'SUCCESS'
-
-        # TODO: Full text
-        # TODO: DwC Dates
-        # TODO: Check all data and fields
-        # TODO: Add more to dynamic properties
+        # Get all text fields to use in the _full_index
+        index_fields = self.get_index_fields(source_table)
 
         # At this point, all of the source tables are in place
         # So create or refresh the materialised view
@@ -237,9 +250,16 @@ class KeEMuDatastore(object):
             self.session.execute(text('REFRESH MATERIALIZED VIEW "{resource_id}"'.format(resource_id=resource_id)))
 
         else:
+            # Create materialised view query
+            view_q = select(source_table.c)
+            view_q = view_q.column(
+                func.to_tsvector(
+                    literal_column("ARRAY_TO_STRING(ARRAY[%s], ' ')" % index_fields)
+                ).label('_full_text')
+            )
 
             # Create the view
-            self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS (SELECT * FROM "{source_table}")'.format(resource_id=resource_id, source_table=source_table))
+            self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS ({view_q})'.format(resource_id=resource_id, view_q=view_q))
             # Create index on the view
             self.session.execute('CREATE UNIQUE INDEX "{resource_id}_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id))
 
@@ -249,8 +269,22 @@ class KeEMuDatastore(object):
 
         print 'Created datastore %s: SUCCESS' % self.name
 
+    def create(self):
+        """
+        Create the datastore - this action is called by the KE EMu command
+        @return: None
+        """
+        resource_id = self.create_datastore_resource()
+
+        source_table = self.build_source_table(resource_id)
+
+        self.materialize_resource(resource_id, source_table)
+
 
 class KeEMuSpecimensDatastore(KeEMuDatastore):
+
+    # TODO: Check all data and fields
+    # TODO: Add more to dynamic properties (sites etc.,)
 
     name = 'Specimens'
     description = 'Specimen records'
@@ -261,50 +295,122 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'title': "Collection"
     }
 
-    views = {}
+    index_field_blacklist = [
+        'associatedMedia',
+        'AssociatedRecords',
+        'DecimalLatitude',
+        'verbatimLatitude',
+        'verbatimLongitude',
+        'MinimumElevationInMeters',
+        'MaximumElevationInMeters',
+        'FieldNumber',
+        'CollectorNumber',
+        'DecimalLongitude',
+        'properties',
+        'StartTimeOfDay',
+        'EndTimeOfDay',
+        'InstitutionCode',
+        'date_collected_from',
+        'date_collected_to',
+        'HigherTaxon',
+        'ScientificNameAuthorYear',
+        'CollectedFromYear',
+        'CollectedFromMonth',
+        'CollectedFromMonth',
+        'CollectedToYear',
+        'CollectedToMonth',
+        'CollectedToDay',
+        'CollectedYear',
+        'CollectedMonth',
+        'CollectedDay'
+    ]
 
-    def get_views(self):
+    resource_type = 'dwc'
 
-        return [
-            {
-                'name': '_geological_context_v',
-                'func': self._geological_context_view,
-                'type': TABLE  # Use a table where we want to add individual fields - primary key can be used in group clause
-            },
-            {
-                'name': '_associated_records_v',
-                'func': self._associated_records_view,
-                'type': VIEW
-            },
-            {
-                'name': '_taxonomy_v',
-                'func': self._taxonomy_view,
-                'type': TABLE
-            },
-            {
-                'name': '_dynamic_properties_v',
-                'func': self._dynamic_properties_view,
-                'type': TABLE
-            },
-        ]
+    def build_source_table(self, resource_id, rebuild=True):
+        """
+        Override the build_source_table()
+        Because of the complexity of the queries, there are a number of views we need to build first
+        @return: sqla source table
+        """
+
+        if rebuild:
+
+            # Build the views on which the source table is built
+            self.create_view('_geological_context_v', self._geological_context_view())
+            self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
+            self.create_view('_collection_date_v', self._collection_date_view())
+            self.create_view('_taxonomy_v', self._taxonomy_view())
+            self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
+
+        # Build the source table
+        source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id, rebuild)
+
+        # TODO: Update dependencies
+        # TODO: Part Inheritance
+
+        return source_table
+
+    def create_view(self, name, query, view_type=TABLE):
+
+        # Does this object already exist?
+        if self.view_exists(name):
+
+            if view_type is VIEW:
+                # If it's just a view and already exists, do nothing
+                print 'View %s already exists: SKIPPING' % name
+                return
+
+            elif view_type is MATERIALIZED_VIEW:
+                # If the mat view already exists, refresh it
+                print 'Materialized view %s already exists: REFRESHING' % name
+                self.session.execute(text('REFRESH MATERIALIZED VIEW {name}'.format(name=name)))
+                return
+
+            else:
+                # Drop the table
+                print 'Drop table %s' % name
+                self.session.execute('DROP TABLE IF EXISTS {name}'.format(name=name))
+
+        print 'Creating view %s' % name
+
+        c = CreateAsSelect(name, query, view_type)
+        self.session.execute(c)
+
+        # And add a primary key for materialized and view
+        if view_type is MATERIALIZED_VIEW:
+            print 'Adding index to materialized view %s' % name
+            self.session.execute(text('CREATE UNIQUE INDEX {name}_irn_idx ON {name} (irn)'.format(name=name)))
+        elif view_type is TABLE:
+            print 'Adding index to table %s' % name
+            self.session.execute(text('ALTER TABLE {name} ADD PRIMARY KEY (irn)'.format(name=name)))
+
+        print 'Creating view %s: SUCCESS' % name
+
+        self.session.commit()
 
     def datastore_query(self, force_rebuild=False):
 
         q = self._dwc_query()
 
-        # TODO: It's dynamic properties breaking this.
-        # TODO: It doesn't need to be json. Just key=value.
-        # TODO: And how fast if stripped down to non null only. That will be tiny!!
-
         # Add the dynamic properties field and joins
         # Needs to go here to prevent self referential queries in _dwc_query
-        # metadata = MetaData(self.session.bind)
-        # _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
-        # q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
-        # q = q.column(_dynamic_properties_v.c.properties)
-        # q = q.group_by(_dynamic_properties_v.c.irn)
+        metadata = MetaData(self.session.bind)
+        _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
+        q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
+        q = q.column(_dynamic_properties_v.c.properties.label('DynamicProperties'))
+        q = q.group_by(_dynamic_properties_v.c.irn)
 
         return q
+
+    @staticmethod
+    def convert_field_name(name):
+        """
+        Convert a field name to capital case
+        @param name: field name
+        @return: FieldName
+        """
+        return ''.join(n.capitalize() or '_' for n in name.split('_'))
 
     def _dynamic_properties_view(self):
 
@@ -312,52 +418,40 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
 
-        # for model in itertools.chain([SpecimenModel]):
-
             if model is StubModel:
                 continue
 
             # Get all columns not mapped to dwc
-            columns = self.dwc_get_unmapped(model)
+            columns = self.dwc_get_unmapped_fields(model)
 
-            # Get a list of all tables
-            # Specimen, Site and Collection events will be handled separately
+            cols = ', '.join("'%s=' || %s.%s" % (self.convert_field_name(c.name), c.table, c.name) for c in columns)
+
             tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__]])
-
-            # Create a type name based on the tables used (site and collection event are universal so are excluded)
-            # CREATE TYPE name_t AS (f1 int, f2 text, f3 text)
-            type_name = '_'.join(t.name for t in tables) + '_ty'
-            type_cols = ', '.join('%s %s' % (c.name, c.type) for c in columns)
-
-            # Drop type if it exists - this code is only called on rebuilding, so no overhead
-            self.session.execute('DROP TYPE IF EXISTS {type_name}'.format(type_name=type_name))
-            self.session.execute('CREATE TYPE {type_name} AS ({type_cols})'.format(type_name=type_name, type_cols=type_cols))
 
             q = select([
                 SpecimenModel.__table__.c.irn,
-                func.array_to_json(
-                    func.array_agg(
-                        # Doesn't seem to be an easy way to specify row::type, so am just using a literal
-                        literal_column('row(%s)::%s' % (', '.join('%s' % c for c in columns), type_name))
-                    )
-                ).label('properties')
+                func.concat_ws(literal_column("'; '"), literal_column(cols)).label('properties')
             ])
 
             # Build select from (for the joins)
             select_from = SpecimenModel.__table__
+            q = q.group_by(SpecimenModel.__table__.c.irn)
+
             for table in tables:
                 select_from = select_from.join(table, table.c.irn == SpecimenModel.__table__.c.irn)
+                q = q.group_by(table.c.irn)
 
-            # Add joins to events and sites
+            # Add joins and group by to events and sites
             select_from = select_from.outerjoin(SiteModel, SiteModel.__table__.c.irn == SpecimenModel.__table__.c.site_irn)
+            q = q.group_by(SiteModel.__table__.c.irn)
+
             select_from = select_from.outerjoin(CollectionEventModel, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
+            q = q.group_by(CollectionEventModel.__table__.c.irn)
 
             q = q.select_from(select_from)
 
             # Only select a particular type - this does mean more and a slower query - but ensures data is correct
             q = q.where(CatalogueModel.__table__.c.type == model.__mapper_args__['polymorphic_identity'])
-
-            q = q.group_by(SpecimenModel.__table__.c.irn)
 
             # Create list of queries we'll union_all later
             qs.append(q)
@@ -484,11 +578,35 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return q
 
+    @staticmethod
+    def _collection_date_view():
+
+        q = select([
+            SpecimenModel.irn,
+            func.substring(CollectionEventModel.date_collected_from, '([0-9]{4})').label('from_date_year'),
+            func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-([0-9]{2})').label('from_date_month'),
+            func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-[0-9]{2}-([0-9]{2})').label('from_date_day'),
+            func.substring(CollectionEventModel.date_collected_to, '([0-9]{4})').label('to_date_year'),
+            func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-([0-9]{2})').label('to_date_month'),
+            func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-[0-9]{2}-([0-9]{2})').label('to_date_day')
+        ])
+
+        q = q.select_from(SpecimenModel.__table__.join(CollectionEventModel.__table__, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn))
+
+        # TODO: CHeck this is ORing
+        q = q.where(CollectionEventModel.date_collected_from != None)
+        q = q.where(CollectionEventModel.date_collected_to != None)
+
+        return q
+
     def _dwc_query(self):
         """
         Query for converting data from KE EMu into DwC record
         Only datasets with this method will show a DwC view
         """
+
+        INSTITUTION_CODE = 'NHMUK'
+        IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
 
         # Reflected views
         metadata = MetaData(self.session.bind)
@@ -498,6 +616,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         _geological_context_v = Table('_geological_context_v', metadata, autoload=True)
         _associated_records_v = Table('_associated_records_v', metadata, autoload=True)
         _taxonomy_v = Table('_taxonomy_v', metadata, autoload=True)
+        _collection_date_v = Table('_collection_date_v', metadata, autoload=True)
 
         q = select([
 
@@ -505,7 +624,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             CatalogueModel.irn.label('_id'),
             CatalogueModel.ke_date_modified.label('modified'),
             literal_column("'%s'::text" % INSTITUTION_CODE).label('InstitutionCode'),
-            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn),
+            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn).label('CatalogueNumber'),
 
             # Other numbers
             func.array_to_string(
@@ -580,9 +699,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 CollectionEventModel.expedition_name
             ).label('Collector'),
             CollectionEventModel.collector_number.label('CollectorNumber'),
-            # These need to be parsed into StartYearCollected
-            CollectionEventModel.date_collected_from,
-            CollectionEventModel.date_collected_to,
             func.coalesce(
                 CollectionEventModel.time_collected_from,
                 CollectionEventModel.time_collected_to
@@ -595,7 +711,25 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 CollectionEventModel.depth_to_metres,
                 SiteModel.maximum_depth_in_meters
             ).label('maximumDepthInMeters'),
-
+            # Collection date
+            _collection_date_v.c.from_date_year.label('CollectedFromYear'),
+            _collection_date_v.c.from_date_month.label('CollectedFromMonth'),
+            _collection_date_v.c.from_date_day.label('CollectedFromDay'),
+            _collection_date_v.c.to_date_year.label('CollectedToYear'),
+            _collection_date_v.c.to_date_year.label('CollectedToMonth'),
+            _collection_date_v.c.to_date_day.label('CollectedToDay'),
+            func.coalesce(
+                _collection_date_v.c.from_date_year,
+                _collection_date_v.c.to_date_year
+            ).label('CollectedYear'),
+            func.coalesce(
+                _collection_date_v.c.from_date_month,
+                _collection_date_v.c.to_date_month
+            ).label('CollectedMonth'),
+            func.coalesce(
+                _collection_date_v.c.from_date_day,
+                _collection_date_v.c.to_date_day
+            ).label('CollectedDay'),
             # Botany model
             BotanySpecimenModel.habitat_verbatim.label('Habitat'),
 
@@ -673,12 +807,16 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         # Associated records
         select_from = select_from.outerjoin(_associated_records_v, _associated_records_v.c.irn == SpecimenModel.__table__.c.irn)
-        #
-        # # Determination
+
+        # Determination
         select_from = select_from.outerjoin(_taxonomy_v, _taxonomy_v.c.irn == SpecimenModel.__table__.c.irn)
 
         # Geological context
         select_from = select_from.outerjoin(_geological_context_v, _geological_context_v.c.irn == SpecimenModel.__table__.c.irn)
+
+       # Collection date context
+        select_from = select_from.outerjoin(_collection_date_v, _collection_date_v.c.irn == SpecimenModel.__table__.c.irn)
+
 
         q = q.select_from(select_from)
 
@@ -690,15 +828,16 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         q = q.group_by(BotanySpecimenModel.__table__.c.irn)
         q = q.group_by(_geological_context_v.c.irn)
         q = q.group_by(_taxonomy_v.c.irn)
+        q = q.group_by(_collection_date_v.c.irn)
 
         q = q.where(CatalogueModel.type != 'stub')
 
         return q
 
 
-    def dwc_get_mapped_columns(self):
+    def dwc_get_mapped_fields(self):
         """
-        Return a list of all columns in the DwC query
+        Return a list of all fields used in the DwC query
         """
 
         dwc_q = self._dwc_query()
@@ -727,12 +866,12 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return columns
 
-    def dwc_get_unmapped(self, model):
+    def dwc_get_unmapped_fields(self, model):
         """
         For a model, get all unmapped DwC fields
         """
 
-        field_mappings = self.dwc_get_mapped_columns()
+        field_mappings = self.dwc_get_mapped_fields()
 
         # Filter out DwC fields / IRN / Foreign Keys
         def _field_filter(field):
@@ -741,6 +880,10 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 return False
 
             if 'irn' in field.key:
+                return False
+
+            # Fields we don't want to include
+            if field.key in ['ke_date_inserted', 'type']:
                 return False
 
             if field.key.startswith('_'):
@@ -761,26 +904,26 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return list(itertools.ifilter(_field_filter, itertools.chain.from_iterable([t.columns for t in tables])))
 
-    def def_list_all_unmapped(self):
-        """
-        Output a list of all unmapped fields
-        """
-        unmapped_fields = OrderedDict()
-
-        for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
-
-            for field in self.dwc_get_unmapped(model):
-
-                try:
-
-                    if model.__table__.name not in unmapped_fields[field.name]:
-                        unmapped_fields[field.name].append(model.__table__.name)
-
-                except KeyError:
-                    unmapped_fields[field.name] = [model.__table__.name]
-
-        for unmapped_field, models in unmapped_fields.items():
-            print '%s\t%s' % (unmapped_field, ';'.join(models))
+    # def def_list_all_unmapped(self):
+    #     """
+    #     Output a list of all unmapped fields
+    #     """
+    #     unmapped_fields = OrderedDict()
+    #
+    #     for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
+    #
+    #         for field in self.dwc_get_unmapped_fields(model):
+    #
+    #             try:
+    #
+    #                 if model.__table__.name not in unmapped_fields[field.name]:
+    #                     unmapped_fields[field.name].append(model.__table__.name)
+    #
+    #             except KeyError:
+    #                 unmapped_fields[field.name] = [model.__table__.name]
+    #
+    #     for unmapped_field, models in unmapped_fields.items():
+    #         print '%s\t%s' % (unmapped_field, ';'.join(models))
 
 
 class KeEMuIndexlotDatastore(object):
@@ -878,7 +1021,7 @@ class KeEMuIndexlotDatastore(object):
         return query
 
 
-class KeEMuArtefactDatastore(object):
+class KeEMuArtefactDatastore(KeEMuDatastore):
     """
     KE EMu artefacts datastore
     """
@@ -890,53 +1033,52 @@ class KeEMuArtefactDatastore(object):
         'title': "Artefacts"
     }
 
+    index_field_blacklist = ['multimedia']
+
     def datastore_query(self):
 
-        query = """
-                SELECT a.irn as _id,
-                    a.kind,
-                    a.name,
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(m.irn, m.mime_type, m.title)::multimedia_t
-                            )
-                        )
-                    ) as "multimedia",
-                    to_tsvector(
-                      concat_ws(',',
-                        a.kind,
-                        a.name
-                      )
-                    ) as _full_text
-                FROM {schema}.artefact a
-                LEFT OUTER JOIN {schema}.catalogue_multimedia cm ON cm.catalogue_irn = a.irn
-                INNER JOIN {schema}.multimedia m ON m.irn = cm.multimedia_irn
-                GROUP BY a.irn
-                """.format(schema='keemu')
+        q = select([
+            ArtefactModel.irn.label('_id'),
+            ArtefactModel.kind,
+            ArtefactModel.name,
+            func.array_to_string(
+                func.array_remove(
+                    func.array_agg(
+                        func.format(MULTIMEDIA_URL, catalogue_multimedia.c.multimedia_irn)
+                    ),
+                MULTIMEDIA_URL % ''
+                ), '; ').label('multimedia'),
 
-        return query
+        ])
 
+        q = q.select_from(ArtefactModel.__table__.join(catalogue_multimedia, catalogue_multimedia.c.catalogue_irn == ArtefactModel.__table__.c.irn))
+
+        # Add group by clauses so my aggregates work
+        q = q.group_by(ArtefactModel.__table__.c.irn)
+        return q
 
 
 if __name__ == '__main__':
 
-    from sqlalchemy.orm import sessionmaker
-    from ckanext.datastore.db import _get_engine
-    data_dict = {'connection_url': 'postgresql://ckan_default:asdf@localhost/datastore_default'}
-    engine = _get_engine(data_dict)
-    session = sessionmaker(bind=engine)()
+
 
     d = KeEMuSpecimensDatastore()
-    d.create()
+    # print d._dynamic_properties_view()
+    # r = d.session.execute(d._dynamic_properties_view())
+    # for x in r:
+    #     print x
 
-    # x = d._taxonomy_view()
+    c = d._collection_date_view()
     # print x
     # q =
 
-    # c = CreateAsSelect('dwc4', d.datastore_query())
-    # session.execute(c)
-    # session.commit()
+    # c = CreateAsSelect('dyn1', d._dynamic_properties_view())
+    result = d.session.execute(c)
+    for x in result:
+        print x
+
+
+    # d.session.commit()
 
     #
     # print x
