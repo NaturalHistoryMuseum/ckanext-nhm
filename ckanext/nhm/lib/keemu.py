@@ -19,7 +19,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.expression import cast
 from sqlalchemy import literal_column
 from sqlalchemy import case
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect
 import csv
 import sqlalchemy
@@ -251,7 +251,11 @@ class KeEMuDatastore(object):
 
         else:
             # Create materialised view query
-            view_q = select(source_table.c)
+
+            # All the columns in the source table, except any _index ones
+            columns = [column for column in source_table.c if column.key is not '_index']
+
+            view_q = select(columns)
             view_q = view_q.column(
                 func.to_tsvector(
                     literal_column("ARRAY_TO_STRING(ARRAY[%s], ' ')" % index_fields)
@@ -434,8 +438,10 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             ])
 
             # Build select from (for the joins)
-            select_from = SpecimenModel.__table__
+            # We always want the CatalogueModel
+            select_from = SpecimenModel.__table__.join(CatalogueModel.__table__, CatalogueModel.__table__.c.irn == SpecimenModel.__table__.c.irn)
             q = q.group_by(SpecimenModel.__table__.c.irn)
+            q = q.group_by(CatalogueModel.__table__.c.irn)
 
             for table in tables:
                 select_from = select_from.join(table, table.c.irn == SpecimenModel.__table__.c.irn)
@@ -592,10 +598,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         ])
 
         q = q.select_from(SpecimenModel.__table__.join(CollectionEventModel.__table__, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn))
-
-        # TODO: CHeck this is ORing
-        q = q.where(CollectionEventModel.date_collected_from != None)
-        q = q.where(CollectionEventModel.date_collected_to != None)
+        q = q.where(or_(CollectionEventModel.date_collected_from != None, CollectionEventModel.date_collected_to != None))
 
         return q
 
@@ -766,7 +769,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             _geological_context_v.c.member,
 
             # Taxonomy
-            _taxonomy_v.c.scientific_name.label('scientificName'),
+            _taxonomy_v.c.scientific_name.label('ScientificName'),
             _taxonomy_v.c.kingdom.label('Kingdom'),
             _taxonomy_v.c.phylum.label('Phylum'),
             _taxonomy_v.c.taxonomic_class.label('Class'),
@@ -779,7 +782,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             _taxonomy_v.c.species.label('Species'),
             _taxonomy_v.c.subspecies.label('Subspecies'),
             _taxonomy_v.c.rank.label('Rank'),
-            _taxonomy_v.c.scientific_name_author.label('ScientificName'),
+            _taxonomy_v.c.scientific_name_author.label('ScientificNameAuthor'),
             _taxonomy_v.c.scientific_name_author_year.label('ScientificNameAuthorYear'),
             _taxonomy_v.c.HigherTaxon
 
@@ -925,8 +928,10 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
     #     for unmapped_field, models in unmapped_fields.items():
     #         print '%s\t%s' % (unmapped_field, ';'.join(models))
 
+    def update_dependencies(self):
+        pass
 
-class KeEMuIndexlotDatastore(object):
+class KeEMuIndexlotDatastore(KeEMuDatastore):
     """
     KE EMu artefacts datastore
     """
@@ -947,79 +952,72 @@ class KeEMuIndexlotDatastore(object):
                 """
             )
 
-        query = """
-                SELECT i.irn as _id,
-                    i.material,
-                    i.is_type,
-                    i.media,
-                    i.kind_of_material,
-                    i.kind_of_media,
-                    t.scientific_name,
-                    t.kingdom,
-                    t.phylum,
-                    t.taxonomic_class,
-                    t.order,
-                    t.suborder,
-                    t.superfamily,
-                    t.family,
-                    t.subfamily,
-                    t.genus,
-                    t.subgenus,
-                    t.species,
-                    t.subspecies,
-                    t.validity,
-                    t.rank as taxonomic_rank,
-                    t.scientific_name_author,
-                    t.scientific_name_author_year,
-                    t.currently_accepted_name,
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(count,sex,types,stage,primary_type_number)::material_t
-                            )
-                        )
-                    ) as "material_detail",
-                    to_tsvector(
-                      concat_ws(',',
-                        ARRAY_TO_STRING(ARRAY_AGG(ARRAY[(sex, types, stage, primary_type_number)]::text), ','),
-                        i.kind_of_material,
-                        i.kind_of_media,
-                        t.scientific_name,
-                        t.kingdom,
-                        t.phylum,
-                        t.taxonomic_class,
-                        t.order,
-                        t.suborder,
-                        t.superfamily,
-                        t.family,
-                        t.subfamily,
-                        t.genus,
-                        t.subgenus,
-                        t.species,
-                        t.subspecies,
-                        t.validity,
-                        t.rank,
-                        t.scientific_name_author,
-                        t.scientific_name_author_year
-                      )
-                    ) as _full_text,
-                    ARRAY_TO_JSON(
-                        ARRAY_AGG(
-                            ROW_TO_JSON(
-                                ROW(mm.irn, mm.mime_type, mm.title)::multimedia_t
-                            )
-                        )
-                    ) as "multimedia"
-                FROM {schema}.indexlot i
-                LEFT OUTER JOIN {schema}.indexlot_material m ON m.irn = i.irn
-                LEFT OUTER JOIN {schema}.taxonomy t ON t.irn = i.taxonomy_irn
-                LEFT OUTER JOIN {schema}.catalogue_multimedia cmm ON cmm.catalogue_irn = i.irn
-                  LEFT OUTER JOIN {schema}.multimedia mm ON mm.irn = cmm.multimedia_irn
-                GROUP BY i.irn, t.irn
-                """.format(schema='keemu')
+        q = select([
+            IndexLotModel.irn.label('_id'),
+            IndexLotModel.material,
+            IndexLotModel.is_type,
+            IndexLotModel.media,
+            IndexLotModel.kind_of_material,
+            IndexLotModel.kind_of_media,
+            TaxonomyModel.scientific_name,
+            TaxonomyModel.kingdom,
+            TaxonomyModel.phylum,
+            TaxonomyModel.taxonomic_class,
+            TaxonomyModel.order,
+            TaxonomyModel.suborder,
+            TaxonomyModel.superfamily,
+            TaxonomyModel.family,
+            TaxonomyModel.subfamily,
+            TaxonomyModel.genus,
+            TaxonomyModel.subgenus,
+            TaxonomyModel.species,
+            TaxonomyModel.subspecies,
+            TaxonomyModel.validity,
+            TaxonomyModel.rank.label('taxonomic_rank'),
+            TaxonomyModel.scientific_name_author,
+            TaxonomyModel.scientific_name_author_year,
+            TaxonomyModel.currently_accepted_name,
+            # Material detail
+            func.array_to_json(
+                func.array_agg(
+                    func.row_to_json(
+                        literal_column('ROW(count, sex, types, stage, primary_type_number)::material_t')
+                    )
+                )
+            ).label('material_detail'),
 
-        return query
+            # Multimedia
+            func.array_to_string(
+                func.array_remove(
+                    func.array_agg(
+                        func.format(MULTIMEDIA_URL, catalogue_multimedia.c.multimedia_irn)
+                    ),
+                MULTIMEDIA_URL % ''
+                ), ';').label('multimedia'),
 
+            # Extra index so the material is represented
+            func.array_to_string(
+                func.array_agg(
+                    func.concat_ws(' ',
+                        IndexLotMaterialModel.stage,
+                        IndexLotMaterialModel.sex,
+                        IndexLotMaterialModel.types
+                    )
+                ), ' ').label('_index'),
+        ])
+
+        # Material
+        select_from = IndexLotModel.__table__.outerjoin(TaxonomyModel.__table__, TaxonomyModel.__table__.c.irn == IndexLotModel.__table__.c.taxonomy_irn)
+        # Taxonomy
+        select_from = select_from.outerjoin(IndexLotMaterialModel.__table__, IndexLotModel.__table__.c.irn == IndexLotMaterialModel.__table__.c.irn)
+        # Multimedia
+        select_from = select_from.outerjoin(catalogue_multimedia, catalogue_multimedia.c.catalogue_irn == IndexLotModel.__table__.c.irn)
+        q = q.select_from(select_from)
+
+        q = q.group_by(IndexLotModel.__table__.c.irn)
+        q = q.group_by(TaxonomyModel.__table__.c.irn)
+
+        return q
 
 class KeEMuArtefactDatastore(KeEMuDatastore):
     """
@@ -1062,20 +1060,21 @@ if __name__ == '__main__':
 
 
 
-    d = KeEMuSpecimensDatastore()
+    d = KeEMuIndexlotDatastore()
     # print d._dynamic_properties_view()
     # r = d.session.execute(d._dynamic_properties_view())
     # for x in r:
     #     print x
 
-    c = d._collection_date_view()
+    c = d.datastore_query()
+    print c
     # print x
     # q =
 
     # c = CreateAsSelect('dyn1', d._dynamic_properties_view())
-    result = d.session.execute(c)
-    for x in result:
-        print x
+    # result = d.session.execute(c)
+    # for x in result:
+    #     print x
 
 
     # d.session.commit()
