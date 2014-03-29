@@ -33,6 +33,7 @@ import inspect
 from collections import OrderedDict
 from sqlalchemy.schema import MetaData
 from sqlalchemy import desc
+from sqlalchemy import update
 
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
@@ -282,7 +283,7 @@ class KeEMuDatastore(object):
 
         source_table = self.build_source_table(resource_id)
 
-        self.materialize_resource(resource_id, source_table)
+        # self.materialize_resource(resource_id, source_table)
 
 
 class KeEMuSpecimensDatastore(KeEMuDatastore):
@@ -298,6 +299,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'notes': u'The Natural History Museum\'s collection',
         'title': "Collection"
     }
+
+    # TODO: Dynamic properties
 
     index_field_blacklist = [
         'associatedMedia',
@@ -331,7 +334,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     resource_type = 'dwc'
 
-    def build_source_table(self, resource_id, rebuild=True):
+    def build_source_table(self, resource_id, rebuild=False):
         """
         Override the build_source_table()
         Because of the complexity of the queries, there are a number of views we need to build first
@@ -350,8 +353,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         # Build the source table
         source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id, rebuild)
 
-        # TODO: Update dependencies
-        # TODO: Part Inheritance
+        # Part fields can inherit from parent
+        self.update_inherited_fields(source_table)
 
         return source_table
 
@@ -928,10 +931,44 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
     #     for unmapped_field, models in unmapped_fields.items():
     #         print '%s\t%s' % (unmapped_field, ';'.join(models))
 
-    def update_dependencies(self):
-        pass
+    def update_inherited_fields(self, source_table):
+        """
+        Fields that inherit from parts, updates to use the parent record field value if is null
+        But there are (apparently - TBC) some fields in the main specimen record that also are inheritable
+        @param source_table:
+        @return: None
+        """
 
-class KeEMuIndexlotDatastore(KeEMuDatastore):
+        print 'Updating dependent fields'
+
+        # List of inherited fields
+        inherited_fields = [
+            "Phylum",
+            "Suborder",
+            "Family",
+            "Subfamily"
+        ]
+
+        # There's no way of doing update set from in sqlalchemy - so add it just as plain sql
+        values = []
+        for inherited_field in inherited_fields:
+            values.append('"{inherited_field}" = COALESCE(s1."{inherited_field}", s2."{inherited_field}") '.format(inherited_field=inherited_field))
+
+        sql = """
+              UPDATE "{table}" s1
+              SET {values}
+              FROM "{table}" s2
+                INNER JOIN {part} p ON p.parent_irn = s2._id
+              WHERE s1._id = p.irn
+              """.format(table=source_table,
+                         values=', '.join(values),
+                         part=PartModel.__table__)
+
+        self.session.execute(sql)
+
+        print 'Updating dependent fields: SUCCESS'
+
+class KeEMuIndexlotDatastore(object):
     """
     KE EMu artefacts datastore
     """
@@ -1019,7 +1056,7 @@ class KeEMuIndexlotDatastore(KeEMuDatastore):
 
         return q
 
-class KeEMuArtefactDatastore(KeEMuDatastore):
+class KeEMuArtefactDatastore(object):
     """
     KE EMu artefacts datastore
     """
@@ -1060,13 +1097,13 @@ if __name__ == '__main__':
 
 
 
-    d = KeEMuIndexlotDatastore()
+    d = KeEMuSpecimensDatastore()
     # print d._dynamic_properties_view()
     # r = d.session.execute(d._dynamic_properties_view())
     # for x in r:
     #     print x
 
-    c = d.datastore_query()
+    c = d.update_inherited_fields()
     print c
     # print x
     # q =
