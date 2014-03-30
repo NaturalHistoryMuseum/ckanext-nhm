@@ -435,9 +435,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
             cols = ', '.join("'%s=' || %s.%s" % (self.convert_field_name(c.name), c.table, c.name) for c in columns)
 
-            # if ke_model is MineralogySpecimenModel:
-            #     cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
-
             tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__]])
 
             q = select([
@@ -461,11 +458,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             select_from = select_from.outerjoin(CollectionEventModel, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
             q = q.group_by(CollectionEventModel.__table__.c.irn)
 
-
-
-            # TODO: Temp - put back
             # Only select a particular type - this does mean more and a slower query - but ensures data is correct
-            # q = q.where(CatalogueModel.__table__.c.type == ke_model.__mapper_args__['polymorphic_identity'])
+            q = q.where(CatalogueModel.__table__.c.type == ke_model.__mapper_args__['polymorphic_identity'])
 
             # Add some extra fields for content types with external tables (Mineralogy, Paleo?)
 
