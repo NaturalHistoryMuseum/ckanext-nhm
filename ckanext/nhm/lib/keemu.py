@@ -58,7 +58,7 @@ class KeEMuDatastore(object):
         'resources': [],
     }
 
-    resource_type = None
+    format = 'csv'  # Default format is CSV
     session = None
     # Fields to exclude from the _full_text index
     index_field_blacklist = []
@@ -146,7 +146,7 @@ class KeEMuDatastore(object):
                     'name': self.name,
                     'description': self.description,
                     'package_id': package['id'],
-                    'resource_type': self.resource_type
+                    'format': self.format
                 }
             }
 
@@ -281,7 +281,7 @@ class KeEMuDatastore(object):
         """
         resource_id = self.create_datastore_resource()
 
-        source_table = self.build_source_table(resource_id)
+        # source_table = self.build_source_table(resource_id)
 
         # self.materialize_resource(resource_id, source_table)
 
@@ -293,9 +293,10 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     name = 'Specimens'
     description = 'Specimen records'
+    format = 'dwc'  # Darwin Core format
 
     package = {
-        'name': u'nhm-collection25',
+        'name': u'nhm-collection32',
         'notes': u'The Natural History Museum\'s collection',
         'title': "Collection"
     }
@@ -331,8 +332,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'CollectedMonth',
         'CollectedDay'
     ]
-
-    resource_type = 'dwc'
 
     def build_source_table(self, resource_id, rebuild=False):
         """
@@ -421,15 +420,20 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     def _dynamic_properties_view(self):
 
+        """
+        Rather than having a wide table (which CKAN is really struggling with), we can use DwC DynamicProperties
+        Peter Desmet recommends this approach: https://groups.google.com/forum/#!msg/canadensys/Et6VN0nbZ18/R4-4xRQ4u20J
+        @return: sqla query - irn, properties (key=value; key=value)
+        """
         qs = []
 
-        for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
+        for ke_model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
 
-            if model is StubModel:
+            if ke_model is StubModel:
                 continue
 
             # Get all columns not mapped to dwc
-            columns = self.dwc_get_unmapped_fields(model)
+            columns = self.dwc_get_unmapped_fields(ke_model)
 
             cols = ', '.join("'%s=' || %s.%s" % (self.convert_field_name(c.name), c.table, c.name) for c in columns)
 
@@ -460,7 +464,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             q = q.select_from(select_from)
 
             # Only select a particular type - this does mean more and a slower query - but ensures data is correct
-            q = q.where(CatalogueModel.__table__.c.type == model.__mapper_args__['polymorphic_identity'])
+            q = q.where(CatalogueModel.__table__.c.type == ke_model.__mapper_args__['polymorphic_identity'])
 
             # Create list of queries we'll union_all later
             qs.append(q)
@@ -968,7 +972,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         print 'Updating dependent fields: SUCCESS'
 
-class KeEMuIndexlotDatastore(object):
+class KeEMuIndexlotDatastore(KeEMuDatastore):
     """
     KE EMu artefacts datastore
     """
@@ -1056,7 +1060,7 @@ class KeEMuIndexlotDatastore(object):
 
         return q
 
-class KeEMuArtefactDatastore(object):
+class KeEMuArtefactDatastore(KeEMuDatastore):
     """
     KE EMu artefacts datastore
     """
