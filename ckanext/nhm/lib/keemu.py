@@ -7,7 +7,7 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 import sys
 from ke2sql.model.keemu import *
 
-from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia
+from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import mapper, column_property
 from sqlalchemy.sql.expression import select, join
@@ -301,8 +301,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'title': "Collection"
     }
 
-    # TODO: Dynamic properties
-
     index_field_blacklist = [
         'associatedMedia',
         'AssociatedRecords',
@@ -437,11 +435,13 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
             cols = ', '.join("'%s=' || %s.%s" % (self.convert_field_name(c.name), c.table, c.name) for c in columns)
 
+            # if ke_model is MineralogySpecimenModel:
+            #     cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
+
             tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__]])
 
             q = select([
                 SpecimenModel.__table__.c.irn,
-                func.concat_ws(literal_column("'; '"), literal_column(cols)).label('properties')
             ])
 
             # Build select from (for the joins)
@@ -461,10 +461,26 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             select_from = select_from.outerjoin(CollectionEventModel, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
             q = q.group_by(CollectionEventModel.__table__.c.irn)
 
-            q = q.select_from(select_from)
 
+
+            # TODO: Temp - put back
             # Only select a particular type - this does mean more and a slower query - but ensures data is correct
-            q = q.where(CatalogueModel.__table__.c.type == ke_model.__mapper_args__['polymorphic_identity'])
+            # q = q.where(CatalogueModel.__table__.c.type == ke_model.__mapper_args__['polymorphic_identity'])
+
+            # Add some extra fields for content types with external tables (Mineralogy, Paleo?)
+
+            # Mineralogy - so add mineralogical ages
+            if ke_model is MineralogySpecimenModel:
+                select_from = select_from.outerjoin(specimen_mineralogical_age, specimen_mineralogical_age.c.mineralogy_irn == SpecimenModel.__table__.c.irn)
+                select_from = select_from.outerjoin(MineralogicalAge, MineralogicalAge.__table__.c.id == specimen_mineralogical_age.c.mineralogical_age_id)
+                # Append the new fields to the existing columns
+                cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
+
+
+            # Add the main dynamic properties field (we do it here, so it can be manipulated by specific case
+            q = q.column(func.concat_ws(literal_column("'; '"), literal_column(cols)).label('properties'))
+
+            q = q.select_from(select_from)
 
             # Create list of queries we'll union_all later
             qs.append(q)
@@ -1107,8 +1123,8 @@ if __name__ == '__main__':
     # for x in r:
     #     print x
 
-    c = d.update_inherited_fields()
-    print c
+    c = d._dynamic_properties_view()
+    # print c
     # print x
     # q =
 
