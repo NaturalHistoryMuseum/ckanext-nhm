@@ -34,8 +34,7 @@ from collections import OrderedDict
 from sqlalchemy.schema import MetaData
 from sqlalchemy import desc
 from sqlalchemy import update
-import rdflib
-from ckanext.nhm.lib.dwc import get_dwc_properties
+from ckanext.nhm.lib.dwc import DwC
 
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
@@ -1148,7 +1147,12 @@ if __name__ == '__main__':
     # print os.path.dirname(os.path.realpath(__file__))
     # print os.getcwd()
 
-    p = get_dwc_properties()
+    dwc = DwC(institutionCode='NHM', occurrenceID=123, otherCatalogNumbers='1,2', created='12-02')
+
+    for name, term in dwc.get_group_terms('Occurrence'):
+        print term['uri']
+
+    # p = get_dwc_properties()
 
     # print p.keys()
 
@@ -1253,3 +1257,27 @@ if __name__ == '__main__':
     #
     #     print cls
 
+# def get_dwc_properties():
+#     """
+#     This build a dict of DwC properties, keyed by property name
+#     @return: dict
+#     """
+#
+#     g = Graph()
+#     g.load(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), 'src', 'dwcterms.rdf'))
+#
+#     DWC = Namespace('http://rs.tdwg.org/dwc/terms/')
+#     DWCA = Namespace('http://rs.tdwg.org/dwc/terms/attributes/')
+#
+#     properties = {}
+#
+#     for p in g.subjects(RDF.type, RDF.Property):
+#
+#         property_name = p.rsplit('/', 1)[1]
+#
+#         properties[property_name] = {
+#             'uri': p,
+#             'class': g.value(p, DWCA.organizedInClass)
+#         }
+#
+#     return properties

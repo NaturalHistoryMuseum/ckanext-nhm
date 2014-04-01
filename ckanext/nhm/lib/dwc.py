@@ -8,10 +8,12 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 import os
 from rdflib import Graph, RDF, RDFS, Namespace, URIRef
 
+from rdflib.namespace import DCTERMS
+
 class DwC(object):
 
     g = Graph()
-    g.load(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), 'src', 'dwcterms.rdf'))
+    g.load(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src', 'dwcterms.rdf'))
 
     DWC = Namespace('http://rs.tdwg.org/dwc/terms/')
     DWCA = Namespace('http://rs.tdwg.org/dwc/terms/attributes/')
@@ -25,17 +27,26 @@ class DwC(object):
     def __setitem__(self, name, value):
 
         # On setting a value, get the DwC term properties
-        term = self.get_term(name)
-        term['value'] = value
-        self.__dict__[name] = term
+        if not name.startswith('_'):
+            term = self.get_term(name)
+            term['value'] = value
+            self.__dict__[name] = term
 
     def __getitem__(self, name):
+
         return self.__dict__[name]
 
     def get_term(self, name):
         """
         Get a DwC term definition
         """
+        if name in ['created', 'modified']:
+            return {
+                'uri': URIRef(DCTERMS.term(name)),
+                'group': None,
+                'label': name.title()
+            }
+
         try:
             # Find the subject in the graph
             s, p, o = self.g.triples((URIRef(self.DWC.term(name)), RDF.type, RDF.Property)).next()
@@ -51,6 +62,11 @@ class DwC(object):
             raise AttributeError('Unknown DwC term: %s' % name)
 
     def get_group_terms(self, group):
+
+        """Generator returning terms in a particular group
+        @param group:
+        @return: dict
+        """
 
         if not isinstance(group, URIRef):
             group = URIRef(self.DWC.term(group))
