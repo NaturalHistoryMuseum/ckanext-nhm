@@ -5,9 +5,13 @@ import ckan.logic as logic
 from datetime import datetime
 import ckan.lib.formatters as formatters
 import urllib
-
+from collections import OrderedDict
 # All funcs will be made available as helpers
 from webhelpers.number import format_data_size
+from rdflib.namespace import DC
+from ckanext.nhm.lib.dwc import DwC
+import os
+
 
 log = logging.getLogger(__name__)
 
@@ -28,24 +32,30 @@ def get_site_statistics():
 def record_display_name(record):
     # Get the name to display for a record
     # TODO: Need to have a form for adding what field to use
-    # TODO: Remove
-
-    return record.get('title', None) or record.get('name', None) or 'Record %s' % record.get('_id', 'Unknown')
+    return record.get('title', None) or record.get('name', None) or record.get('name', None) or 'Record %s' % record.get('_id', 'Unknown')
 
 
-def keemu_record_display_name(record):
+def record_to_dwc(record):
 
-    # Get the name to display for a KE EMu record
+    return DwC(**record)
 
-    # Get name for specific record type
-    if record.type == 'artefact' and record.name:
-        return record.name
-    # Trying to access a non existent property will cause a session error - check first
-    elif hasattr(record, 'catalogue_number') and record.catalogue_number:
-        return 'Catalogue record %s' % record.catalogue_number
 
-    return 'Record %s' % record.irn
+def fields_have_content(record, fields):
+    """
+    See if any one of a list fo fields have content
+    @param record:
+    @param fields: fields to check exist
+    @return: True
+    """
+    for field in fields:
 
+        # Ensure it's a list
+        if not isinstance(field, list):
+            field = [field]
+
+        for f in field:
+            if record.get(f, None):
+                return True
 
 def keemu_render_datetime(datetime_):
     # Datetime formatter
