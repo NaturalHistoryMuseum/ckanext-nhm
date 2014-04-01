@@ -1,0 +1,55 @@
+{% extends "record/view.html" %}
+
+{% macro field_group(label, fields) -%}
+
+    {% if h.fields_have_content(rec, fields.values()) %}
+
+        <tr>
+            <th colspan="2">{{ label }}</th>
+        </tr>
+
+        {% for field_label, field_name in fields.items() : %}
+
+            {% if field_name is not string %}
+
+                {% set values = [] %}
+
+                {% for f in field_name : %}
+
+                    {% if rec[f] is not none %}
+                        {% do values.append(rec[f]) %}
+                    {% endif %}
+
+                {% endfor %}
+
+                {{ field_row(field_label, '-'.join(values), False) }}
+
+            {% else %}
+
+                {{ field_row(field_label, rec[field_name], False) }}
+
+            {% endif %}
+
+        {% endfor %}
+
+    {% endif %}
+
+{%- endmacro %}
+
+{% block record_content %}
+
+{% set dwc = h.record_to_dwc(rec) %}
+
+{{ dwc }}
+
+{% endblock %}
+
+  {% block record_additional_information_rows %}
+       <tr>
+        <th scope="row">{{ _('Last updated') }}</th>
+        <td>{{ h.render_datetime(rec.modified) }}</td>
+      </tr>
+
+       {{ super() }}
+
+  {% endblock %}
