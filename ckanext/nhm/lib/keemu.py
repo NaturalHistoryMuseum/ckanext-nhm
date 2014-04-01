@@ -35,6 +35,7 @@ from sqlalchemy.schema import MetaData
 from sqlalchemy import desc
 from sqlalchemy import update
 import rdflib
+from ckanext.nhm.lib.dwc import get_dwc_properties
 
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
@@ -43,6 +44,8 @@ MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
 TABLE = 'TABLE'
 
 Base = declarative_base()
+
+# TODO Check observedWeight is in dynamic properties
 
 class KeEMuDatastore(object):
     """
@@ -299,6 +302,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'title': "Collection"
     }
 
+    # TODO: Update these
     index_field_blacklist = [
         'associatedMedia',
         'AssociatedRecords',
@@ -316,7 +320,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'InstitutionCode',
         'date_collected_from',
         'date_collected_to',
-        'HigherTaxon',
+        'higherClassification',
         'ScientificNameAuthorYear',
         'CollectedFromYear',
         'CollectedFromMonth',
@@ -398,7 +402,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         metadata = MetaData(self.session.bind)
         _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
         q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
-        q = q.column(_dynamic_properties_v.c.properties.label('DynamicProperties'))
+        q = q.column(_dynamic_properties_v.c.properties.label('dynamicProperties'))
         q = q.group_by(_dynamic_properties_v.c.irn)
 
         return q
@@ -545,15 +549,18 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         qs = [
             select([
                 catalogue_associated_record.c.catalogue_irn.label('irn'),
-                catalogue_associated_record.c.associated_irn.label('associated_irn')
+                catalogue_associated_record.c.associated_irn.label('associated_irn'),
+                literal_column("'associated'").label('rel_type')
             ]).distinct(),
             select([
                 PartModel.__table__.c.irn.label('irn'),
                 PartModel.__table__.c.parent_irn.label('associated_irn'),
+                literal_column("'parent'").label('rel_type')
             ]).where(PartModel.__table__.c.parent_irn != None).distinct(),
             select([
                 PartModel.__table__.c.parent_irn.label('irn'),
                 PartModel.__table__.c.irn.label('associated_irn'),
+                literal_column("'part'").label('rel_type')
             ]).where(PartModel.__table__.c.parent_irn != None).distinct()
         ]
 
@@ -569,9 +576,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             TaxonomyModel.phylum,
             TaxonomyModel.taxonomic_class,
             TaxonomyModel.order,
-            TaxonomyModel.suborder,
             TaxonomyModel.family,
-            TaxonomyModel.subfamily,
             TaxonomyModel.genus,
             TaxonomyModel.subgenus,
             TaxonomyModel.species,
@@ -589,7 +594,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 TaxonomyModel.subfamily,
                 TaxonomyModel.genus,
                 TaxonomyModel.subgenus
-            ).label('HigherTaxon')
+            ).label('higherClassification')
         ])
 
         # NB: Printing the query will not show DISTINCT ON: Need to compile print q.compile(dialect=postgresql.dialect())
@@ -636,6 +641,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         _taxonomy_v = Table('_taxonomy_v', metadata, autoload=True)
         _collection_date_v = Table('_collection_date_v', metadata, autoload=True)
 
+
+
         q = select([
 
             # Catalogue model
@@ -643,87 +650,87 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             CatalogueModel.ke_date_modified.label('modified'),  # dcterms:modified
             CatalogueModel.ke_date_modified.label('created'),  # This isn't actually in DwC - but I'm going to use dcterms:created
 
-            literal_column("'%s'::text" % INSTITUTION_CODE).label('InstitutionCode'),
-            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn).label('GlobalUniqueIdentifier'),
+            literal_column("'%s'::text" % INSTITUTION_CODE).label('institutionCode'),
+            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn).label('occurrenceID'),
 
             # Other numbers
             func.array_to_string(
                 func.array_agg(
                     OtherNumbersModel.value
-                ), ';').label('OtherNumbers'),
+                ), ';').label('otherCatalogNumbers'),
 
             # Specimen model
             case(
                 [(SpecimenModel.collection_department == 'Entomology', 'BMNH(E)')],
                 else_=func.upper(func.substr(SpecimenModel.collection_department, 0, 4))
-            ).label('CollectionCode'),
-            SpecimenModel.catalogue_number.label('CatalogNumber'),
-            SpecimenModel.type_status.label('TypeStatus'),
-            # TODO: DwC just has identified???? Not split like this.
-            SpecimenModel.date_identified_day.label('DayIdentified'),
-            SpecimenModel.date_identified_month.label('MonthIdentified'),
-            SpecimenModel.date_identified_year.label('YearIdentified'),
-            SpecimenModel.specimen_count.label('IndividualCount'),
-            SpecimenModel.preparation.label('Preparations'),
-            SpecimenModel.preparation_type.label('PreparationType'),
-            SpecimenModel.weight.label('ObservedWeight'),
-            SpecimenModel.identification_qualifier.label('IdentificationQualifier'),
-            SpecimenModel.identified_by.label('IdentifiedBy'),
+            ).label('collectionCode'),
+            SpecimenModel.catalogue_number.label('catalogNumber'),
+            SpecimenModel.type_status.label('typeStatus'),
+
+            func.concat_ws('-',
+                SpecimenModel.date_identified_day,
+                SpecimenModel.date_identified_month,
+                SpecimenModel.date_identified_year
+            ).label('dateIdentified'),
+            SpecimenModel.specimen_count.label('individualCount'),
+            func.coalesce(
+                SpecimenModel.preparation,
+                SpecimenModel.preparation_type
+            ).label('preparations'),
+            SpecimenModel.identification_qualifier.label('identificationQualifier'),
+            SpecimenModel.identified_by.label('identifiedBy'),
 
             # Sex stage
             func.array_to_string(
                 func.array_agg(
                     SexStageModel.sex
-                ), ';').label('Sex'),
+                ), ';').label('sex'),
             func.array_to_string(
                 func.array_agg(
                     SexStageModel.stage
-                ), ';').label('LifeStage'),
+                ), ';').label('lifeStage'),
 
             # Site model
-            SiteModel.continent.label('Continent'),
-            SiteModel.country.label('Country'),
-            SiteModel.state_province.label('StateProvince'),
-            SiteModel.county.label('County'),
-            SiteModel.locality.label('Locality'),
-            SiteModel.ocean.label('ContinentOcean'),
-            SiteModel.island_group.label('IslandGroup'),
-            SiteModel.island.label('Island'),
-            SiteModel.geodetic_datum.label('GeodeticDatum'),
-            SiteModel.georef_method.label('GeorefMethod'),
-            SiteModel.decimal_latitude.label('DecimalLatitude'),
-            SiteModel.decimal_longitude.label('DecimalLongitude'),
+            SiteModel.continent.label('continent'),
+            SiteModel.country.label('country'),
+            SiteModel.state_province.label('stateProvince'),
+            SiteModel.county.label('county'),
+            SiteModel.locality.label('locality'),
+            SiteModel.island_group.label('islandGroup'),
+            SiteModel.island.label('island'),
+            SiteModel.geodetic_datum.label('geodeticDatum'),
+            SiteModel.georef_method.label('georeferenceProtocol'),
+            SiteModel.decimal_latitude.label('decimalLatitude'),
+            SiteModel.decimal_longitude.label('decimalLongitude'),
             SiteModel.latitude.label('verbatimLatitude'),
             SiteModel.longitude.label('verbatimLongitude'),
-            SiteModel.minimum_elevation_in_meters.label('MinimumElevationInMeters'),
-            SiteModel.maximum_elevation_in_meters.label('MaximumElevationInMeters'),
+            SiteModel.minimum_elevation_in_meters.label('minimumElevationInMeters'),
+            SiteModel.maximum_elevation_in_meters.label('maximumElevationInMeters'),
             func.coalesce(
                 SiteModel.river_basin,
                 SiteModel.ocean,
                 SiteModel.lake
-            ).label('WaterBody'),
+            ).label('waterBody'),
             func.concat_ws('; ',
                SiteModel.continent,
                SiteModel.country,
                SiteModel.state_province,
                SiteModel.county,
                SiteModel.nearest_named_place
-            ).label('HigherGeography'),
+            ).label('higherGeography'),
 
             # CollectionEvent
-            CollectionEventModel.time_collected_from.label('StartTimeOfDay'),
-            CollectionEventModel.time_collected_to.label('EndTimeOfDay'),
-            CollectionEventModel.collection_event_code.label('FieldNumber'),
+            CollectionEventModel.collection_event_code.label('fieldNumber'),
             CollectionEventModel.collection_method.label('samplingProtocol'),
             func.coalesce(
                 CollectionEventModel.collector_name,
                 CollectionEventModel.expedition_name
-            ).label('Collector'),
-            CollectionEventModel.collector_number.label('CollectorNumber'),
+            ).label('recordedBy'),
+            CollectionEventModel.collector_number.label('recordNumber'),
             func.coalesce(
                 CollectionEventModel.time_collected_from,
                 CollectionEventModel.time_collected_to
-            ).label('TimeOfDay'),
+            ).label('eventTime'),
             func.coalesce(
                 CollectionEventModel.depth_from_metres,
                 SiteModel.minimum_depth_in_meters
@@ -733,26 +740,20 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 SiteModel.maximum_depth_in_meters
             ).label('maximumDepthInMeters'),
             # Collection date
-            _collection_date_v.c.from_date_year.label('CollectedFromYear'),
-            _collection_date_v.c.from_date_month.label('CollectedFromMonth'),
-            _collection_date_v.c.from_date_day.label('CollectedFromDay'),
-            _collection_date_v.c.to_date_year.label('CollectedToYear'),
-            _collection_date_v.c.to_date_year.label('CollectedToMonth'),
-            _collection_date_v.c.to_date_day.label('CollectedToDay'),
             func.coalesce(
                 _collection_date_v.c.from_date_year,
                 _collection_date_v.c.to_date_year
-            ).label('CollectedYear'),
+            ).label('year'),
             func.coalesce(
                 _collection_date_v.c.from_date_month,
                 _collection_date_v.c.to_date_month
-            ).label('CollectedMonth'),
+            ).label('month'),
             func.coalesce(
                 _collection_date_v.c.from_date_day,
                 _collection_date_v.c.to_date_day
-            ).label('CollectedDay'),
+            ).label('day'),
             # Botany model
-            BotanySpecimenModel.habitat_verbatim.label('Habitat'),
+            BotanySpecimenModel.habitat_verbatim.label('habitat'),
 
             # Multimedia
             func.array_to_string(
@@ -768,7 +769,13 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 func.array_agg(
                     _associated_records_v.c.associated_irn
                 )
-            , ';').label('AssociatedRecords'),
+            , ';').label('relatedResourceID'),
+
+            func.array_to_string(
+                func.array_agg(
+                    _associated_records_v.c.rel_type
+                )
+            , ';').label('relationshipOfResource'),
 
             # Geological context
             _geological_context_v.c.earliestEonOrLowestEonothem,
@@ -788,22 +795,24 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             _geological_context_v.c.bed,
 
             # Taxonomy
-            _taxonomy_v.c.scientific_name.label('ScientificName'),
-            _taxonomy_v.c.kingdom.label('Kingdom'),
-            _taxonomy_v.c.phylum.label('Phylum'),
-            _taxonomy_v.c.taxonomic_class.label('Class'),
-            _taxonomy_v.c.order.label('Order'),
-            _taxonomy_v.c.suborder.label('Suborder'),
-            _taxonomy_v.c.family.label('Family'),
-            _taxonomy_v.c.subfamily.label('Subfamily'),
-            _taxonomy_v.c.genus.label('Genus'),
-            _taxonomy_v.c.subgenus.label('Subgenus'),
-            _taxonomy_v.c.species.label('Species'),
-            _taxonomy_v.c.subspecies.label('Subspecies'),
-            _taxonomy_v.c.rank.label('Rank'),
-            _taxonomy_v.c.scientific_name_author.label('ScientificNameAuthor'),
-            _taxonomy_v.c.scientific_name_author_year.label('ScientificNameAuthorYear'),
-            _taxonomy_v.c.HigherTaxon
+            _taxonomy_v.c.scientific_name.label('scientificName'),
+            _taxonomy_v.c.kingdom.label('kingdom'),
+            _taxonomy_v.c.phylum.label('phylum'),
+            _taxonomy_v.c.taxonomic_class.label('class'),
+            _taxonomy_v.c.order.label('order'),
+            _taxonomy_v.c.family.label('family'),
+            _taxonomy_v.c.genus.label('genus'),
+            _taxonomy_v.c.subgenus.label('subgenus'),
+            _taxonomy_v.c.species.label('specificEpithet'),
+            _taxonomy_v.c.subspecies.label('infraspecificEpithet'),
+            _taxonomy_v.c.rank.label('taxonRank'),
+
+            func.concat_ws(' ',
+               _taxonomy_v.c.scientific_name_author,
+               _taxonomy_v.c.scientific_name_author_year
+            ).label('scientificNameAuthorship'),
+
+            _taxonomy_v.c.higherClassification
 
         ])
 
@@ -959,10 +968,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         # List of inherited fields
         inherited_fields = [
-            "Phylum",
-            "Suborder",
-            "Family",
-            "Subfamily"
+            "phylum",
+            "family",
         ]
 
         # There's no way of doing update set from in sqlalchemy - so add it just as plain sql
@@ -1116,7 +1123,7 @@ if __name__ == '__main__':
 
 
     # d = KeEMuSpecimensDatastore()
-    # # print d._dynamic_properties_view()
+    # print d._associated_records_view()
     # # r = d.session.execute(d._dynamic_properties_view())
     # # for x in r:
     # #     print x
@@ -1141,15 +1148,25 @@ if __name__ == '__main__':
     # print os.path.dirname(os.path.realpath(__file__))
     # print os.getcwd()
 
-    g=rdflib.Graph()
-    g.load(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), 'src', 'dwctermshistory.rdf'))
+    p = get_dwc_properties()
 
-    DWC = Namespace('http://rs.tdwg.org/dwc/terms/')
-    DWCA = Namespace('http://rs.tdwg.org/dwc/terms/attributes/')
+    # print p.keys()
 
-    # DC terms history adds a date to the
-    for p in g.subjects():
-        print p
+
+    # print properties
+
+        # properties[property_name] = {
+        #
+        # }
+
+        #
+        # if property_name == 'individualCount':
+        #
+
+        #
+        #
+        #     print property_name
+        #     print g.value(p, DWCA.organizedInClass)
 
 
     # try:
