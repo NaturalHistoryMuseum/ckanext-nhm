@@ -19,7 +19,6 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
 
-
 class RecordController(base.BaseController):
     """
     Controller for displaying an individual record
@@ -49,7 +48,12 @@ class RecordController(base.BaseController):
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         # Try and use a template file based on the resource name
-        template_file = 'record/%s.html' % c.resource['name'].lower()
+        template_file = 'record/{dataset}_{resource}.html'.format(
+            # TODO: Change this
+            # dataset=c.package['name'].lower(),
+            dataset='collection',
+            resource=c.resource['name'].lower()
+        )
 
         if not find_template(template_file):
             # If we don;t have a specific template file, use the generic one
