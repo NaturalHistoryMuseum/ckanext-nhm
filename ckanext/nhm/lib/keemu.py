@@ -34,6 +34,7 @@ from collections import OrderedDict
 from sqlalchemy.schema import MetaData
 from sqlalchemy import desc
 from sqlalchemy import update
+import rdflib
 
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
@@ -157,7 +158,7 @@ class KeEMuDatastore(object):
 
         return resource_id
 
-    def build_source_table(self, resource_id, rebuild=True):
+    def build_source_table(self, resource_id):
         """
         Build a table to use as a source for the materialised view
 
@@ -171,21 +172,18 @@ class KeEMuDatastore(object):
         try:
             source_table = Table(source_table_name, self.metadata, autoload=True)
 
-            # If exists, do we want to rebuild (only really used for debugging)
-            if rebuild:
+            # Source table exists
+            # Remove existing data
+            self.session.execute(text('TRUNCATE TABLE "{source_table_name}"'.format(source_table_name=source_table_name)))
 
-                # Source table exists
-                # Remove existing data
-                self.session.execute(text('TRUNCATE TABLE "{source_table_name}"'.format(source_table_name=source_table_name)))
+            # Ensure columns match
+            assert [c.key for c in datastore_query.c] == [c.key for c in source_table.c]
 
-                # Ensure columns match
-                assert [c.key for c in datastore_query.c] == [c.key for c in source_table.c]
+            # INSERT INTO source_table (columns) (datastore_query)
+            q = source_table.insert().from_select(source_table.c, datastore_query)
+            self.session.execute(q)
 
-                # INSERT INTO source_table (columns) (datastore_query)
-                q = source_table.insert().from_select(source_table.c, datastore_query)
-                self.session.execute(q)
-
-                print 'Updating source table: SUCCESS'
+            print 'Updating source table: SUCCESS'
 
         except NoSuchTableError:
 
@@ -281,9 +279,9 @@ class KeEMuDatastore(object):
         """
         resource_id = self.create_datastore_resource()
 
-        # source_table = self.build_source_table(resource_id)
+        source_table = self.build_source_table(resource_id)
 
-        # self.materialize_resource(resource_id, source_table)
+        self.materialize_resource(resource_id, source_table)
 
 
 class KeEMuSpecimensDatastore(KeEMuDatastore):
@@ -331,24 +329,22 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'CollectedDay'
     ]
 
-    def build_source_table(self, resource_id, rebuild=False):
+    def build_source_table(self, resource_id):
         """
         Override the build_source_table()
         Because of the complexity of the queries, there are a number of views we need to build first
         @return: sqla source table
         """
 
-        if rebuild:
-
-            # Build the views on which the source table is built
-            self.create_view('_geological_context_v', self._geological_context_view())
-            self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
-            self.create_view('_collection_date_v', self._collection_date_view())
-            self.create_view('_taxonomy_v', self._taxonomy_view())
-            self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
+        # Build the views on which the source table is built
+        self.create_view('_geological_context_v', self._geological_context_view())
+        self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
+        self.create_view('_collection_date_v', self._collection_date_view())
+        self.create_view('_taxonomy_v', self._taxonomy_view())
+        self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
 
         # Build the source table
-        source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id, rebuild)
+        source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id)
 
         # Part fields can inherit from parent
         self.update_inherited_fields(source_table)
@@ -421,6 +417,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         """
         Rather than having a wide table (which CKAN is really struggling with), we can use DwC DynamicProperties
         Peter Desmet recommends this approach: https://groups.google.com/forum/#!msg/canadensys/Et6VN0nbZ18/R4-4xRQ4u20J
+        Also see: http://rs.tdwg.org/dwc/terms/simple/index.htm
         @return: sqla query - irn, properties (key=value; key=value)
         """
         qs = []
@@ -470,7 +467,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 # Append the new fields to the existing columns
                 cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
 
-
             # Add the main dynamic properties field (we do it here, so it can be manipulated by specific case
             q = q.column(func.concat_ws(literal_column("'; '"), literal_column(cols)).label('properties'))
 
@@ -509,6 +505,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         # TODO: There are other zones
         contexts['lowestBiostratigraphicZone'] = {'direction': 'from', 'stratigraphic_type': 'zone'}
         contexts['highestBiostratigraphicZone'] = {'direction': 'to', 'stratigraphic_type': 'zone'}
+
+        # TODO: LithostratigraphicTerms
 
         contexts['group'] = {'stratigraphic_type': 'group'}
         contexts['formation'] = {'stratigraphic_type': 'formation'}
@@ -642,9 +640,11 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
             # Catalogue model
             CatalogueModel.irn.label('_id'),
-            CatalogueModel.ke_date_modified.label('modified'),
+            CatalogueModel.ke_date_modified.label('modified'),  # dcterms:modified
+            CatalogueModel.ke_date_modified.label('created'),  # This isn't actually in DwC - but I'm going to use dcterms:created
+
             literal_column("'%s'::text" % INSTITUTION_CODE).label('InstitutionCode'),
-            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn).label('CatalogueNumber'),
+            func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn).label('GlobalUniqueIdentifier'),
 
             # Other numbers
             func.array_to_string(
@@ -659,6 +659,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             ).label('CollectionCode'),
             SpecimenModel.catalogue_number.label('CatalogNumber'),
             SpecimenModel.type_status.label('TypeStatus'),
+            # TODO: DwC just has identified???? Not split like this.
             SpecimenModel.date_identified_day.label('DayIdentified'),
             SpecimenModel.date_identified_month.label('MonthIdentified'),
             SpecimenModel.date_identified_year.label('YearIdentified'),
@@ -784,6 +785,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             _geological_context_v.c.group,
             _geological_context_v.c.formation,
             _geological_context_v.c.member,
+            _geological_context_v.c.bed,
 
             # Taxonomy
             _taxonomy_v.c.scientific_name.label('ScientificName'),
@@ -1106,18 +1108,24 @@ class KeEMuArtefactDatastore(KeEMuDatastore):
         q = q.group_by(ArtefactModel.__table__.c.irn)
         return q
 
+from rdflib.namespace import DC
+from rdflib import RDF, RDFS, Namespace, URIRef
+import os
 
 if __name__ == '__main__':
 
 
+    # d = KeEMuSpecimensDatastore()
+    # # print d._dynamic_properties_view()
+    # # r = d.session.execute(d._dynamic_properties_view())
+    # # for x in r:
+    # #     print x
+    #
+    # dwc_q = d._dwc_query()
+    #
+    # for column in dwc_q._raw_columns:
+    #     print "('%s', '%s')," % (column._label, column._label)
 
-    d = KeEMuSpecimensDatastore()
-    # print d._dynamic_properties_view()
-    # r = d.session.execute(d._dynamic_properties_view())
-    # for x in r:
-    #     print x
-
-    c = d._dynamic_properties_view()
     # print c
     # print x
     # q =
@@ -1127,14 +1135,104 @@ if __name__ == '__main__':
     # for x in result:
     #     print x
 
-
     # d.session.commit()
 
     #
-    # print x
+    # print os.path.dirname(os.path.realpath(__file__))
+    # print os.getcwd()
+
+    g=rdflib.Graph()
+    g.load(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.path.pardir)), 'src', 'dwctermshistory.rdf'))
+
+    DWC = Namespace('http://rs.tdwg.org/dwc/terms/')
+    DWCA = Namespace('http://rs.tdwg.org/dwc/terms/attributes/')
+
+    # DC terms history adds a date to the
+    for p in g.subjects():
+        print p
+
+
+    # try:
+    #     s, p, o = g.triples((URIRef(DWC.term('GlobalUniqueIdentifier')), RDF.type, RDF.Property)).next()
+    #     print s
+    # except StopIteration:
+    #     print 'Does not exist'
+
+
+
     #
-    # result = session.execute(x)
-    # # for row in result:
-    # #     print row
+    # print s
+
     #
+    # print g.label(s)
+    #
+    # print s
+
+
+    #
+    # print p
+
+    # print g.value(URIRef(DWC.acceptedNameUsage))
+
+    # print g.items(URIRef(DWC.acceptedNameUsage))
+
+
+    # print g[(URIRef(DWC.acceptedNameUsage), RDF.type, RDF.Property)]
+
+    # print p.next()
+    #
+    # print dir(p)
+
+    # for x in p:
+    #     print x
+
+    #
+
+
+    #
+    # # cls = g.value(p, DWC.organizedInClass)
+    #
+    # # print dwc.organizedInClasses
+    #
+    # for s,o,p in g:
+    #     print s.label()
+        # print o
+        # print p
+
+
+    # for p in g.subjects(DC.description, DWC.pylum):
+    #     print p
+
+    #
+    # # Loop through the table, getting the property from the graph for each field
+    #
+    #
+    # terms = OrderedDict
+    #
+    # print g
+
+    # print DWC.acceptedNameUsage
+    #
+    # print g.value(RDF.value, DWC.acceptedNameUsage)
+
+    # for p in g.subjects(RDFS.label, rdflib.Literal(u'County')):
+    #     print p
+
+
+    # for p in g.subjects(RDF.type, RDF.Property):
+    #
+    #     print '-----------'
+    #     print p
+    #     for x in g.predicate_objects(p):
+    #         print x
+
+        # print type(p)
+
+
+    #     # for m in g.objects(p, RDFS.label):
+    #     #     print m
+    #
+    #     cls = g.value(p, DWC.organizedInClass)
+    #
+    #     print cls
 
