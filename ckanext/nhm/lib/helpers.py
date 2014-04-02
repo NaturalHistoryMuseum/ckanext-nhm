@@ -8,7 +8,6 @@ import urllib
 from collections import OrderedDict
 # All funcs will be made available as helpers
 from webhelpers.number import format_data_size
-from rdflib.namespace import DC
 from ckanext.nhm.lib.dwc import DwC
 import os
 
@@ -33,11 +32,6 @@ def record_display_name(record):
     # Get the name to display for a record
     # TODO: Need to have a form for adding what field to use
     return record.get('title', None) or record.get('name', None) or record.get('name', None) or 'Record %s' % record.get('_id', 'Unknown')
-
-
-def record_to_dwc(record):
-
-    return DwC(**record)
 
 
 def fields_have_content(record, fields):
