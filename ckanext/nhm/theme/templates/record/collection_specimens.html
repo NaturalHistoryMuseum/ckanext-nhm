@@ -1,55 +1,45 @@
 {% extends "record/view.html" %}
 
-{% macro field_group(label, fields) -%}
-
-    {% if h.fields_have_content(rec, fields.values()) %}
-
-        <tr>
-            <th colspan="2">{{ label }}</th>
-        </tr>
-
-        {% for field_label, field_name in fields.items() : %}
-
-            {% if field_name is not string %}
-
-                {% set values = [] %}
-
-                {% for f in field_name : %}
-
-                    {% if rec[f] is not none %}
-                        {% do values.append(rec[f]) %}
-                    {% endif %}
-
-                {% endfor %}
-
-                {{ field_row(field_label, '-'.join(values), False) }}
-
-            {% else %}
-
-                {{ field_row(field_label, rec[field_name], False) }}
-
-            {% endif %}
-
-        {% endfor %}
-
-    {% endif %}
-
-{%- endmacro %}
-
 {% block record_content %}
 
-{% set dwc = h.record_to_dwc(rec) %}
+{% set dwc = h.DwC(**rec) %}
 
-{{ dwc }}
+<table>
+
+{% for group, terms in dwc.get_groups(): %}
+
+    <tr><th colspan="2">
+        {{ group }}
+    </th></tr>
+
+    {% for term_name in terms: %}
+
+        {% set term = dwc.get_term(term_name) %}
+
+        <tr>
+            <td width="250">
+                <a href="{{ term['uri'] }}" title="{{ term['uri'] }} target="_blank">{{ term_name }}</a>
+            </td>
+            <td>{{ term['value'] if term['value'] != None else '' }}</td>
+        </tr>
+
+    {% endfor %}
+
+{% endfor %}
+
+</table>
 
 {% endblock %}
 
   {% block record_additional_information_rows %}
        <tr>
+        <th scope="row">{{ _('Created') }}</th>
+        <td>{{ h.render_datetime(rec.created) }}</td>
+      </tr>
+       <tr>
         <th scope="row">{{ _('Last updated') }}</th>
         <td>{{ h.render_datetime(rec.modified) }}</td>
       </tr>
-
        {{ super() }}
 
   {% endblock %}
