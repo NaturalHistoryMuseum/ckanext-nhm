@@ -1,0 +1,28 @@
+--- tdwg_dwcterms.xsd
++++ tdwg_dwcterms.xsd
+@@ -80,6 +80,7 @@
+         <xs:sequence>
+             <xs:element ref="dcterms:type" minOccurs="0"/>
+             <xs:element ref="dcterms:modified" minOccurs="0"/>
++            <xs:element ref="dcterms:created" minOccurs="0"/>
+             <xs:element ref="dcterms:language" minOccurs="0"/>
+             <xs:element ref="dcterms:rights" minOccurs="0"/>
+             <xs:element ref="dcterms:rightsHolder" minOccurs="0"/>
+@@ -203,7 +204,7 @@
+     <xs:element name="higherGeographyID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyLocationTerm"/>
+     <xs:element name="higherGeography" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
+     <xs:element name="continent" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
+-    <xs:element name="waterbody" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
++    <xs:element name="waterBody" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
+     <xs:element name="islandGroup" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
+     <xs:element name="island" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
+     <xs:element name="country" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>
+@@ -248,7 +249,7 @@
+             <xs:element ref="dwc:higherGeographyID" minOccurs="0"/>
+             <xs:element ref="dwc:higherGeography" minOccurs="0"/>
+             <xs:element ref="dwc:continent" minOccurs="0"/>
+-            <xs:element ref="dwc:waterbody" minOccurs="0"/>
++            <xs:element ref="dwc:waterBody" minOccurs="0"/>
+             <xs:element ref="dwc:islandGroup" minOccurs="0"/>
+             <xs:element ref="dwc:island" minOccurs="0"/>
+             <xs:element ref="dwc:country" minOccurs="0"/>
