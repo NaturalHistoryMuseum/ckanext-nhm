@@ -5,7 +5,9 @@
 {% set res = c.resource %}
 {% set pkg = c.pkg_dict or pkg_dict %}
 
-{% set record_name = h.record_display_name(c.record_dict) %}
+{% if not record_name %}
+    {% set record_name = h.record_display_name(c.record_dict) %}
+{% endif %}
 
 {% block head_extras -%}
   {{ super() }}
@@ -22,44 +24,44 @@
   <li class="active"><a href="">{{ record_name|truncate(30) }}</a></li>
 {% endblock %}
 
-{% block pre_primary %}
-    <section class="module module-resource">
+{% block primary_content_inner %}
+
+    <section class="module module-record">
         <div class="module-content">
+
+            {% block heading %}
+                <h1 class="page-heading">{{ record_name|truncate(50) }}</h1>
+            {% endblock %}
+
             <div class="actions">
                 <ul>
                     <li><a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"><i class="icon-download"></i> {{ _('Download') }}</a></li>
                 </ul>
             </div>
+        </div>
 
-            <h1 class="page-heading">{{ record_name|truncate(50) }}</h1>
+    </section>
 
-            <div class="record-content">
-            {% block record_content %}
+    {% block record %}
+
+        <div class="record-content">
 
             <table>
 
                 {% for field_name in rec: %}
-
                     {% if rec[field_name]: %}
-
                         {{ field_row(field_name, rec[field_name]) }}
-
                     {% endif %}
-
                 {% endfor %}
 
             </table>
 
-            {% endblock %}
-
-            </div>
-
         </div>
-    </section>
-{% endblock %}
 
-{% block primary_content %}
-    {% block record_additional_information %}
+    {% endblock %}
+
+    {% block record_metadata %}
+
         <section class="module">
             <div class="module-content">
               <h2>{{ _('Additional Information') }}</h2>
@@ -72,7 +74,7 @@
                 </thead>
                 <tbody>
 
-                  {% block record_additional_information_rows %}
+                  {% block record_metadata_rows %}
                        <tr>
                         <th scope="row">{{ _('Format') }}</th>
                         <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
@@ -96,10 +98,6 @@
                       <tr class="toggle-more">
                         <th scope="row">{{ _('Resource ID') }}</th>
                         <td>{{ res.id }}</td>
-                      </tr>
-                      <tr class="toggle-more">
-                        <th scope="row">{{ _('Status') }}</th>
-                        <td>{{ rec.status or _('unknown') }}</td>
                       </tr>
                   {% endblock %}
 

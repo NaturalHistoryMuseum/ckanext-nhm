@@ -1,62 +1,60 @@
-{% from 'macros/record.html' import field_row %}
-{% extends "package/base.html" %}
+{% extends "record/view.html" %}
 
-{% set rec = c.record_dict  %}
-{% set res = c.resource %}
-{% set pkg = c.pkg_dict or pkg_dict %}
+{% if c.record_dict['scientificName'] %}
+    {% set record_name = '%s (%s)' % (c.record_dict['scientificName'], c.record_dict['occurrenceID']) %}
+{% else %}
+    {% set record_name = c.record_dict['occurrenceID'] %}
+{% endif %}
 
-{% set record_name = h.record_display_name(c.record_dict) %}
+{% block content_primary_nav %}
 
-{% block head_extras -%}
-  {{ super() }}
-  <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_name }} - {{ g.site_title }}">
-{% endblock -%}
+  {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+  {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
 
-{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{record_name}} {% endblock %}
-
-{% block breadcrumb_content_selected %}{% endblock %}
-
-{% block breadcrumb_content %}
-  {{ super() }}
-  <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
-  <li class="active"><a href="">{{ record_name|truncate(30) }}</a></li>
 {% endblock %}
 
-{% block pre_primary %}
-    <section class="module module-resource">
-        <div class="module-content">
-            <div class="actions">
-                <ul>
-                    <li><a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"><i class="icon-download"></i> {{ _('Download') }}</a></li>
-                </ul>
-            </div>
+{% block record %}
 
-            <h1 class="page-heading">DWC{{ record_name|truncate(50) }}</h1>
+    {% set dwc = h.DwC(**rec) %}
 
-            <div class="record-content">
-            {% block record_content %}
+    <table>
 
-                <p>DWC View</p>
+    {% for group, terms in dwc.get_groups(): %}
 
-            {% endblock %}
+        <tr><th colspan="2">
+            {{ group }}
+        </th></tr>
 
-            </div>
+        {% for term_name in terms: %}
 
-        </div>
-    </section>
+            {% set term = dwc.get_term(term_name) %}
+
+            <tr>
+                <td width="250">
+                    <a href="{{ term['uri'] }}" title="{{ term['uri'] }} target="_blank">{{ term_name }}</a>
+                </td>
+
+                <td>{{ term['value'] if term['value'] != None else '' }}</td>
+            </tr>
+
+        {% endfor %}
+
+    {% endfor %}
+
+    </table>
+
 {% endblock %}
 
-{% block primary_content %}
-    {% block record_additional_information %}
 
-
-    {% endblock %}
-{% endblock %}
-
-{% block secondary_content %}
-
-  {% block resource_license %}
-    {% snippet "snippets/social.html" %}
-  {% endblock %}
+{% block record_metadata_rows %}
+   <tr>
+    <th scope="row">{{ _('Created') }}</th>
+    <td>{{ h.render_datetime(rec.created) }}</td>
+  </tr>
+   <tr>
+    <th scope="row">{{ _('Last updated') }}</th>
+    <td>{{ h.render_datetime(rec.modified) }}</td>
+  </tr>
+   {{ super() }}
 
 {% endblock %}
