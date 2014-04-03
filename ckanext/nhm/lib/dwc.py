@@ -81,8 +81,6 @@ class DwC(object):
 
         return label
 
-
-
     def get_groups(self):
         """
         @return: Generator of group names
