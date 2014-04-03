@@ -27,6 +27,8 @@ import itertools
 import abc
 import ckan.model as model
 import ckan.logic as logic
+import ckan.plugins.toolkit as toolkit
+from pylons import config
 from itertools import chain
 from sqlalchemy import union_all
 import inspect
@@ -87,6 +89,11 @@ class KeEMuDatastore(object):
         """
         Return the select query to create the datastore
         """
+        return None
+
+    @abc.abstractproperty
+    def geom_columns(self):
+        """Return the latitude and longitude field names, or None"""
         return None
 
     def view_exists(self, view_name):
@@ -169,6 +176,9 @@ class KeEMuDatastore(object):
         """
         source_table_name = '_source_%s' % resource_id
 
+        user = logic.get_action('get_site_user')({'model': model, 'ignore_auth': True}, {})
+        context = {'model': model, 'session': model.Session, 'user': user['name'], 'extras_as_string': True}
+
         datastore_query = self.datastore_query()
 
         try:
@@ -178,12 +188,33 @@ class KeEMuDatastore(object):
             # Remove existing data
             self.session.execute(text('TRUNCATE TABLE "{source_table_name}"'.format(source_table_name=source_table_name)))
 
+            # List the columns we want to copy
+            copy_columns = []
+            exclude = []
+            if self.geom_columns:
+                exclude.append(config.get('map.geom_field', '_the_geom_webmercator'))
+                exclude.append(config.get('map.geom_field_4326', '_geom'))
+
+            for c in source_table.c:
+                if c.key not in exclude:
+                    copy_columns.append(c)
+
             # Ensure columns match
-            assert [c.key for c in datastore_query.c] == [c.key for c in source_table.c]
+            assert [c.key for c in datastore_query.c] == [c.key for c in copy_columns]
 
             # INSERT INTO source_table (columns) (datastore_query)
-            q = source_table.insert().from_select(source_table.c, datastore_query)
+            q = source_table.insert().from_select(copy_columns, datastore_query)
             self.session.execute(q)
+            self.session.commit()
+
+            # Update geometry columns
+            if self.geom_columns is not None:
+                update_geom_columns = toolkit.get_action('update_geom_columns')
+                update_geom_columns(context, {
+                    'resource_id': source_table_name,
+                    'lat_field': self.geom_columns['lat_field'],
+                    'long_field': self.geom_columns['long_field']
+                })
 
             print 'Updating source table: SUCCESS'
 
@@ -193,6 +224,15 @@ class KeEMuDatastore(object):
             q = CreateAsSelect(source_table_name, datastore_query)
             self.session.execute(q)
             self.session.commit()
+
+            # Add geometry columns
+            if self.geom_columns is not None:
+                create_geom_columns = toolkit.get_action('create_geom_columns')
+                create_geom_columns(context, {
+                    'resource_id': source_table_name,
+                    'lat_field': self.geom_columns['lat_field'],
+                    'long_field': self.geom_columns['long_field']
+                })
 
             # Reflect the new source table
             source_table = Table(source_table_name, self.metadata, autoload=True)
@@ -331,6 +371,11 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'CollectedMonth',
         'CollectedDay'
     ]
+
+    geom_columns = {
+        'lat_field': 'decimalLatitude',
+        'long_field': 'decimalLongitude'
+    }
 
     def build_source_table(self, resource_id):
         """
@@ -997,6 +1042,7 @@ class KeEMuIndexlotDatastore(KeEMuDatastore):
     name = 'Index lots'
     description = 'Entomology indexlot records'
     package = KeEMuSpecimensDatastore.package
+    geom_columns = None
 
     def datastore_query(self):
 
@@ -1091,6 +1137,8 @@ class KeEMuArtefactDatastore(KeEMuDatastore):
     }
 
     index_field_blacklist = ['multimedia']
+
+    geom_columns = None
 
     def datastore_query(self):
 
