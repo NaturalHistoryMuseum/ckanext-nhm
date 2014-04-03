@@ -5,7 +5,6 @@ import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 import logging
-from ckanext.nhm.logic import NotDarwinCore
 
 log = logging.getLogger(__name__)
 
@@ -36,6 +35,10 @@ class DarwinCoreController(base.BaseController):
         # Try & get the resource
         try:
             c.resource = get_action('resource_show')(context, {'id': resource_id})
+
+            if c.resource['format'] != 'dwc':
+                abort(404, _('No Darwin Core record found'))
+
             c.package = get_action('package_show')(context, {'id': package_name})
             # required for nav menu
             c.pkg = context['package']
@@ -43,8 +46,6 @@ class DarwinCoreController(base.BaseController):
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id, 'dwc': True})
         except NotFound:
             abort(404, _('Resource not found'))
-        except NotDarwinCore:
-            abort(404, _('Not a DarwinCore record'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 

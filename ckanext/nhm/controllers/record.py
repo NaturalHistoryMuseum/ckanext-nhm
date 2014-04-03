@@ -6,7 +6,6 @@ import ckan.plugins as p
 from ckan.common import _, c
 import logging
 from ckan.lib.render import find_template
-from ckanext.nhm.logic import NotDarwinCore
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +48,7 @@ class RecordController(base.BaseController):
 
         # Try and use a template file based on the resource name
         template_file = 'record/{dataset}_{resource}.html'.format(
-            # TODO: Change this
+            # TODO: TEMP: Change this
             # dataset=c.package['name'].lower(),
             dataset='collection',
             resource=c.resource['name'].lower()
