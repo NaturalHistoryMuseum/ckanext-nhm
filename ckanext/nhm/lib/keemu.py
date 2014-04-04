@@ -5,36 +5,22 @@ Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
 import sys
-from ke2sql.model.keemu import *
-
-from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import mapper, column_property
-from sqlalchemy.sql.expression import select, join
-from sqlalchemy.sql import expression, functions
-from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy import text
-from sqlalchemy import Table, Column, Integer, Float, String, ForeignKey, Boolean, Date, UniqueConstraint, Enum, DateTime, func
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.sql.expression import cast
-from sqlalchemy import literal_column
-from sqlalchemy import case
-from sqlalchemy import and_, or_
-from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect
-import csv
-import sqlalchemy
 import itertools
 import abc
+import inspect
+from collections import OrderedDict
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql.expression import select, join
+from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all
+from sqlalchemy.schema import MetaData
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from pylons import config
-from itertools import chain
-from sqlalchemy import union_all
-import inspect
-from collections import OrderedDict
-from sqlalchemy.schema import MetaData
-from sqlalchemy import desc
+from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect
+from ke2sql.model.keemu import *
+from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
 
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
 
@@ -43,8 +29,6 @@ MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
 TABLE = 'TABLE'
 
 Base = declarative_base()
-
-# TODO Check observedWeight is in dynamic properties
 
 class KeEMuDatastore(object):
     """
@@ -108,7 +92,7 @@ class KeEMuDatastore(object):
         @return: package
         """
         #  Merge package params with default params
-        params = dict(chain(self.default_package_params.iteritems(), self.package.iteritems()))
+        params = dict(itertools.chain(self.default_package_params.iteritems(), self.package.iteritems()))
 
         try:
 
@@ -328,6 +312,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     # TODO: Check all data and fields
     # TODO: Add more to dynamic properties (sites etc.,)
+    # TODO Check observedWeight is in dynamic properties
 
     name = 'Specimens'
     description = 'Specimen records'
@@ -339,35 +324,32 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'title': "Collection"
     }
 
-    # TODO: Update these
     index_field_blacklist = [
-        'associatedMedia',
-        'AssociatedRecords',
-        'DecimalLatitude',
+        'modified',
+        'created',
+        'institutionCode',
+        'dateIdentified',
+        'individualCount',
+        'decimalLatitude',
+        'decimalLongitude',
         'verbatimLatitude',
         'verbatimLongitude',
-        'MinimumElevationInMeters',
-        'MaximumElevationInMeters',
-        'FieldNumber',
-        'CollectorNumber',
-        'DecimalLongitude',
-        'properties',
-        'StartTimeOfDay',
-        'EndTimeOfDay',
-        'InstitutionCode',
-        'date_collected_from',
-        'date_collected_to',
+        'minimumElevationInMeters',
+        'maximumElevationInMeters',
+        'higherGeography',
+        'fieldNumber',
+        'recordNumber',
+        'eventTime',
+        'minimumDepthInMeters',
+        'maximumDepthInMeters',
+        'year',
+        'month',
+        'day',
+        'associatedMedia',
+        'relatedResourceID',
+        'relationshipOfResource',
         'higherClassification',
-        'ScientificNameAuthorYear',
-        'CollectedFromYear',
-        'CollectedFromMonth',
-        'CollectedFromMonth',
-        'CollectedToYear',
-        'CollectedToMonth',
-        'CollectedToDay',
-        'CollectedYear',
-        'CollectedMonth',
-        'CollectedDay'
+        'properties',
     ]
 
     geom_columns = {
