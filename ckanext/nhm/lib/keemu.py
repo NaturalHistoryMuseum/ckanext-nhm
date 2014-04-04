@@ -317,16 +317,16 @@ class KeEMuDatastore(object):
 class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     # TODO: Check all data and fields
-    # TODO: Add more to dynamic properties (sites etc.,)
+    # TODO: Check paleo fields
 
     name = 'Specimens'
     description = 'Specimen records'
     format = 'dwc'  # Darwin Core format
 
     package = {
-        'name': u'nhm-collection34',
+        'name': u'nhm-collection',
         'notes': u'The Natural History Museum\'s collection',
-        'title': "Collection"
+        'title': "Specimens"
     }
 
     # Fields not to include in the _full_text index
