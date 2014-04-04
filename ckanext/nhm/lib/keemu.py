@@ -12,13 +12,13 @@ from collections import OrderedDict
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import select, join
 from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all
+from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_
 from sqlalchemy.schema import MetaData
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from pylons import config
-from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect
+from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect, InsertFromSelect
 from ke2sql.model.keemu import *
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
 
@@ -167,30 +167,29 @@ class KeEMuDatastore(object):
         datastore_query = self.datastore_query()
 
         try:
+
             source_table = Table(source_table_name, self.metadata, autoload=True)
 
             # Source table exists
             # Remove existing data
             self.session.execute(text('TRUNCATE TABLE "{source_table_name}"'.format(source_table_name=source_table_name)))
 
-            # List the columns we want to copy
-            copy_columns = []
-            exclude = []
-            if self.geom_columns:
-                exclude.append(config.get('map.geom_field', '_the_geom_webmercator'))
-                exclude.append(config.get('map.geom_field_4326', '_geom'))
+            print 'Deleting existing records: SUCCESS'
 
-            for c in source_table.c:
-                if c.key not in exclude:
-                    copy_columns.append(c)
+            # Set geometry columns to null
+            datastore_query = datastore_query.column(literal_column("NULL").label(config.get('map.geom_field_4326', '_geom')))
+            datastore_query = datastore_query.column(literal_column("NULL").label(config.get('map.geom_field', '_the_geom_webmercator')))
 
             # Ensure columns match
-            assert [c.key for c in datastore_query.c] == [c.key for c in copy_columns]
+            assert [c.key for c in datastore_query.c] == [c.key for c in source_table.c]
 
-            # INSERT INTO source_table (columns) (datastore_query)
-            q = source_table.insert().from_select(copy_columns, datastore_query)
+            #  INSERT INTO source_table (copy_columns) (SELECT ... datastore_query)
+            q = InsertFromSelect(source_table, datastore_query)
+
             self.session.execute(q)
             self.session.commit()
+
+            print 'Updating source table: SUCCESS'
 
             # Update geometry columns
             if self.geom_columns is not None:
@@ -201,7 +200,7 @@ class KeEMuDatastore(object):
                     'long_field': self.geom_columns['long_field']
                 })
 
-            print 'Updating source table: SUCCESS'
+            print 'Updating geometry: SUCCESS'
 
         except NoSuchTableError:
 
@@ -245,7 +244,7 @@ class KeEMuDatastore(object):
         q = q.where(information_schema.c.data_type.in_(['character varying', 'text']))
 
         if self.full_text_blacklist:
-            q = q.where(information_schema.c.column_name.notin_(self.full_text_blacklist))
+            q = q.where(not_(information_schema.c.column_name.in_(self.full_text_blacklist)))
 
         return self.session.execute(q).scalar()
 
@@ -376,17 +375,17 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         """
 
         # Build the views on which the source table is built
-        self.create_view('_geological_context_v', self._geological_context_view())
-        self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
-        self.create_view('_collection_date_v', self._collection_date_view())
-        self.create_view('_taxonomy_v', self._taxonomy_view())
-        self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
+        # self.create_view('_geological_context_v', self._geological_context_view())
+        # self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
+        # self.create_view('_collection_date_v', self._collection_date_view())
+        # self.create_view('_taxonomy_v', self._taxonomy_view())
+        # self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
 
         # Build the source table
         source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id)
 
         # Part fields can inherit from parent
-        self.update_inherited_fields(source_table)
+        # self.update_inherited_fields(source_table)
 
         return source_table
 
@@ -488,10 +487,10 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 q = q.group_by(table.c.irn)
 
             # Add joins and group by to events and sites
-            select_from = select_from.outerjoin(SiteModel, SiteModel.__table__.c.irn == SpecimenModel.__table__.c.site_irn)
+            select_from = select_from.outerjoin(SiteModel.__table__, SiteModel.__table__.c.irn == SpecimenModel.__table__.c.site_irn)
             q = q.group_by(SiteModel.__table__.c.irn)
 
-            select_from = select_from.outerjoin(CollectionEventModel, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
+            select_from = select_from.outerjoin(CollectionEventModel.__table__, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
             q = q.group_by(CollectionEventModel.__table__.c.irn)
 
             # Only select a particular type - this does mean more and a slower query - but ensures data is correct
@@ -502,7 +501,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             # Mineralogy - so add mineralogical ages
             if ke_model is MineralogySpecimenModel:
                 select_from = select_from.outerjoin(specimen_mineralogical_age, specimen_mineralogical_age.c.mineralogy_irn == SpecimenModel.__table__.c.irn)
-                select_from = select_from.outerjoin(MineralogicalAge, MineralogicalAge.__table__.c.id == specimen_mineralogical_age.c.mineralogical_age_id)
+                select_from = select_from.outerjoin(MineralogicalAge.__table__, MineralogicalAge.__table__.c.id == specimen_mineralogical_age.c.mineralogical_age_id)
                 # Append the new fields to the existing columns
                 cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
 
@@ -641,6 +640,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     @staticmethod
     def _collection_date_view():
+
+        # TODO: Not needed anymore
 
         q = select([
             SpecimenModel.irn,
@@ -860,7 +861,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         select_from = select_from.outerjoin(BotanySpecimenModel.__table__, BotanySpecimenModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
 
         # Other numbers
-        select_from = select_from.outerjoin(OtherNumbersModel, OtherNumbersModel.__table__.c.irn == SpecimenModel.__table__.c.irn)
+        select_from = select_from.outerjoin(OtherNumbersModel.__table__, OtherNumbersModel.__table__.c.irn == SpecimenModel.__table__.c.irn)
 
         # Sex stage
         select_from = select_from.outerjoin(specimen_sex_stage, specimen_sex_stage.c.specimen_irn == CatalogueModel.__table__.c.irn)

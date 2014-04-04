@@ -8,7 +8,7 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 import pylons
 from sqlalchemy.orm import sessionmaker
 from ckanext.datastore.db import _get_engine
-from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.ext import compiler
 from sqlalchemy.sql.expression import Executable, ClauseElement
 
 def get_datastore_session():
@@ -26,23 +26,21 @@ def get_datastore_session():
     return session()
 
 
-# class CreateTableAs(Executable, ClauseElement):
-#     """
-#     Compiler to use as CREATE TABLE [x] AS [SELECT]
-#     Used to create the KE EMu datastore table
-#     """
-#     def __init__(self, table, select):
-#         self.table = table
-#         self.select = select
-#
-# @compiles(CreateTableAs)
-# def visit_create_table_as(element, compiler, **kw):
-#     return "CREATE TABLE \"%s\" AS (%s)" % (
-#         element.table,
-#         compiler.process(element.select)
-#     )
+class InsertFromSelect(Executable, ClauseElement):
+    """
+    Compiler to use as INSERT INTO t1 (SELECT * FROM t2)
+    table.insert().from_select(select) is not available in sqla 0.7.8
+    """
+    def __init__(self, table, select):
+        self.table = table
+        self.select = select
 
-
+@compiler.compiles(InsertFromSelect)
+def visit_insert_from_select(element, compiler, **kw):
+    return "INSERT INTO %s (%s)" % (
+        compiler.process(element.table, asfrom=True),
+        compiler.process(element.select)
+    )
 
 class CreateAsSelect(Executable, ClauseElement):
     """
@@ -53,7 +51,7 @@ class CreateAsSelect(Executable, ClauseElement):
         self.select = select
         self.object_type = object_type
 
-@compiles(CreateAsSelect)
+@compiler.compiles(CreateAsSelect)
 def visit_create_as_select(element, compiler, **kw):
     return "CREATE %s \"%s\" AS (%s)" % (
         element.object_type,
