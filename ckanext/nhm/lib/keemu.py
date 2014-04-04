@@ -177,8 +177,9 @@ class KeEMuDatastore(object):
             print 'Deleting existing records: SUCCESS'
 
             # Set geometry columns to null
-            datastore_query = datastore_query.column(literal_column("NULL").label(config.get('map.geom_field_4326', '_geom')))
-            datastore_query = datastore_query.column(literal_column("NULL").label(config.get('map.geom_field', '_the_geom_webmercator')))
+            if self.geom_columns is not None:
+                datastore_query = datastore_query.column(literal_column("NULL").label(config.get('map.geom_field_4326', '_geom')))
+                datastore_query = datastore_query.column(literal_column("NULL").label(config.get('map.geom_field', '_the_geom_webmercator')))
 
             # Ensure columns match
             assert [c.key for c in datastore_query.c] == [c.key for c in source_table.c]
@@ -200,7 +201,7 @@ class KeEMuDatastore(object):
                     'long_field': self.geom_columns['long_field']
                 })
 
-            print 'Updating geometry: SUCCESS'
+                print 'Updating geometry: SUCCESS'
 
         except NoSuchTableError:
 
@@ -295,7 +296,7 @@ class KeEMuDatastore(object):
 
             # Create additional indexes on the view
             for index_field in self.index_fields:
-                self.session.execute('CREATE INDEX "{resource_id}_{index_field}_idx" ON "{resource_id}" ("{index_field})"'.format(
+                self.session.execute('CREATE INDEX "{resource_id}_{index_field}_idx" ON "{resource_id}" ("{index_field}")'.format(
                     resource_id=resource_id,
                     index_field=index_field
                 ))
@@ -375,17 +376,17 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         """
 
         # Build the views on which the source table is built
-        # self.create_view('_geological_context_v', self._geological_context_view())
-        # self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
-        # self.create_view('_collection_date_v', self._collection_date_view())
-        # self.create_view('_taxonomy_v', self._taxonomy_view())
-        # self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
+        self.create_view('_geological_context_v', self._geological_context_view())
+        self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
+        self.create_view('_collection_date_v', self._collection_date_view())
+        self.create_view('_taxonomy_v', self._taxonomy_view())
+        self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
 
         # Build the source table
         source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id)
 
         # Part fields can inherit from parent
-        # self.update_inherited_fields(source_table)
+        self.update_inherited_fields(source_table)
 
         return source_table
 
