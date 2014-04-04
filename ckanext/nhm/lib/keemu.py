@@ -225,7 +225,7 @@ class KeEMuDatastore(object):
 
         return source_table
 
-    def get_index_fields(self, source_table):
+    def get_full_text_fields(self, source_table):
         """
         Concatenated list of text fields fields to include in _full_text index
         @return: string
@@ -263,7 +263,7 @@ class KeEMuDatastore(object):
             self.session.execute('DROP TABLE "{resource_id}"'.format(resource_id=resource_id))
 
         # Get all text fields to use in the _full_index
-        index_fields = self.get_index_fields(source_table)
+        full_text_fields = self.get_full_text_fields(source_table)
 
         # At this point, all of the source tables are in place
         # So create or refresh the materialised view
@@ -283,7 +283,7 @@ class KeEMuDatastore(object):
             view_q = select(columns)
             view_q = view_q.column(
                 func.to_tsvector(
-                    literal_column("ARRAY_TO_STRING(ARRAY[%s], ' ')" % index_fields)
+                    literal_column("ARRAY_TO_STRING(ARRAY[%s], ' ')" % full_text_fields)
                 ).label('_full_text')
             )
 
@@ -294,8 +294,8 @@ class KeEMuDatastore(object):
             self.session.execute('CREATE UNIQUE INDEX "{resource_id}_id_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id,))
 
             # Create additional indexes on the view
-            for index_field in index_fields:
-                self.session.execute('CREATE INDEX "{resource_id}_{index_field}_idx" ON "{resource_id}" ({index_field})'.format(
+            for index_field in self.index_fields:
+                self.session.execute('CREATE INDEX "{resource_id}_{index_field}_idx" ON "{resource_id}" ("{index_field})"'.format(
                     resource_id=resource_id,
                     index_field=index_field
                 ))
