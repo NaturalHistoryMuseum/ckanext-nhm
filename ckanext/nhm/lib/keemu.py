@@ -53,6 +53,8 @@ class KeEMuDatastore(object):
     # Fields to index (in addition to primary key)
     index_fields = []
 
+    geom_columns = None
+
     def __init__(self):
         self.session = get_datastore_session()
         self.metadata = MetaData(self.session.bind)
@@ -74,11 +76,6 @@ class KeEMuDatastore(object):
         """
         Return the select query to create the datastore
         """
-        return None
-
-    @abc.abstractproperty
-    def geom_columns(self):
-        """Return the latitude and longitude field names, or None"""
         return None
 
     def view_exists(self, view_name):
@@ -1027,7 +1024,6 @@ class KeEMuIndexlotDatastore(KeEMuDatastore):
     name = 'Index lots'
     description = 'Entomology indexlot records'
     package = KeEMuSpecimensDatastore.package
-    geom_columns = None
 
     def datastore_query(self):
 
@@ -1122,8 +1118,6 @@ class KeEMuArtefactDatastore(KeEMuDatastore):
     }
 
     full_text_blacklist = ['multimedia']
-
-    geom_columns = None
 
     def datastore_query(self):
 
