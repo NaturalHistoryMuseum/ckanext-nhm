@@ -48,7 +48,10 @@ class KeEMuDatastore(object):
     format = 'csv'  # Default format is CSV
     session = None
     # Fields to exclude from the _full_text index
-    index_field_blacklist = []
+    full_text_blacklist = []
+
+    # Fields to index (in addition to primary key)
+    index_fields = []
 
     def __init__(self):
         self.session = get_datastore_session()
@@ -241,8 +244,8 @@ class KeEMuDatastore(object):
         # We only want varchar and text types
         q = q.where(information_schema.c.data_type.in_(['character varying', 'text']))
 
-        if self.index_field_blacklist:
-            q = q.where(information_schema.c.column_name.notin_(self.index_field_blacklist))
+        if self.full_text_blacklist:
+            q = q.where(information_schema.c.column_name.notin_(self.full_text_blacklist))
 
         return self.session.execute(q).scalar()
 
@@ -287,10 +290,16 @@ class KeEMuDatastore(object):
 
             # Create the view
             self.session.execute('CREATE MATERIALIZED VIEW "{resource_id}" AS ({view_q})'.format(resource_id=resource_id, view_q=view_q))
-            # Create index on the view
-            self.session.execute('CREATE UNIQUE INDEX "{resource_id}_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id))
 
-            # TODO: Add other indexes? Scientific name?
+            #  Create primary key (_id) index
+            self.session.execute('CREATE UNIQUE INDEX "{resource_id}_id_idx" ON "{resource_id}" (_id)'.format(resource_id=resource_id,))
+
+            # Create additional indexes on the view
+            for index_field in index_fields:
+                self.session.execute('CREATE INDEX "{resource_id}_{index_field}_idx" ON "{resource_id}" ({index_field})'.format(
+                    resource_id=resource_id,
+                    index_field=index_field
+                ))
 
         self.session.commit()
 
@@ -319,12 +328,12 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
     format = 'dwc'  # Darwin Core format
 
     package = {
-        'name': u'nhm-collection32',
+        'name': u'nhm-collection34',
         'notes': u'The Natural History Museum\'s collection',
         'title': "Collection"
     }
 
-    index_field_blacklist = [
+    full_text_blacklist = [
         'modified',
         'created',
         'institutionCode',
@@ -351,6 +360,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'higherClassification',
         'properties',
     ]
+
+    index_fields = ['scientificName']
 
     geom_columns = {
         'lat_field': 'decimalLatitude',
@@ -664,8 +675,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         _associated_records_v = Table('_associated_records_v', metadata, autoload=True)
         _taxonomy_v = Table('_taxonomy_v', metadata, autoload=True)
         _collection_date_v = Table('_collection_date_v', metadata, autoload=True)
-
-
 
         q = select([
 
@@ -1116,7 +1125,7 @@ class KeEMuArtefactDatastore(KeEMuDatastore):
         'title': "Artefacts"
     }
 
-    index_field_blacklist = ['multimedia']
+    full_text_blacklist = ['multimedia']
 
     geom_columns = None
 
