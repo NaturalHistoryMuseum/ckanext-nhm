@@ -321,7 +321,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     # TODO: Check all data and fields
     # TODO: Add more to dynamic properties (sites etc.,)
-    # TODO Check observedWeight is in dynamic properties
 
     name = 'Specimens'
     description = 'Specimen records'
@@ -333,6 +332,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'title': "Collection"
     }
 
+    # Fields not to include in the _full_text index
     full_text_blacklist = [
         'modified',
         'created',
@@ -361,12 +361,17 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'properties',
     ]
 
+    # Extra fields to index on
     index_fields = ['scientificName']
 
     geom_columns = {
         'lat_field': 'decimalLatitude',
         'long_field': 'decimalLongitude'
     }
+
+    # Fields not to include in dynamic properties
+    # All fields included in DwC will be excluded automatically
+    dynamic_properties_blacklist = ['ke_date_inserted', 'type', 'date_collected_from', 'date_collected_to']
 
     def build_source_table(self, resource_id):
         """
@@ -443,13 +448,25 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         return q
 
     @staticmethod
-    def convert_field_name(name):
+    def get_dynamic_properties_field_name(name):
         """
         Convert a field name to capital case
         @param name: field name
         @return: FieldName
         """
-        return ''.join(n.capitalize() or '_' for n in name.split('_'))
+
+        # Some fields in dynamic properties map to existing DwC fields, so we should use the old field name
+        field_name_mappings = {
+            'weight': 'observedWeight'
+        }
+
+        try:
+            field_name = field_name_mappings[name]
+        except KeyError:
+            field_name = ''.join(n.capitalize() or '_' for n in name.split('_'))
+
+        return field_name
+
 
     def _dynamic_properties_view(self):
 
@@ -467,9 +484,9 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 continue
 
             # Get all columns not mapped to dwc
-            columns = self.dwc_get_unmapped_fields(ke_model)
+            columns = self.dwc_get_dynamic_properties(ke_model)
 
-            cols = ', '.join("'%s=' || %s.%s" % (self.convert_field_name(c.name), c.table, c.name) for c in columns)
+            cols = ', '.join("'%s=' || %s.%s" % (self.get_dynamic_properties_field_name(c.name), c.table, c.name) for c in columns)
 
             tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__]])
 
@@ -641,8 +658,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     @staticmethod
     def _collection_date_view():
-
-        # TODO: Not needed anymore
 
         q = select([
             SpecimenModel.irn,
@@ -932,7 +947,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return columns
 
-    def dwc_get_unmapped_fields(self, model):
+    def dwc_get_dynamic_properties(self, model):
         """
         For a model, get all unmapped DwC fields
         """
@@ -949,7 +964,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 return False
 
             # Fields we don't want to include
-            if field.key in ['ke_date_inserted', 'type']:
+            if field.key in self.dynamic_properties_blacklist:
                 return False
 
             if field.key.startswith('_'):
@@ -969,27 +984,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 pass
 
         return list(itertools.ifilter(_field_filter, itertools.chain.from_iterable([t.columns for t in tables])))
-
-    # def def_list_all_unmapped(self):
-    #     """
-    #     Output a list of all unmapped fields
-    #     """
-    #     unmapped_fields = OrderedDict()
-    #
-    #     for model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
-    #
-    #         for field in self.dwc_get_unmapped_fields(model):
-    #
-    #             try:
-    #
-    #                 if model.__table__.name not in unmapped_fields[field.name]:
-    #                     unmapped_fields[field.name].append(model.__table__.name)
-    #
-    #             except KeyError:
-    #                 unmapped_fields[field.name] = [model.__table__.name]
-    #
-    #     for unmapped_field, models in unmapped_fields.items():
-    #         print '%s\t%s' % (unmapped_field, ';'.join(models))
 
     def update_inherited_fields(self, source_table):
         """
