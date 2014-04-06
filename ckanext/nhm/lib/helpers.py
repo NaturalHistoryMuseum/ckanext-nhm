@@ -11,8 +11,10 @@ from webhelpers.number import format_data_size
 from ckanext.nhm.lib.dwc import DwC
 import os
 
-
 log = logging.getLogger(__name__)
+
+# TODO: Why is this necessary? Add tuple() to jinja2
+tuple = tuple
 
 def get_site_statistics():
     # TODO: TEMP: Just to put some stats on the home page
@@ -41,7 +43,7 @@ def fields_have_content(record, fields):
     @param fields: fields to check exist
     @return: True
     """
-    for field in fields:
+    for field, label in fields:
 
         # Ensure it's a list
         if not isinstance(field, list):
@@ -57,4 +59,3 @@ def keemu_render_datetime(datetime_):
     # Convert data to datetime
     datetime_ = datetime.combine(datetime_, datetime.min.time())
     return formatters.localised_nice_date(datetime_, show_date=True)
-
