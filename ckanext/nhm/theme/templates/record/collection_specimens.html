@@ -1,7 +1,91 @@
 {% extends "dwc/view.html" %}
+{% from 'macros/record.html' import field_row %}
 
 {% block record %}
 
-    <p>TODO</p>
+    {% if rec['collectionCode'] == 'BOT': %}
+        {% do rec.update({'collectionCode':'BOT (Botany)'}) %}
+    {% elif rec['collectionCode'] == 'MIN': %}
+        {% do rec.update({'collectionCode':'BOT (Mineralogy)'}) %}
+    {% elif rec['collectionCode'] == 'PAL': %}
+        {% do rec.update({'collectionCode':'PAL (Paleontology)'}) %}
+    {% elif rec['collectionCode'] == 'BMNH(E)': %}
+        {% do rec.update({'collectionCode':'NHM(E) (Entomology)'}) %}
+    {% endif %}
+
+    {% for property in rec.dynamicProperties.split(';'): %}
+        {% do rec.update([h.tuple(property.strip().split('='))]) %}
+    {% endfor %}
+
+    {% do rec.update([('collection_date', '-'.join([rec['day'], rec['month'], rec['year']]))]) %}
+
+    {% set group_fields = [
+        ('Classification', [
+            ('scientificName', 'Scientific name'),
+            ('kingdom', 'Kingdom'),
+            ('phylum', 'Phylum'),
+            ('class', 'Class'),
+            ('order', 'Order'),
+            ('suborder', 'Suborder'),
+            ('superfamily', 'Superfamily'),
+            ('family', 'Family'),
+            ('subfamily', 'Subfamily'),
+            ('genus', 'Genus'),
+            ('subgenus', 'Subgenus'),
+            ('specificEpithet', 'Species'),
+            ('infraspecificEpithet', 'Subspecies'),
+            ('taxonRank', 'Rank'),
+            ('validity', 'Validity'),
+            ('currentlyAcceptedName', 'Currently accepted name'),
+            ('scientificNameAuthorship', 'Authorship')
+        ]),
+        ('Specimen', [
+            ('collectionCode', 'Collection code'),
+            ('CollectionSubDepartment', 'Sub department'),
+            ('SpecimenUnit', 'Specimen unit'),
+            ('CurationUnit', 'Curation unit'),
+            ('catalogNumber', 'Catalogue number'),
+            ('otherCatalogNumbers', 'Other catalogue numbers')
+        ]),
+        ('Occurrence', [
+            ('recordNumber', 'Record/collector number'),
+            ('recordedBy', 'Collector'),
+            ('individualCount', 'Count'),
+            ('sex', 'Sex'),
+            ('lifeStage', 'Life stage'),
+            ('preparations', 'Preparations')
+        ]),
+        ('Collection event', [
+            ('recordNumber', 'Record/collector number'),
+            ('recordedBy', 'Collector'),
+            ('individualCount', 'Count'),
+            ('sex', 'Sex'),
+            ('lifeStage', 'Life stage'),
+            ('preparations', 'Preperations'),
+            ('collection_date', 'Collection date')
+        ])
+    ] %}
+
+    <table>
+
+        {% for group, fields in group_fields: %}
+
+            {% if h.fields_have_content(rec, fields) %}
+
+                <tr><th colspan="2">{{ group }}</th></tr>
+
+                {% for field, label in fields: %}
+
+                    {{ field_row(label, rec[field]) }}
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endfor %}
+
+    </table>
+
+
 
 {% endblock %}

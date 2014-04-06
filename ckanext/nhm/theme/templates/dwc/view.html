@@ -15,7 +15,7 @@
 
 {% block record %}
 
-    {% set dwc = h.DwC(**rec) %}
+    {% set dwc = h.DwC(**c.record_dict) %}
 
     <table>
 

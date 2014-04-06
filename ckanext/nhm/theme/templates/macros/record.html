@@ -2,7 +2,7 @@
     <strong>{{label}}</strong> {{value}}
 {%- endmacro %}
 
-{% macro field_row(label, value, display_none = True) -%}
+{% macro field_row(label, value, display_none = False) -%}
 
     {% if value or display_none: %}
         <tr>
