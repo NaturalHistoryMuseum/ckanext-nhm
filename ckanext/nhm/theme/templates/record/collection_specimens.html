@@ -1,6 +1,5 @@
 {% extends "dwc/view.html" %}
-{% from 'macros/record.html' import field_row %}
-
+{
 {% block record %}
 
     {% if rec.collectionCode == 'BOT': %}
@@ -156,7 +155,6 @@
         ('Botany', [
             ('exsiccati', 'Exsiccati'),
             ('exsiccatiNumber', 'Exsiccati number'),
-            ('siteDescription', 'Site description'),
             ('plantDescription', 'Plant description'),
             ('cultivated', 'Cultivated'),
             ('plantForm', 'Plant form'),
@@ -195,11 +193,16 @@
 
             {% if h.fields_have_content(rec, fields) %}
 
-                <tr><th colspan="2">{{ group }}</th></tr>
+                <tr><th colspan="3">{{ group }}</th></tr>
 
                 {% for field, label in fields: %}
 
-                    {{ field_row(label, rec[field]) }}
+                    {% if rec[field]: %}
+                        <tr>
+                        <td><strong>{{ label }}:</strong></td>
+                        <td colspan="2">{{ rec[field] }}</td>
+                        </tr>
+                    {% endif %}
 
                 {% endfor %}
 
@@ -207,6 +210,50 @@
 
         {% endfor %}
 
+        {% if h.fields_have_content(rec, ['earliestEonOrLowestEonothem', 'latestEonOrHighestEonothem', 'earliestEraOrLowestErathem', 'earliestPeriodOrLowestSystem', 'latestPeriodOrHighestSystem', 'earliestEpochOrLowestSeries', 'latestEpochOrHighestSeries', 'earliestAgeOrLowestStage', 'latestAgeOrHighestStage', 'lowestBiostratigraphicZone', 'highestBiostratigraphicZone', 'group', 'formation', 'member', 'bed']) %}
+
+            <tr>
+                <tr><th colspan="3">Geology</th></tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <th>From</th>
+                    <th>To</th>
+                </tr>
+            </tr>
+
+            {% set geo_fields = [
+                ('Eon', 'earliestEonOrLowestEonothem', 'latestEonOrHighestEonothem'),
+                ('Era', 'earliestEraOrLowestErathem', 'latestEraOrLowestErathem'),
+                ('Period', 'earliestPeriodOrLowestSystem', 'latestPeriodOrHighestSystem'),
+                ('Epoch', 'earliestEpochOrLowestSeries', 'latestEpochOrHighestSeries'),
+                ('Stage', 'earliestAgeOrLowestStage', 'latestAgeOrHighestStage'),
+                ('Biostratigraphic zone', 'lowestBiostratigraphicZone', 'highestBiostratigraphicZone'),
+            ] %}
+
+            {% for time, from, to in geo_fields: %}
+
+                <tr>
+                    <td><strong>{{ time }}</strong></td>
+                    <td>{{ rec[from] or '' }}</td>
+                    <td>{{ rec[to] or '' }}</td>
+                </tr>
+
+            {% endfor %}
+
+
+            {% for field in ['group', 'formation', 'member', 'bed']: %}
+
+                {% if rec[field]: %}
+                    <tr>
+                    <td><strong>{{ field|title }}:</strong></td>
+                    <td colspan="2">{{ rec[field] }}</td>
+                    </tr>
+                {% endif %}
+
+            {% endfor %}
+
+
+        {% endif %}
 
         {% if rec.relatedResourceID: %}
 
@@ -223,13 +270,13 @@
 
         <tr>
 
-            <tr><th colspan="2">Related records</th></tr>
+            <tr><th colspan="3">Related records</th></tr>
 
             {% for type, records in related_records.items(): %}
 
                 <tr>
                     <td><strong>{{ type|title }}</strong></td>
-                    <td>
+                    <td colspan="2">
                         <ul>
                             {% for record_id in records: %}
                                 <li>
