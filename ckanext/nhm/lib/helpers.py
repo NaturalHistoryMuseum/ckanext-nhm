@@ -39,15 +39,13 @@ def fields_have_content(record, fields):
     @param fields: fields to check exist
     @return: True
     """
-    for field, label in fields:
+    for field in fields:
 
-        # Ensure it's a list
-        if not isinstance(field, list):
-            field = [field]
+        if isinstance(field, tuple):
+            field = field[0]
 
-        for f in field:
-            if record.get(f, None):
-                return True
+        if record.get(field, None):
+            return True
 
 def keemu_render_datetime(datetime_):
     # Datetime formatter
