@@ -3,13 +3,15 @@
 
 {% block record %}
 
-    {% if rec['collectionCode'] == 'BOT': %}
+    {% if rec.collectionCode == 'BOT': %}
         {% do rec.update({'collectionCode':'BOT (Botany)'}) %}
-    {% elif rec['collectionCode'] == 'MIN': %}
+    {% elif rec.collectionCode == 'MIN': %}
         {% do rec.update({'collectionCode':'BOT (Mineralogy)'}) %}
-    {% elif rec['collectionCode'] == 'PAL': %}
+    {% elif rec.collectionCode == 'PAL': %}
         {% do rec.update({'collectionCode':'PAL (Paleontology)'}) %}
-    {% elif rec['collectionCode'] == 'BMNH(E)': %}
+    {% elif rec.collectionCode == 'ZOO': %}
+        {% do rec.update({'collectionCode':'ZOO (Zoology)'}) %}
+    {% elif rec.collectionCode == 'BMNH(E)': %}
         {% do rec.update({'collectionCode':'NHM(E) (Entomology)'}) %}
     {% endif %}
 
@@ -17,7 +19,27 @@
         {% do rec.update([h.tuple(property.strip().split('='))]) %}
     {% endfor %}
 
-    {% do rec.update([('collection_date', '-'.join([rec['day'], rec['month'], rec['year']]))]) %}
+    {% set collection_date = [] %}
+
+    {% for i in ['day', 'month', 'year']: %}
+
+        {% if rec[i]: %}
+            {% do collection_date.append(rec[i]) %}
+        {% endif %}
+
+    {% endfor %}
+
+    {% if collection_date: %}
+        {% do rec.update([('collectionDate', '-'.join(collection_date))]) %}
+    {% endif %}
+
+    {% set registered_weight_label = 'Registered weight' %}
+
+    {% if rec.registeredWeightUnit: %}
+        {% set registered_weight_label = 'Registered weight' + ' (' + rec.registeredWeightUnit + ')' %}
+    {% else %}
+        {% set registered_weight_label = 'Registered weight' %}
+    {% endif %}
 
     {% set group_fields = [
         ('Classification', [
@@ -39,31 +61,125 @@
             ('currentlyAcceptedName', 'Currently accepted name'),
             ('scientificNameAuthorship', 'Authorship')
         ]),
-        ('Specimen', [
-            ('collectionCode', 'Collection code'),
-            ('CollectionSubDepartment', 'Sub department'),
-            ('SpecimenUnit', 'Specimen unit'),
-            ('CurationUnit', 'Curation unit'),
-            ('catalogNumber', 'Catalogue number'),
-            ('otherCatalogNumbers', 'Other catalogue numbers')
-        ]),
-        ('Occurrence', [
-            ('recordNumber', 'Record/collector number'),
-            ('recordedBy', 'Collector'),
-            ('individualCount', 'Count'),
-            ('sex', 'Sex'),
-            ('lifeStage', 'Life stage'),
-            ('preparations', 'Preparations')
+        ('Location', [
+            ('continent', 'Continent'),
+            ('waterBody', 'Water body'),
+            ('islandGroup', 'Island group'),
+            ('island', 'Island'),
+            ('country', 'Country'),
+            ('stateProvince', 'State / province'),
+            ('county', 'County'),
+            ('vice_county', 'Vice county'),
+            ('parish', 'Parish'),
+            ('town', 'Town'),
+            ('mineral_complex', 'Mineral complex'),
+            ('mine', 'Mine'),
+            ('miningDistrict', 'Mining district'),
+            ('tectonicProvince', 'Tectonic province'),
+            ('geologyRegion', 'Geology region'),
+            ('locality', 'Locality'),
+            ('siteDescription', 'Site description'),
+            ('minimumElevationInMeters','Minimum elevation (meters)'),
+            ('maximumElevationInMeters','Maximum elevation (meters)'),
+            ('minimumDepthInMeters','Minimum depth (meters)'),
+            ('maximumDepthInMeters','Maximum depth (meters)'),
+            ('verbatimLatitude','Latitude'),
+            ('verbatimLongitude','Longitude'),
+            ('decimalLatitude','Decimal latitude'),
+            ('decimalLongitude','Decimal longitude'),
+            ('geodeticDatum','Geodetic datum'),
+            ('georeferenceProtocol','Georeferencing protocol'),
         ]),
         ('Collection event', [
-            ('recordNumber', 'Record/collector number'),
+            ('recordNumber', 'Collector number'),
             ('recordedBy', 'Collector'),
+            ('collectionDate', 'Collection date'),
+            ('eventTime', 'Collection time'),
+            ('habitat', 'Habitat'),
+            ('fieldNumber', 'Field number'),
+            ('expeditionStartDate', 'Expedition start date'),
+            ('vesselName', 'Vessel name'),
+            ('vesselType', 'Vessel type'),
+        ]),
+        ('Identification', [
+            ('identifiedBy', 'Identified by'),
+            ('dateIdentified', 'Date identified'),
+            ('identificationQualifier', 'Identification qualifier'),
+            ('typeStatus', 'Type status'),
+            ('identificationAsRegistered', 'Identification as registered'),
+        ]),
+        ('Specimen', [
+            ('catalogNumber', 'Catalogue number'),
+            ('collectionCode', 'Collection code'),
+            ('collectionSubDepartment', 'Collection sub-department'),
+            ('specimenUnit', 'Specimen unit'),
+            ('curationUnit', 'Curation unit'),
+            ('otherCatalogNumbers', 'Other catalogue numbers'),
+            ('preparations', 'Preparations'),
+            ('preservation', 'Preservation'),
+            ('verbatimLabelData', 'Verbatim label data'),
+            ('donorName', 'Donor name'),
+            ('dateCatalogued', 'Date catalogued'),
+            ('kindOfCollection', 'Kind of collection'),
+            ('weight', 'Weight'),
+            ('registrationCode', 'Registration code'),
             ('individualCount', 'Count'),
             ('sex', 'Sex'),
-            ('lifeStage', 'Life stage'),
-            ('preparations', 'Preperations'),
-            ('collection_date', 'Collection date')
-        ])
+            ('stage', 'Stage'),
+        ]),
+        ('Mineralogy', [
+            ('dateRegistered', 'Date registered'),
+            ('occurrence', 'occurrence'),
+            ('commodity', 'Commodity'),
+            ('depositType', 'Deposit type'),
+            ('texture', 'Texture'),
+            ('identificationVariety', 'Identification variety'),
+            ('identificationOther', 'Other identification'),
+            ('hostRock', 'Host rock'),
+            ('HostAge', 'Host age'),
+            ('MineralisationAge', 'Mineralisation age'),
+            ('RockAge', 'Rock age'),
+            ('Ar-Arage', 'Ar-Ar age'),
+        ]),
+        ('Meteorite', [
+            ('meteoriteType', 'Meteorite type'),
+            ('meteoriteGroup', 'meteorite group'),
+            ('chondriteAchondrite', 'Chondrite / achondrite'),
+            ('meteoriteClass', 'Meteorite class'),
+            ('petType', 'Petrology type'),
+            ('petSubType', 'Petrology subtype'),
+            ('recovery', 'Recovery'),
+            ('recoveryDate', 'Recovery date'),
+            ('recoveryWeight', 'Recovery weight'),
+            (registered_weight_label, 'Registered weight'),
+        ]),
+        ('Botany', [
+            ('exsiccati', 'Exsiccati'),
+            ('exsiccatiNumber', 'Exsiccati number'),
+            ('siteDescription', 'Site description'),
+            ('plantDescription', 'Plant description'),
+            ('cultivated', 'Cultivated'),
+            ('plantForm', 'Plant form'),
+        ]),
+        ('Silica gel', [
+            ('populationCode', 'Population code'),
+        ]),
+        ('Nest', [
+            ('nestShape', 'Nest shape'),
+            ('nestSite', 'Nest site'),
+        ]),
+        ('Field notebook', [
+            ('leftPageTranscription', 'Left page transcription'),
+            ('leftPageNumber', 'Left page number'),
+            ('rightPageTranscription', 'Right page transcription'),
+            ('rightPageNumber', 'Right page number'),
+            ('leftPageMultimedia', 'Left page multimedia'),
+            ('rightPageMultimedia', 'Right page multimedia'),
+        ]),
+        ('Egg', [
+            ('clutchSize', 'Clutch size'),
+            ('setMark', 'Set mark'),
+        ]),
     ] %}
 
     <table>
@@ -86,6 +202,20 @@
 
     </table>
 
+    {% if rec.associatedMedia: %}
 
+        {% for src in rec.associatedMedia.split(';'): %}
+
+            <img src="{{ src }}&image=yes&width=325" />
+
+        {% endfor %}
+
+    {% endif %}
+
+    {% if rec.decimalLatitude and rec.decimalLongitude: %}
+
+        <div id="map" style="width:200px; height:200px; background-color: #cccccc">MAP</div>
+
+    {% endif %}
 
 {% endblock %}
