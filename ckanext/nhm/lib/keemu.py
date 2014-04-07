@@ -14,6 +14,7 @@ from sqlalchemy.sql.expression import select, join
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_
 from sqlalchemy.schema import MetaData
+import sqlalchemy.types as types
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
@@ -486,7 +487,23 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             # Get all columns not mapped to dwc
             columns = self.dwc_get_dynamic_properties(ke_model)
 
-            cols = ', '.join("'%s=' || %s.\"%s\"" % (self.get_dynamic_properties_field_name(c.name), c.table, c.name) for c in columns)
+            cols = []
+
+            for c in columns:
+
+                col_str = "'{field_name}=' || "
+                # For text columns, we want to remove = and ; so text can be parsed
+                col_str += "translate({table}.\"{column}\", ';=', '')" if c.type.python_type is str else "{table}.\"{column}\""
+
+                cols.append(
+                    col_str.format(
+                        field_name=self.get_dynamic_properties_field_name(c.name),
+                        table=c.table,
+                        column=c.name
+                    )
+                )
+
+            cols = ', '.join(cols)
 
             tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__, _taxonomy_v]])
 
@@ -553,7 +570,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         contexts['latestEonOrHighestEonothem'] = {'direction': 'to', 'stratigraphic_type': 'eon'}
 
         contexts['earliestEraOrLowestErathem'] = {'direction': 'from', 'stratigraphic_type': 'era'}
-        contexts['earliestEraOrLowestErathem'] = {'direction': 'to', 'stratigraphic_type': 'era'}
+        contexts['latestEraOrLowestErathem'] = {'direction': 'to', 'stratigraphic_type': 'era'}
 
         contexts['earliestPeriodOrLowestSystem'] = {'direction': 'from', 'stratigraphic_type': 'period'}
         contexts['latestPeriodOrHighestSystem'] = {'direction': 'to', 'stratigraphic_type': 'period'}
