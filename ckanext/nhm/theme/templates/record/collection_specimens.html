@@ -16,7 +16,7 @@
     {% endif %}
 
     {% for property in rec.dynamicProperties.split(';'): %}
-        {% do rec.update([h.tuple(property.strip().split('='))]) %}
+        {% do rec.update([tuple(property.strip().split('='))]) %}
     {% endfor %}
 
     {% set collection_date = [] %}
@@ -172,6 +172,21 @@
             ('clutchSize', 'Clutch size'),
             ('setMark', 'Set mark'),
         ]),
+        ('Parasite card', [
+            ('barcode', 'Barcode'),
+            ('parasite', 'Parasite'),
+            ('parasiteStage', 'Parasite stage'),
+            ('host', 'Host'),
+            ('hostStage', 'Host stage'),
+        ]),
+        ('DNA Preparation', [
+            ('extractionMethod', 'Extraction method'),
+            ('resuspendedIn', 'Resuspended in'),
+            ('totalVolume', 'Total volume')
+        ]),
+        ('Part', [
+            ('partType', 'Part type')
+        ]),
     ] %}
 
     <table>
@@ -191,6 +206,46 @@
             {% endif %}
 
         {% endfor %}
+
+
+        {% if rec.relatedResourceID: %}
+
+        {% set rel_types = rec.relationshipOfResource.split(';') %}
+        {% set related_records = {} %}
+
+        {% for rel_type in rel_types: %}
+            {% do related_records.update({rel_type: []}) %}
+        {% endfor %}
+
+        {% for i, id in enumerate(rec.relatedResourceID.split(';')): %}
+            {% do related_records[rel_types[i]].append(id) %}
+        {% endfor %}
+
+        <tr>
+
+            <tr><th colspan="2">Related records</th></tr>
+
+            {% for type, records in related_records.items(): %}
+
+                <tr>
+                    <td><strong>{{ type|title }}</strong></td>
+                    <td>
+                        <ul>
+                            {% for record_id in records: %}
+                                <li>
+                                    {{ h.link_to('NHMUK:ecatalogue:' + record_id, h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record_id)) }}
+                                </li>
+                            {% endfor %}
+                         </ul>
+
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+        </tr>
+
+    {% endif %}
 
     </table>
 
