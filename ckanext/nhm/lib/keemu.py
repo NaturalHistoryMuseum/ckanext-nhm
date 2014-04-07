@@ -22,7 +22,8 @@ from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect, InsertFrom
 from ke2sql.model.keemu import *
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
 
-MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s'
+# TODO: Videos
+MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s&image=yes'
 
 VIEW = 'VIEW'
 MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
@@ -436,8 +437,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         # Add the dynamic properties field and joins
         # Needs to go here to prevent self referential queries in _dwc_query
-        metadata = MetaData(self.session.bind)
-        _dynamic_properties_v = Table('_dynamic_properties_v', metadata, autoload=True)
+        _dynamic_properties_v = Table('_dynamic_properties_v', self.metadata, autoload=True)
         q = q.select_from(q.froms[0].join(_dynamic_properties_v, CatalogueModel.__table__.c.irn == _dynamic_properties_v.c.irn))
         q = q.column(_dynamic_properties_v.c.properties.label('dynamicProperties'))
         q = q.group_by(_dynamic_properties_v.c.irn)
@@ -461,6 +461,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             field_name = field_name_mappings[name]
         except KeyError:
             field_name = ''.join(n.capitalize() or '_' for n in name.split('_'))
+            field_name = field_name[0].lower() + field_name[1:]
 
         return field_name
 
@@ -475,6 +476,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         """
         qs = []
 
+        _taxonomy_v = Table('_taxonomy_v', self.metadata, autoload=True)
+
         for ke_model in itertools.chain([SpecimenModel], SpecimenModel.__subclasses__(), PartModel.__subclasses__()):
 
             if ke_model is StubModel:
@@ -483,9 +486,9 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             # Get all columns not mapped to dwc
             columns = self.dwc_get_dynamic_properties(ke_model)
 
-            cols = ', '.join("'%s=' || %s.%s" % (self.get_dynamic_properties_field_name(c.name), c.table, c.name) for c in columns)
+            cols = ', '.join("'%s=' || %s.\"%s\"" % (self.get_dynamic_properties_field_name(c.name), c.table, c.name) for c in columns)
 
-            tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__]])
+            tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__, _taxonomy_v]])
 
             q = select([
                 SpecimenModel.__table__.c.irn,
@@ -501,12 +504,15 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 select_from = select_from.join(table, table.c.irn == SpecimenModel.__table__.c.irn)
                 q = q.group_by(table.c.irn)
 
-            # Add joins and group by to events and sites
+            # Add joins and group by to events, sites & taxonomy
             select_from = select_from.outerjoin(SiteModel.__table__, SiteModel.__table__.c.irn == SpecimenModel.__table__.c.site_irn)
             q = q.group_by(SiteModel.__table__.c.irn)
 
             select_from = select_from.outerjoin(CollectionEventModel.__table__, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn)
             q = q.group_by(CollectionEventModel.__table__.c.irn)
+
+            select_from = select_from.outerjoin(_taxonomy_v, _taxonomy_v.c.irn == SpecimenModel.__table__.c.irn)
+            q = q.group_by(_taxonomy_v.c.irn)
 
             # Only select a particular type - this does mean more and a slower query - but ensures data is correct
             q = q.where(CatalogueModel.__table__.c.type == ke_model.__mapper_args__['polymorphic_identity'])
@@ -625,14 +631,19 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             TaxonomyModel.phylum,
             TaxonomyModel.taxonomic_class,
             TaxonomyModel.order,
+            TaxonomyModel.suborder,
+            TaxonomyModel.superfamily,
             TaxonomyModel.family,
+            TaxonomyModel.subfamily,
             TaxonomyModel.genus,
             TaxonomyModel.subgenus,
             TaxonomyModel.species,
             TaxonomyModel.subspecies,
+            TaxonomyModel.validity,
             TaxonomyModel.rank,
             TaxonomyModel.scientific_name_author,
             TaxonomyModel.scientific_name_author_year,
+            TaxonomyModel.currently_accepted_name,
             func.concat_ws('; ',
                 TaxonomyModel.kingdom,
                 TaxonomyModel.phylum,
@@ -643,7 +654,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 TaxonomyModel.subfamily,
                 TaxonomyModel.genus,
                 TaxonomyModel.subgenus
-            ).label('higherClassification')
+            ).label('higher_classification')
         ])
 
         # NB: Printing the query will not show DISTINCT ON: Need to compile print q.compile(dialect=postgresql.dialect())
@@ -680,15 +691,13 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         INSTITUTION_CODE = 'NHMUK'
         IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
 
-        # Reflected views
-        metadata = MetaData(self.session.bind)
         # Annoyingly, sqlalchemy doesn't support reflection of materialised views
         # See https://bitbucket.org/zzzeek/sqlalchemy/issue/2891/support-materialized-views-in-postgresql
         # For now, need to use either TABLE or VIEW if reflection is needed
-        _geological_context_v = Table('_geological_context_v', metadata, autoload=True)
-        _associated_records_v = Table('_associated_records_v', metadata, autoload=True)
-        _taxonomy_v = Table('_taxonomy_v', metadata, autoload=True)
-        _collection_date_v = Table('_collection_date_v', metadata, autoload=True)
+        _geological_context_v = Table('_geological_context_v', self.metadata, autoload=True)
+        _associated_records_v = Table('_associated_records_v', self.metadata, autoload=True)
+        _taxonomy_v = Table('_taxonomy_v', self.metadata, autoload=True)
+        _collection_date_v = Table('_collection_date_v', self.metadata, autoload=True)
 
         q = select([
 
@@ -859,7 +868,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                _taxonomy_v.c.scientific_name_author_year
             ).label('scientificNameAuthorship'),
 
-            _taxonomy_v.c.higherClassification
+            _taxonomy_v.c.higher_classification.label('higherClassification')
 
         ])
 
@@ -912,7 +921,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return q
 
-
     def dwc_get_mapped_fields(self):
         """
         Return a list of all fields used in the DwC query
@@ -946,9 +954,9 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     def dwc_get_dynamic_properties(self, model):
         """
-        For a model, get all unmapped DwC fields
+        For a model, get all unmapped DwC fields to use as dynamicProperties
         """
-
+        _taxonomy_v = Table('_taxonomy_v', self.metadata, autoload=True)
         field_mappings = self.dwc_get_mapped_fields()
 
         # Filter out DwC fields / IRN / Foreign Keys
@@ -969,8 +977,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
             return True
 
-        # Get all tables in this model (all have SIte & Collection Event)
-        tables = set([SiteModel.__table__, CollectionEventModel.__table__])
+        # Get all tables in this model (all have Site, Collection Event & Taxonomy)
+        tables = set([SiteModel.__table__, CollectionEventModel.__table__, _taxonomy_v])
 
         for cls in inspect.getmro(model):
 
