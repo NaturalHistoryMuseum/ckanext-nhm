@@ -526,6 +526,12 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 # Append the new fields to the existing columns
                 cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
 
+            elif ke_model is ParasiteCardModel:
+
+                select_from = select_from.outerjoin(HostParasiteAssociation.__table__, HostParasiteAssociation.__table__.c.parasite_card_irn == SpecimenModel.__table__.c.irn)
+                select_from = select_from.outerjoin(TaxonomyModel.__table__, TaxonomyModel.__table__.c.irn == HostParasiteAssociation.__table__.c.taxonomy_irn)
+                cols += ", string_agg(format('%s=%s; %sStage=%s', parasite_host, taxonomy.scientific_name, parasite_host, stage), '; ')"
+
             # Add the main dynamic properties field (we do it here, so it can be manipulated by specific case
             q = q.column(func.concat_ws(literal_column("'; '"), literal_column(cols)).label('properties'))
 
