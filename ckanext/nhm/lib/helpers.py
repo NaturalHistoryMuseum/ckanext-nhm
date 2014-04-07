@@ -8,13 +8,9 @@ import urllib
 from collections import OrderedDict
 # All funcs will be made available as helpers
 from webhelpers.number import format_data_size
-from ckanext.nhm.lib.dwc import DwC
 import os
 
 log = logging.getLogger(__name__)
-
-# TODO: Why is this necessary? Add tuple() to jinja2
-tuple = tuple
 
 def get_site_statistics():
     # TODO: TEMP: Just to put some stats on the home page
