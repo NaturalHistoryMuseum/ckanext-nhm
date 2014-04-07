@@ -5,6 +5,7 @@ import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 import logging
+from ckanext.nhm.lib.dwc import DwC
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +50,9 @@ class DarwinCoreController(base.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
-        return p.toolkit.render('dwc/view.html')
+        return p.toolkit.render('dwc/view.html', extra_vars={
+            'DwC': DwC,
+        })
 
 
 

@@ -22,6 +22,7 @@ class RecordController(base.BaseController):
     """
     Controller for displaying an individual record
     """
+
     def view(self, package_name, resource_id, record_id):
 
         """
@@ -58,6 +59,9 @@ class RecordController(base.BaseController):
             # If we don;t have a specific template file, use the generic one
             template_file = 'record/view.html'
 
-        return p.toolkit.render(template_file)
+        return p.toolkit.render(template_file, extra_vars={
+            'enumerate': enumerate,
+            'tuple': tuple
+        })
 
 
