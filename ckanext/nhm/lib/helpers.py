@@ -50,4 +50,4 @@ def fields_have_content(record, fields):
 
 
 def unique_identifier(id):
-    return IDENTIFIER_PREFIX % id
+    return '%s%s' % (IDENTIFIER_PREFIX, id)
