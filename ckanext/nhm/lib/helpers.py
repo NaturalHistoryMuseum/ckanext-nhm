@@ -9,6 +9,7 @@ from collections import OrderedDict
 # All funcs will be made available as helpers
 from webhelpers.number import format_data_size
 import os
+from ckanext.nhm.lib.keemu import IDENTIFIER_PREFIX
 
 log = logging.getLogger(__name__)
 
@@ -47,9 +48,6 @@ def fields_have_content(record, fields):
         if record.get(field, None):
             return True
 
-def keemu_render_datetime(datetime_):
-    # Datetime formatter
 
-    # Convert data to datetime
-    datetime_ = datetime.combine(datetime_, datetime.min.time())
-    return formatters.localised_nice_date(datetime_, show_date=True)
+def unique_identifier(id):
+    return IDENTIFIER_PREFIX % id
