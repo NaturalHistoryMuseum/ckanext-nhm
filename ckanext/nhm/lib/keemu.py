@@ -12,7 +12,7 @@ from collections import OrderedDict
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import select, join
 from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_
+from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_, and_
 from sqlalchemy.schema import MetaData
 import sqlalchemy.types as types
 import ckan.model as model
@@ -23,8 +23,10 @@ from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect, InsertFrom
 from ke2sql.model.keemu import *
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
 
-# TODO: Videos
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s&image=yes'
+
+INSTITUTION_CODE = 'NHMUK'
+IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
 
 VIEW = 'VIEW'
 MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
@@ -319,7 +321,6 @@ class KeEMuDatastore(object):
 class KeEMuSpecimensDatastore(KeEMuDatastore):
 
     # TODO: Check all data and fields
-    # TODO: Check paleo fields
 
     name = 'Specimens'
     description = 'Specimen records'
@@ -380,17 +381,17 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         """
 
         # Build the views on which the source table is built
-        self.create_view('_geological_context_v', self._geological_context_view())
-        self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
-        self.create_view('_collection_date_v', self._collection_date_view())
-        self.create_view('_taxonomy_v', self._taxonomy_view())
-        self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
+        # self.create_view('_geological_context_v', self._geological_context_view())
+        # self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
+        # self.create_view('_collection_date_v', self._collection_date_view())
+        # self.create_view('_taxonomy_v', self._taxonomy_view())
+        # self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
 
         # Build the source table
         source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id)
 
         # Part fields can inherit from parent
-        self.update_inherited_fields(source_table)
+        # self.update_inherited_fields(source_table)
 
         return source_table
 
@@ -466,6 +467,30 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return field_name
 
+    def _columns_to_string(self, columns):
+        """
+        Given a list of columns, convert to select string
+        @param columns:
+        @return: string
+        """
+
+        cols = []
+
+        for c in columns:
+
+            col_str = "'{field_name}=' || "
+            # For text columns, we want to remove = and ; so text can be parsed
+            col_str += "translate({table}.\"{column}\", ';=', '')" if c.type.python_type is str else "{table}.\"{column}\""
+
+            cols.append(
+                col_str.format(
+                    field_name=self.get_dynamic_properties_field_name(c.name),
+                    table=c.table,
+                    column=c.name
+                )
+            )
+
+        return ', '.join(cols)
 
     def _dynamic_properties_view(self):
 
@@ -487,23 +512,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             # Get all columns not mapped to dwc
             columns = self.dwc_get_dynamic_properties(ke_model)
 
-            cols = []
-
-            for c in columns:
-
-                col_str = "'{field_name}=' || "
-                # For text columns, we want to remove = and ; so text can be parsed
-                col_str += "translate({table}.\"{column}\", ';=', '')" if c.type.python_type is str else "{table}.\"{column}\""
-
-                cols.append(
-                    col_str.format(
-                        field_name=self.get_dynamic_properties_field_name(c.name),
-                        table=c.table,
-                        column=c.name
-                    )
-                )
-
-            cols = ', '.join(cols)
+            columns_str = self._columns_to_string(columns)
 
             tables = set([column.table for column in columns if column.table not in [SpecimenModel.__table__, SiteModel.__table__, CollectionEventModel.__table__, _taxonomy_v]])
 
@@ -541,16 +550,21 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
                 select_from = select_from.outerjoin(specimen_mineralogical_age, specimen_mineralogical_age.c.mineralogy_irn == SpecimenModel.__table__.c.irn)
                 select_from = select_from.outerjoin(MineralogicalAge.__table__, MineralogicalAge.__table__.c.id == specimen_mineralogical_age.c.mineralogical_age_id)
                 # Append the new fields to the existing columns
-                cols += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
+                columns_str += ", string_agg(concat_ws('=', replace(age_type, ' ', ''), age), '; ')"
 
             elif ke_model is ParasiteCardModel:
-
                 select_from = select_from.outerjoin(HostParasiteAssociation.__table__, HostParasiteAssociation.__table__.c.parasite_card_irn == SpecimenModel.__table__.c.irn)
                 select_from = select_from.outerjoin(TaxonomyModel.__table__, TaxonomyModel.__table__.c.irn == HostParasiteAssociation.__table__.c.taxonomy_irn)
-                cols += ", string_agg(format('%s=%s; %sStage=%s', parasite_host, taxonomy.scientific_name, parasite_host, stage), '; ')"
+                columns_str += ", string_agg(format('%s=%s; %sStage=%s', parasite_host, taxonomy.scientific_name, parasite_host, stage), '; ')"
+
+            elif ke_model is PalaeontologySpecimenModel:
+                select_from = select_from.outerjoin(StratigraphyModel.__table__, StratigraphyModel.__table__.c.irn == PalaeontologySpecimenModel.__table__.c.stratigraphy_irn)
+                q = q.group_by(StratigraphyModel.__table__.c.irn)
+                columns = self.dwc_get_dynamic_properties(StratigraphyModel, False)
+                columns_str += ', ' + self._columns_to_string(columns)
 
             # Add the main dynamic properties field (we do it here, so it can be manipulated by specific case
-            q = q.column(func.concat_ws(literal_column("'; '"), literal_column(cols)).label('properties'))
+            q = q.column(func.concat_ws(literal_column("'; '"), literal_column(columns_str)).label('properties'))
 
             q = q.select_from(select_from)
 
@@ -570,7 +584,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         contexts['latestEonOrHighestEonothem'] = {'direction': 'to', 'stratigraphic_type': 'eon'}
 
         contexts['earliestEraOrLowestErathem'] = {'direction': 'from', 'stratigraphic_type': 'era'}
-        contexts['latestEraOrLowestErathem'] = {'direction': 'to', 'stratigraphic_type': 'era'}
+        contexts['latestEraOrHighestErathem'] = {'direction': 'to', 'stratigraphic_type': 'era'}
 
         contexts['earliestPeriodOrLowestSystem'] = {'direction': 'from', 'stratigraphic_type': 'period'}
         contexts['latestPeriodOrHighestSystem'] = {'direction': 'to', 'stratigraphic_type': 'period'}
@@ -584,11 +598,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         contexts['earliestAgeOrLowestStage'] = {'direction': 'from', 'stratigraphic_type': 'stage'}
         contexts['latestAgeOrHighestStage'] = {'direction': 'to', 'stratigraphic_type': 'stage'}
 
-        # TODO: There are other zones
         contexts['lowestBiostratigraphicZone'] = {'direction': 'from', 'stratigraphic_type': 'zone'}
         contexts['highestBiostratigraphicZone'] = {'direction': 'to', 'stratigraphic_type': 'zone'}
-
-        # TODO: LithostratigraphicTerms
 
         contexts['group'] = {'stratigraphic_type': 'group'}
         contexts['formation'] = {'stratigraphic_type': 'formation'}
@@ -710,9 +721,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         Query for converting data from KE EMu into DwC record
         Only datasets with this method will show a DwC view
         """
-
-        INSTITUTION_CODE = 'NHMUK'
-        IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
 
         # Annoyingly, sqlalchemy doesn't support reflection of materialised views
         # See https://bitbucket.org/zzzeek/sqlalchemy/issue/2891/support-materialized-views-in-postgresql
@@ -860,6 +868,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             _geological_context_v.c.earliestEonOrLowestEonothem,
             _geological_context_v.c.latestEonOrHighestEonothem,
             _geological_context_v.c.earliestEraOrLowestErathem,
+            _geological_context_v.c.latestEraOrHighestErathem,
             _geological_context_v.c.earliestPeriodOrLowestSystem,
             _geological_context_v.c.latestPeriodOrHighestSystem,
             _geological_context_v.c.earliestEpochOrLowestSeries,
@@ -914,6 +923,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         # Multimedia
         select_from = select_from.outerjoin(catalogue_multimedia, catalogue_multimedia.c.catalogue_irn == SpecimenModel.__table__.c.irn)
+        select_from = select_from.outerjoin(MultimediaModel.__table__, MultimediaModel.__table__.c.irn == catalogue_multimedia.c.multimedia_irn)
 
         # Associated records
         select_from = select_from.outerjoin(_associated_records_v, _associated_records_v.c.irn == SpecimenModel.__table__.c.irn)
@@ -926,7 +936,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
        # Collection date context
         select_from = select_from.outerjoin(_collection_date_v, _collection_date_v.c.irn == SpecimenModel.__table__.c.irn)
-
 
         q = q.select_from(select_from)
 
@@ -941,6 +950,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         q = q.group_by(_collection_date_v.c.irn)
 
         q = q.where(CatalogueModel.type != 'stub')
+        q = q.where(MultimediaModel.mime_type == 'image')
 
         return q
 
@@ -975,9 +985,12 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return columns
 
-    def dwc_get_dynamic_properties(self, model):
+    def dwc_get_dynamic_properties(self, model, expand=True):
         """
         For a model, get all unmapped DwC fields to use as dynamicProperties
+        @param model:
+        @param expand: Expand to include all related models
+        @return:
         """
         _taxonomy_v = Table('_taxonomy_v', self.metadata, autoload=True)
         field_mappings = self.dwc_get_mapped_fields()
@@ -1000,16 +1013,25 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
             return True
 
-        # Get all tables in this model (all have Site, Collection Event & Taxonomy)
-        tables = set([SiteModel.__table__, CollectionEventModel.__table__, _taxonomy_v])
+        # Should we get use all the tables?
+        if expand:
 
-        for cls in inspect.getmro(model):
+            # Get all tables in this model (all have Site, Collection Event & Taxonomy)
+            tables = set([SiteModel.__table__, CollectionEventModel.__table__, _taxonomy_v])
 
-            try:
-                tables.add(cls.__table__)
-            except AttributeError:
-                # For tertiary objects, there will be no defined __table__
-                pass
+            for cls in inspect.getmro(model):
+
+                try:
+                    tables.add(cls.__table__)
+                except AttributeError:
+                    # For tertiary objects, there will be no defined __table__
+                    pass
+
+        #  Or just the one passed in
+        else:
+
+            tables = set([model.__table__])
+
 
         return list(itertools.ifilter(_field_filter, itertools.chain.from_iterable([t.columns for t in tables])))
 
