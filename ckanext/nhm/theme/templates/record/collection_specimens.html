@@ -185,6 +185,12 @@
         ('Part', [
             ('partType', 'Part type')
         ]),
+        ('Palaeontology', [
+            ('catalogueDescription', 'Catalogue description'),
+            ('biozone', 'Biozone'),
+            ('sedimentology', 'Sedimentology'),
+            ('sedimentaryFacies', 'Sedimentary facies'),
+        ]),
     ] %}
 
     <table>
@@ -223,7 +229,7 @@
 
             {% set geo_fields = [
                 ('Eon', 'earliestEonOrLowestEonothem', 'latestEonOrHighestEonothem'),
-                ('Era', 'earliestEraOrLowestErathem', 'latestEraOrLowestErathem'),
+                ('Era', 'earliestEraOrLowestErathem', 'latestEraOrHighestErathem'),
                 ('Period', 'earliestPeriodOrLowestSystem', 'latestPeriodOrHighestSystem'),
                 ('Epoch', 'earliestEpochOrLowestSeries', 'latestEpochOrHighestSeries'),
                 ('Stage', 'earliestAgeOrLowestStage', 'latestAgeOrHighestStage'),
@@ -232,11 +238,13 @@
 
             {% for time, from, to in geo_fields: %}
 
-                <tr>
-                    <td><strong>{{ time }}</strong></td>
-                    <td>{{ rec[from] or '' }}</td>
-                    <td>{{ rec[to] or '' }}</td>
-                </tr>
+                {% if rec[from] or rec[to]: %}
+                    <tr>
+                        <td><strong>{{ time }}</strong></td>
+                        <td>{{ rec[from] or '' }}</td>
+                        <td>{{ rec[to] or '' }}</td>
+                    </tr>
+                {% endif %}
 
             {% endfor %}
 
@@ -280,7 +288,7 @@
                         <ul>
                             {% for record_id in records: %}
                                 <li>
-                                    {{ h.link_to('NHMUK:ecatalogue:' + record_id, h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record_id)) }}
+                                    {{ h.link_to(h.unique_identifier(record_id), h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record_id)) }}
                                 </li>
                             {% endfor %}
                          </ul>
@@ -300,7 +308,7 @@
 
         {% for src in rec.associatedMedia.split(';'): %}
 
-            <img src="{{ src }}&image=yes&width=325" />
+            <img src="{{ src }}&width=100&height=100" />
 
         {% endfor %}
 
@@ -308,7 +316,7 @@
 
     {% if rec.decimalLatitude and rec.decimalLongitude: %}
 
-        <div id="map" style="width:200px; height:200px; background-color: #cccccc">MAP</div>
+        <div id="map" style="width:100px; height:100px; background-color: #cccccc">MAP</div>
 
     {% endif %}
 
