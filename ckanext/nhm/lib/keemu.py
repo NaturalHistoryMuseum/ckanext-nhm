@@ -8,13 +8,13 @@ import sys
 import itertools
 import abc
 import inspect
+import logging
 from collections import OrderedDict
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import select, join
 from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_, and_
+from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_
 from sqlalchemy.schema import MetaData
-import sqlalchemy.types as types
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
@@ -22,6 +22,8 @@ from pylons import config
 from ckanext.nhm.lib.db import get_datastore_session, CreateAsSelect, InsertFromSelect
 from ke2sql.model.keemu import *
 from ke2sql.model.keemu import specimen_sex_stage, catalogue_associated_record, catalogue_multimedia, specimen_mineralogical_age
+
+log = logging.getLogger(__name__)
 
 MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s&image=yes'
 
@@ -33,6 +35,9 @@ MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
 TABLE = 'TABLE'
 
 Base = declarative_base()
+
+# TODO: Logging
+# TODO: Plug into tasks
 
 class KeEMuDatastore(object):
     """
@@ -124,7 +129,7 @@ class KeEMuDatastore(object):
         # Create a package for the new datastore
         package = self.create_package(context)
 
-        print 'Creating datastore %s' % self.name
+        log.info('Creating package %s: SUCCESS', self.name)
 
         # Get all existing resources keyed by name
         existing_resources = {r['name']: r for r in package['resources']}
@@ -149,7 +154,7 @@ class KeEMuDatastore(object):
             datastore = logic.get_action('datastore_create')(context, datastore_params)
             resource_id = datastore['resource_id']
 
-        print 'Creating datastore %s: SUCCESS' % resource_id
+        log.info('Creating datastore %s: SUCCESS', resource_id)
 
         return resource_id
 
@@ -175,7 +180,7 @@ class KeEMuDatastore(object):
             # Remove existing data
             self.session.execute(text('TRUNCATE TABLE "{source_table_name}"'.format(source_table_name=source_table_name)))
 
-            print 'Deleting existing records: SUCCESS'
+            log.info('Deleting existing records: SUCCESS')
 
             # Set geometry columns to null
             if self.geom_columns is not None:
@@ -191,7 +196,7 @@ class KeEMuDatastore(object):
             self.session.execute(q)
             self.session.commit()
 
-            print 'Updating source table: SUCCESS'
+            log.info('Updating source table: SUCCESS')
 
             # Update geometry columns
             if self.geom_columns is not None:
@@ -202,7 +207,7 @@ class KeEMuDatastore(object):
                     'long_field': self.geom_columns['long_field']
                 })
 
-                print 'Updating geometry: SUCCESS'
+                log.info('Updating geometry: SUCCESS')
 
         except NoSuchTableError:
 
@@ -223,7 +228,7 @@ class KeEMuDatastore(object):
             # Reflect the new source table
             source_table = Table(source_table_name, self.metadata, autoload=True)
 
-            print 'Creating source table: SUCCESS'
+            log.info('Creating source table: SUCCESS')
 
         return source_table
 
@@ -304,7 +309,8 @@ class KeEMuDatastore(object):
 
         self.session.commit()
 
-        print 'Created datastore %s: SUCCESS' % self.name
+        log.info('Creating materialized view %s: SUCCESS', resource_id)
+
 
     def create(self):
         """
@@ -319,8 +325,6 @@ class KeEMuDatastore(object):
 
 
 class KeEMuSpecimensDatastore(KeEMuDatastore):
-
-    # TODO: Check all data and fields
 
     name = 'Specimens'
     description = 'Specimen records'
@@ -381,17 +385,18 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         """
 
         # Build the views on which the source table is built
-        # self.create_view('_geological_context_v', self._geological_context_view())
-        # self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
-        # self.create_view('_collection_date_v', self._collection_date_view())
-        # self.create_view('_taxonomy_v', self._taxonomy_view())
-        # self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
+        self.create_view('_geological_context_v', self._geological_context_view())
+        self.create_view('_associated_records_v', self._associated_records_view(), VIEW)
+        self.create_view('_multimedia_v', self._multimedia_view(), VIEW)
+        self.create_view('_collection_date_v', self._collection_date_view())
+        self.create_view('_taxonomy_v', self._taxonomy_view())
+        self.create_view('_dynamic_properties_v', self._dynamic_properties_view())
 
         # Build the source table
         source_table = super(KeEMuSpecimensDatastore, self).build_source_table(resource_id)
 
         # Part fields can inherit from parent
-        # self.update_inherited_fields(source_table)
+        self.update_dependent_fields(source_table)
 
         return source_table
 
@@ -402,34 +407,34 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
             if view_type is VIEW:
                 # If it's just a view and already exists, do nothing
-                print 'View %s already exists: SKIPPING' % name
+                log.debug('View %s already exists: SKIPPING', name)
                 return
 
             elif view_type is MATERIALIZED_VIEW:
                 # If the mat view already exists, refresh it
-                print 'Materialized view %s already exists: REFRESHING' % name
+                log.debug('Materialized view %s already exists: REFRESHING', name)
                 self.session.execute(text('REFRESH MATERIALIZED VIEW {name}'.format(name=name)))
                 return
 
             else:
                 # Drop the table
-                print 'Drop table %s' % name
+                log.debug('Drop table %s', name)
                 self.session.execute('DROP TABLE IF EXISTS {name}'.format(name=name))
 
-        print 'Creating view %s' % name
+        log.debug('Creating view %s', name)
 
         c = CreateAsSelect(name, query, view_type)
         self.session.execute(c)
 
         # And add a primary key for materialized and view
         if view_type is MATERIALIZED_VIEW:
-            print 'Adding index to materialized view %s' % name
+            log.debug('Adding index to materialized view %s', name)
             self.session.execute(text('CREATE UNIQUE INDEX {name}_irn_idx ON {name} (irn)'.format(name=name)))
         elif view_type is TABLE:
-            print 'Adding index to table %s' % name
+            log.debug('Adding index to table %s', name)
             self.session.execute(text('ALTER TABLE {name} ADD PRIMARY KEY (irn)'.format(name=name)))
 
-        print 'Creating view %s: SUCCESS' % name
+        log.info('Creating view %s: SUCCESS', name)
 
         self.session.commit()
 
@@ -681,6 +686,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             func.concat_ws('; ',
                 TaxonomyModel.kingdom,
                 TaxonomyModel.phylum,
+                TaxonomyModel.taxonomic_class,
                 TaxonomyModel.order,
                 TaxonomyModel.suborder,
                 TaxonomyModel.superfamily,
@@ -716,6 +722,23 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return q
 
+    @staticmethod
+    def _multimedia_view():
+        """
+        Return a view of catalogue_irn, multimedia_irn filtered on mime_type == 'image'
+        @return: query
+        """
+
+        q = select([
+            catalogue_multimedia.c.catalogue_irn,
+            catalogue_multimedia.c.multimedia_irn
+        ])
+
+        q = q.select_from(catalogue_multimedia.join(MultimediaModel.__table__, MultimediaModel.__table__.c.irn == catalogue_multimedia.c.multimedia_irn))
+        q = q.where(MultimediaModel.mime_type == 'image')
+
+        return q
+
     def _dwc_query(self):
         """
         Query for converting data from KE EMu into DwC record
@@ -728,6 +751,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         _geological_context_v = Table('_geological_context_v', self.metadata, autoload=True)
         _associated_records_v = Table('_associated_records_v', self.metadata, autoload=True)
         _taxonomy_v = Table('_taxonomy_v', self.metadata, autoload=True)
+        _multimedia_v = Table('_multimedia_v', self.metadata, autoload=True)
         _collection_date_v = Table('_collection_date_v', self.metadata, autoload=True)
 
         q = select([
@@ -736,7 +760,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             CatalogueModel.irn.label('_id'),
             CatalogueModel.ke_date_modified.label('modified'),  # dcterms:modified
             CatalogueModel.ke_date_modified.label('created'),  # This isn't actually in DwC - but I'm going to use dcterms:created
-
+            literal_column("'Specimen'").label('basisOfRecord'),
             literal_column("'%s'::text" % INSTITUTION_CODE).label('institutionCode'),
             func.format(IDENTIFIER_PREFIX + '%s', CatalogueModel.irn).label('occurrenceID'),
 
@@ -846,7 +870,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
             func.array_to_string(
                 func.array_remove(
                     func.array_agg(
-                        func.format(MULTIMEDIA_URL, catalogue_multimedia.c.multimedia_irn)
+                        func.format(MULTIMEDIA_URL, _multimedia_v.c.multimedia_irn)
                     ),
                 MULTIMEDIA_URL % ''
                 ), ';').label('associatedMedia'),
@@ -922,8 +946,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         select_from = select_from.outerjoin(SexStageModel.__table__, SexStageModel.__table__.c.id == specimen_sex_stage.c.sex_stage_id)
 
         # Multimedia
-        select_from = select_from.outerjoin(catalogue_multimedia, catalogue_multimedia.c.catalogue_irn == SpecimenModel.__table__.c.irn)
-        select_from = select_from.outerjoin(MultimediaModel.__table__, MultimediaModel.__table__.c.irn == catalogue_multimedia.c.multimedia_irn)
+        select_from = select_from.outerjoin(_multimedia_v, _multimedia_v.c.catalogue_irn == SpecimenModel.__table__.c.irn)
 
         # Associated records
         select_from = select_from.outerjoin(_associated_records_v, _associated_records_v.c.irn == SpecimenModel.__table__.c.irn)
@@ -950,7 +973,6 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         q = q.group_by(_collection_date_v.c.irn)
 
         q = q.where(CatalogueModel.type != 'stub')
-        q = q.where(MultimediaModel.mime_type == 'image')
 
         return q
 
@@ -1035,7 +1057,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         return list(itertools.ifilter(_field_filter, itertools.chain.from_iterable([t.columns for t in tables])))
 
-    def update_inherited_fields(self, source_table):
+    def update_dependent_fields(self, source_table):
         """
         Fields that inherit from parts, updates to use the parent record field value if is null
         But there are (apparently - TBC) some fields in the main specimen record that also are inheritable
@@ -1043,18 +1065,60 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         @return: None
         """
 
-        print 'Updating dependent fields'
+        log.debug('Updating dependent fields')
 
         # List of inherited fields
-        inherited_fields = [
-            "phylum",
-            "family",
+        dependent_fields = [
+            # Taxonomy
+            'scientificName',
+            'kingdom',
+            'phylum',
+            'class',
+            'order',
+            'family',
+            'genus',
+            'subgenus',
+            'specificEpithet',
+            'infraspecificEpithet',
+            'taxonRank',
+            'scientificNameAuthorship',
+            'higherClassification',
+            # Site
+            'continent',
+            'country',
+            'stateProvince',
+            'county',
+            'locality',
+            'islandGroup',
+            'island',
+            'geodeticDatum',
+            'georeferenceProtocol',
+            'decimalLatitude',
+            'decimalLongitude',
+            'verbatimLatitude',
+            'verbatimLongitude',
+            'minimumElevationInMeters',
+            'maximumElevationInMeters',
+            'waterBody',
+            'higherGeography',
+            # Collection event
+            'fieldNumber',
+            'samplingProtocol',
+            'recordedBy',
+            'recordNumber',
+            'eventTime',
+            'minimumDepthInMeters',
+            'maximumDepthInMeters',
+            'year',
+            'month',
+            'day',
+            'habitat',
         ]
 
         # There's no way of doing update set from in sqlalchemy - so add it just as plain sql
         values = []
-        for inherited_field in inherited_fields:
-            values.append('"{inherited_field}" = COALESCE(s1."{inherited_field}", s2."{inherited_field}") '.format(inherited_field=inherited_field))
+        for dependent_field in dependent_fields:
+            values.append('"{inherited_field}" = COALESCE(s1."{inherited_field}", s2."{inherited_field}") '.format(inherited_field=dependent_field))
 
         sql = """
               UPDATE "{table}" s1
@@ -1068,7 +1132,8 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         self.session.execute(sql)
 
-        print 'Updating dependent fields: SUCCESS'
+        log.info('Updating dependent fields: SUCCESS')
+
 
 class KeEMuIndexlotDatastore(KeEMuDatastore):
     """
