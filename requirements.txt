@@ -6,5 +6,6 @@ anyjson==0.3.3
 billiard==3.3.0.13
 celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-map.git#egg=ckanext-map
+-e git+https://github.com/okfn/ckanext-spatial.git@stable#egg=ckanext-spatial
 distribute==0.6.34
 pytz==2013.9
