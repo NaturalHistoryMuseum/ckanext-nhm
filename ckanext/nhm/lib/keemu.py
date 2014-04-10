@@ -9,6 +9,7 @@ import itertools
 import abc
 import inspect
 import logging
+import json
 from collections import OrderedDict
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import select, join
@@ -36,7 +37,6 @@ TABLE = 'TABLE'
 
 Base = declarative_base()
 
-# TODO: Logging
 # TODO: Plug into tasks
 
 class KeEMuDatastore(object):
@@ -334,13 +334,14 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
         'name': u'nhm-collection',
         'notes': u'The Natural History Museum\'s collection',
         'title': "Specimens",
-        'extras': {
-            'spatial': {
-                "type":"Polygon",
-                "coordinates":[[[2.05827, 49.8625],[2.05827, 55.7447], [-6.41736, 55.7447], [-6.41736, 49.8625], [2.05827, 49.8625]]]
-            }
-        }
-
+        'extras': [{
+            'key': 'spatial',
+            'value': json.dumps({
+                'type': 'Polygon',
+                # The whole world
+                'coordinates': [[[-180.0, 84.0], [180.0, 84.0], [180.0, -84.0], [-180.0, -84.0], [-180.0, 84.0]]]
+            })
+        }]
     }
 
     # Fields not to include in the _full_text index
