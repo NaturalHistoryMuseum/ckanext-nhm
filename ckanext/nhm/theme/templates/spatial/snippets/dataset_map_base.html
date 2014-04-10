@@ -1,0 +1,13 @@
+{#
+
+Removed map attribution - this is now in the footer
+
+#}
+
+{% set map_config = h.get_common_map_config() %}
+
+<div class="dataset-map" data-module="dataset-map" data-extent="{{ extent }}" data-module-site_url="{{ h.dump_json(h.url('/', locale='default', qualified=true)) }}" data-module-map_config="{{ h.dump_json(map_config) }}">
+  <div id="dataset-map-container"></div>
+</div>
+
+{% resource 'ckanext-spatial/dataset_map' %}
