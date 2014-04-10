@@ -333,7 +333,14 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
     package = {
         'name': u'nhm-collection',
         'notes': u'The Natural History Museum\'s collection',
-        'title': "Specimens"
+        'title': "Specimens",
+        'extras': {
+            'spatial': {
+                "type":"Polygon",
+                "coordinates":[[[2.05827, 49.8625],[2.05827, 55.7447], [-6.41736, 55.7447], [-6.41736, 49.8625], [2.05827, 49.8625]]]
+            }
+        }
+
     }
 
     # Fields not to include in the _full_text index
