@@ -5,7 +5,7 @@
     {% if rec.collectionCode == 'BOT': %}
         {% do rec.update({'collectionCode':'BOT (Botany)'}) %}
     {% elif rec.collectionCode == 'MIN': %}
-        {% do rec.update({'collectionCode':'BOT (Mineralogy)'}) %}
+        {% do rec.update({'collectionCode':'MIN (Mineralogy)'}) %}
     {% elif rec.collectionCode == 'PAL': %}
         {% do rec.update({'collectionCode':'PAL (Paleontology)'}) %}
     {% elif rec.collectionCode == 'ZOO': %}
@@ -14,9 +14,7 @@
         {% do rec.update({'collectionCode':'NHM(E) (Entomology)'}) %}
     {% endif %}
 
-    {% for property in rec.dynamicProperties.split(';'): %}
-        {% do rec.update([tuple(property.strip().split('='))]) %}
-    {% endfor %}
+    {% do rec.update(h.parse_dynamic_properties(rec)) %}
 
     {% set collection_date = [] %}
 

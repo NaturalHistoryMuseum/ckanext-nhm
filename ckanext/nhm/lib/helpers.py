@@ -65,3 +65,29 @@ def get_record_point(rec):
 
     return None
 
+def parse_dynamic_properties(rec):
+
+    properties = {}
+
+    for prop in rec['dynamicProperties'].strip().split(';'):
+        try:
+            key, value = prop.strip().split('=')
+        except ValueError:
+            pass
+        else:
+
+            properties[key] = value
+
+    return properties
+
+
+
+    # {% for properties in rec.dynamicProperties.split(';'): %}
+    #     {% if properties: %}
+    #
+    #         {% set values = properties.split('=') %}
+    #         {{ values }}
+    #
+    #     {% endif %}
+    # {% endfor %}
+    #  {% do rec.update([tuple(property.strip().split('='))]) %}
