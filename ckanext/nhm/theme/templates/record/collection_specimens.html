@@ -314,10 +314,14 @@
 
     {% endif %}
 
-    {% if rec.decimalLatitude and rec.decimalLongitude: %}
 
-        <div id="map" style="width:100px; height:100px; background-color: #cccccc">MAP</div>
+    {% set record_extent = h.get_record_point(rec) %}
 
+    {% if record_extent %}
+      {% snippet "snippets/record_map.html", extent=record_extent %}
     {% endif %}
+
+
+
 
 {% endblock %}

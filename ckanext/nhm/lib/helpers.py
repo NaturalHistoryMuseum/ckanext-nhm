@@ -1,5 +1,6 @@
 
 import logging
+import json
 import ckan.model as model
 import ckan.logic as logic
 from datetime import datetime
@@ -51,3 +52,16 @@ def fields_have_content(record, fields):
 
 def unique_identifier(id):
     return '%s%s' % (IDENTIFIER_PREFIX, id)
+
+def get_record_point(rec):
+
+    # TODO: What should happen if lat/lon not sane?
+    if rec['decimalLatitude'] and rec['decimalLongitude']:
+
+        return json.dumps({
+            'type': 'Point',
+            'coordinates': [rec['decimalLongitude'], rec['decimalLatitude']]
+        })
+
+    return None
+

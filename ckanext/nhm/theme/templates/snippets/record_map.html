@@ -1,0 +1,4 @@
+<section class="record-map-section {% if g.ckan_base_version.startswith('2.0') %}dataset-map-section-20x{% endif %}">
+  <h3>{{ _('Location') }}</h3>
+  {% snippet "spatial/snippets/dataset_map_base.html", extent=extent %}
+</section>
