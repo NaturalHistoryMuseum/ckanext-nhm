@@ -333,7 +333,7 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
     package = {
         'name': u'nhm-collection',
         'notes': u'The Natural History Museum\'s collection',
-        'title': "Specimens",
+        'title': "Collection",
         'extras': [{
             'key': 'spatial',
             'value': json.dumps({
