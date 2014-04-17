@@ -14,7 +14,7 @@ from collections import OrderedDict
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import select, join
 from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy import Table, Column, func, literal_column, case, or_, text, desc, union_all, not_
+from sqlalchemy import Table, Column, Integer, func, literal_column, case, or_, text, desc, union_all, not_, cast
 from sqlalchemy.schema import MetaData
 import ckan.model as model
 import ckan.logic as logic
@@ -717,12 +717,12 @@ class KeEMuSpecimensDatastore(KeEMuDatastore):
 
         q = select([
             SpecimenModel.irn,
-            func.substring(CollectionEventModel.date_collected_from, '([0-9]{4})').label('from_date_year'),
-            func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-([0-9]{2})').label('from_date_month'),
-            func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-[0-9]{2}-([0-9]{2})').label('from_date_day'),
-            func.substring(CollectionEventModel.date_collected_to, '([0-9]{4})').label('to_date_year'),
-            func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-([0-9]{2})').label('to_date_month'),
-            func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-[0-9]{2}-([0-9]{2})').label('to_date_day')
+            cast(func.substring(CollectionEventModel.date_collected_from, '([0-9]{4})'), Integer).label('from_date_year'),
+            cast(func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-([0-9]{2})'), Integer).label('from_date_month'),
+            cast(func.substring(CollectionEventModel.date_collected_from, '[0-9]{4}-[0-9]{2}-([0-9]{2})'), Integer).label('from_date_day'),
+            cast(func.substring(CollectionEventModel.date_collected_to, '([0-9]{4})'), Integer).label('to_date_year'),
+            cast(func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-([0-9]{2})'), Integer).label('to_date_month'),
+            cast(func.substring(CollectionEventModel.date_collected_to, '[0-9]{4}-[0-9]{2}-([0-9]{2})'), Integer).label('to_date_day')
         ])
 
         q = q.select_from(SpecimenModel.__table__.join(CollectionEventModel.__table__, CollectionEventModel.__table__.c.irn == SpecimenModel.__table__.c.collection_event_irn))
