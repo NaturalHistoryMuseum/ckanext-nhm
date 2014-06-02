@@ -49,8 +49,3 @@ class DarwinCoreController(base.BaseController):
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         return p.toolkit.render('dwc/view.html')
-
-
-
-
-
