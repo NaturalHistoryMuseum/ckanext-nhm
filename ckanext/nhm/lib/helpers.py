@@ -10,7 +10,7 @@ from collections import OrderedDict
 from webhelpers.number import format_data_size
 from ckanext.nhm.lib.dwc import DwC
 import os
-
+import json
 
 log = logging.getLogger(__name__)
 
@@ -51,10 +51,35 @@ def fields_have_content(record, fields):
             if record.get(f, None):
                 return True
 
+
 def keemu_render_datetime(datetime_):
     # Datetime formatter
 
     # Convert data to datetime
     datetime_ = datetime.combine(datetime_, datetime.min.time())
     return formatters.localised_nice_date(datetime_, show_date=True)
+
+
+def resource_view_state(resource_view_json):
+    """
+    Alter the recline view resource, adding in state info
+    @param resource_view_json:
+    @return:
+    """
+
+    resource_view = json.loads(resource_view_json)
+    resource_view['state'] = {
+        'fitColumns': True,
+        'enableCellRangeSelection': False,
+        'enableTextSelectionOnCells': False,
+        'gridOptions': {
+            'defaultFormatter': 'NHMFormatter',
+            'enableCellRangeSelection': False,
+            'enableTextSelectionOnCells': False,
+            'enableCellNavigation': False,
+            'selectedCellCssClass': 'bugger'
+        }
+    }
+
+    return json.dumps(resource_view)
 
