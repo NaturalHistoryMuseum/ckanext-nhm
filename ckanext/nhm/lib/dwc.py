@@ -59,6 +59,13 @@ class DwC(object):
             if group_terms:
                 self.groups[group_label] = group_terms
 
+        # Created isn't part of the DwC standard, but add as Dublin Core
+        self.terms['created'] = {
+            'group': self.terms['modified']['group'],
+            'uri': self.terms['modified']['uri'].replace('modified', 'created'),
+            'value': kwargs.pop('created')
+        }
+
         # Do we have any kwargs left (excluding hidden fields)
         unknown_terms = [k for k in kwargs if not k.startswith('_')]
         if unknown_terms:
