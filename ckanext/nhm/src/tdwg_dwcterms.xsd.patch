@@ -1,13 +1,5 @@
 --- tdwg_dwcterms.xsd
 +++ tdwg_dwcterms.xsd
-@@ -80,6 +80,7 @@
-         <xs:sequence>
-             <xs:element ref="dcterms:type" minOccurs="0"/>
-             <xs:element ref="dcterms:modified" minOccurs="0"/>
-+            <xs:element ref="dcterms:created" minOccurs="0"/>
-             <xs:element ref="dcterms:language" minOccurs="0"/>
-             <xs:element ref="dcterms:rights" minOccurs="0"/>
-             <xs:element ref="dcterms:rightsHolder" minOccurs="0"/>
 @@ -203,7 +204,7 @@
      <xs:element name="higherGeographyID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyLocationTerm"/>
      <xs:element name="higherGeography" type="xs:string" substitutionGroup="dwc:anyLocationTerm"/>

@@ -80,7 +80,6 @@
         <xs:sequence>
             <xs:element ref="dcterms:type" minOccurs="0"/>
             <xs:element ref="dcterms:modified" minOccurs="0"/>
-            <xs:element ref="dcterms:created" minOccurs="0"/>
             <xs:element ref="dcterms:language" minOccurs="0"/>
             <xs:element ref="dcterms:rights" minOccurs="0"/>
             <xs:element ref="dcterms:rightsHolder" minOccurs="0"/>
