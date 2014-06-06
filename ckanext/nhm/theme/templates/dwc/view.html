@@ -15,11 +15,9 @@
 
 {% block record %}
 
-    {% set dwc = DwC(**c.record_dict) %}
-
     <table>
 
-    {% for group, terms in dwc.get_groups(): %}
+    {% for group, terms in c.dwc.get_groups(): %}
 
         <tr><th colspan="2">
             {{ group }}
@@ -27,7 +25,7 @@
 
         {% for term_name in terms: %}
 
-            {% set term = dwc.get_term(term_name) %}
+            {% set term = c.dwc.get_term(term_name) %}
 
             <tr>
                 <td width="250">
