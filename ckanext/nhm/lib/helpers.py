@@ -10,16 +10,16 @@ from collections import OrderedDict
 # All funcs will be made available as helpers
 from webhelpers.number import format_data_size
 import os
-<<<<<<< HEAD
-from ckanext.nhm.lib.keemu import IDENTIFIER_PREFIX
-=======
-import json
->>>>>>> ckan-1251-1725-custom
 
 log = logging.getLogger(__name__)
 
+MULTIMEDIA_URL = 'http://www.nhm.ac.uk/emu-classes/class.EMuMedia.php?irn=%s&image=yes'
+
+INSTITUTION_CODE = 'NHMUK'
+IDENTIFIER_PREFIX = '%s:ecatalogue:' % INSTITUTION_CODE
+
 def get_site_statistics():
-    # TODO: TEMP: Just to put some stats on the home page
+    #TEMP: Just to put some stats on the home page
     stats = {}
     stats['dataset_count'] = logic.get_action('package_search')(
         {}, {"rows": 1})['count']
@@ -84,25 +84,6 @@ def parse_dynamic_properties(rec):
 
     return properties
 
-<<<<<<< HEAD
-=======
-
-def keemu_render_datetime(datetime_):
-    # Datetime formatter
->>>>>>> ckan-1251-1725-custom
-
-
-<<<<<<< HEAD
-    # {% for properties in rec.dynamicProperties.split(';'): %}
-    #     {% if properties: %}
-    #
-    #         {% set values = properties.split('=') %}
-    #         {{ values }}
-    #
-    #     {% endif %}
-    # {% endfor %}
-    #  {% do rec.update([tuple(property.strip().split('='))]) %}
-=======
 
 def resource_view_state(resource_view_json):
     """
@@ -126,5 +107,3 @@ def resource_view_state(resource_view_json):
     }
 
     return json.dumps(resource_view)
-
->>>>>>> ckan-1251-1725-custom
