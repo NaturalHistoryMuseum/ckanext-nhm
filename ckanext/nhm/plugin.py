@@ -1,17 +1,6 @@
 import ckan.plugins as p
 import ckanext.nhm.logic.action as action
-import ckanext.nhm.lib.helpers as nhmhelpers
-
-class ThemePlugin(p.SingletonPlugin):
-    """
-    Theme for the NHM data portal
-    """
-    p.implements(p.IConfigurer)
-
-    ## IConfigurer
-    def update_config(self, config):
-        p.toolkit.add_template_directory(config, 'theme/templates')
-        p.toolkit.add_public_directory(config, 'theme/public')
+import ckanext.nhm.lib.helpers as helpers
 
 class NHMPlugin(p.SingletonPlugin):
     """
@@ -19,15 +8,16 @@ class NHMPlugin(p.SingletonPlugin):
         View individual records in a dataset
         Set up NHM (CKAN) model
     """
-    p.implements(p.IConfigurable, inherit=True)
     p.implements(p.IRoutes, inherit=True)
     p.implements(p.IActions)
     p.implements(p.ITemplateHelpers)
+    p.implements(p.IConfigurer)
 
-    def configure(self, config):
-        # TODO: Move adding mat views here?
-        pass
-
+    ## IConfigurer
+    def update_config(self, config):
+        p.toolkit.add_template_directory(config, 'theme/templates')
+        p.toolkit.add_public_directory(config, 'theme/public')
+        p.toolkit.add_resource('theme/public', 'ckanext-nhm')
 
     ## IRoutes
     def before_map(self, map):
@@ -52,18 +42,21 @@ class NHMPlugin(p.SingletonPlugin):
 
     def get_helpers(self):
 
-        helpers = {}
+        h = {}
 
         #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
-        for helper in dir(nhmhelpers):
+        for helper in dir(helpers):
 
             #  Exclude private
             if not helper.startswith('_'):
-                func = getattr(nhmhelpers, helper)
+                func = getattr(helpers, helper)
 
                 #  Ensure it's a function
                 if hasattr(func, '__call__'):
-                    helpers[helper] = func
+                    h[helper] = func
 
-        return helpers
+        return h
+
+
+
 

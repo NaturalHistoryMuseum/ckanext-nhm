@@ -10,7 +10,11 @@ from collections import OrderedDict
 # All funcs will be made available as helpers
 from webhelpers.number import format_data_size
 import os
+<<<<<<< HEAD
 from ckanext.nhm.lib.keemu import IDENTIFIER_PREFIX
+=======
+import json
+>>>>>>> ckan-1251-1725-custom
 
 log = logging.getLogger(__name__)
 
@@ -80,8 +84,15 @@ def parse_dynamic_properties(rec):
 
     return properties
 
+<<<<<<< HEAD
+=======
+
+def keemu_render_datetime(datetime_):
+    # Datetime formatter
+>>>>>>> ckan-1251-1725-custom
 
 
+<<<<<<< HEAD
     # {% for properties in rec.dynamicProperties.split(';'): %}
     #     {% if properties: %}
     #
@@ -91,3 +102,29 @@ def parse_dynamic_properties(rec):
     #     {% endif %}
     # {% endfor %}
     #  {% do rec.update([tuple(property.strip().split('='))]) %}
+=======
+
+def resource_view_state(resource_view_json):
+    """
+    Alter the recline view resource, adding in state info
+    @param resource_view_json:
+    @return:
+    """
+
+    resource_view = json.loads(resource_view_json)
+    resource_view['state'] = {
+        'fitColumns': True,
+        'enableCellRangeSelection': False,
+        'enableTextSelectionOnCells': False,
+        'gridOptions': {
+            'defaultFormatter': 'NHMFormatter',
+            'enableCellRangeSelection': False,
+            'enableTextSelectionOnCells': False,
+            'enableCellNavigation': False,
+            'selectedCellCssClass': 'bugger'
+        }
+    }
+
+    return json.dumps(resource_view)
+
+>>>>>>> ckan-1251-1725-custom

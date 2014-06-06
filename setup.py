@@ -7,8 +7,7 @@ setup(
 	name='ckanext-nhm',
 	version=version,
 	description="",
-	long_description="""\
-	""",
+	long_description="""""",
 	classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
 	keywords='',
 	author='Ben Scott',
@@ -26,11 +25,5 @@ setup(
 	"""
         [ckan.plugins]
             nhm = ckanext.nhm.plugin:NHMPlugin
-            nhm_theme = ckanext.nhm.plugin:ThemePlugin
-            nhm_record = ckanext.nhm.plugin:RecordPlugin
-
-	    [paste.paster_command]
-            keemu=ckanext.nhm.commands.keemu:KEEMuCommand
-
 	""",
 )

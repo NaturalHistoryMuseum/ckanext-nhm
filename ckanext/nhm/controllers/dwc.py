@@ -50,6 +50,7 @@ class DarwinCoreController(base.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
+<<<<<<< HEAD
         return p.toolkit.render('dwc/view.html', extra_vars={
             'DwC': DwC,
         })
@@ -58,3 +59,6 @@ class DarwinCoreController(base.BaseController):
 
 
 
+=======
+        return p.toolkit.render('dwc/view.html')
+>>>>>>> ckan-1251-1725-custom
