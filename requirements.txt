@@ -1,5 +1,3 @@
--e git+https://github.com/NaturalHistoryMuseum/KEParser.git#egg=KEParser
--e git+https://github.com/NaturalHistoryMuseum/ke2sql.git#egg=ke2sql
 PyYAML==3.10
 amqp==1.4.0
 anyjson==0.3.3
