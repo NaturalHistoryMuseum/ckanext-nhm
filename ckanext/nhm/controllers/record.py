@@ -23,15 +23,15 @@ class RecordController(base.BaseController):
     Controller for displaying an individual record
     """
 
-    def view(self, package_name, resource_id, record_id):
+    def _load_data(self, package_name, resource_id, record_id):
+        """
+        Load the data for dataset, resource and record (into C var)
+        @param package_name:
+        @param resource_id:
+        @param record_id:
+        @return:
+        """
 
-        """
-        View an individual record
-        :param id:
-        :param resource_id:
-        :param record_id:
-        :return: html
-        """
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         # Try & get the resource
@@ -42,26 +42,36 @@ class RecordController(base.BaseController):
             c.pkg = context['package']
             c.pkg_dict = c.package
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
+
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
+    def view(self, package_name, resource_id, record_id):
+
+        """
+        View an individual record
+        :param id:
+        :param resource_id:
+        :param record_id:
+        :return: html
+        """
+
+        self._load_data(package_name, resource_id, record_id)
+
         # Try and use a template file based on the resource name
         template_file = 'record/{dataset}_{resource}.html'.format(
-            # TODO: TEMP: Change this
+            # TEMP: Change this
             # dataset=c.package['name'].lower(),
             dataset='collection',
             resource=c.resource['name'].lower()
         )
 
         if not find_template(template_file):
-            # If we don;t have a specific template file, use the generic one
+            # If we don't have a specific template file, use the generic one
             template_file = 'record/view.html'
 
-        return p.toolkit.render(template_file, extra_vars={
-            'enumerate': enumerate,
-            'tuple': tuple
-        })
+        return p.toolkit.render(template_file)
 
 
