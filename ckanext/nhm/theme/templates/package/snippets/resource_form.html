@@ -52,7 +52,6 @@
         {% set image_field_info = _('This dataset has not been added to the datastore, so we are unable to extract field information.') %}
     {% endif %}
 
-
     {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs=image_field_attrs) %}
         {{ form.info(image_field_info, inline=True) }}
     {% endcall %}
