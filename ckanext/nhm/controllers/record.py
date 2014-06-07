@@ -42,6 +42,15 @@ class RecordController(base.BaseController):
             c.pkg_dict = c.package
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
 
+            image_field = c.resource.get('_image_field', None)
+            if image_field:
+                try:
+                    # Pop the image field so it won't be output as part of the record_dict
+                    c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
+                except KeyError:
+                    # Skip errors - there are no images
+                    pass
+
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
