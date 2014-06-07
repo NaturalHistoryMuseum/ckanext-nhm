@@ -22,6 +22,11 @@ class NHMPlugin(p.SingletonPlugin):
     ## IRoutes
     def before_map(self, map):
 
+        # Add controller for KE EMu specimen records
+        map.connect('specimen', '/dataset/{package_name}/resource/663c6f9e-aff6-43ee-a5e5-e47bba9928f8/record/{record_id}',
+                    controller='ckanext.nhm.controllers.specimen:SpecimenController',
+                    action='view', resource_id='663c6f9e-aff6-43ee-a5e5-e47bba9928f8')
+
         # Add view record
         map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
                     controller='ckanext.nhm.controllers.record:RecordController',
