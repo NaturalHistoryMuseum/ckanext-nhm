@@ -1,35 +1,22 @@
-{% extends "record/view.html" %}
-
-{% if c.record_dict['scientificName'] %}
-    {% set record_name = '%s (%s)' % (c.record_dict['scientificName'], c.record_dict['occurrenceID']) %}
-{% else %}
-    {% set record_name = c.record_dict['occurrenceID'] %}
-{% endif %}
-
-{% block content_primary_nav %}
-
-  {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-  {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-
-{% endblock %}
+{% extends "record/specimen.html" %}
 
 {% block record %}
 
     <table>
 
-    {% for group, terms in c.dwc.get_groups(): %}
+    {% for group, terms in c.dwc.get_groups() %}
 
         <tr><th colspan="2">
             {{ group }}
         </th></tr>
 
-        {% for term_name in terms: %}
+        {% for term_name in terms %}
 
             {% set term = c.dwc.get_term(term_name) %}
 
             <tr>
                 <td width="250">
-                    <a href="{{ term['uri'] }}" title="{{ term['uri'] }} target="_blank">{{ term_name }}</a>
+                    <a href="{{ term['uri'] }}" title="{{ term['uri'] }} target="_blank">{{term_name}}</a>
                 </td>
 
                 <td>{{ term['value'] if term['value'] != None else '' }}</td>
