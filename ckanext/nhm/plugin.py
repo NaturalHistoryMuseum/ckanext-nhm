@@ -61,7 +61,3 @@ class NHMPlugin(p.SingletonPlugin):
                     h[helper] = func
 
         return h
-
-
-
-
