@@ -4,6 +4,7 @@ import json
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
+import itertools
 
 log = logging.getLogger(__name__)
 
@@ -66,12 +67,9 @@ def get_datastore_fields(resource_id):
     data = {'resource_id': resource_id, 'limit': 0}
     try:
         result = toolkit.get_action('datastore_search')({}, data)['fields']
-        print result
     except NotFound:
         fields = []
     else:
-        fields = [(f['id'], f['id'].title()) for f in result]
-
-    print fields
+        fields = itertools.chain([None], [{'value': f['id'], 'name': f['id']} for f in result])
 
     return fields
