@@ -31,7 +31,6 @@ class RecordController(base.BaseController):
         @param record_id:
         @return:
         """
-
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         # Try & get the resource
@@ -57,21 +56,16 @@ class RecordController(base.BaseController):
         :param record_id:
         :return: html
         """
-
         self._load_data(package_name, resource_id, record_id)
 
-        # Try and use a template file based on the resource name
-        template_file = 'record/{dataset}_{resource}.html'.format(
-            # TEMP: Change this
-            # dataset=c.package['name'].lower(),
-            dataset='collection',
-            resource=c.resource['name'].lower()
-        )
+        c.record_title = 'Record %s' % record_id
 
-        if not find_template(template_file):
-            # If we don't have a specific template file, use the generic one
-            template_file = 'record/view.html'
+        # TODO: Field order is wrong
 
-        return p.toolkit.render(template_file)
+        # TODO: Alice has added Lat / Lon selection - need to use this for the map
 
+        # TODO: Select image field
 
+        # Image and map should be a block in main record view
+
+        return p.toolkit.render('record/view.html')
