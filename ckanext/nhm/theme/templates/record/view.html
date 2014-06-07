@@ -44,8 +44,8 @@
 
             <table>
 
-                {% for field_name in rec: %}
-                    {% if rec[field_name]: %}
+                {% for field_name in rec %}
+                    {% if rec[field_name] %}
                         {{ field_row(field_name, rec[field_name]) }}
                     {% endif %}
                 {% endfor %}
@@ -53,6 +53,12 @@
             </table>
 
         </div>
+
+        {% if c.images %}
+            {% for image in c.images %}
+                <img src="{{ image }}" alt="c.record_title" />
+            {% endfor %}
+        {% endif %}
 
     {% endblock %}
 
