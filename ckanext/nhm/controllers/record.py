@@ -18,6 +18,7 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
 
+
 class RecordController(base.BaseController):
     """
     Controller for displaying an individual record
