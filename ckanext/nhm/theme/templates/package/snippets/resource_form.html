@@ -42,18 +42,24 @@
       {% endcall %}
     {% endblock %}
 
-    {% set datastore_fields = h.get_datastore_fields(data.id) %}
+    {% set datastore_fields = h.form_select_datastore_field_options(data.id) %}
 
     {% if datastore_fields %}
-        {% set image_field_attrs = {} %}
+        {% set field_attrs = {} %}
         {% set image_field_info = _('Does your dataset contain images?.  If so, please select the field here.') %}
+        {% set title_field_info = _('Please select the field to use for the record title.') %}
     {% else %}
-        {% set image_field_attrs = {'disabled' : 'disabled'} %}
+        {% set field_attrs = {'disabled' : 'disabled'} %}
         {% set image_field_info = _('This dataset has not been added to the datastore, so we are unable to extract field information.') %}
+        {% set title_field_info = _('') %}
     {% endif %}
 
-    {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs=image_field_attrs) %}
+    {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs=field_attrs) %}
         {{ form.info(image_field_info, inline=True) }}
+    {% endcall %}
+
+    {% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field, attrs=field_attrs) %}
+        {{ form.info(title_field_info, inline=True) }}
     {% endcall %}
 
   {% block metadata_fields %}
