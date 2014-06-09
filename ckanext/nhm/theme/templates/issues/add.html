@@ -1,0 +1,30 @@
+{% ckan_extends %}
+
+{% block ourform %}
+<form class="dataset-form form-horizontal" method="post" data-module="basic-form">
+  {% block error_summary %}
+    {% if c.error_summary | count %}
+      <div class="alert alert-error error-explanation">
+        <p>{{ _('The form contains invalid entries:') }}</p>
+        <ul>
+set           {% for key, error in c.error_summary.items() %}
+            <li>{{ key }}: {{ error[0] }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endblock %}
+
+  {% block fields %}
+    {{ form.input('title', label=_('Title'), id='field-title', placeholder=_('Title'), value=data.title, error=errors.title, classes=['control-full']) }}
+    {{ form.markdown('description', label=_('Description'), id='field-description', placeholder=_('Add a comment'), value=data.description, error=errors.description) }}
+  {% endblock %}
+
+  <div class="form-actions">
+    {{ h.nav_link(_('Cancel'), controller='package', action='read', id=c.pkg.name, class_='btn') }}
+    <button class="btn btn-primary" type="submit" name="save" tabindex="4">{{ _('Create') }}</button>
+  </div>
+</form>
+
+{% endblock %}
+
