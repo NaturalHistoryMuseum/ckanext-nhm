@@ -66,10 +66,23 @@ def get_datastore_fields(resource_id):
 
     data = {'resource_id': resource_id, 'limit': 0}
     try:
-        result = toolkit.get_action('datastore_search')({}, data)['fields']
+        return toolkit.get_action('datastore_search')({}, data)['fields']
     except NotFound:
-        fields = []
-    else:
-        fields = itertools.chain([None], [{'value': f['id'], 'name': f['id']} for f in result])
+        pass
+
+
+def form_select_datastore_field_options(resource_id=None, required=False):
+
+    fields = []
+    # Need to check for resource_id as this form gets loaded on add, nut just edit
+    # And on add there will be no resource_id
+    if resource_id:
+        datastore_fields = get_datastore_fields(resource_id)
+        # If this isn't required, add the None option
+        if datastore_fields and not required:
+            fields = list(itertools.chain([None], [{'value': f['id'], 'name': f['id']} for f in datastore_fields]))
 
     return fields
+
+
+
