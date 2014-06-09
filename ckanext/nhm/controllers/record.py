@@ -105,10 +105,5 @@ class RecordController(base.BaseController):
             if not field['id'].startswith('_'):
                 c.field_data[field['id']] = c.record_dict.get(field['id'], None)
 
-
-
-        # TODO: Alice has added Lat / Lon selection - need to use this for the map
-        # Resource view list
-
         # Image and map should be a block in main record view
         return p.toolkit.render('record/view.html')
