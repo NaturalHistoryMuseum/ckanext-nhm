@@ -5,6 +5,9 @@ import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 import itertools
+from ckanext.issues.model import Issue, ISSUE_STATUS
+from sqlalchemy.orm import joinedload
+from sqlalchemy import func
 
 log = logging.getLogger(__name__)
 
@@ -82,4 +85,17 @@ def form_select_datastore_field_options(resource_id=None, required=False):
     return fields
 
 
+def resource_issue_count(package_id):
 
+    issues_count = {}
+    # Get the counts from the issues model
+    result = dict(model.Session.query(Issue.status, func.count(Issue.id)).group_by(Issue.status).filter(Issue.dataset_id==package_id).all())
+
+    # Lop through the issue status (open and closed) and assign the count if there's a value; otherwise use 0
+    for status in ISSUE_STATUS:
+        try:
+            issues_count[status] = result[status]
+        except KeyError:
+            issues_count[status] = 0
+
+    return issues_count
