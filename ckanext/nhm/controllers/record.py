@@ -20,9 +20,7 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
 
-# The view type for the tiledmap
-TILED_MAP_TYPE = 'tiledmap'
-IMAGE_THUMBNAIL_WIDTH = 100
+TILED_MAP_TYPE = 'tiledmap'  # The view type for the tiledmap
 
 class RecordController(base.BaseController):
     """
@@ -66,7 +64,7 @@ class RecordController(base.BaseController):
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
                 # Also thumbnail it - there is a thumbnail=yes option, but that seems a bit small
-                c.images = ['%s&width=%s' % (image.strip(), IMAGE_THUMBNAIL_WIDTH) for image in c.record_dict.pop(image_field).split(';')]
+                c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
             except KeyError:
                 # Skip errors - there are no images
                 pass

@@ -40,7 +40,6 @@
 
     {% block record %}
 
-
         {% block record_data  %}
             <div class="record-content">
                 <table>
@@ -56,11 +55,14 @@
         {% endblock %}
 
         {% block record_images  %}
-
             {% if c.images %}
+
+                {% set loading_text = _('Loading...') %}
+
                 {% for image in c.images %}
-                    <img src="{{ image }}" alt="c.record_title" />
+                    <a href="{{ image }}" data-module="modal-image" data-module-image-url="{{ image }}"><img src="{{ image }}&width=120" alt="c.record_title" /></a>
                 {% endfor %}
+
             {% endif %}
 
         {% endblock %}
@@ -72,6 +74,8 @@
             {% endif %}
 
         {% endblock %}
+
+        {% resource 'ckanext-nhm/record' %}
 
     {% endblock %}
 
