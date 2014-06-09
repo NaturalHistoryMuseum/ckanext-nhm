@@ -22,6 +22,7 @@ get_action = logic.get_action
 
 # The view type for the tiledmap
 TILED_MAP_TYPE = 'tiledmap'
+IMAGE_THUMBNAIL_WIDTH = 100
 
 class RecordController(base.BaseController):
     """
@@ -64,7 +65,8 @@ class RecordController(base.BaseController):
         if image_field:
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
+                # Also thumbnail it - there is a thumbnail=yes option, but that seems a bit small
+                c.images = ['%s&width=%s' % (image.strip(), IMAGE_THUMBNAIL_WIDTH) for image in c.record_dict.pop(image_field).split(';')]
             except KeyError:
                 # Skip errors - there are no images
                 pass
@@ -84,10 +86,6 @@ class RecordController(base.BaseController):
                     })
 
                 break
-
-
-        print c.record_map
-
 
     def view(self, package_name, resource_id, record_id):
 
