@@ -5,7 +5,8 @@ import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 import logging
-from ckan.lib.render import find_template
+from ckanext.nhm.lib.helpers import get_datastore_fields
+from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
@@ -42,20 +43,32 @@ class RecordController(base.BaseController):
             c.pkg = context['package']
             c.pkg_dict = c.package
             c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
-
-            image_field = c.resource.get('_image_field', None)
-            if image_field:
-                try:
-                    # Pop the image field so it won't be output as part of the record_dict
-                    c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
-                except KeyError:
-                    # Skip errors - there are no images
-                    pass
-
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
+
+        image_field = c.resource.get('_image_field', None)
+        title_field = c.resource.get('_title_field', None)
+
+        if title_field:
+            # If we have title field assign to record_title and pop from the record_dict
+            c.record_title = c.record_dict.pop(title_field)
+        else:
+            # Otherwise just use _id field
+            c.record_title = 'Record %s' % record_id
+
+        if image_field:
+            try:
+                # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
+                c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
+            except KeyError:
+                # Skip errors - there are no images
+                pass
+
+        views = p.toolkit.get_action('resource_view_list')(context, {'id': resource_id})
+        print views
+
 
     def view(self, package_name, resource_id, record_id):
 
@@ -68,14 +81,17 @@ class RecordController(base.BaseController):
         """
         self._load_data(package_name, resource_id, record_id)
 
-        c.record_title = 'Record %s' % record_id
+        # The record_dict does not have field sin the correct order
+        # So load the fields, and create an OrderedDict with field: value
+        c.field_data = OrderedDict()
+        for field in get_datastore_fields(resource_id):
+            if not field['id'].startswith('_'):
+                c.field_data[field['id']] = c.record_dict.get(field['id'], None)
 
-        # TODO: Field order is wrong
+
 
         # TODO: Alice has added Lat / Lon selection - need to use this for the map
-
-        # TODO: Select image field
+        # Resource view list
 
         # Image and map should be a block in main record view
-
         return p.toolkit.render('record/view.html')
