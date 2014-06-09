@@ -1,0 +1,11 @@
+--- ckanext-issues/ckanext/issues/templates/issues/base.html
++++ ckanext-issues/ckanext/issues/templates/issues/base.html
+@@ -8,7 +8,6 @@
+ {% block breadcrumb_content %}
+   <li>{{ h.nav_link(_('Datasets'), controller='package', action='search') }}</li>
+   <li><a href="{{ h.url_for(controller='package', action='read', id=c.pkg.name) }}" title="{{ c.pkg.title }}">{{ h.truncate(c.pkg.title, 60) }}</a></li>
+-  <li><a href="{{ h.url_for('issues_home', package_id=c.pkg.name) }}">Issues</a></li>
+-  <li class="active">{% block breadcrumb_item %}{% endblock %}</li>
++  <li class="active"><a href="{{ h.url_for('issues_home', package_id=c.pkg.name) }}">Issues</a></li>
+ {% endblock %}
+ 
