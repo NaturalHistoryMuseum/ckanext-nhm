@@ -44,9 +44,9 @@
 
             <table>
 
-                {% for field_name in rec %}
-                    {% if rec[field_name] %}
-                        {{ field_row(field_name, rec[field_name]) }}
+                {% for field_name, value in c.field_data.items() %}
+                    {% if value %}
+                        {{ field_row(field_name, value) }}
                     {% endif %}
                 {% endfor %}
 
