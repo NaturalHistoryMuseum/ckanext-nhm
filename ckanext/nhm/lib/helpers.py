@@ -24,17 +24,14 @@ def get_site_statistics():
     return stats
 
 
-def get_record_point(rec):
-
-    # TODO: What should happen if lat/lon not sane?
-    if rec['decimalLatitude'] and rec['decimalLongitude']:
-
-        return json.dumps({
-            'type': 'Point',
-            'coordinates': [rec['decimalLongitude'], rec['decimalLatitude']]
-        })
-
-    return None
+# def get_record_point(rec):
+#
+#     # TODO: What should happen if lat/lon not sane?
+#     if rec['decimalLatitude'] and rec['decimalLongitude']:
+#
+#
+#
+#     return None
 
 
 def resource_view_state(resource_view_json):

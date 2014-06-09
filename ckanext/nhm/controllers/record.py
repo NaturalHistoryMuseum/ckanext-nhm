@@ -5,6 +5,7 @@ import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 import logging
+import json
 from ckanext.nhm.lib.helpers import get_datastore_fields
 from collections import OrderedDict
 
@@ -19,6 +20,8 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
 
+# The view type for the tiledmap
+TILED_MAP_TYPE = 'tiledmap'
 
 class RecordController(base.BaseController):
     """
@@ -66,8 +69,24 @@ class RecordController(base.BaseController):
                 # Skip errors - there are no images
                 pass
 
+        # Loop through all the views - if we have a tiled map view with lat/lon fields
+        # We'll use those fields to add the map
         views = p.toolkit.get_action('resource_view_list')(context, {'id': resource_id})
-        print views
+
+        for view in views:
+            if view['view_type'] == TILED_MAP_TYPE:
+                latitude, longitude = c.record_dict.get(view[u'latitude_field']), c.record_dict.get(view[u'longitude_field'])
+
+                if latitude and longitude:
+                    c.record_map = json.dumps({
+                        'type': 'Point',
+                        'coordinates': [longitude, latitude]
+                    })
+
+                break
+
+
+        print c.record_map
 
 
     def view(self, package_name, resource_id, record_id):

@@ -40,25 +40,38 @@
 
     {% block record %}
 
-        <div class="record-content">
 
-            <table>
+        {% block record_data  %}
+            <div class="record-content">
+                <table>
 
-                {% for field_name, value in c.field_data.items() %}
-                    {% if value %}
-                        {{ field_row(field_name, value) }}
-                    {% endif %}
+                    {% for field_name, value in c.field_data.items() %}
+                        {% if value %}
+                            {{ field_row(field_name, value) }}
+                        {% endif %}
+                    {% endfor %}
+
+                </table>
+            </div>
+        {% endblock %}
+
+        {% block record_images  %}
+
+            {% if c.images %}
+                {% for image in c.images %}
+                    <img src="{{ image }}" alt="c.record_title" />
                 {% endfor %}
+            {% endif %}
 
-            </table>
+        {% endblock %}
 
-        </div>
+        {% block record_map  %}
 
-        {% if c.images %}
-            {% for image in c.images %}
-                <img src="{{ image }}" alt="c.record_title" />
-            {% endfor %}
-        {% endif %}
+            {% if c.record_map %}
+                {% snippet "snippets/record_map.html", extent=c.record_map %}
+            {% endif %}
+
+        {% endblock %}
 
     {% endblock %}
 
