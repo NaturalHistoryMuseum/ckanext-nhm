@@ -1,0 +1,8 @@
+{% block modal_link %}
+
+    <a class="btn btn-primary" data-module="modal-contact" href="{{ h.url_for('contact_form') }}" title="{{ _('Contact') }}">
+        <i class="icon-info"></i>{{ _('Request information') }}
+    </a>
+
+{% resource 'ckanext-contact/main' %}
+{% endblock %}
