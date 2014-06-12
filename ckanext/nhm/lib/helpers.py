@@ -12,6 +12,8 @@ from sqlalchemy import func
 log = logging.getLogger(__name__)
 
 NotFound = logic.NotFound
+NotAuthorized = logic.NotAuthorized
+get_action = logic.get_action
 
 def get_site_statistics():
     #TEMP: Just to put some stats on the home page
@@ -27,14 +29,30 @@ def get_site_statistics():
     return stats
 
 
-# def get_record_point(rec):
-#
-#     # TODO: What should happen if lat/lon not sane?
-#     if rec['decimalLatitude'] and rec['decimalLongitude']:
-#
-#
-#
-#     return None
+def _get_action(action, params):
+
+    context = {'ignore_auth': True, 'for_view': True}
+
+    try:
+        return get_action(action)(context, params)
+    except (NotFound, NotAuthorized):
+        pass
+
+    return None
+
+
+def get_resource(resource_id):
+    return _get_action('resource_show', {'id': resource_id})
+
+
+def get_record(resource_id, record_id):
+    return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
+
+
+def record_display_name(resource, record):
+    title_field = resource.get('_title_field', None)
+    display_name = record.get(title_field, 'Record %s' % record.get('_id'))
+    return display_name
 
 
 def resource_view_state(resource_view_json):
