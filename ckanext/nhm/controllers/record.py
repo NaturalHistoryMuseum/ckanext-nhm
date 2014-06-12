@@ -51,14 +51,6 @@ class RecordController(base.BaseController):
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         image_field = c.resource.get('_image_field', None)
-        title_field = c.resource.get('_title_field', None)
-
-        if title_field:
-            # If we have title field assign to record_title and pop from the record_dict
-            c.record_title = c.record_dict.pop(title_field)
-        else:
-            # Otherwise just use _id field
-            c.record_title = 'Record %s' % record_id
 
         if image_field:
             try:
