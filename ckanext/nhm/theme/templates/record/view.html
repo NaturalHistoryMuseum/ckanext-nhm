@@ -4,6 +4,8 @@
 {% set rec = c.record_dict  %}
 {% set res = c.resource %}
 {% set pkg = c.pkg_dict or pkg_dict %}
+{% set record_display_name = h.record_display_name(res, rec) %}
+
 
 {% block head_extras -%}
   {{ super() }}
@@ -17,7 +19,7 @@
 {% block breadcrumb_content %}
   {{ super() }}
   <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
-  <li class="active"><a href="">{{ c.record_title|truncate(30) }}</a></li>
+  <li class="active"><a href="">{{ record_display_name|truncate(30) }}</a></li>
 {% endblock %}
 
 {% block primary_content_inner %}
@@ -26,7 +28,7 @@
         <div class="module-content">
 
             {% block heading %}
-                <h1 class="page-heading">{{ c.record_title }}</h1>
+                <h1 class="page-heading">{{ record_display_name }}</h1>
             {% endblock %}
 
             <div class="actions">
@@ -61,7 +63,7 @@
                 {% set loading_text = _('Loading...') %}
 
                 {% for image in c.images %}
-                    <a href="{{ image }}" data-module="modal-image" data-module-image-url="{{ image }}"><img src="{{ image }}&width=120" alt="c.record_title" /></a>
+                    <a href="{{ image }}" data-module="modal-image" data-module-image-url="{{ image }}"><img src="{{ image }}&width=120" alt="{{ record_display_name }}" /></a>
                 {% endfor %}
 
             {% endif %}
