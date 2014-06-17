@@ -55,12 +55,7 @@ def _modify_schema(schema):
 
     schema['category'] = [convert_from_tags(DATASET_CATEGORY), ignore_missing]
     schema['temporal_extent'] = [ignore_missing, convert_to_extras]
-
-    # Do we need these?
-    # del schema['maintainer']
-    # del schema['maintainer_email']
-    # del schema['author_email']
-
+    schema['update_frequency'] = [ignore_missing, convert_to_extras]
 
 def show_package_schema():
 
@@ -71,4 +66,5 @@ def show_package_schema():
     schema['tags']['__extras'].append(p.toolkit.get_converter('free_tags_only'))
     schema['category'] = [convert_to_tags(DATASET_CATEGORY)]
     schema['temporal_extent'] = [convert_from_extras]
+    schema['update_frequency'] = [convert_from_extras]
     return schema
