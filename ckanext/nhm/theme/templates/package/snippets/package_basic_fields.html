@@ -8,19 +8,23 @@
   {{ form.markdown('notes', id='field-notes', label=_('Abstract'), placeholder=_('eg. Some useful notes about the data'), value=data.notes, error=errors.notes, is_required=true) }}
 {% endblock %}
 
-{% block package_basic_fields_custom %}
+{% block package_basic_fields_tags %}
+
+ {{ form.input('temporal_extent', label=_('temporal_extent'), id='field-temporal-extent', placeholder=_('temporal extent'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
+
+ {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
+ {{ form.input('tag_string', id='field-tags', label=_('Keywords'), placeholder=_('eg. economy, mental health, government'), value=data.tag_string, error=errors.tags, classes=['control-full'], attrs=tag_attrs) }}
 
   <div class="control-group">
     <label class="control-label" for="field-category">{{ _("Dataset category") }}</label>
     <div class="controls">
       <select id="field-category" name="category" data-module="autocomplete">
+        <option value="">None</option>
         {% for category in h.dataset_categories()  %}
           <option value="{{ category }}" {% if category in data.get('category', []) %}selected="selected"{% endif %}>{{ category }}</option>
         {% endfor %}
       </select>
     </div>
   </div>
-
-{{ form.input('temporal_extent', label=_('temporal_extent'), id='field-temporal-extent', placeholder=_('temporal extent'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
 
 {% endblock %}

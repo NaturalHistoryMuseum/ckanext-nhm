@@ -1,8 +1,25 @@
 {% ckan_extends %}
 
+{% block package_metadata_fields_url %}
+{% endblock %}
+
+{% block package_metadata_fields_version %}
+{% endblock %}
+
+{% block package_metadata_author %}
+    {{ form.input('author', label=_('Author'), id='field-author', placeholder=_('Joe Bloggs'), value=data.author, error=errors.author, classes=['control-medium']) }}
+{% endblock %}
+
+{% block package_metadata_fields_maintainer %}
+{% endblock %}
+
 {% block custom_fields %}
     {# Remove 'free extras' from the package form. If you're using
 convert_to/from_extras() as we are with our 'custom_text' field below then
 you need to remove free extras from the form, or editing your custom field
 won't work. #}
+
+    {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('temporal extent'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
+    {{ form.input('update_frequency', label=_('Update frequency'), id='field-update-frequency', placeholder=_('update frequency'), value=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
+
 {% endblock %}
