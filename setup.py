@@ -25,5 +25,8 @@ setup(
 	"""
         [ckan.plugins]
             nhm = ckanext.nhm.plugin:NHMPlugin
+
+	    [paste.paster_command]
+            category=ckanext.nhm.commands.category:CategoryCommand
 	""",
 )
