@@ -21,7 +21,7 @@ def record_get(context, data_dict):
     """
     # Validate the data
     context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    schema = context.get('schema', nhm_schema.nhm_record_get_schema())
+    schema = context.get('schema', nhm_schema.record_get_schema())
     data_dict, errors = _validate(data_dict, schema, context)
 
     if errors:

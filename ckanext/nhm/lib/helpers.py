@@ -9,6 +9,8 @@ from ckanext.issues.model import Issue, ISSUE_STATUS
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 
+from ckanext.nhm.commands.category import DATASET_CATEGORY
+
 log = logging.getLogger(__name__)
 
 NotFound = logic.NotFound
@@ -30,6 +32,12 @@ def get_site_statistics():
 
 
 def _get_action(action, params):
+    """
+    Call basic get_action from template
+    @param action:
+    @param params:
+    @return:
+    """
 
     context = {'ignore_auth': True, 'for_view': True}
 
@@ -117,3 +125,15 @@ def resource_issue_count(package_id):
             issues_count[status] = 0
 
     return issues_count
+
+
+def dataset_categories():
+    """
+    Return list of dataset category terms
+    @return: list
+    """
+    try:
+        categories = toolkit.get_action('tag_list')(data_dict={'vocabulary_id': DATASET_CATEGORY})
+        return categories
+    except toolkit.ObjectNotFound:
+        return None
