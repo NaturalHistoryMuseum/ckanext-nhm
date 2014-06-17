@@ -3,13 +3,10 @@ import ckan.plugins as p
 from ckan.logic.schema import (
     default_create_package_schema,
     default_update_package_schema,
-    default_show_package_schema,
-    default_resource_schema,
+    default_show_package_schema
     )
 
-from ckanext.nhm.logic.validators import (
-    string_max_length,
-)
+from ckanext.nhm.logic.validators import string_max_length
 
 get_converter = p.toolkit.get_converter
 get_validator = p.toolkit.get_validator
@@ -48,7 +45,7 @@ def update_package_schema():
 
 def _modify_schema(schema):
 
-    convert_from_tags = get_converter('convert_from_tags')
+    convert_from_tags = get_converter('convert_to_tags')
     convert_to_extras = get_converter('convert_to_extras')
 
     # Required fields
@@ -68,9 +65,10 @@ def _modify_schema(schema):
 def show_package_schema():
 
     convert_from_extras = get_converter('convert_from_extras')
-    convert_to_tags = get_converter('convert_to_tags')
+    convert_to_tags = get_converter('convert_from_tags')
 
     schema = default_show_package_schema()
     schema['tags']['__extras'].append(p.toolkit.get_converter('free_tags_only'))
     schema['category'] = [convert_to_tags(DATASET_CATEGORY)]
     schema['temporal_extent'] = [convert_from_extras]
+    return schema
