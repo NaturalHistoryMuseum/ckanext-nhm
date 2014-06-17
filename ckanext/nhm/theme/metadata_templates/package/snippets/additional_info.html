@@ -1,0 +1,19 @@
+{% ckan_extends %}
+
+{% block extras %}
+
+  {% if pkg_dict.temporal_extent %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Temporal extent") }}</th>
+      <td class="dataset-details">{{ pkg_dict.temporal_extent }}</td>
+    </tr>
+  {% endif %}
+
+  {% if pkg_dict.category %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("Category") }}</th>
+      <td class="dataset-details">{{ pkg_dict.category }}</td>
+    </tr>
+  {% endif %}
+
+{% endblock %}

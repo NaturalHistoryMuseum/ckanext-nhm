@@ -1,0 +1,5 @@
+{% ckan_extends %}
+
+{% block basic_fields_name %}
+  {{ form.input('name', id='field-name', label=_('Name'), placeholder=_('eg. Specimens'), value=data.name, error=errors.name, classes=['control-full'], is_required=True) }}
+{% endblock %}
