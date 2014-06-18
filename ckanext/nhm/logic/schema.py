@@ -21,7 +21,7 @@ int_validator = get_validator('int_validator')
 
 DATASET_CATEGORY = 'dataset_category'
 
-update_frequencies = [
+UPDATE_FREQUENCIES = [
     ('', ''),
     ('daily', 'Daily'),
     ('weekly', 'Weekly'),
@@ -67,8 +67,8 @@ def _modify_schema(schema):
 
     # Add new fields
     schema['category'] = [convert_from_tags(DATASET_CATEGORY), ignore_missing]
-    schema['temporal_extent'] = [ignore_missing, convert_to_extras, unicode]
-    schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in update_frequencies]), convert_to_extras, unicode]
+    schema['temporal_extent'] = [ignore_missing, unicode, convert_to_extras]
+    schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in UPDATE_FREQUENCIES]), convert_to_extras, unicode]
 
 
 def show_package_schema():

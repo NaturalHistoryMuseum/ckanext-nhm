@@ -19,6 +19,6 @@ you need to remove free extras from the form, or editing your custom field
 won't work. #}
 
     {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('temporal extent'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
-    {{ form.select('update_frequency', label=_('Update frequency'), id='field-update-frequency', options=h.list_to_form_options(update_frequencies, False), selected=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
+    {{ form.select('update_frequency', label=_('Update frequency'), id='field-update-frequency', options=h.form_select_update_frequency_options(), selected=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
 
 {% endblock %}
