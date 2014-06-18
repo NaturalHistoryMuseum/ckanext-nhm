@@ -2,7 +2,14 @@ import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
-from ckan.lib.base import c
+from ckan.common import request
+from ckanext.spatial.lib import save_package_extent, validate_bbox, bbox_query, bbox_query_ordered
+import ckanext.nhm.logic.validators as validators
+from ckan.lib.helpers import json
+
+# import is_latitude, is_longitude
+
+Invalid = p.toolkit.Invalid
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
@@ -15,6 +22,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.ITemplateHelpers, inherit=True)
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IDatasetForm, inherit=True)
+    p.implements(p.IPackageController, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -86,3 +94,80 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def show_package_schema(self):
         return nhm_schema.show_package_schema()
+
+    def edit(self, package):
+        self.check_spatial_extra(package)
+
+    # def check_spatial_extra(self, package):
+    #     """
+    #     ckanext-spatial required pasting geoJSON into an extra key field, which is nasty
+    #     So we allow user to select point / polygon and coordinates
+    #     At some point, we'll also a map selection
+    #
+    #     @param package:
+    #     @return:
+    #     """
+    #
+    #     # TODO: Map selection
+    #     # TODO: Tidy form
+    #
+    #     spatial_type = request.params.get('spatial_type', None)
+    #
+    #     # Delete package extent
+    #     if not spatial_type:
+    #         save_package_extent(package.id, None)
+    #         return
+    #
+    #     # User has selected a spatial type, so we need to check we have the correct coordinates
+    #     if spatial_type == 'point':
+    #         spatial_fields = ['point']
+    #     elif spatial_type == 'polygon':
+    #         spatial_fields = ['east', 'west', 'north', 'south']
+    #
+    #     error_dict = {}
+    #     coordinates = []
+    #
+    #     for spatial_field in spatial_fields:
+    #
+    #         coordinate = []
+    #
+    #         for lat_lon in ['latitude', 'longitude']:
+    #             field = '%s_%s' % (spatial_field, lat_lon)
+    #             value = request.params.get(field, None)
+    #
+    #             if not value:
+    #                 error_dict[field] = [u'Missing value']
+    #             else:
+    #
+    #                 # Ensure value is a valid latitude / longitude
+    #                 validator_func = 'is_%s' % lat_lon
+    #
+    #                 try:
+    #                     # Validate the value
+    #                     getattr(validators, validator_func)(value)
+    #                 except Invalid:
+    #                     # If invalid, add to the error dictionary
+    #                     error_dict[field] = [u'Invalid value']
+    #
+    #             #  Build a list of list coordinates
+    #             coordinate.append(float(value))
+    #
+    #         coordinates.append(coordinate)
+    #
+    #     if error_dict:
+    #         error_summary = {field: errors[0] for field, errors in error_dict.items()}
+    #         raise p.toolkit.ValidationError(error_dict, error_summary=error_summary)
+    #
+    #     else:
+    #
+    #         # No errors, lets save
+    #         geometry = {
+    #             'type': 'Point',
+    #             'coordinates': coordinates[0]
+    #         }
+    #
+    #         # Save the package extent
+    #         save_package_extent(package.id, geometry)
+    #
+    #         print geometry
+
