@@ -96,7 +96,12 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return nhm_schema.show_package_schema()
 
     def edit(self, package):
-        self.check_spatial_extra(package)
+        # print package
+
+        for extra in package.extras_list:
+            print extra.key
+
+        # self.check_spatial_extra(package)
 
     # def check_spatial_extra(self, package):
     #     """

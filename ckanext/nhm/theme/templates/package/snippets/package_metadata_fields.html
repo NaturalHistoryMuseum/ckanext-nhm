@@ -20,30 +20,6 @@ won't work. #}
 
     {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('temporal extent'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
     {{ form.select('update_frequency', label=_('Update frequency'), id='field-update-frequency', options=h.form_select_update_frequency_options(), selected=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
-
-    <fieldset>
-        <legend>Geospatial extent</legend>
-        <label for="polygon">Polygon</label><input type="radio" name="spatial_type" value="polygon" id="polygon"><br />
-        <label for="point">Point</label><input type="radio" name="spatial_type" value="point" id="point"><br />
-        <label for="none">None</label><input type="radio" name="spatial_type" value="" id="none">
-    </fieldset>
-
-    {# Point latitude / longitude #}
-    {{ form.input('point_latitude', label=_('Latitude'), id='field-point-latitude', placeholder=_('0.0'), value=data.point_latitude, error=errors.point_latitude, classes=['control-medium']) }}
-    {{ form.input('point_longitude', label=_('Longitude'), id='field-point-longitude', placeholder=_('0.0'), value=data.point_longitude, error=errors.point_longitude, classes=['control-medium']) }}
-
-    {# Polygon latitude / longitude #}
-    {#  West  #}
-    {{ form.input('west_latitude', label=_('West latitude'), id='field-west-latitude', placeholder=_('0.0'), value=data.west_latitude, error=errors.west_latitude, classes=['control-medium']) }}
-    {{ form.input('west_longitude', label=_('West longitude'), id='field-west-longitude', placeholder=_('0.0'), value=data.west_longitude, error=errors.west_longitude, classes=['control-medium']) }}
-    {#  East  #}
-    {{ form.input('east_latitude', label=_('East latitude'), id='field-east-latitude', placeholder=_('0.0'), value=data.east_latitude, error=errors.east_latitude, classes=['control-medium']) }}
-    {{ form.input('east_longitude', label=_('East longitude'), id='field-east-longitude', placeholder=_('0.0'), value=data.east_longitude, error=errors.east_longitude, classes=['control-medium']) }}
-    {#  North  #}
-    {{ form.input('north_latitude', label=_('North latitude'), id='field-north-latitude', placeholder=_('0.0'), value=data.north_latitude, error=errors.north_latitude, classes=['control-medium']) }}
-    {{ form.input('north_longitude', label=_('North longitude'), id='field-north-longitude', placeholder=_('0.0'), value=data.north_longitude, error=errors.north_longitude, classes=['control-medium']) }}
-    {#  South  #}
-    {{ form.input('south_latitude', label=_('South latitude'), id='field-south-latitude', placeholder=_('0.0'), value=data.south_latitude, error=errors.south_latitude, classes=['control-medium']) }}
-    {{ form.input('south_longitude', label=_('South longitude'), id='field-south-longitude', placeholder=_('0.0'), value=data.south_longitude, error=errors.south_longitude, classes=['control-medium']) }}
+    {{ form.input('spatial', label=_('Spatial'), id='field-spatial', placeholder=_('{"type": "Point", "coordinates": [-3.145,53.078]}'), value=data.spatial, error=errors.spatial, classes=['control-medium']) }}
 
 {% endblock %}
