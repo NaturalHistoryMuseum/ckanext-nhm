@@ -86,8 +86,3 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def show_package_schema(self):
         return nhm_schema.show_package_schema()
-
-    def setup_template_variables(self, context, data_dict=None, package_type=None):
-
-        super(NHMPlugin, self).setup_template_variables(context, data_dict)
-        c.update_frequencies = nhm_schema.update_frequencies
