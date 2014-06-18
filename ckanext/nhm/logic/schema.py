@@ -7,6 +7,7 @@ from ckan.logic.schema import (
     )
 
 from ckanext.nhm.logic.validators import string_max_length
+from formencode.validators import OneOf
 
 get_converter = p.toolkit.get_converter
 get_validator = p.toolkit.get_validator
@@ -20,6 +21,16 @@ int_validator = get_validator('int_validator')
 
 DATASET_CATEGORY = 'dataset_category'
 
+update_frequencies = [
+    ('', ''),
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+    ('quarterly', 'Quarterly'),
+    ('annual', 'Annual'),
+    ('discontinued', 'Discontinued'),
+    ('never', 'Never'),
+]
 
 def record_get_schema():
 
@@ -57,7 +68,7 @@ def _modify_schema(schema):
     # Add new fields
     schema['category'] = [convert_from_tags(DATASET_CATEGORY), ignore_missing]
     schema['temporal_extent'] = [ignore_missing, convert_to_extras, unicode]
-    schema['update_frequency'] = [ignore_missing, convert_to_extras, unicode]
+    schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in update_frequencies]), convert_to_extras, unicode]
 
 def show_package_schema():
 

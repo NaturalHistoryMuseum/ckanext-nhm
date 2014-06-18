@@ -97,18 +97,41 @@ def get_datastore_fields(resource_id):
         pass
 
 
-def form_select_datastore_field_options(resource_id=None, required=False):
+def form_select_datastore_field_options(resource_id=None, allow_empty=False):
 
-    fields = []
     # Need to check for resource_id as this form gets loaded on add, nut just edit
     # And on add there will be no resource_id
     if resource_id:
-        datastore_fields = get_datastore_fields(resource_id)
-        # If this isn't required, add the None option
-        if datastore_fields and not required:
-            fields = list(itertools.chain([None], [{'value': f['id'], 'name': f['id']} for f in datastore_fields]))
+        datastore_fields = [f['id'] for f in get_datastore_fields(resource_id)]
+        return list_to_form_options(datastore_fields)
 
-    return fields
+    return []
+
+def list_to_form_options(values, allow_empty=False, allow_empty_text='- None -'):
+    """
+    Format a list of values into a list of dict suitable for use in forms: [{value: x, name: y}]
+    @param values: list or list of tuples [(value, name)]
+    @param allow_empty: If true, will add none option
+    @param allow_empty_name: Label for none value
+    @return:
+    """
+    options = []
+
+    if allow_empty:
+        options.append({'value': None, 'text': allow_empty_text or None})
+
+    for value in values:
+
+        try:
+            # If this is a tuple use (value, name)
+            value, name = value[0], value[1]
+        except KeyError:
+            # Otherwise, use value for both
+            value, name = value, value
+
+        options.append({'value': value, 'text': name})
+
+    return options
 
 
 def resource_issue_count(package_id):

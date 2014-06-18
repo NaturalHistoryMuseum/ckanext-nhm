@@ -1,0 +1,6 @@
+{% ckan_extends %}
+
+{% block metadata_fields %}
+{#  Add update_frequencies #}
+{% snippet 'package/snippets/package_metadata_fields.html', data=data, errors=errors, update_frequencies=c.update_frequencies %}
+{% endblock %}

@@ -2,6 +2,7 @@ import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
+from ckan.lib.base import c
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
@@ -72,7 +73,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
    # See See http://docs.ckan.org/en/latest/extensions/adding-custom-fields.html
 
     def package_types(self):
-        return []
+        return ['dataset']
 
     def is_fallback(self):
         return True
@@ -85,3 +86,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def show_package_schema(self):
         return nhm_schema.show_package_schema()
+
+    def setup_template_variables(self, context, data_dict=None, package_type=None):
+
+        super(NHMPlugin, self).setup_template_variables(context, data_dict)
+        c.update_frequencies = nhm_schema.update_frequencies
