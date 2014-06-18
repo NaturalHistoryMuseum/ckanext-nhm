@@ -70,6 +70,7 @@ def _modify_schema(schema):
     schema['temporal_extent'] = [ignore_missing, convert_to_extras, unicode]
     schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in update_frequencies]), convert_to_extras, unicode]
 
+
 def show_package_schema():
 
     convert_from_extras = get_converter('convert_from_extras')
