@@ -9,7 +9,7 @@ from ckanext.issues.model import Issue, ISSUE_STATUS
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 
-from ckanext.nhm.commands.category import DATASET_CATEGORY
+from ckanext.nhm.logic.schema import DATASET_CATEGORY, UPDATE_FREQUENCIES
 
 log = logging.getLogger(__name__)
 
@@ -106,6 +106,11 @@ def form_select_datastore_field_options(resource_id=None, allow_empty=False):
         return list_to_form_options(datastore_fields)
 
     return []
+
+
+def form_select_update_frequency_options():
+    return list_to_form_options(UPDATE_FREQUENCIES)
+
 
 def list_to_form_options(values, allow_empty=False, allow_empty_text='- None -'):
     """
