@@ -51,11 +51,13 @@ def _modify_schema(schema):
     # Required fields
     schema['title'] = [not_empty, string_max_length(255), unicode]
     schema['notes'] = [not_empty, string_max_length(4000), unicode]
+    schema['author'] = [not_empty, unicode]
     schema['resources']['name'] = [not_empty, string_max_length(255), unicode]
 
+    # Add new fields
     schema['category'] = [convert_from_tags(DATASET_CATEGORY), ignore_missing]
-    schema['temporal_extent'] = [ignore_missing, convert_to_extras]
-    schema['update_frequency'] = [ignore_missing, convert_to_extras]
+    schema['temporal_extent'] = [ignore_missing, convert_to_extras, unicode]
+    schema['update_frequency'] = [ignore_missing, convert_to_extras, unicode]
 
 def show_package_schema():
 
