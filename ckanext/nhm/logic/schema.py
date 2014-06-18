@@ -82,6 +82,7 @@ def show_package_schema():
     schema['category'] = [convert_to_tags(DATASET_CATEGORY)]
     schema['temporal_extent'] = [ignore_missing, convert_from_extras]
     schema['update_frequency'] = [ignore_missing, convert_from_extras]
+    # This is the same as the extras field with key=spatial for ckanext-spatial
     schema['spatial'] = [ignore_missing, convert_from_extras]
 
     return schema
