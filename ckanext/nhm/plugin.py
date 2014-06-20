@@ -23,6 +23,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         p.toolkit.add_public_directory(config, 'theme/public')
         p.toolkit.add_resource('theme/public', 'ckanext-nhm')
 
+        # Add another public directory for dataset files - this will hopefully be temporary, until DAMS
+        p.toolkit.add_public_directory(config, 'files')
+
     ## IRoutes
     def before_map(self, map):
 
