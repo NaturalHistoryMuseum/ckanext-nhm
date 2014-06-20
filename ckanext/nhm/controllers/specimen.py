@@ -238,9 +238,7 @@ class SpecimenController(RecordController):
             'BMNH(E)': 'Entomology'
         }
 
-        # TEMP: All should have this
-        if collection_code:
-            c.record_dict['collectionCode'] = '%s (%s)' % (collection_code, collection_departments[collection_code])
+        c.record_dict['collectionCode'] = '%s (%s)' % (collection_code, collection_departments[collection_code])
 
         # Parse collection date
         collection_date = list()
