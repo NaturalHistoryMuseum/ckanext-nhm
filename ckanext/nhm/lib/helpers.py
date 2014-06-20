@@ -60,7 +60,7 @@ def get_record(resource_id, record_id):
 def record_display_name(resource, record):
     title_field = resource.get('_title_field', None)
     display_name = record.get(title_field, 'Record %s' % record.get('_id'))
-    return display_name
+    return str(display_name)
 
 
 def resource_view_state(resource_view_json):
@@ -96,6 +96,8 @@ def get_datastore_fields(resource_id):
     except NotFound:
         pass
 
+    return []
+
 
 def form_select_datastore_field_options(resource_id=None, allow_empty=False):
 
@@ -127,12 +129,12 @@ def list_to_form_options(values, allow_empty=False, allow_empty_text='- None -')
 
     for value in values:
 
-        try:
-            # If this is a tuple use (value, name)
-            value, name = value[0], value[1]
-        except KeyError:
-            # Otherwise, use value for both
-            value, name = value, value
+        if isinstance(value, basestring):
+            name = value
+        else:
+            # If this is a tuple or list use (value, name)
+            name = value[1]
+            value = value[0]
 
         options.append({'value': value, 'text': name})
 
@@ -165,3 +167,7 @@ def dataset_categories():
         return categories
     except toolkit.ObjectNotFound:
         return None
+
+
+def url_for_specimen_dataset(**params):
+    return 'dataset'
