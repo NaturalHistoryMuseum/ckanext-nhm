@@ -4,7 +4,12 @@
    with the Organizations link removed #}
 {% block header_site_navigation_tabs %}
   {{ h.build_nav_main(
-    ('search', _('Datasets')),
+    ('home', _('Home')),
+    ('search', _('Data')),
     ('about', _('About'))
   ) }}
+{% endblock %}
+
+{# We do not want a search #}
+{% block header_site_search %}
 {% endblock %}

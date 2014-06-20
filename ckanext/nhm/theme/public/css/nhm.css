@@ -1,3 +1,67 @@
 .full-width .container{
     width: auto!important;
 }
+
+.account-masthead,
+.masthead,
+.hero{
+    background: #327EBF;
+    color: white;
+}
+
+.account-masthead a,
+.masthead a,
+.hero a{
+    color: white;
+}
+
+
+.hero  h1.page-heading{
+    color: white;
+    text-shadow: 1px 1px #444;
+    font-size: 36px;
+}
+
+.stats ul li{
+    color: white;
+    display: block;
+    text-align: right;
+    float: none!important;
+    width: auto!important;
+}
+
+
+.masthead .navigation .nav-pills li a:hover,
+.masthead .navigation .nav-pills li.active a{
+    background: none;
+    text-decoration: underline;
+}
+
+a{
+    color: #327EBF;
+}
+
+.module-search form{
+    background: url("/images/search_map_bg.png")!important;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 60px 80px 50px 80px!important;
+}
+
+.account-masthead .account ul li {
+    border-left: none;
+}
+
+.site-footer {
+    min-height: 100px;
+    color: #999999;
+    background: #444444;
+}
+
+.site-footer a {
+    color: #fff;
+}
+
+.homepage .module-search .search-giant input {
+    border-color: #ccc!important;
+}
