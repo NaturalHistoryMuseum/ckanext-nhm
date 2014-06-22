@@ -32,6 +32,7 @@ UPDATE_FREQUENCIES = [
     ('never', 'Never'),
 ]
 
+
 def record_get_schema():
 
     schema = {
