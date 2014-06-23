@@ -1,0 +1,25 @@
+{% ckan_extends %}
+
+{% block primary %}
+    <div class="primary">
+      <article class="module">
+        <div class="module-content">
+          {% block about_content %}
+              <h1 class="page-heading">{{ _('About') }}</h1>
+              {% snippet 'about/snippets/about_text.html' %}
+          {% endblock %}
+        </div>
+      </article>
+    </div>
+{% endblock %}
+
+
+{% block secondary %}
+
+  <aside class="secondary">
+    {% block secondary_content %}
+        {% snippet 'about/snippets/menu.html' %}
+    {% endblock %}
+  </aside>
+
+{% endblock %}

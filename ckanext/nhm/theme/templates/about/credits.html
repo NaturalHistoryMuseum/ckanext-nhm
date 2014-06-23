@@ -1,0 +1,35 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.page:PageController', action='about_credits' %}</li>
+{% endblock %}
+
+{% block about_content %}
+    <h1 class="page-heading">{{ title }}</h1>
+
+<p>The data portal has been developed by the Natural History Museum’s <a title="Biodiversity Informatics Group" href="http://www.nhm.ac.uk/research-curation/research/informatics/team/index.html">Biodiversity Informatics Group</a>, with the help and support of teams throughout the Museum.</p>
+<p>The project team consists of:</p>
+
+<ol id="credits">
+    <li>Vince Smith - SRO</li>
+    <li>Ben Scott - Lead architect</li>
+    <li>Alice Heaton - Senior developer</li>
+    <li>Andy Allan - Geospatial developer</li>
+    <li>Laurence Livermore - Business analyst</li>
+    <li>Yuki Geali - IA/UX</li>
+    <li>Lucy Brooks - Copy writing</li>
+</ol>
+
+
+<p>As a window onto the Museum’s data the success of the portal is a credit to the scientists producing the data and curating the collections.</p>
+
+<h2>Open source</h2>
+
+<p>The data portal is built with CKAN, an open-source data-publishing platform.</p>
+<p>The Museum has extended and customised CKAN, and this code is licensed under the terms of the GNU GPL v3.0 [TBC], and available from <a title="The Natural History Museum’s Github account" href="https://github.com/NaturalHistoryMuseum">The Natural History Museum’s Github account</a>.</p>
+
+
+{% endblock %}

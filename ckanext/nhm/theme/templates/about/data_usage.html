@@ -1,0 +1,39 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.page:PageController', action='about_data_usage' %}</li>
+{% endblock %}
+
+{% block about_content %}
+    <h1 class="page-heading">{{ title }}</h1>
+
+    <h2>Licensing</h2>
+    <p>As a public institution we publish all data under a [TBC] license to encourage the data submission and exchange. However, other licenses may be used for some datasets, for example a specific licence will be used when the Museum is not the sole copyright owner.</p>
+    <p>Learn more about the [Museum’s data policies].</p>
+
+    <h2>Attribution</h2>
+    <p>If you use our data, we encourage you to cite or attribute this work as you would any other scientific research (even if the license does not implicitly require you to). Many Museum datasets are the result of a huge amount of time and effort invested by Museum staff and collaborators. Some represent an individual’s work over many decades. Citing these data allows us to measure the impact of the research and encourages others to deposit their data through the portal.</p>
+
+    <h2>Preferred citation format</h2>
+    <p>All datasets are assigned a DOI. Please use this in all citations.</p>
+    <p class="about-doi">Scott, B., & Smith , V. Dataset title Natural History Museum. http://doi:1.2.3.4/56789</p>
+
+    <h2>Data download</h2>
+    <p>Datasets can be downloaded via the download button on the dataset page. The portal will process download requests, package up the dataset, and email a link to the newly create data package. The downloadable data format is dependent on the data type of each dataset. For the collections dataset this will be as a Darwin Core Archive.</p>
+
+    <h2>API</h2>
+    <p>The data portal provides a REST API to access datasets.</p>
+
+    {% if c.userobj %}
+        <p>To access the API, you will need <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" title="{{ _('View profile') }}">your API key</a>.</p>
+    {% else %}
+        <p>To access the API, please <a href="{{ h.url_for(controller='user', action='register') }}" title="{{ _('Sign up') }}">sign up for an account</a>, to obtain an API key.</p>
+    {% endif %}
+
+    <p>For all datasets, the API will return data in JSON format.</p>
+    <p>Full documentation on the API is available - see <a href="http://docs.nhm.apiary.io/" title="Natural History Museum API">API Docs [TODO]</a>.</p>
+
+{% endblock %}

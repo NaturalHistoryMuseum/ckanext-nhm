@@ -44,6 +44,10 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     controller='ckanext.nhm.controllers.dwc:DarwinCoreController',
                     action='view')
 
+        # Add static pages
+        map.connect('about_data_usage', '/about/data-usage', controller='ckanext.nhm.controllers.page:PageController', action='about_data_usage')
+        map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.page:PageController', action='about_credits')
+
         return map
 
     # IActions
