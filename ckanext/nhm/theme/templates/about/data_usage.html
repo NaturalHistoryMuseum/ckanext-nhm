@@ -8,6 +8,10 @@
 {% endblock %}
 
 {% block about_content %}
+
+    {% set api_link = h.link_to(_('API'), h.url_for(controller='api', action='get_api', ver=3)) %}
+    {% set api_doc_link = h.api_doc_link() %}
+
     <h1 class="page-heading">{{ title }}</h1>
 
     <h2>Licensing</h2>
@@ -25,7 +29,7 @@
     <p>Datasets can be downloaded via the download button on the dataset page. The portal will process download requests, package up the dataset, and email a link to the newly create data package. The downloadable data format is dependent on the data type of each dataset. For the collections dataset this will be as a Darwin Core Archive.</p>
 
     <h2>API</h2>
-    <p>The data portal provides a REST API to access datasets.</p>
+    <p>The data portal provides a {{ api_link }} to access datasets.</p>
 
     {% if c.userobj %}
         <p>To access the API, you will need <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" title="{{ _('View profile') }}">your API key</a>.</p>
@@ -34,6 +38,6 @@
     {% endif %}
 
     <p>For all datasets, the API will return data in JSON format.</p>
-    <p>Full documentation on the API is available - see <a href="http://docs.nhm.apiary.io/" title="Natural History Museum API">API Docs [TODO]</a>.</p>
+    <p>Full documentation on the API is available - see {{ api_doc_link }} [TODO].</p>
 
 {% endblock %}
