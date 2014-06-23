@@ -1,0 +1,22 @@
+{% ckan_extends %}
+
+{% block resources %}
+    {{ super() }}
+    {#  Add author and categories  #}
+
+    {% if package.author %}
+        <p><strong>Author:</strong>{{ package.author }}</p>
+    {% endif %}
+
+    {% if package.category %}
+        <strong>Category:</strong>
+        <ul class="dataset-category unstyled">
+            {% for pkg_category in package.category %}
+                <li>{{ pkg_category }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}
+
+
