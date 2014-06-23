@@ -9,8 +9,8 @@ from ckanext.issues.model import Issue, ISSUE_STATUS
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 from pylons import config
-from ckan.common import c
-from ckan.lib.helpers import url_for
+from ckan.common import c, _
+from ckan.lib.helpers import url_for, link_to
 from collections import OrderedDict
 
 from ckanext.nhm.logic.schema import DATASET_CATEGORY, UPDATE_FREQUENCIES
@@ -252,4 +252,7 @@ def delimit_number(num):
     @return:
     """
     return "{:,}".format(num)
+
+def api_doc_link():
+    return link_to(_('API Docs'), 'http://docs.nhm.apiary.io/')
 
