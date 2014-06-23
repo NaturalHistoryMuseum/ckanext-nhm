@@ -1,0 +1,16 @@
+{% ckan_extends %}
+
+{# Renaming datasets => data #}
+
+{% block subtitle %}{{ _('Data') }}{% endblock %}
+
+{% block breadcrumb_content %}
+  {% if pkg %}
+    {% set dataset = pkg.title or pkg.name %}
+    <li>{% link_for _('Data'), controller='package', action='search' %}</li>
+    <li{{ self.breadcrumb_content_selected() }}>{% link_for dataset|truncate(30), controller='package', action='read', id=pkg.name %}</li>
+  {% else %}
+    <li>{% link_for _('Data'), controller='package', action='search' %}</li>
+    <li class="active"><a href="">{{ _('Create Dataset') }}</a></li>
+  {% endif %}
+{% endblock %}
