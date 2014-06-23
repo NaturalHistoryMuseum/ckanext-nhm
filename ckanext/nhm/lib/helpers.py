@@ -21,6 +21,8 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
 
+# Make enumerate available to templates
+enumerate = enumerate
 
 def get_site_statistics():
     stats = dict()
