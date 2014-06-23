@@ -49,8 +49,13 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # Add static pages
         map.connect('about_data_usage', '/about/data-usage', controller='ckanext.nhm.controllers.page:PageController', action='about_data_usage')
         map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.page:PageController', action='about_credits')
+        map.connect('about_statistics', '/about/statistics', controller='ckanext.nhm.controllers.page:PageController', action='about_statistics')
+
+        # Dataset metrics
+        map.connect('metrics_dataset', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.metrics:MetricsController', action='dataset', ckan_icon='bar-chart')
 
         return map
+
 
     # IActions
 
