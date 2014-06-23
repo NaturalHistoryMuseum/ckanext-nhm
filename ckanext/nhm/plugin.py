@@ -2,6 +2,7 @@ import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
+from collections import OrderedDict
 
 Invalid = p.toolkit.Invalid
 
@@ -16,6 +17,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.ITemplateHelpers, inherit=True)
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IDatasetForm, inherit=True)
+    p.implements(p.IFacets, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -94,3 +96,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def show_package_schema(self):
         return nhm_schema.show_package_schema()
+
+    # IFacets
+    def dataset_facets(self, facets_dict, package_type):
+
+        # Remove organisations and groups
+        del facets_dict['organization']
+        del facets_dict['groups']
+
+        # Add author facet as the first item
+        facets_dict = OrderedDict([('author', 'Author')] + facets_dict.items())
+        return facets_dict
