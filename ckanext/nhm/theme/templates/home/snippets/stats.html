@@ -9,18 +9,21 @@
           {{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}
         </a>
       </li>
+
       <li>
-        <a href="#">
-          <b>3.5m</b>
-          Records
+        <a href="{{ h.url_for(controller='package', action='search') }}">
+          <b>{{ h.SI_number_span(stats.record_count) }}</b>
+          {{ _('record') if stats.record_count == 1 else _('records') }}
         </a>
       </li>
+
       <li>
-        <a href="#">
-          <b>69</b>
-          Contributors
+        <a href="{{ h.url_for(controller='package', action='search') }}">
+          <b>{{ h.SI_number_span(stats.contributor_count) }}</b>
+          {{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}
         </a>
       </li>
+
     </ul>
   </div>
 </div>
