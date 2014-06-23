@@ -1,0 +1,86 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.page:PageController', action='about_data_usage' %}</li>
+{% endblock %}
+
+{% block about_content %}
+
+    <section id="stats-total-datasets" class="module-content">
+      <h2>{{ _('Number of datasets') }}</h2>
+
+      {% set xaxis = {'mode': 'time', 'timeformat': '%y-%b'} %}
+      {% set yaxis = {'min': 0} %}
+      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
+        <thead>
+          <tr>
+            <th>{{ _("Date") }}</th>
+            <th>{{ _("Total datasets") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in c.raw_packages_by_week %}
+            <tr>
+              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
+              <td>{{ row.total_packages }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="stats-dataset-revisions" class="module-content">
+      <h2>{{ _('Dataset Revisions per Week') }}</h2>
+
+      {% set xaxis = {'mode': 'time', 'timeformat': '%y-%b'} %}
+      {% set lines = {'fill': 1} %}
+      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-lines="{{ h.dump_json(lines) }}">
+        <thead>
+          <tr>
+            <th>{{ _("Date") }}</th>
+            <th>{{ _("All dataset revisions") }}</th>
+            <th>{{ _("New datasets") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in c.raw_all_package_revisions %}
+            <tr>
+              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
+              <td>{{ row.total_revisions }}</td>
+              <td>{{ c.raw_new_datasets[loop.index0].new_packages }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="stats-total-datasets" class="module-content">
+      <h2>{{ _('Number of contributors') }}</h2>
+
+      {% set xaxis = {'mode': 'time', 'timeformat': '%y-%b'} %}
+      {% set yaxis = {'min': 0} %}
+      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
+        <thead>
+          <tr>
+            <th>{{ _("Date") }}</th>
+            <th>{{ _("Total contributors") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in c.raw_packages_by_week %}
+            <tr>
+              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
+              <td>{{ row.total_packages }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    {% resource "vendor/block_html5_shim" %}
+    {% resource "ckanext_stats/stats" %}
+
+{% endblock %}

@@ -1,10 +1,13 @@
 {% set collection_stats = h.collection_stats() %}
+{% set collection_codes = collection_stats['collections'].keys() %}
 
 <p>The Natural History Museum’s main dataset is the collection database that currently holds <a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> records, a number due to rise to 20 million over the next 5 years.</p>
 <p>The digital collection programme plans to digitise 20 million specimens from the Museum’s
-{% for collection_code in collection_stats['collections'].keys() %}
-    <a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ h.get_department(collection_code) }}</a>,
+{% for key, collection_code in h.enumerate(collection_codes) %}
+    <a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ h.get_department(collection_code) }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
+
 {%  endfor %}
+
 collections in 5 years, a quarter of the Museum’s 80 million specimens.</p>
 <p>The Museum has over 600 curators, researchers, scientific associates, students and volunteers. Our scientists generate over 1,000 scientific papers published annually and datasets from these publications will be available through the portal.</p>
 <h3>The collection</h3>

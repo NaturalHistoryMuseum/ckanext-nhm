@@ -11,14 +11,14 @@
       </li>
 
       <li>
-        <a href="{{ h.url_for(controller='package', action='search') }}">
+        <a href="{{ h.url_for(controller='ckanext.nhm.controllers.page:PageController', action='about_statistics') }}">
           <b>{{ h.SI_number_span(stats.record_count) }}</b>
           {{ _('record') if stats.record_count == 1 else _('records') }}
         </a>
       </li>
 
       <li>
-        <a href="{{ h.url_for(controller='package', action='search') }}">
+        <a href="{{ h.url_for(controller='ckanext.nhm.controllers.page:PageController', action='about_statistics') }}">
           <b>{{ h.SI_number_span(stats.contributor_count) }}</b>
           {{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}
         </a>
