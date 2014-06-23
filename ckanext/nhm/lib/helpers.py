@@ -8,6 +8,10 @@ import itertools
 from ckanext.issues.model import Issue, ISSUE_STATUS
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
+from pylons import config
+from ckan.common import c
+from ckan.lib.helpers import url_for
+from collections import OrderedDict
 
 from ckanext.nhm.logic.schema import DATASET_CATEGORY, UPDATE_FREQUENCIES
 
@@ -17,17 +21,15 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
 
-def get_site_statistics():
-    #TEMP: Just to put some stats on the home page
-    stats = {}
-    stats['dataset_count'] = logic.get_action('package_search')(
-        {}, {"rows": 1})['count']
-    result = model.Session.execute(
-        '''select count(*) from related r
-           left join related_dataset rd on r.id = rd.related_id
-           where rd.status = 'active' or rd.id is null''').first()[0]
-    stats['related_count'] = result
 
+def get_site_statistics():
+    stats = dict()
+    stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
+    # Get a count of all distinct user IDs
+    stats['contributor_count'] = model.Session.execute("SELECT COUNT(DISTINCT creator_user_id) from package").scalar()
+
+    # TODO: Get all records count
+    stats['record_count'] = 3500000
     return stats
 
 
@@ -169,5 +171,85 @@ def dataset_categories():
         return None
 
 
-def url_for_specimen_dataset(**params):
-    return 'dataset'
+def url_for_collection_view(view_type='recline_grid', **kwargs):
+    """
+    Return URL to link through to specimen dataset view, with optional search params
+    @param view_type: grid to link to - grid or map
+    @param kwargs: search filter params
+    @return: url
+    """
+
+    resource_id = config.get("ckanext.nhm.collection_resource_id")
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+
+    views = toolkit.get_action('resource_view_list')(context, {'id': resource_id})
+
+    for view in views:
+        if view['view_type'] == view_type:
+            break
+
+    return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], **kwargs)
+
+
+def collection_stats():
+    """
+    Get collection stats, grouped by collectionCode
+    @return:
+    """
+
+    resource_id = config.get("ckanext.nhm.collection_resource_id")
+
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+
+    sql = '''SELECT "collectionCode", COUNT(*) AS count
+           FROM "{resource_id}"
+           GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
+
+    result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
+    total = 0
+
+    collections = OrderedDict()
+
+    for record in result['records']:
+        # TEMP: After next run, this will not be needed
+        if not record['collectionCode']:
+            continue
+        count = int(record['count'])
+        collections[record['collectionCode']] = count
+        total += count
+
+    stats = {
+        'total': total,
+        'collections': collections
+    }
+
+    return stats
+
+
+def get_department(collection_code):
+    """
+    Return a department name for collection code
+    @param collection_code: BOT, PAL etc.,
+    @return: Full department name - Entomology
+    """
+
+    # TODO: Update record to use this
+
+    departments = {
+        'BMNH(E)': 'Entomology',
+        'BOT': 'Botany',
+        'MIN': 'Mineralogy',
+        'PAL': 'Paleontology',
+        'ZOO': 'Zoology',
+    }
+
+    return departments[collection_code]
+
+def delimit_number(num):
+    """
+    Separate long number into thousands 1000000 => 1,000,000
+    @param num:
+    @return:
+    """
+    return "{:,}".format(num)
+

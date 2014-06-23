@@ -6,6 +6,8 @@
 {% block maintag %}{% endblock %}
 {% block toolbar %}{% endblock %}
 
+{% set collection_stats = h.collection_stats() %}
+
 {% block content %}
   <div class="homepage layout-3">
     <div class="container">
@@ -43,13 +45,18 @@
         <div class="row row2">
           <div class="col2">
             <div class="module-content box">
-
                 <h2>Search the Natural History Museum Specimen Collection </h2>
-                <h3><a href="{{ h.url_for_specimen_dataset() }}">2,837,146</a> of the Natural History Museum's specimens are now available online</h3>
+                <h3><a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> of the Natural History Museum's specimens are now available online</h3>
                 {% block search %}
                   {% snippet 'home/snippets/search.html' %}
                 {% endblock %}
-                <p><a href="{{ h.url_for_specimen_dataset(collectionCode='BOT') }}">646, 108</a> Botany <a href="{{ h.url_for_specimen_dataset(collectionCode='PAL') }}">335,266</a> Paleontology <a href="{{ h.url_for_specimen_dataset(collectionCode='MIN') }}">402,849</a> Mineralogy <a href="{{ h.url_for_specimen_dataset(collectionCode='ZOO') }}">1,197,402</a> Zoology <a href="{{ h.url_for_specimen_dataset(collectionCode='ENT') }}">255,521</a> Entomology</p>
+
+                <p>
+                    {% for collection_code, count in collection_stats['collections'].items() %}
+                        <a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ h.delimit_number(count) }}</a> {{ h.get_department(collection_code) }}
+                    {%  endfor %}
+                </p>
+
               </div>
             </div>
           </div>
@@ -59,39 +66,9 @@
       <div role="main">
         <div class="container">
           <div class="row row2">
-              <div class="col2 span4">
-                <div class="module-content box">
-                  <section class="featured media-overlay">
-                      <h2><a href="#">Featured dataset</a></h2>
-                        <a class="media-image" href="#">
-                          <img src="http://placehold.it/248x100" alt="Placeholder" width="248" height="100" />
-                        </a>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis laoreet, erat vel ullamcorper egestas, metus nulla convallis erat, tincidunt posuere urna mi eu tortor. Vivamus nec dictum ipsum, vel tempor augue.</p>
-                    </section>
-                </div>
-              </div>
-              <div class="col2 span4">
-                <div class="module-content box">
-                   <section class="featured media-overlay">
-                      <h2><a href="#">Featured dataset</a></h2>
-                        <a class="media-image" href="#">
-                          <img src="http://placehold.it/248x100" alt="Placeholder" width="248" height="100" />
-                        </a>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis laoreet, erat vel ullamcorper egestas, metus nulla convallis erat, tincidunt posuere urna mi eu tortor. Vivamus nec dictum ipsum, vel tempor augue.</p>
-                    </section>
-                </div>
-              </div>
-              <div class="col2 span4">
-                <div class="module-content box">
-                  <section class="featured media-overlay">
-                      <h2><a href="#">Featured dataset</a></h2>
-                        <a class="media-image" href="#">
-                          <img src="http://placehold.it/248x100" alt="Placeholder" width="248" height="100" />
-                        </a>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis laoreet, erat vel ullamcorper egestas, metus nulla convallis erat, tincidunt posuere urna mi eu tortor. Vivamus nec dictum ipsum, vel tempor augue.</p>
-                    </section>
-                </div>
-              </div>
+              {% snippet 'home/snippets/featured_dataset1.html' %}
+              {% snippet 'home/snippets/featured_dataset2.html' %}
+              {% snippet 'home/snippets/featured_dataset3.html' %}
           </div>
         </div>
       </div>
