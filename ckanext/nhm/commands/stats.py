@@ -3,7 +3,7 @@ import logging
 from ckan.plugins import toolkit
 import ckan.model as model
 from ckan.lib.cli import CkanCommand
-from ckanext.nhmstats.model import DatastoreStats
+from ckanext.nhm.model.stats import DatastoreStats
 from sqlalchemy import desc
 from datetime import datetime
 
