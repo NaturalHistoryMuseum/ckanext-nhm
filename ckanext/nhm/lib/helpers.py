@@ -20,19 +20,59 @@ log = logging.getLogger(__name__)
 NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
+_check_access = logic.check_access
 
 # Make enumerate available to templates
 enumerate = enumerate
+
 
 def get_site_statistics():
     stats = dict()
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
     # Get a count of all distinct user IDs
-    stats['contributor_count'] = model.Session.execute("SELECT COUNT(DISTINCT creator_user_id) from package").scalar()
-
-    # TODO: Get all records count
-    stats['record_count'] = 3500000
+    stats['contributor_count'] = get_contributor_count()
+    datastore_stats = get_datastore_stats()
+    stats['record_count'] = datastore_stats['total']
     return stats
+
+
+def get_datastore_stats():
+
+    context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
+
+    stats = {
+        'resources': [],
+        'total': 0,
+        'date': None,
+    }
+
+    resource_counts = model.Session.execute(
+        """
+        SELECT r.id, r.name, d.count, d.date, p.id as pkg_id, p.title as pkg_title, p.name as pkg_name
+        FROM resource r
+        INNER JOIN datastore_stats d ON r.id = d.resource_id
+        INNER JOIN resource_group rg ON r.resource_group_id = rg.id
+        INNER JOIN package p ON rg.package_id = p.id
+        WHERE r.state='active' AND p.state='active' AND date = (SELECT date FROM datastore_stats ORDER BY date DESC LIMIT 1)
+        ORDER BY count DESC
+        """
+    );
+
+    for resource in resource_counts:
+        try:
+            _check_access('resource_show', context, dict(resource))
+        except NotAuthorized:
+            pass
+        else:
+            stats['resources'].append(resource)
+            stats['total'] += int(resource['count'])
+            stats['date'] = resource['date']
+
+    return stats
+
+
+def get_contributor_count():
+    return model.Session.execute("SELECT COUNT(DISTINCT creator_user_id) from package WHERE state='active'").scalar()
 
 
 def _get_action(action, params):
@@ -257,4 +297,11 @@ def delimit_number(num):
 
 def api_doc_link():
     return link_to(_('API Docs'), 'http://docs.nhm.apiary.io/')
+
+def get_google_analytics_config():
+
+    return {
+        'id': config.get("googleanalytics.id"),
+        'domain': config.get("googleanalytics.domain", "auto")
+    }
 
