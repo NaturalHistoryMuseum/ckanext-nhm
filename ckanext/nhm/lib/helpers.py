@@ -212,7 +212,7 @@ def dataset_categories():
         categories = toolkit.get_action('tag_list')(data_dict={'vocabulary_id': DATASET_CATEGORY})
         return categories
     except toolkit.ObjectNotFound:
-        return None
+        return []
 
 
 def url_for_collection_view(view_type='recline_grid', **kwargs):
