@@ -1,0 +1,62 @@
+{% extends "package/read_base.html" %}
+
+
+{% block primary_content_inner %}
+
+    <section id="stats-datasets-citations" class="module-content">
+        <h2>{{ _('Dataset cited in') }}</h2>
+
+        <ul>
+            <li>Author E G. Example title. Example Journal 2014; 6: 22. <a href="">[CrossRef]</a></li>
+            <li>Author E G. Example title. Example Journal 2014; 6: 22. <a href="">[CrossRef]</a></li>
+        </ul>
+
+        <p class="info">Citations are retrieved from articles in CrossRef. This isn't a definitive list.</p>
+
+    </section>
+
+    <section id="stats-datasets-views" class="module-content">
+        <h2>{{ _('Dataset views') }}</h2>
+        <table class="table table-chunky table-bordered table-striped">
+            <thead>
+                <tr>
+                    {% for date in c.pageviews %}
+                        <th>{{ date }}</th>
+                    {% endfor %}
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in c.pageviews.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                    <td>{{ c.total_pageviews }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="stats-datasets-downloads" class="module-content">
+        <h2>{{ _('Downloads') }}</h2>
+        <table class="table table-chunky table-bordered table-striped">
+            <thead>
+                <tr>
+                    {% for date in c.pageviews %}
+                        <th>{{ date }}</th>
+                    {% endfor %}
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for value in c.pageviews.values() %}
+                        <td>0</td>
+                    {% endfor %}
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "stats/base.html" %}
+
+{% block breadcrumb_content %}
+    {{ super() }}
+    <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.stats:StatsController', action='records' %}</li>
+{% endblock %}
+
+{% block stats_content %}
+
+    <section id="stats-record-count" class="module-content">
+      <h2>{{ _('Records per dataset') }}</h2>
+
+      <table class="table table-chunky table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>{{ _("Dataset") }}</th>
+            <th>{{ _("Resource") }}</th>
+            <th>{{ _("Number of records") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for row in c.datastore_stats['resources'] %}
+
+            <tr>
+              <th><a href="{{ h.url_for(controller='package', action='read', id=row.pkg_name ) }}">{{ row.pkg_title }}</a></th>
+              <th><a href="{{ h.url_for(controller='package', action='resource_read', id=row.pkg_name, resource_id=row.id ) }}">{{ row.name }}</a></th>
+              <td>{{ h.delimit_number(row.count) }}</td>
+            </tr>
+          {% endfor %}
+
+          <tr>
+              <td colspan="2">Total</td>
+              <td>{{ h.delimit_number(c.datastore_stats['total']) }}</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <section id="stats-total-datasets" class="module-content">
+      <h2>{{ _('Total number of records') }}</h2>
+
+      {% set xaxis = {'mode': 'time', 'timeformat': '%d-%m-%y'} %}
+      {% set yaxis = {'min': 0} %}
+      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
+        <thead>
+          <tr>
+            <th>{{ _("Date") }}</th>
+            <th>{{ _("Records") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in c.num_records %}
+            <tr>
+              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
+              <td>{{ row.count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+      <p class="info">Record statistics are updated daily - these figures were last updated on {{ h.render_datetime(c.datastore_stats['date']) }} </p>
+
+    </section>
+
+{% endblock %}
