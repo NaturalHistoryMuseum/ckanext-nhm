@@ -28,5 +28,7 @@ setup(
 
 	    [paste.paster_command]
             category=ckanext.nhm.commands.category:CategoryCommand
+            initdb=ckanext.nhm.commands.initdb:InitDBCommand
+            stats=ckanext.nhm.commands.stats:StatsCommand
 	""",
 )
