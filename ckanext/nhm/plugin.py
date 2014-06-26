@@ -24,6 +24,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         p.toolkit.add_template_directory(config, 'theme/templates')
         p.toolkit.add_public_directory(config, 'theme/public')
         p.toolkit.add_resource('theme/public', 'ckanext-nhm')
+        p.toolkit.add_resource('theme/fanstatic', 'nhm_theme')
 
         # Add another public directory for dataset files - this will hopefully be temporary, until DAMS
         p.toolkit.add_public_directory(config, 'files')

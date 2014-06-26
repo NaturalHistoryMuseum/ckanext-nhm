@@ -8,7 +8,7 @@
 
 {% block styles %}
   {{ super() }}
-  <link rel='stylesheet' href='/css/nhm.css'>
+  {% resource 'nhm_theme/nhm.css' %}
 {% endblock %}
 
 {% block scripts %}
