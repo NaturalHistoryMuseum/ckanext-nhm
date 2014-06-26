@@ -74,8 +74,27 @@ a{
     float: none;
 }
 
+#about-menu li a i{
+    display: none;
+}
+
 .about-doi{
     background: #eee;
     padding: 10px;
     margin: 20px 100px 20px 40px;
+}
+
+p.info{
+    color: #777;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.site-footer ul li{
+    float: left;
+    padding: 0 5px;
+}
+
+.site-footer{
+    font-size: 12px;
 }
