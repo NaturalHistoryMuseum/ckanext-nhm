@@ -19,6 +19,8 @@ log = logging.getLogger(__name__)
 
 NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
+ValidationError = logic.ValidationError
+
 get_action = logic.get_action
 _check_access = logic.check_access
 
@@ -247,18 +249,22 @@ def collection_stats():
            FROM "{resource_id}"
            GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
 
-    result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
     total = 0
-
     collections = OrderedDict()
 
-    for record in result['records']:
-        # TEMP: After next run, this will not be needed
-        if not record['collectionCode']:
-            continue
-        count = int(record['count'])
-        collections[record['collectionCode']] = count
-        total += count
+    try:
+        result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
+    except ValidationError:
+        pass
+    else:
+
+        for record in result['records']:
+            # TEMP: After next run, this will not be needed
+            if not record['collectionCode']:
+                continue
+            count = int(record['count'])
+            collections[record['collectionCode']] = count
+            total += count
 
     stats = {
         'total': total,
