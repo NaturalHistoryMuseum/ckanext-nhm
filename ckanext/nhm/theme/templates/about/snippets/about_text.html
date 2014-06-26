@@ -5,7 +5,6 @@
 <p>The digital collection programme plans to digitise 20 million specimens from the Museum’s
 {% for key, collection_code in h.enumerate(collection_codes) %}
     <a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ h.get_department(collection_code) }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
-
 {%  endfor %}
 
 collections in 5 years, a quarter of the Museum’s 80 million specimens.</p>

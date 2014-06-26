@@ -1,3 +1,27 @@
 {% ckan_extends %}
 
-{% block maintag %}<div role="main" class="full-width">{% endblock %}
+{% block resource_read_url %}{% endblock %}
+
+{% block resource_actions_inner %}
+{% if h.check_access('package_update', {'id':pkg.id }) %}
+  <li>{% link_for _('Manage'), controller='package', action='resource_edit', id=pkg.name, resource_id=res.id, class_='btn', icon='wrench' %}</li>
+{% endif %}
+{% if res.url %}
+  <li>
+    <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
+      {% if res.resource_type in ('listing', 'service') %}
+        <i class="icon-eye-open"></i> {{ _('View') }}
+      {% elif  res.resource_type == 'api' %}
+        <i class="icon-key"></i> {{ _('API Endpoint') }}
+      {% elif not res.has_views or not res.can_be_previewed %}
+        <i class="icon-external-link"></i> {{ _('Download') }}
+      {% else %}
+        <i class="icon-download"></i> {{ _('Download') }}
+      {% endif %}
+    </a>
+  </li>
+{% endif %}
+{% if 'datastore' in g.plugins %}
+  <li>{% snippet 'package/snippets/data_api_button.html', resource=res, datastore_root_url=c.datastore_api %}</li>
+{% endif %}
+{% endblock %}

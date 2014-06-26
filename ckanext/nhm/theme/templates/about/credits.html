@@ -4,7 +4,7 @@
 
 {% block breadcrumb_content %}
   <li>{% link_for _('About'), controller='home', action='about' %}</li>
-  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.page:PageController', action='about_credits' %}</li>
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.about:AboutController', action='credits' %}</li>
 {% endblock %}
 
 {% block about_content %}
