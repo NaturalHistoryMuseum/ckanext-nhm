@@ -226,13 +226,17 @@ def url_for_collection_view(view_type='recline_grid', **kwargs):
     resource_id = config.get("ckanext.nhm.collection_resource_id")
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    views = toolkit.get_action('resource_view_list')(context, {'id': resource_id})
+    try:
+        views = toolkit.get_action('resource_view_list')(context, {'id': resource_id})
+    except NotFound:
+        return None
+    else:
 
-    for view in views:
-        if view['view_type'] == view_type:
-            break
+        for view in views:
+            if view['view_type'] == view_type:
+                break
 
-    return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], **kwargs)
+        return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], **kwargs)
 
 
 def collection_stats():
