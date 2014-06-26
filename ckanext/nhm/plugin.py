@@ -46,13 +46,17 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     controller='ckanext.nhm.controllers.dwc:DarwinCoreController',
                     action='view')
 
-        # Add static pages
-        map.connect('about_data_usage', '/about/data-usage', controller='ckanext.nhm.controllers.page:PageController', action='about_data_usage')
-        map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.page:PageController', action='about_credits')
-        map.connect('about_statistics', '/about/statistics', controller='ckanext.nhm.controllers.page:PageController', action='about_statistics')
+        # About pages
+        map.connect('about_data_usage', '/about/data-usage', controller='ckanext.nhm.controllers.about:AboutController', action='data_usage')
+        map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.about:AboutController', action='credits')
+
+        # About stats pages
+        map.connect('stats_datasets', '/about/statistics/datasets', controller='ckanext.nhm.controllers.stats:StatsController', action='datasets', ckan_icon='bar-chart')
+        map.connect('stats_contributors', '/about/statistics/contributors', controller='ckanext.nhm.controllers.stats:StatsController', action='contributors', ckan_icon='user')
+        map.connect('stats_records', '/about/statistics/records', controller='ckanext.nhm.controllers.stats:StatsController', action='records', ckan_icon='file-text')
 
         # Dataset metrics
-        map.connect('metrics_dataset', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.metrics:MetricsController', action='dataset', ckan_icon='bar-chart')
+        map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
 
         return map
 
@@ -111,4 +115,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         # Add author facet as the first item
         facets_dict = OrderedDict([('author', 'Author')] + facets_dict.items())
+        facets_dict['creator_user_id'] = 'User'
+
         return facets_dict
