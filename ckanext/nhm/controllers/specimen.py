@@ -273,7 +273,7 @@ class SpecimenController(RecordController):
             part_refs = c.record_dict.pop('partRefs').split(';')
             # And remove this records IRN
             part_refs.remove(str(record_id))
-        except AttributeError:
+        except (AttributeError, KeyError):
             pass
         else:
             for part_ref in part_refs:
