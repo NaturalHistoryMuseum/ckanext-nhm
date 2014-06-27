@@ -58,15 +58,9 @@
 
         {% block record_images  %}
             {% if c.images %}
-
-                {% set loading_text = _('Loading...') %}
-
-                {% for image in c.images %}
-                    <a href="{{ image }}" data-module="modal-image" data-module-image-url="{{ image }}"><img src="{{ image }}" alt="{{ record_display_name }}" /></a>
-                {% endfor %}
-
+                <h3>Images</h3>
+                {% snippet 'gallery/snippets/gallery.html', images=c.images %}
             {% endif %}
-
         {% endblock %}
 
         {% block record_map  %}
