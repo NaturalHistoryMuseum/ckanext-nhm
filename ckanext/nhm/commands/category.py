@@ -5,7 +5,7 @@ from ckan.lib.cli import CkanCommand
 from ckanext.nhm.logic.schema import DATASET_CATEGORY
 
 log = logging.getLogger()
-# TODO: Logging not working with this
+# TODO: Add logging settings
 
 class CategoryCommand(CkanCommand):
     """
