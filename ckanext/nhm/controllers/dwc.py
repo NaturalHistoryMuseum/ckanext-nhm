@@ -38,7 +38,7 @@ class DarwinCoreController(RecordController):
 
         c.dwc = DwC(**c.record_dict)
 
-        if c.resource['format'] != 'dwc':
+        if c.resource['format'].lower() != 'dwc':
             abort(404, _('Record not in Darwin Core format'))
 
         return p.toolkit.render('dwc/view.html')
