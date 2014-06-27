@@ -3,6 +3,7 @@ import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
 from collections import OrderedDict
+from pylons import config
 
 Invalid = p.toolkit.Invalid
 
@@ -32,10 +33,12 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IRoutes
     def before_map(self, map):
 
+        resource_id = config.get("ckanext.nhm.collection_resource_id")
+
         # Add controller for KE EMu specimen records
-        map.connect('specimen', '/dataset/{package_name}/resource/663c6f9e-aff6-43ee-a5e5-e47bba9928f8/record/{record_id}',
+        map.connect('specimen', '/dataset/{package_name}/resource/%s/record/{record_id}' % resource_id,
                     controller='ckanext.nhm.controllers.specimen:SpecimenController',
-                    action='view', resource_id='663c6f9e-aff6-43ee-a5e5-e47bba9928f8')
+                    action='view', resource_id=resource_id)
 
         # Add view record
         map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
