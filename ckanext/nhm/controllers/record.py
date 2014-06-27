@@ -57,7 +57,7 @@ class RecordController(base.BaseController):
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
                 # Also thumbnail it - there is a thumbnail=yes option, but that seems a bit small
                 c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
-            except KeyError:
+            except (KeyError, AttributeError):
                 # Skip errors - there are no images
                 pass
 

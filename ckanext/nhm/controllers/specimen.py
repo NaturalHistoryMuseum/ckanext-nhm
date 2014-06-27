@@ -6,6 +6,7 @@ import ckan.plugins as p
 from ckan.common import _, c
 import logging
 from ckanext.nhm.controllers.record import RecordController
+from ckanext.nhm.lib.helpers import get_department
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -203,7 +204,7 @@ class SpecimenController(RecordController):
 
         self._load_data(package_name, resource_id, record_id)
 
-        c.record_title = c.record_dict.get('occurrenceID')
+        c.record_title = c.record_dict['occurrenceID']
 
         # Unpack the dynamic properties so they cna be used as just field values
         for prop in c.record_dict.pop('dynamicProperties').strip().split(';'):
@@ -213,8 +214,6 @@ class SpecimenController(RecordController):
                 pass
             else:
                 c.record_dict[key] = value
-
-                print key, value
 
         # Remove self referential part refs
         try:
@@ -229,16 +228,7 @@ class SpecimenController(RecordController):
         c.field_data = OrderedDict()
 
         collection_code = c.record_dict.get('collectionCode')
-
-        collection_departments = {
-            'BOT': 'Botany',
-            'MIN': 'Mineralogy',
-            'PAL': 'Paleontology',
-            'ZOO': 'Zoology',
-            'BMNH(E)': 'Entomology'
-        }
-
-        c.record_dict['collectionCode'] = '%s (%s)' % (collection_code, collection_departments[collection_code])
+        c.record_dict['collectionCode'] = '%s (%s)' % (collection_code, get_department(collection_code))
 
         # Parse collection date
         collection_date = list()
@@ -266,7 +256,7 @@ class SpecimenController(RecordController):
 
             for field in fields:
                 try:
-                    value = c.record_dict.pop(field[0])
+                    value = c.record_dict[field[0]]
                 except KeyError:
                     # If the value doesn't exist in kwargs, we don't care, it won't get added to the values
                     pass

@@ -6,13 +6,12 @@
 {% set pkg = c.pkg_dict or pkg_dict %}
 {% set record_display_name = h.record_display_name(res, rec) %}
 
-
 {% block head_extras -%}
   {{ super() }}
-  <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_title }} - {{ g.site_title }}">
+  <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_display_name }} - {{ g.site_title }}">
 {% endblock -%}
 
-{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{c.record_title}} {% endblock %}
+{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{record_display_name}} {% endblock %}
 
 {% block breadcrumb_content_selected %}{% endblock %}
 
@@ -43,7 +42,6 @@
     </section>
 
     {% block record %}
-
         {% block record_data  %}
             <div class="record-content">
                 <table>

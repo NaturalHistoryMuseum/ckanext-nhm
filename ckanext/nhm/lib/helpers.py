@@ -284,9 +284,6 @@ def get_department(collection_code):
     @param collection_code: BOT, PAL etc.,
     @return: Full department name - Entomology
     """
-
-    # TODO: Update record to use this
-
     departments = {
         'BMNH(E)': 'Entomology',
         'BOT': 'Botany',
