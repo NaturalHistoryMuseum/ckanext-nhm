@@ -6,7 +6,7 @@ import ckan.plugins as p
 from ckan.common import _, c
 import logging
 import json
-from ckanext.nhm.lib.helpers import get_datastore_fields
+from ckanext.nhm.lib.helpers import get_datastore_fields, record_display_name
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -51,15 +51,16 @@ class RecordController(base.BaseController):
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         image_field = c.resource.get('_image_field', None)
-
         if image_field:
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                # Also thumbnail it - there is a thumbnail=yes option, but that seems a bit small
-                c.images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
+                images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
             except (KeyError, AttributeError):
                 # Skip errors - there are no images
                 pass
+            else:
+                title = record_display_name(c.resource, c.record_dict)
+                c.images = [{'title': title, 'url': image} for image in images]
 
         # Loop through all the views - if we have a tiled map view with lat/lon fields
         # We'll use those fields to add the map
