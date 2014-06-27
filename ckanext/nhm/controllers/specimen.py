@@ -5,6 +5,7 @@ import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 import logging
+import re
 from ckanext.nhm.controllers.record import RecordController
 from ckanext.nhm.lib.helpers import get_department
 from collections import OrderedDict
@@ -19,6 +20,7 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
+
 
 
 class SpecimenController(RecordController):
@@ -185,10 +187,6 @@ class SpecimenController(RecordController):
         ]),
         ('Palaeontology', [
             ('catalogueDescription', 'Catalogue description'),
-        ]),
-        ('Related records', [
-            ('relatedResourceID', 'Related resources'),
-            ('partRefs', 'Parts'),
         ])
     ])
 
@@ -214,14 +212,6 @@ class SpecimenController(RecordController):
                 pass
             else:
                 c.record_dict[key] = value
-
-        # Remove self referential part refs
-        try:
-            if c.record_dict['partRefs'] == record_id:
-                del c.record_dict['partRefs']
-            # TODO: Remove part ref from list
-        except KeyError:
-            pass
 
         # Build an ordered dict for the field data
         # Organised into groups
@@ -250,6 +240,49 @@ class SpecimenController(RecordController):
             # If the value doesn't exist in kwargs, we don't care, it won't get added to __dict__
             pass
 
+        # Related resources
+        c.related_records = []
+
+        try:
+            related_resources = c.record_dict.pop('relatedResourceID').split(';')
+        except AttributeError:
+            pass
+        else:
+            for related_resource in related_resources:
+                m = re.search('IRN: ([0-9]+), ([0-9a-zA-Z ]+)', related_resource)
+                try:
+                    irn = m.group(1)
+                    type = m.group(2)
+                except AttributeError:
+                    pass
+                else:
+
+                    try:
+                        # Make sure it exists - there only ever seems to be one related record
+                        # But if this changes, we will need to change lookup code
+                        record = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': irn})
+                    except NotFound:
+                        pass
+                    else:
+                        c.related_records.append({
+                            '_id': irn,
+                            'title': '%s: %s' % (type, record['occurrenceID']),
+                        })
+
+        try:
+            part_refs = c.record_dict.pop('partRefs').split(';')
+            # And remove this records IRN
+            part_refs.remove(str(record_id))
+        except AttributeError:
+            pass
+        else:
+            for part_ref in part_refs:
+                c.related_records.append({
+                    '_id': part_ref,
+                    'title': '%s: %s' % ('Part', part_ref),
+                })
+
+
         for group, fields in self.field_groups.items():
 
             field_values = OrderedDict()
@@ -268,66 +301,8 @@ class SpecimenController(RecordController):
             if field_values:
                 c.field_data[group] = field_values
 
+        # Add thumbnails to images
+        for image in c.images:
+            image['thumbnail'] = '%s&width=100&height=100' % image['url']
+
         return p.toolkit.render('record/specimen.html')
-
-
-
-
-
-# TODO:
-
-    #         {% if rec.relatedResourceID: %}
-    #
-    #     {% set rel_types = rec.relationshipOfResource.split(';') %}
-    #     {% set related_records = {} %}
-    #
-    #     {% for rel_type in rel_types: %}
-    #         {% do related_records.update({rel_type: []}) %}
-    #     {% endfor %}
-    #
-    #     {% for i, id in enumerate(rec.relatedResourceID.split(';')): %}
-    #         {% do related_records[rel_types[i]].append(id) %}
-    #     {% endfor %}
-    #
-    #     <tr>
-    #
-    #         <tr><th colspan="3">Related records</th></tr>
-    #
-    #         {% for type, records in related_records.items(): %}
-    #
-    #             <tr>
-    #                 <td><strong>{{ type|title }}</strong></td>
-    #                 <td colspan="2">
-    #                     <ul>
-    #                         {% for record_id in records: %}
-    #                             <li>
-    #                                 {{ h.link_to(h.unique_identifier(record_id), h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record_id)) }}
-    #                             </li>
-    #                         {% endfor %}
-    #                      </ul>
-    #
-    #                 </td>
-    #             </tr>
-    #
-    #         {% endfor %}
-    #
-    #     </tr>
-    #
-    # {% endif %}
-    #
-    # {% if rec.associatedMedia: %}
-    #
-    #     {% for src in rec.associatedMedia.split(';'): %}
-    #
-    #         <img src="{{ src }}&width=100&height=100" />
-    #
-    #     {% endfor %}
-    #
-    # {% endif %}
-    #
-    #
-    # {% set record_extent = h.get_record_point(rec) %}
-    #
-    # {% if record_extent %}
-    #   {% snippet "snippets/record_map.html", extent=record_extent %}
-    # {% endif %}

@@ -35,16 +35,16 @@ class RecordController(base.BaseController):
         @param record_id:
         @return:
         """
-        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+        self.context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         # Try & get the resource
         try:
-            c.resource = get_action('resource_show')(context, {'id': resource_id})
-            c.package = get_action('package_show')(context, {'id': package_name})
+            c.resource = get_action('resource_show')(self.context, {'id': resource_id})
+            c.package = get_action('package_show')(self.context, {'id': package_name})
             # required for nav menu
-            c.pkg = context['package']
+            c.pkg = self.context['package']
             c.pkg_dict = c.package
-            c.record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
+            c.record_dict = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': record_id})
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
@@ -64,7 +64,7 @@ class RecordController(base.BaseController):
 
         # Loop through all the views - if we have a tiled map view with lat/lon fields
         # We'll use those fields to add the map
-        views = p.toolkit.get_action('resource_view_list')(context, {'id': resource_id})
+        views = p.toolkit.get_action('resource_view_list')(self.context, {'id': resource_id})
 
         for view in views:
             if view['view_type'] == TILED_MAP_TYPE:

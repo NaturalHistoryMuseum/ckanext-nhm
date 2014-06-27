@@ -26,6 +26,23 @@
 
         {% endfor %}
 
+        {% if c.related_records %}
+
+            <tr><th colspan="3">Related records</th></tr>
+            <tr>
+                <td><strong>Records:</strong></td>
+                <td>
+                    <ul>
+                    {% for record in c.related_records %}
+                        <li>{{ h.link_to(record['title'], h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record['_id'])) }}</li>
+                    {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+
+        {%  endif %}
+
+
     </table>
 
 {% endblock %}
