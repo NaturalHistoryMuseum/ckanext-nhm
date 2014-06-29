@@ -271,17 +271,21 @@ class SpecimenController(RecordController):
 
         try:
             part_refs = c.record_dict.pop('partRefs').split(';')
-            # And remove this records IRN
-            part_refs.remove(str(record_id))
         except (AttributeError, KeyError):
             pass
         else:
+
+            try:
+                # And remove this records IRN
+                part_refs.remove(str(record_id))
+            except ValueError:
+                pass
+
             for part_ref in part_refs:
                 c.related_records.append({
                     '_id': part_ref,
                     'title': '%s: %s' % ('Part', part_ref),
                 })
-
 
         for group, fields in self.field_groups.items():
 
