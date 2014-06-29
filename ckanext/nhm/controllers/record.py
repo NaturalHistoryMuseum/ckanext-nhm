@@ -50,6 +50,11 @@ class RecordController(base.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
+
+        c.record_dict['SummaryData'] = c.record_dict['SummaryData'].encode('raw_unicode_escape').decode('utf-8')
+
+        # c.record_dict['SummaryData'] = u'C\xe1ceres'
+
         image_field = c.resource.get('_image_field', None)
         if image_field:
             try:
