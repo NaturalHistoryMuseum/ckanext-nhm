@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% ckan_extends %}
 
 {% block page %}
 
@@ -6,6 +6,7 @@
        data-module-site_url="{{ h.dump_json(h.url('/', locale='default', qualified=true)) }}"
        data-module-resource = "{{ h.dump_json(resource_json) }}";
        data-module-resource-view = "{{ h.dump_json(h.resource_view_state(resource_view_json)) }}";
+       class="recline-data-explorer"
        >
     <h4 class="loading-dialog">
       <div class="loading-spinner"></div>
@@ -16,6 +17,3 @@
   {% resource 'ckanext-reclinepreview/main' %}
   {% resource 'ckanext-nhm/slickgrid' %}
 {% endblock %}
-
-{% block styles %}{% endblock %}
-{% block custom_styles %}{% endblock %}
