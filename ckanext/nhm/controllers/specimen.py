@@ -199,7 +199,6 @@ class SpecimenController(RecordController):
         :param record_id:
         :return: html
         """
-
         self._load_data(package_name, resource_id, record_id)
 
         c.record_title = c.record_dict['occurrenceID']
@@ -307,6 +306,8 @@ class SpecimenController(RecordController):
 
         # Add thumbnails to images
         for image in c.images:
+            # Width is required in the image URL (This will change when we move to DAMS)
+            image['url'] += '&width=600'
             image['thumbnail'] = '%s&width=100&height=100' % image['url']
 
         return p.toolkit.render('record/specimen.html')
