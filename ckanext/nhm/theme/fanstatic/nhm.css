@@ -98,3 +98,8 @@ p.info{
 .site-footer{
     font-size: 12px;
 }
+
+/* Filters */
+div.resource-view-filter-values div.select2-container {
+    min-width: 520px;
+}
