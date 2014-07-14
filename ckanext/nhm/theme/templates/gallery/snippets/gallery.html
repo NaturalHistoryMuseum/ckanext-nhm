@@ -1,0 +1,20 @@
+  <div id="gallery" data-toggle="modal-gallery" data-target="#modal-gallery">
+
+    <div class="row">
+
+        {% if package_name and resource_id %}
+            {% set description = "<a href='{{ h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=package_name, resource_id=resource_id, record_id=image['record_id']) }}'>View record</a>" %}
+        {% endif %}
+
+        {% for image in images %}
+            <div class="gallery-image col2 span2">
+                <a href="{{ image.url }}" title="{{ image.title }}" data-gallery="gallery" data-description="{{ description }}" class="gallery-thumbnail">
+                    <img src="{{ image.thumbnail or image.url }}" alt="{{ title }}" />
+                </a>
+                <p>{{ image.title }}</p>
+            </div>
+        {% endfor %}
+    </div>
+  </div>
+
+{% resource 'ckanext-gallery/main' %}
