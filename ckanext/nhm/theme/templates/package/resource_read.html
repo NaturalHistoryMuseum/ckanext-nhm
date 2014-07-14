@@ -8,15 +8,22 @@
 {% endif %}
 {% if res.url %}
   <li>
-    <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
       {% if res.resource_type in ('listing', 'service') %}
-        <i class="icon-eye-open"></i> {{ _('View') }}
+        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
+          <i class="icon-eye-open"></i> {{ _('View') }}
+        </a>
       {% elif  res.resource_type == 'api' %}
-        <i class="icon-key"></i> {{ _('API Endpoint') }}
+        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
+          <i class="icon-key"></i> {{ _('API Endpoint') }}
+        </a>
       {% elif not res.has_views or not res.can_be_previewed %}
-        <i class="icon-external-link"></i> {{ _('Download') }}
+        {% snippet 'ckanpackager/snippets/package_resource.html',
+                   res=res, pkg=pkg, bt_class="icon-external-link", bt_text=_('Download')
+        %}
       {% else %}
-        <i class="icon-download"></i> {{ _('Download') }}
+        {% snippet 'ckanpackager/snippets/package_resource.html',
+                   res=res, pkg=pkg, bt_class="icon-download", bt_text=_('Download')
+        %}
       {% endif %}
     </a>
   </li>

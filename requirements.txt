@@ -11,6 +11,7 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-userdatasets.git#egg=ckanext-userdatasets
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-ldap.git#egg=ckanext-ldap
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-graph.git#egg=ckanext-graph
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-ckanpackager.git#egg=ckanext-ckanpackager
 -e git+https://github.com/okfn/ckanext-spatial.git@stable#egg=ckanext-spatial
 -e git+https://github.com/okfn/ckanext-issues.git#egg=ckanext-issues
 distribute==0.6.34
