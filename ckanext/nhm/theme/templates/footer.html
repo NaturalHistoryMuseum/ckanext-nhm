@@ -1,24 +1,43 @@
 {% ckan_extends %}
 
 {% block footer_content %}
-  <div class="row row2">
-    <div class="span9 col2">
+    <div class="container">
+  <div class="row">
+
+    <div class="span2">
+        <ul class="attribution unstyled">
+            <li><a class="logo" href="{{ h.url('home') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a></li>
+            <li>{% trans %}<strong>Powered by</strong> <a class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{% endtrans %}</li>
+        </ul>
+    </div>
+
+    <div class="span6">
+        <div class="dev-info">
+            <p>An open source project by the Natural History Museum's Biodiversity Informatics Group.</p><p>Source code available on <a href="">Github.</a></p>
+            <p>Base tiles by  <a href="http://www.mapquest.com">MapQuest</a> and &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors.</p>
+        </div>
+    </div>
+
+    <div class="span3">
       <ul class="nav unstyled">
         {% block footer_links %}
           <li><a href="{{ h.url_for('home') }}">Home</a></li>
             <li><a href="{{ h.url_for('search') }}">Data</a></li>
-            <li><a href="{{ h.url_for('about') }}">About</a></li>
-            <li><a href="{{ h.url_for('about_data_usage') }}">Data usage</a></li>
-            <li><a href="{{ h.url_for('about_credits') }}">Credits</a></li>
-            <li><a href="{{ h.url_for('stats_datasets') }}">Statistics</a></li>
-            <li><a href="">Privacy statement</a></li>
-            <li><a href="">Legal</a></li>
-            <li>{{ h.api_doc_link() }}</li>
+            <li><a href="{{ h.url_for('about') }}">About</a>
+                <ul>
+                    <li><a href="{{ h.url_for('about_data_usage') }}">Data usage</a></li>
+                    <li><a href="{{ h.url_for('about_credits') }}">Credits</a></li>
+                    <li><a href="{{ h.url_for('stats_datasets') }}">Statistics</a></li>
+                    <li><a href="">Privacy statement</a></li>
+                    <li><a href="">Legal</a></li>
+                    <li>{{ h.api_doc_link() }}</li>
+                </ul>
+            </li>
         {% endblock %}
       </ul>
     </div>
 
-    <div class="span3 col2">
+    <div class="span1 no-margin">
       <ul class="nav unstyled">
         {% block footer_menu_links %}
             <li><a href="{{ h.url_for('login') }}">Login</a></li>
@@ -28,26 +47,6 @@
       </ul>
     </div>
   </div>
-
-<div class="row row2">
-    <div class="span6 col2">
-        <p>An open source project for the Natural History Museum.  All code available on <a href="">Github</a></p>
-    </div>
-
-    <div class="span6 col2">
-
-      <div class="attribution">
-        {% block footer_attribution %}
-          <p>{% trans %}<strong>Powered by</strong> <a class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{% endtrans %}</p>
-        {% endblock %}
-      </div>
-
-      <div id="map-attribution">
-          <p>Base tiles by  <a href="http://www.mapquest.com">MapQuest</a> and &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors</p>
-      </div>
-
-    </div>
-
 </div>
 
 {% endblock %}

@@ -10,23 +10,25 @@ Example:
 #}
 {% block package_info %}
   {% if pkg %}
-    <section class="module module-narrow">
-      <div class="module context-info">
-        <div class="module-content">
-          {% block package_info_inner %}
-            {% block heading %}
-              <h1 class="heading">{{ pkg.title or pkg.name }}</h1>
-            {% endblock %}
+
+      <section class="module module-narrow module-shallow">
+
+          <h2 class="module-heading"><i class="icon-medium icon-exclamation-sign"></i> {{ _('Data issues') }}</h2>
+
+           <div class="module-content">
             {% block issues %}
               <div class="issues">
-                <dl>
-                  <dt>{{ _('Data issues') }}</dt>
-                  <dd><a href="{{ h.url_for('issues_home', package_id=pkg.name) }}">Issues</a>
-                  {% for status, count in h.resource_issue_count(pkg.id).items() %}
-                    <span class="issue-{{ status }}">{{ count }}</span>
-                  {% endfor %}
-                </dd>
-                </dl>
+
+                <table class="table table-no-border">
+                    <tr>
+                        <th><a href="{{ h.url_for('issues_home', package_id=pkg.name) }}">Issues</a></th>
+                        {% for status, count in h.resource_issue_count(pkg.id).items() %}
+                            <td class="issue-{{ status }}">
+                                <a href="{{ h.url_for('issues_home', package_id=pkg.name, status=status) }}">{{ count }}</a>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </table>
               </div>
             {% endblock %}
 
@@ -39,24 +41,38 @@ Example:
                 </div>
             {% endblock %}
 
-            {% block nums %}
+           </div>
+
+      </section>
+
+      <section class="module module-narrow module-shallow">
+
+        <h2 class="module-heading"><i class="icon-medium icon-eye-open"></i> {{ _('Follow dataset') }}</h2>
+
+           <div class="module-content">
+
+                  {% block nums %}
               <div class="nums">
-                <dl>
-                  <dt>{{ _('Followers') }}</dt>
-                  <dd>{{ h.SI_number_span(h.follow_count('dataset', pkg.id)) }}</dd>
-                </dl>
+                <table class="table table-no-border">
+                    <tr>
+                        <th>{{ _('Followers') }}</th>
+                        <td>{{ h.SI_number_span(h.follow_count('dataset', pkg.id)) }}</td>
+                    </tr>
+                </table>
               </div>
             {% endblock %}
             {% block follow_button %}
-              {% if not hide_follow_button %}
                 <div class="follow_button">
-                  {{ h.follow_button('dataset', pkg.name) }}
+                  {{ h.persistent_follow_button('dataset', pkg.name) }}
                 </div>
-              {% endif %}
             {% endblock %}
-          {% endblock %}
-        </div>
-      </div>
-    </section>
+
+            <p class="text-center"><small>Follow this dataset to receive update notifications.</small></p>
+
+           </div>
+
+      </section>
+
+
   {% endif %}
 {% endblock %}
