@@ -1,22 +1,41 @@
 {% ckan_extends %}
 
-{% block resources %}
-    {{ super() }}
-    {#  Add author and categories  #}
+{% block package_item %}
 
-    {% if package.author %}
-        <p><strong>Author:</strong>{{ package.author }}</p>
-    {% endif %}
+<tr>
+    <td>
+        {% block heading %}
+            {{ super() }}
+        {% endblock %}
 
-    {% if package.category %}
-        <strong>Category:</strong>
-        <ul class="dataset-category unstyled">
-            {% for pkg_category in package.category %}
-                <li>{{ pkg_category }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+        {% block notes %}
+            {{ super() }}
+        {% endblock %}
+
+        {% block resources %}
+            {{ super() }}
+        {% endblock %}
+
+    </td>
+
+    <td>
+        {% if package.author %}
+            {{ package.author }}
+        {% endif %}
+    </td>
+
+    <td>
+        {% if package.category %}
+            {{ package.category }}
+        {% endif %}
+    </td>
+
+    <td>
+        {% if package.license_title %}
+            {{ package.license_title }}
+        {% endif %}
+    </td>
+
+</tr>
 
 {% endblock %}
-
-

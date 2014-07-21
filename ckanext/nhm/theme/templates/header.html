@@ -13,3 +13,39 @@
 {# We do not want a search #}
 {% block header_site_search %}
 {% endblock %}
+
+{% block header_wrapper %}
+    <header class="masthead">
+        <div class="container">
+            <div class="row">
+                <div class="span5">
+                    {% block header_logo %}
+
+                    {% if g.site_logo %}
+                      <a class="logo" href="{{ h.url('home') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+                    {% endif %}
+
+                      <h1 class="light site-title">
+                        <a href="{{ h.url('home') }}">{{ g.site_title }}</a>
+                      </h1>
+
+                    {% endblock %}
+
+                </div>
+
+                <div class="span4">
+                    {% block header_site_navigation %}
+                        {{ super() }}
+                    {% endblock %}
+                </div>
+
+                <div class="span3">
+                    {% block header_account_container_content %}
+                        {{ super() }}
+                    {% endblock %}
+                </div>
+            </div>
+
+        </div>
+    </header>
+{% endblock %}

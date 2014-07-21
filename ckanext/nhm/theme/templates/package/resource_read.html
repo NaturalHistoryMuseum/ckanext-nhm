@@ -2,6 +2,12 @@
 
 {% block resource_read_url %}{% endblock %}
 
+{% block resource_additional_information %}
+    <div class="additional-info">
+        {{  super() }}
+    </div>
+{% endblock %}
+
 {% block resource_actions_inner %}
 {% if h.check_access('package_update', {'id':pkg.id }) %}
   <li>{% link_for _('Manage'), controller='package', action='resource_edit', id=pkg.name, resource_id=res.id, class_='btn', icon='wrench' %}</li>
