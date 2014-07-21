@@ -10,8 +10,9 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 from pylons import config
 from ckan.common import c, _
-from ckan.lib.helpers import url_for, link_to
+from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects
 from collections import OrderedDict
+from beaker.cache import cache_region
 
 from ckanext.nhm.logic.schema import DATASET_CATEGORY, UPDATE_FREQUENCIES
 
@@ -239,6 +240,7 @@ def url_for_collection_view(view_type='recline_grid', **kwargs):
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], **kwargs)
 
 
+@cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by collectionCode
@@ -246,6 +248,9 @@ def collection_stats():
     """
 
     resource_id = config.get("ckanext.nhm.collection_resource_id")
+
+    if not resource_id:
+        log.error('Please configure collection resource ID')
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
@@ -312,3 +317,27 @@ def get_google_analytics_config():
         'domain': config.get("googleanalytics.domain", "auto")
     }
 
+
+def persistent_follow_button(obj_type, obj_id):
+    '''Return a follow button for the given object type and id.
+
+    Replaces ckan.lib.follow_button which returns an empty string for anonymous users
+
+    For anon users this function outputs a follow button which links through to the login page
+
+    '''
+    obj_type = obj_type.lower()
+    assert obj_type in _follow_objects
+
+    if c.user:
+        context = {'model': model, 'session': model.Session, 'user': c.user}
+        action = 'am_following_%s' % obj_type
+        following = logic.get_action(action)(context, {'id': obj_id})
+        return snippet('snippets/follow_button.html',
+                   following=following,
+                   obj_id=obj_id,
+                   obj_type=obj_type)
+
+    return snippet('snippets/anon_follow_button.html',
+           obj_id=obj_id,
+           obj_type=obj_type)

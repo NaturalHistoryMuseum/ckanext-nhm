@@ -1,0 +1,23 @@
+{% ckan_extends %}
+
+{# Move the breadcrumb to the header #}
+{% block header %}
+    {{ super() }}
+    {% if self.breadcrumb_content() | trim %}
+        <div class="toolbar">
+            <div class="container">
+                <div class="row">
+                    <div class="span12">
+                        <ol class="breadcrumb">
+                            {% snippet 'snippets/home_breadcrumb_item.html' %}
+                            {% block breadcrumb_content %}{% endblock %}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{# And remove the toolbar from the mainbody #}
+{% block toolbar %}{% endblock %}

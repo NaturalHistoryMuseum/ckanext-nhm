@@ -1,0 +1,18 @@
+{% set url=h.url_for(controller='package', action='read', id=id) %}
+
+<div class="span4 box">
+    <a class="media-image" href="{{ url }}">
+      {% block image %}{% endblock %}
+    </a>
+    <div class="module-content">
+      <section class="featured media-overlay">
+          <h5><a href="{{ url }}">{{ title }}</a></h5>
+
+          <div class="box-text">
+            <p>{% block description %}{% endblock %}</p>
+          </div>
+
+          <p class="text-right"><a href="{{ url }}" title="View dataset">Read more <i class="icon-circle-arrow-right"></i></a></p>
+        </section>
+    </div>
+  </div>

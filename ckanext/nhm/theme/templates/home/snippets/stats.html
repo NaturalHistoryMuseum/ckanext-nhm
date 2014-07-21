@@ -2,24 +2,25 @@
 
 <div class="stats">
   <div class="inner">
-    <ul>
-      <li>
-        <a href="{{ h.url_for(controller='package', action='search') }}">
-          <b>{{ h.SI_number_span(stats.dataset_count) }}</b>
-          {{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}
-        </a>
-      </li>
+    <ul class="unstyled inline pull-right">
 
       <li>
         <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='records') }}">
-          <b>{{ h.SI_number_span(stats.record_count) }}</b>
+          <strong>{{ h.SI_number_span(stats.record_count) }}</strong>
           {{ _('record') if stats.record_count == 1 else _('records') }}
         </a>
       </li>
 
       <li>
+        <a href="{{ h.url_for(controller='package', action='search') }}">
+          <strong>{{ h.SI_number_span(stats.dataset_count) }}</strong>
+          {{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}
+        </a>
+      </li>
+
+      <li>
         <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='contributors') }}">
-          <b>{{ h.SI_number_span(stats.contributor_count) }}</b>
+          <strong>{{ h.SI_number_span(stats.contributor_count) }}</strong>
           {{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}
         </a>
       </li>

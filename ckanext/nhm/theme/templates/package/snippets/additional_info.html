@@ -2,18 +2,31 @@
 
 {% block extras %}
 
-    <tr>
-        <th scope="row" class="dataset-label">{{ _("Temporal extent") }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('temporal_extent', None) }}</td>
-    </tr>
-    <tr>
-        <th scope="row" class="dataset-label">{{ _("Update frequency") }}</th>
-        <td class="dataset-details">{{ pkg_dict.get('update_frequency', None) }}</td>
-    </tr>
-    <tr>
-        <th scope="row" class="dataset-label">{{ _("Category") }}</th>
-        <td class="dataset-details">{{ pkg_dict.category.pop() if pkg_dict.category else '' }}</td>
-    </tr>
+    {% set temporal_extent = pkg_dict.get('temporal_extent', None) %}
+    {% set update_frequency = pkg_dict.get('update_frequency', None) %}
+    {% set category = pkg_dict.category.pop() if pkg_dict.category else None %}
+
+    {% if temporal_extent %}
+        <tr>
+            <th scope="row" class="dataset-label">{{ _("Temporal extent") }}</th>
+            <td class="dataset-details">{{ temporal_extent }}</td>
+        </tr>
+    {%  endif %}
+
+    {% if update_frequency %}
+        <tr>
+            <th scope="row" class="dataset-label">{{ _("Update frequency") }}</th>
+            <td class="dataset-details">{{ update_frequency }}</td>
+        </tr>
+    {%  endif %}
+
+    {% if category %}
+        <tr>
+            <th scope="row" class="dataset-label">{{ _("Category") }}</th>
+            <td class="dataset-details">{{ category }}</td>
+        </tr>
+    {%  endif %}
+
     <tr>
         <th scope="row">{{ _('Last updated') }}</th>
         <td>{{ h.render_datetime(pkg_dict.last_modified) or h.render_datetime(pkg_dict.revision_timestamp) or h.render_datetime(pkg_dict.created) or _('unknown') }}</td>

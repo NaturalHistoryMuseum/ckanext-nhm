@@ -1,5 +1,4 @@
 {% extends "page.html" %}
-{% set homepage_style = ( g.homepage_style or '1' ) %}
 
 {% block subtitle %}{{ _("Welcome") }}{% endblock %}
 
@@ -8,67 +7,100 @@
 
 {% set collection_stats = h.collection_stats() %}
 
-{% block content %}
-  <div class="homepage layout-3">
-    <div class="container">
-      {{ self.flash() }}
-    </div>
-    {% block primary_content %}
+  {% block header %}
 
-    <div role="main" class="hero">
+   <div class="extended-masthead">
+
+    {{ super() }}
+
       <div class="container">
-        <div class="row row2">
-          <div class="span9 col2">
-
-            <div class="module-content">
+        <div class="row">
+          <div class="span8">
               <header>
-                {% if intro %}
-                  {{ h.render_markdown(intro) }}
-                {% else %}
-                  <h1 class="page-heading">Explore, visualize and download the Natural History Museum’s collection and research data.</h1>
-                {% endif %}
+                 <h2 class="light welcome">Explore and download the Natural History Museum’s research and collections data.</h2>
               </header>
-            </div>
-
           </div>
-          <div class="span3 col1">
+        </div>
+        <div class="row">
+          <div class="span12">
             {% block stats %}
               {% snippet 'home/snippets/stats.html' %}
             {% endblock %}
           </div>
         </div>
       </div>
-    </div>
 
-    <div role="main">
-      <div class="container">
-        <div class="row row2">
-          <div class="col2">
-            <div class="module-content box">
-                <h2>Search the Natural History Museum Specimen Collection </h2>
-                <h3><a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> of the Natural History Museum's specimens are now available online</h3>
+      <div class="container specimen-collection">
+        <div class="row">
+          <div class="span12">
+             <div class="module-content">
+                <h1>Search the Natural History Museum Specimen Collection</h1>
+                <h3 class="light"><a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> of the Museum's 80 million specimens are now available online.</h3>
                 {% block search %}
                   {% snippet 'home/snippets/search.html' %}
                 {% endblock %}
-
-                <p>
-                    {% for collection_code, count in collection_stats['collections'].items() %}
-                        <a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ h.delimit_number(count) }}</a> {{ h.get_department(collection_code) }}
-                    {%  endfor %}
-                </p>
-
-              </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+   </div>
+   {% endblock %}
+
+{% block content %}
+  <div class="homepage">
+
+    {% block primary_content %}
+
+    <div class="container collection-stats">
+        <div class="row">
+            <div class="span12">
+                <div class="module-content">
+                    <ul class="unstyled inline">
+                       {% for collection_code, count in collection_stats['collections'].items() %}
+
+                          {% set dept = h.get_department(collection_code) %}
+
+                          <li><a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}"><i class="{{ dept|lower }}"></i><strong class="light">{{ h.delimit_number(count) }}</strong><span class="normal-text">{{ dept }}</span></a></li>
+                       {%  endfor %}
+                   </ul>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+      {{ self.flash() }}
+    </div>
+
+      <div role="main">
+        <div class="container">
+          <div class="row">
+              <div class="span12">
+                  <h3>Featured datasets</h3>
+                  <div class="row">
+                      {% snippet 'home/snippets/featured/dataset1.html' %}
+                      {% snippet 'home/snippets/featured/dataset2.html' %}
+                      {% snippet 'home/snippets/featured/dataset3.html' %}
+                  </div>
+               </div>
           </div>
         </div>
       </div>
 
       <div role="main">
         <div class="container">
-          <div class="row row2">
-              {% snippet 'home/snippets/featured_dataset1.html' %}
-              {% snippet 'home/snippets/featured_dataset2.html' %}
-              {% snippet 'home/snippets/featured_dataset3.html' %}
+          <div class="row">
+              <div class="span12">
+                  <h3>Use the data</h3>
+                  <div class="row">
+
+                    {% snippet 'home/snippets/actions/explore.html' %}
+                    {% snippet 'home/snippets/actions/download.html' %}
+                    {% snippet 'home/snippets/actions/cite.html' %}
+
+                  </div>
+               </div>
           </div>
         </div>
       </div>

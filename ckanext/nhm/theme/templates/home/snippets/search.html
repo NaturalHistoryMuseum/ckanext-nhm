@@ -2,7 +2,7 @@
 {% set placeholder = _('E.g. Pediculus humanus') %}
 
 <div class="module module-search module-narrow module-shallow">
-  <form class="module-content search-form" method="get" action="{% url_for controller='package', action='search' %}">
+  <form class="module-content search-form collection-search-form" method="get" action="{% url_for controller='package', action='search' %}">
     <div class="search-input control-group search-giant">
       <input type="text" class="search" name="q" value="" autocomplete="off" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
       <button type="submit">

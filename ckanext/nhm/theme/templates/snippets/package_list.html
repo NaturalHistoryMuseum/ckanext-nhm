@@ -1,0 +1,22 @@
+{% ckan_extends %}
+
+{% block package_list %}
+    {% if packages %}
+
+        <table class="table table-chunky package-list">
+            <thead>
+            <tr><th>Dataset</th><th>Author</th><th>Type</th><th>Licence</th></tr>
+            </thead>
+
+            <tbody>
+            {% block package_list_inner %}
+                {% for package in packages %}
+                    {% snippet 'snippets/package_item.html', package=package, item_class=item_class, hide_resources=hide_resources, banner=banner, truncate=truncate, truncate_title=truncate_title %}
+                {% endfor %}
+            {% endblock %}
+            </tbody>
+
+        </table>
+
+    {% endif %}
+{% endblock %}
