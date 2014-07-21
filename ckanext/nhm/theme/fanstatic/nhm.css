@@ -847,7 +847,8 @@ border-radius: 0;
 }
 
 
-.nav-tabs li{
+.nav-tabs li,
+.view-list li{
     background: #F2F2F2;
     margin-right: 1px;
     position: relative;
@@ -965,4 +966,5 @@ font-weight: normal;
 .module-resource {
     border-bottom: none;
 }
+
 
