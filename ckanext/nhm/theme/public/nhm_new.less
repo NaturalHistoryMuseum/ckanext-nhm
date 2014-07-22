@@ -1,0 +1,1133 @@
+
+/****************** Variables & classes ******************/
+
+// Colors
+@mastheadBackgroundColor: #228900;
+@mastheadTextColor: #fff;
+@mastheadLinkColor: @mastheadTextColor;
+@mastheadLinkHoverColor: @toolbarBackgroundColor;
+
+@baseBackgroundColor: #fff;
+@baseTextColor:#444;
+@baseLinkColor:@mastheadBackgroundColor;
+@baseLinkHoverColor: @baseTextColor;
+
+@smallTextColor: #5B5B5B;
+
+@sidebarBackgroundColor: #f6f6f6;
+@sidebarHeaderBackgroundColor: #ddd;
+@sidebarNavHighlightColor: #525252;
+
+@pillColor: @sidebarNavHighlightColor;
+@pillHoverColor: #E0E0E0;
+
+@footerBackgroundColor: #434343;
+@footerTextColor: #999;
+@footerLinkColor: #fff;
+
+@toolbarBackgroundColor: #BBEDA9;
+
+// Buttons
+@buttonColor: @mastheadBackgroundColor;
+@buttonTextColor: #fff;
+@buttonHoverColor: #015B28;
+@buttonWarningColor: #890022;
+@buttonWarningHoverColor: #6E001B;
+@buttonDisabledColor: #9A9A9A;
+
+// Tabs
+@tabColor: @sidebarBackgroundColor;
+@tabActiveColor: #656565;
+@tabTextColor: #fff;
+
+// Tables
+@tableHeaderColor: #F2F2F2;
+@tableBorderColor: #F2F2F2;
+
+
+// URLS
+@images: "/images";
+@icons: "/images/icons";
+@fonts: "/fonts";
+
+
+// Generic classes
+
+// Basic class to remove box shadow
+.no-box-shadow{
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+// Remove border radius
+.no-border-radius{
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+
+/****************** Typography ******************/
+
+@font-face {
+  font-family: 'nhm_ingrid_lightregular';
+  src: url('@{fonts}/nhmingligreg-webfont.eot');
+  src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  url('@{fonts}/nhmingligreg-webfont.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'nhm_ingridregular';
+  src: url('@{fonts}/nhmingreg-webfont.eot');
+  src: url('@{fonts}/nhmingreg-webfont.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  url('@{fonts}/nhmingreg-webfont.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  font-style: normal;
+}
+
+/* Headers */
+
+h1, h2, h3, h4, h5, h6{
+  font-family: 'nhm_ingridregular', 'Open Sans', sans-serif;
+  font-weight: normal;
+}
+
+h1{
+  font-size: 38px;
+}
+
+h2{
+  font-size: 34px;
+}
+
+h3{
+  font-size: 28px;
+}
+
+h4{
+  font-size: 24px;
+}
+
+h5{
+  font-size: 20px;
+}
+
+h6{
+  font-size: 18px;
+}
+
+.light{
+  font-weight: lighter;
+  font-family: 'nhm_ingrid_lightregular', 'Open Sans', sans-serif;
+}
+
+
+/****************** Color ******************/
+
+body{
+  background: @baseBackgroundColor;
+  color: @baseTextColor;
+}
+
+.base-link-color{
+  color: @baseLinkColor;
+  &:hover {
+    color: @baseLinkHoverColor;
+    &.no-underline{
+      text-decoration:none!important;
+    }
+  }
+}
+
+a{
+  .base-link-color;
+}
+
+// White on green color scheme
+.masthead-color-scheme{
+  background: @mastheadBackgroundColor;
+  color: @mastheadTextColor;
+
+  a{
+    color: @mastheadLinkColor;
+    &:hover {
+      color: @mastheadLinkHoverColor;
+      text-decoration:none!important;
+    }
+  }
+
+}
+
+// White on green color scheme
+.footer-color-scheme{
+  background: @footerBackgroundColor;
+  color: @footerTextColor;
+
+  a{
+    color: @footerLinkColor;
+  }
+
+}
+
+// Grey box color scheme
+.box-color-scheme{
+  background: @sidebarBackgroundColor;
+}
+
+.default-text-color{
+  color: @baseTextColor;
+}
+
+.default-text-color a{
+  .base-link-color;
+}
+
+/****************** Layout ******************/
+
+/* Pages */
+.wrapper{
+  .no-box-shadow;
+  .no-border-radius;
+  background: none;
+}
+
+/* Main */
+[role=main], .main{
+  background: transparent;
+  margin-bottom: 0;
+}
+
+.module-content{
+  padding: 0;
+  margin: 0;
+}
+
+.primary .module-content,
+.box .module-content{
+  padding: 20px;
+}
+
+.module-content:first-child{
+  padding-top: 0;
+}
+
+h1.page-heading{
+  position: relative;
+  top: -6px;
+  margin-bottom: 5px;
+}
+
+.actions,
+.page-header .actions{
+  top: 0;
+}
+
+
+/****************** Page elements ******************/
+
+/* Masthead */
+
+.masthead {
+
+  padding: 3px 0;
+  .masthead-color-scheme;
+
+  a.logo {
+    float: left;
+    margin: 10px 25px 13px 0;
+  }
+
+  a:hover{
+    color: inherit!important;
+  }
+
+  h1.site-title {
+    margin: 20px 0 0 0;
+  }
+
+  /* Navigation */
+
+  .navigation {
+    float: right !important;
+  }
+
+  .nav-pills {
+    margin-top: 24px;
+  }
+
+  .nav-pills li {
+    margin: 0 5px;
+  }
+
+  .nav-pills a {
+    -o-transition: .5s;
+    -ms-transition: .5s;
+    -moz-transition: .5s;
+    -webkit-transition: .5s;
+    transition: .5s;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    text-transform: uppercase;
+    font-weight: normal;
+  }
+
+  .nav-pills li.active a,
+  .nav-pills a:hover,
+  .nav-pills > .active > a,
+  .nav-pills > .active > a:hover,
+  .nav-pills > .active > a:focus {
+    background-color: transparent;
+    background: #2E72A3;
+    background: rgba(0, 0, 0, 0.2) !important;
+  }
+
+}
+
+/* Extended masthead */
+.extended-masthead{
+  .masthead-color-scheme;
+}
+
+.extended-masthead .masthead{
+  background: none;
+}
+
+/* Account links */
+
+.account {
+  text-align: right;
+  font-size: 12px;
+
+  ul li {
+    display: inline-block;
+  }
+
+  ul li a:hover {
+    text-decoration: underline !important;
+  }
+
+  &.authed ul li {
+    padding-left: 7px;
+  }
+
+  &.not-authed ul li:before {
+    content: '\2022';
+    padding: 0 5px;
+  }
+
+  &.not-authed ul li:first-child:before {
+    content: none;
+  }
+}
+
+
+/* Toolbar */
+
+.toolbar {
+  background: @toolbarBackgroundColor;
+  padding: 0;
+  margin-bottom: 20px;
+
+  /* Breadcrumbs */
+
+  .breadcrumb {
+    font-size: 13px;
+  }
+
+  .breadcrumb > li {
+    text-shadow: none;
+    font-weight: normal;
+    padding: 3px 0;
+  }
+
+  .breadcrumb li:after {
+    content: "\f105";
+    font-family: FontAwesome;
+    font-weight: lighter;
+    font-style: normal;
+    text-decoration: inherit;
+    -webkit-font-smoothing: antialiased;
+    margin: 0 1px 0 5px;
+    display: inline-block;
+    font-size: 17px;
+    line-height: 18px;
+    position: relative;
+    top: 1px;
+  }
+
+  > li:last-child:before {
+    content: "";
+  }
+
+  .breadcrumb .active a,
+  .breadcrumb a.active {
+    font-weight: normal;
+  }
+
+  .breadcrumb .home .icon-home {
+    font-size: inherit;
+  }
+}
+
+
+/* Forms */
+
+/* Search form */
+.search-form {
+  border-bottom: none;
+  padding-bottom: 10px;
+
+  .search-input input {
+    border: none;
+    background: #F2F2F2;
+    .no-box-shadow;
+  }
+  .search-input.search-giant button {
+    width: 40px !important;
+    height: 40px !important;
+    margin-top: -20px !important;
+    background: #228900;
+    border-radius: 20px;
+    right: 5px;
+  }
+
+  .search-input.search-giant button i {
+    font-size: 20px;
+    color: #fff;
+  }
+}
+
+// Context blocks
+.box{
+
+  .box-color-scheme;
+  .no-box-shadow;
+  .no-border-radius;
+
+  .module-content{
+    background: @sidebarBackgroundColor;
+  }
+
+  h4{
+    margin-top: 0;
+  }
+
+  .module-content{
+    margin: 0;
+    padding-top: 10px;
+  }
+
+  p{
+    margin: 0;
+  }
+
+  .box-text{
+    min-height: 130px;
+  }
+
+  .box-text p{
+    margin-bottom: 10px;
+  }
+
+}
+
+// Action box (on home page)
+
+.action-box {
+
+  .module-content {
+    .masthead-color-scheme;
+    padding-top: 20px;
+  }
+
+  i.large {
+    float: left;
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+  }
+
+  .content {
+    margin-left: 45px;
+  }
+
+  h4 {
+    margin-bottom: 0;
+  }
+
+  p.text-right {
+    margin-top: 15px;
+  }
+
+}
+
+// Footer
+.site-footer {
+
+  .footer-color-scheme;
+  margin-top: 40px;
+  padding: 0 0 30px 0;
+
+  .no-margin{
+    margin: 0
+  }
+
+  ul.nav {
+    border-left: 1px solid #696969;
+    padding: 45px 0 0 20px;
+    min-height: 200px;
+  }
+
+  .nav li a:hover {
+    text-decoration: underline;
+  }
+
+  .nav > li > a:hover, .nav > li > a:focus {
+    background: transparent;
+  }
+
+  ul.nav ul {
+    font-size: 0.9em;
+  }
+
+  div.dev-info {
+    margin-top: 50px;
+  }
+
+  p {
+    margin-bottom: 25px;
+  }
+
+  a {
+    font-weight: normal;
+    display: inline;
+  }
+
+  ul.attribution {
+    margin-top: 39px;
+  }
+
+  ul.attribution li {
+    margin-bottom: 40px;
+  }
+
+  ul.attribution li strong {
+    font-weight: normal;
+  }
+}
+
+// Secondary column
+.secondary {
+  background: transparent;
+
+  .module {
+    background-color: @sidebarBackgroundColor;
+  }
+
+  .module-heading {
+    background: @sidebarHeaderBackgroundColor;
+  }
+
+  // Navigation
+
+  .nav-item.active > a,
+  .nav-aside li.active a,
+  .nav-item.active > a:hover,
+  .nav-aside li.active a:hover {
+    background-color: @sidebarNavHighlightColor;
+  }
+
+  .nav-item.active > a:before,
+  .nav-aside li.active a:before {
+    background-image: url("@{images}/nav-active.png?1");
+  }
+
+  .read-more {
+    color: @baseLinkColor;
+    font-weight: normal;
+    display: block;
+    text-align: right;
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .module-content p:first-child {
+    margin-top: 0;
+  }
+
+  p small {
+    display: block;
+    color: @smallTextColor;
+    font-size: 11px;
+    line-height: 15px;
+    margin: 15px 0;
+  }
+
+  table {
+    margin: 5px 0 10px 0;
+  }
+
+  table th {
+    font-weight: normal;
+  }
+
+  table td {
+    width: 10px;
+    text-align: right;
+  }
+
+}
+
+/* Pills (for applied facets) */
+.pill{
+  background-color: @pillColor;
+  a:hover{
+    color: @pillHoverColor;
+    text-decoration: none;
+  }
+}
+
+a.btn,
+.btn-group > .btn:first-child {
+
+  background: @buttonColor;
+  padding: 8px 16px;
+  color: @buttonTextColor;
+  font-weight: normal;
+  text-shadow: none;
+  .no-box-shadow;
+  .no-border-radius;
+}
+
+a.btn:hover,
+.js .image-upload .btn.hover {
+  background: @buttonHoverColor;
+  color: @buttonTextColor;
+}
+
+.btn-group.open .btn-primary.dropdown-toggle {
+  background-color: @buttonHoverColor;
+}
+
+a.btn-danger{
+  background: @buttonWarningColor;
+}
+
+a.btn-danger:hover{
+  background: @buttonWarningHoverColor;
+}
+
+
+/* Tables */
+
+.table th, .table td{
+  border-color: @tableBorderColor;
+}
+
+.table-chunky thead th,
+.table-chunky thead td {
+  color: inherit;
+  background-color: transparent;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+}
+
+.table-chunky td,
+.table-chunky th {
+  font-size: inherit;
+}
+
+table.package-list td,
+table.package-list th{
+  width: 60px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.package-list tr td:first-child,
+table.package-list tr th:first-child{
+  width: auto;
+  text-align: left;
+  padding-left: 0;
+}
+
+table.package-list tr td:last-child,
+table.package-list tr th:last-child{
+  width: 100px;
+  padding-right: 0;
+}
+
+.table-no-border th, .table-no-border td{
+  border-top: none;
+}
+
+
+/* Pagination */
+
+.module .pagination {
+  border-top: none;
+
+  ul > li > a,
+  ul > li > span {
+    border: none;
+  }
+
+  li a {
+    border-radius: 16px !important;
+    -webkit-border-radius: 16px !important;
+    padding: 5px 8px!important;
+    margin: 0 2px!important;
+  }
+
+  ul li,
+  ul li a {
+    line-height: 14px;
+  }
+
+  ul > li > a:hover,
+  ul > li > a:focus,
+  ul > .active > a,
+  ul > .active > span {
+    background-color: @baseLinkColor;
+    color: @baseBackgroundColor;
+  }
+
+}
+
+/* Leaflet controls */
+
+.leaflet-container {
+
+  .leaflet-bar {
+    border: none;
+    box-shadow: none;
+    background: rgba(255, 255, 255, .4);
+    padding: 3px;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+  }
+
+  .leaflet-bar-part {
+    border: 3px solid @baseLinkColor;
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    margin-bottom: 5px;
+  }
+
+  .leaflet-bar-part:last-child {
+    margin-bottom: 0;
+  }
+
+  .leaflet-control-zoom a {
+    color: @baseLinkColor;
+  }
+
+  .leaflet-control-draw-rectangle {
+    background-image: url("@{images}/leaflet/pencil.png");
+  }
+
+}
+
+/* Tabs (and view buttons which look the same as tabs) */
+
+// Remove the background for the div behind the tabs
+.page-header {
+  border-bottom: none;
+  background-color: transparent;
+  .no-border-radius;
+}
+
+.page-header{
+  padding-bottom: 0;
+  margin: 0;
+}
+
+/* Tabs */
+
+.nav-tabs{
+  border-bottom: none;
+}
+
+.nav-tabs li,
+.view-list li{
+  background: @tabColor;
+  margin-right: 1px;
+  position: relative;
+}
+
+.view-list.stacked{
+  height: 50px;
+}
+
+.view-list.stacked li {
+  display: block;
+  margin-right: 1px;
+  width: auto;
+  float: left;
+}
+
+.view-list li a {
+  display: inline-block;
+  min-height: inherit;
+  padding: 10px 12px;
+  border: none;
+  .no-border-radius;
+  color: inherit;
+  overflow: inherit;
+}
+
+.view-list li.active a{
+  color: @tabTextColor;
+}
+
+.view-list li a i.icon {
+  float: none;
+  width: auto;
+  height: auto;
+  background-color: transparent;
+  margin: 0 4px 0 0;
+  .no-border-radius;
+}
+
+.view-list li.active a .icon,
+.view-list li a:hover .icon{
+  background-color: transparent;
+  color: inherit;
+}
+
+.nav-tabs li.active,
+.view-list li.active{
+  background: @tabActiveColor;
+}
+
+/* Add pointy arrow */
+.nav-tabs li.active:after,
+.view-list li.active:after{
+  content: ' ';
+  height: 0;
+  position: absolute;
+  width: 0;
+  border: 8px solid transparent;
+  border-top-color: @tabActiveColor;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+}
+
+.page-header .nav-tabs li a,
+.page-header .nav-tabs li.active a,
+.page-header .nav-tabs a:hover {
+  background: transparent;
+  border: none;
+  color: inherit;
+}
+
+.page-header .nav-tabs li a:hover{
+  text-decoration: none;
+}
+
+
+.page-header .nav-tabs li.active a {
+  color: @tabTextColor;
+}
+
+
+/****************** Pages ******************/
+
+
+/* Home page */
+
+h2.welcome{
+  margin: 30px 0 0 0;
+}
+
+/* Stats */
+
+.stats ul li{
+  border-left: 1px solid rgba(255, 255, 255, .4);
+  padding: 0 20px 14px 35px;
+}
+
+.stats ul li:first-child{
+  border: none;
+}
+
+.stats ul li:last-child{
+  padding-right: 0;
+}
+
+.stats {
+  text-align: right;
+}
+
+.stats a{
+  font-size: 16px;
+}
+
+.stats a strong{
+  display: block;
+  font-size: 26px;
+  padding-bottom: 6px;
+}
+
+/* Collection */
+
+.specimen-collection .module-content,
+.collection-stats .module-content{
+  background: @sidebarBackgroundColor;
+}
+
+.specimen-collection h3{
+  margin: 0;
+}
+
+.specimen-collection .module{
+  margin-top: 10px;
+}
+
+/* Bring the next section up flush to the bottom */
+.specimen-collection .module-content{
+  padding: 20px 30px 0 30px;
+}
+
+.specimen-collection .module:last-child {
+  margin-bottom: 0;
+}
+
+.collection-search-form{
+  background: url('@{images}/search_map_bg.png') no-repeat center center!important;
+  border: none;
+  padding: 80px 140px 60px 140px!important;
+}
+
+.collection-search-form .search-input input{
+  background: #fff;
+}
+
+/* Collection stats */
+
+.collection-stats{
+  margin-bottom: 10px;
+}
+
+.collection-stats .module-content{
+  padding: 25px 30px 30px 30px;
+}
+
+.collection-stats ul li{
+  width: 20%;
+  padding: 0;
+}
+
+.collection-stats ul li:first-child{
+  width: 21%;
+}
+
+.collection-stats ul li:last-child{
+  width: 17%;
+}
+
+.collection-stats ul li a{
+  text-decoration: none;
+  position: relative;
+}
+
+.collection-stats ul li a i{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.specimen-collection a{
+  color:@baseLinkColor;
+}
+
+.specimen-collection a:hover,
+.collection-stats ul li a:hover,
+.collection-stats ul li a:hover strong{
+  color:@baseLinkColor;
+  opacity: .8!important;
+}
+
+i.botany{
+  background-image: url('@{icons}/leaf-icon.png');
+}
+
+/* entom */
+i.entomology{
+  background-image: url('@{icons}/fly-icon.png');
+}
+
+/* entom */
+i.zoology{
+  background-image: url('@{icons}/gecko-icon.png');
+}
+
+/* entom */
+i.paleontology{
+  background-image: url('@{icons}/nauti-icon.png');
+}
+
+/* entom */
+i.mineralogy{
+  background-image: url('@{icons}/earth-icon.png');
+}
+
+.collection-stats li a strong{
+  font-size: 26px;
+  margin: 4px 0 5px 0;
+}
+
+.collection-stats li a span,
+.collection-stats li a strong{
+  display: block;
+  margin-left: 40px;
+}
+
+
+/* Dataset page */
+
+.dataset-heading a {
+  color: @baseLinkColor;
+}
+
+
+/* Bump down the primary column a bit */
+.dataset-map-expanded .primary {
+  position: relative;
+  top: 20px;
+}
+
+.dataset-map-expanded #dataset-map{
+  background: @sidebarBackgroundColor;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .btn {
+  background: none;
+  color: inherit;
+
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .btn:after{
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  margin-left: 5px;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .cancel{
+  color: @buttonWarningColor;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .cancel:hover{
+  color: @buttonWarningHoverColor;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply{
+  color: @buttonColor;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply:hover{
+  color: @buttonHoverColor;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .disabled,
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .disabled:hover{
+  color: @buttonDisabledColor;
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .cancel:after{
+  content: '\f057';
+}
+
+.dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply:after{
+  content: '\f0a9';
+}
+
+.issue-open a{
+  color: @buttonWarningColor;
+}
+
+/* Dataset activity page */
+
+.activity{
+  margin-top: 30px;
+}
+
+
+/* Resource page */
+
+/* List of resource */
+
+.resources {
+  h3 {
+    font-size: 18px;
+    margin-top: 30px;
+  }
+  ul.resource-list {
+    margin: 0 0 30px 0;
+
+    li.resource-item {
+      border-style: solid none none;
+      border-color: @tableBorderColor;
+      border-width: 1px;
+      min-height: 45px;
+    }
+
+    li.resource-item:hover {
+      background-color: transparent;
+    }
+
+    li.resource-item:last-child {
+      border-bottom-style: solid;
+    }
+
+    li.resource-item .heading {
+      color: #228900;
+      font-size: 16px;
+      font-weight: normal;
+    }
+
+  }
+}
+
+.module-resource {
+  border-bottom: none;
+}
+
+/* Additional info - used on both dataset and resource page */
+.additional-info {
+  h3{
+    background: @tableHeaderColor;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    padding: 5px;
+  }
+
+  thead {
+    display: none;
+  }
+
+  th {
+    width: 150px;
+  }
+
+  table,
+  table tr,
+  table tr td,
+  table tr th {
+    background: transparent !important;
+    border: none !important;
+  }
+
+}
+
+
+

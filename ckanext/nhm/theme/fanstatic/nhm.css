@@ -623,7 +623,8 @@ a.btn-danger:hover{
     background: #6E001B;
 }
 
-.actions{
+.actions,
+.module-resource .actions{
     top: 0;
 }
 
@@ -854,12 +855,58 @@ border-radius: 0;
     position: relative;
 }
 
-.nav-tabs li.active{
+.view-list.stacked{
+    height: 50px;
+}
+
+.view-list.stacked li {
+    display: block;
+    margin-right: 1px;
+    width: auto;
+    float: left;
+}
+
+.view-list li a {
+    display: inline-block;
+    min-height: inherit;
+    padding: 10px 12px;
+    border: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    color: inherit;
+    overflow: inherit;
+}
+
+.view-list li.active a{
+    color: #fff;
+}
+
+.view-list li a i.icon {
+    float: none;
+    width: auto;
+    height: auto;
+    background-color: transparent;
+    margin: 0 4px 0 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+
+.view-list li.active a .icon,
+.view-list li a:hover .icon{
+    background-color: transparent;
+    color: inherit;
+}
+
+.nav-tabs li.active,
+.view-list li.active{
     background: #656565;
 }
 
 /* Add pointy arrow */
-.nav-tabs li.active:after{
+.nav-tabs li.active:after,
+.view-list li.active:after{
     content: ' ';
 	height: 0;
 	position: absolute;

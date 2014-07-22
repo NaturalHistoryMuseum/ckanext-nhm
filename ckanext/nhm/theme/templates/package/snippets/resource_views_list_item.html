@@ -11,10 +11,7 @@
 {% endif %}
 <li class="resource-view-item{% if is_selected %} active{% endif %}" data-id="{{ view.id }}">
   <a href="{{ url }}" data-id="{{ view.id }}">
-    <span class="icon">
       <i class="icon icon-{{ h.resource_view_icon(view) }}"></i>
-    </span>
-    <h3>{{ view.title }}</h3>
+      {{ view.title }}
   </a>
-  <span class="arrow"></span>
 </li>
