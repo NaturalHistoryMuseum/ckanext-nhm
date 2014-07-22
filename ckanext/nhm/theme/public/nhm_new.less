@@ -234,7 +234,7 @@ h1.page-heading{
 
   a.logo {
     float: left;
-    margin: 10px 25px 13px 0;
+    margin: 10px 25px 14px 0;
   }
 
   a:hover{
@@ -242,7 +242,9 @@ h1.page-heading{
   }
 
   h1.site-title {
-    margin: 20px 0 0 0;
+    margin: 12px 0 0 0;
+    font-size: 42px;
+    letter-spacing: 1px;
   }
 
   /* Navigation */
@@ -396,6 +398,32 @@ h1.page-heading{
     color: #fff;
   }
 }
+
+.alert-danger, .alert-error {
+  background-color: #f8f0f0;
+  border-color: @buttonWarningColor;
+
+}
+
+.control-group.error .control-label,
+.control-group.error .help-block,
+.control-group.error .help-inline,
+.alert-danger, .alert-error {
+  color: @buttonWarningColor;
+}
+
+.error-block {
+  background-color: @buttonWarningColor;
+}
+
+.control-group.error input,
+.control-group.error select,
+.control-group.error textarea,
+.control-group.error .input-prepend .add-on,
+.control-group.error .input-append .add-on {
+  border-color: @buttonWarningColor;
+}
+
 
 // Context blocks
 .box{
@@ -587,9 +615,11 @@ h1.page-heading{
   }
 }
 
-a.btn,
-.btn-group > .btn:first-child {
 
+/* Buttons */
+a.btn,
+button.btn,
+.btn-group > .btn:first-child {
   background: @buttonColor;
   padding: 8px 16px;
   color: @buttonTextColor;
@@ -600,6 +630,7 @@ a.btn,
 }
 
 a.btn:hover,
+button.btn:hover,
 .js .image-upload .btn.hover {
   background: @buttonHoverColor;
   color: @buttonTextColor;
