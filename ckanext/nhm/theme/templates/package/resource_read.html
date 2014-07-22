@@ -28,8 +28,7 @@
                 <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
               </tr>
               {% for key, value in h.format_resource_items(res.items()) %}
-                  {{ key }}
-                  {% if key in ['image field'] %}
+                  {% if h.filter_resource_items(key) %}
                     <tr class="toggle-more"><th scope="row">{{ key }}</th><td>{{ value }}</td></tr>
                   {% endif %}
               {% endfor %}

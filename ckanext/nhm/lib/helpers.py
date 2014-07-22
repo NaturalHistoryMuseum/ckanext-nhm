@@ -341,3 +341,17 @@ def persistent_follow_button(obj_type, obj_id):
     return snippet('snippets/anon_follow_button.html',
            obj_id=obj_id,
            obj_type=obj_type)
+
+
+def filter_resource_items(key):
+    """
+    Filter resource items - if key is in blacklist, return false
+    @param key:
+    @return: boolean
+    """
+
+    blacklist = ['image field', 'title field', 'datastore active', 'has views', 'on same domain', 'resource group id', 'revision id', 'url type']
+
+    return key.strip() not in blacklist
+
+
