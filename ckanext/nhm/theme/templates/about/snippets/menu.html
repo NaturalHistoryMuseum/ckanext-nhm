@@ -5,23 +5,20 @@ Displays the about menu
 <section class="module module-narrow">
   <div class="module context-info">
 
-    {% block heading %}
-        <h2 class="module-heading">About</h2>
-    {% endblock %}
 
-    <div class="module-content">
-        {% block about_menu %}
+      {% block about_menu %}
         <nav class="section navigation">
-          <ul class="nav nav-pills" id="about-menu">
+          <ul class="nav nav-aside" id="about-menu">
               {{ h.build_nav_main(
+                ('about', _('About')),
                 ('about_data_usage', _('Data usage')),
-                ('stats_datasets', _('Statistics')),
+                ('stats_datasets', _('Site statistics')),
                 ('about_credits', _('Credits'))
               ) }}
             </ul>
          </nav>
         {% endblock %}
-    </div>
+
 
   </div>
 </section>
