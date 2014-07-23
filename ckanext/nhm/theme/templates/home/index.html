@@ -17,7 +17,7 @@
         <div class="row">
           <div class="span8">
               <header>
-                 <h2 class="light welcome">Explore and download the Natural History Museum’s research and collections data.</h2>
+                 <h2 class="welcome">Explore and download the Natural History Museum’s research and collections data.</h2>
               </header>
           </div>
         </div>
@@ -35,7 +35,7 @@
           <div class="span12">
              <div class="module-content">
                 <h1>Search the Natural History Museum Specimen Collection</h1>
-                <h3 class="light"><a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> of the Museum's 80 million specimens are now available online.</h3>
+                <h3><a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> of the Museum's 80 million specimens are now available online.</h3>
                 {% block search %}
                   {% snippet 'home/snippets/search.html' %}
                 {% endblock %}
@@ -59,7 +59,7 @@
                     <ul class="unstyled inline">
                        {% for collection_code, count in collection_stats['collections'].items() %}
                           {% set dept = h.get_department(collection_code) %}
-                          <li><a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}"><i class="{{ dept|lower }}"></i><strong class="light">{{ h.delimit_number(count) }}</strong><span class="default-text-color">{{ dept }}</span></a></li>
+                          <li><a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}"><i class="{{ dept|lower }}"></i><span>{{ h.delimit_number(count) }}</span><span class="default-text-color">{{ dept }}</span></a></li>
                        {%  endfor %}
                    </ul>
                </div>

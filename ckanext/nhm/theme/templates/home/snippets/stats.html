@@ -6,21 +6,21 @@
 
       <li>
         <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='records') }}">
-          <strong class="light">{{ h.SI_number_span(stats.record_count) }}</strong>
+          {{ h.SI_number_span(stats.record_count) }}
           <span class="default-text-color">{{ _('record') if stats.record_count == 1 else _('records') }}</span>
         </a>
       </li>
 
       <li>
         <a href="{{ h.url_for(controller='package', action='search') }}">
-          <strong class="light">{{ h.SI_number_span(stats.dataset_count) }}</strong>
+          {{ h.SI_number_span(stats.dataset_count) }}
           <span class="default-text-color">{{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}</span>
         </a>
       </li>
 
       <li>
         <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='contributors') }}">
-          <strong class="light">{{ h.SI_number_span(stats.contributor_count) }}</strong>
+          {{ h.SI_number_span(stats.contributor_count) }}
           <span class="default-text-color">{{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}</span>
         </a>
       </li>
