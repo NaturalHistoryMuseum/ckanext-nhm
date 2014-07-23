@@ -27,7 +27,7 @@ setup(
             nhm = ckanext.nhm.plugin:NHMPlugin
 
 	    [paste.paster_command]
-            category=ckanext.nhm.commands.category:CategoryCommand
+            dataset-type=ckanext.nhm.commands.dataset_type:DatasetTypeCommand
             initdb=ckanext.nhm.commands.initdb:InitDBCommand
             stats=ckanext.nhm.commands.stats:StatsCommand
 	""",
