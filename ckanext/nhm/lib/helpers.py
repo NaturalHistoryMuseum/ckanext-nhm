@@ -14,7 +14,7 @@ from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects
 from collections import OrderedDict
 from beaker.cache import cache_region
 
-from ckanext.nhm.logic.schema import DATASET_CATEGORY, UPDATE_FREQUENCIES
+from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 
 log = logging.getLogger(__name__)
 
@@ -204,14 +204,13 @@ def resource_issue_count(package_id):
     return issues_count
 
 
-def dataset_categories():
+def dataset_types():
     """
     Return list of dataset category terms
     @return: list
     """
     try:
-        categories = toolkit.get_action('tag_list')(data_dict={'vocabulary_id': DATASET_CATEGORY})
-        return categories
+        return toolkit.get_action('tag_list')(data_dict={'vocabulary_id': DATASET_TYPE_VOCABULARY})
     except toolkit.ObjectNotFound:
         return []
 

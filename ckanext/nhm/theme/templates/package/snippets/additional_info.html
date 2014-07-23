@@ -4,7 +4,7 @@
 
     {% set temporal_extent = pkg_dict.get('temporal_extent', None) %}
     {% set update_frequency = pkg_dict.get('update_frequency', None) %}
-    {% set category = pkg_dict.category.pop() if pkg_dict.category else None %}
+    {% set dataset_type = pkg_dict.dataset_type.pop() if pkg_dict.dataset_type else None %}
 
     {% if temporal_extent %}
         <tr>
@@ -20,10 +20,10 @@
         </tr>
     {%  endif %}
 
-    {% if category %}
+    {% if dataset_type %}
         <tr>
-            <th scope="row" class="dataset-label">{{ _("Category") }}</th>
-            <td class="dataset-details">{{ category }}</td>
+            <th scope="row" class="dataset-label">{{ _("Dataset type") }}</th>
+            <td class="dataset-details">{{ dataset_type }}</td>
         </tr>
     {%  endif %}
 

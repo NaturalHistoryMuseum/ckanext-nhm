@@ -16,14 +16,19 @@
  {{ form.input('tag_string', id='field-tags', label=_('Keywords'), placeholder=_('eg. taxonomy, biodiversity'), value=data.tag_string, error=errors.tags, classes=['control-full'], attrs=tag_attrs) }}
 
   <div class="control-group">
-    <label class="control-label" for="field-category">{{ _("Dataset category") }}</label>
+    {% set error = errors.dataset_type %}
+    <label class="control-label" for="field-dataset-type">{{ _("Dataset type") }}</label>
     <div class="controls">
-      <select id="field-category" name="category" data-module="autocomplete">
+
+      <select id="field-dataset-type" name="dataset_type" data-module="autocomplete">
         <option value="">None</option>
-        {% for category in h.dataset_categories()  %}
-          <option value="{{ category }}" {% if category in data.get('category', []) %}selected="selected"{% endif %}>{{ category }}</option>
+        {% for dataset_type in h.dataset_types()  %}
+          <option value="{{ dataset_type }}" {% if dataset_type in data.get('dataset_type', []) %}selected="selected"{% endif %}>{{ dataset_type }}</option>
         {% endfor %}
       </select>
+
+      {% if error %}<span class="error-block">{{ error[0] }}</span>{% endif %}
+
     </div>
   </div>
 

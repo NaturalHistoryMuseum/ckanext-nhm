@@ -2,20 +2,20 @@
 import logging
 from ckan.plugins import toolkit
 from ckan.lib.cli import CkanCommand
-from ckanext.nhm.logic.schema import DATASET_CATEGORY
+from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
 
-log = logging.getLogger()
-# TODO: Add logging settings
+# Dataset type to be automatically added to the vocabulary
+DEFAULT_DATASET_TYPES = ['Specimen', 'Library and archives']
 
-class CategoryCommand(CkanCommand):
+class DatasetTypeCommand(CkanCommand):
     """
-    Create / Add / Delete terms from the dataset category vocabulary
+    Create / Add / Delete type from the dataset type vocabulary
 
     Commands:
-        paster category create -c <config>
-        paster category create -c /vagrant/etc/default/development.ini
+        paster dataset-type create-vocabulary -c <config>
+        paster dataset-type create-vocabulary -c /vagrant/etc/default/development.ini
 
-        paster category add-term string -c /vagrant/etc/default/development.ini
+        paster dataset-type create-type string -c /vagrant/etc/default/development.ini
 
     Where:
         <config> = path to your ckan config file
@@ -48,46 +48,46 @@ class CategoryCommand(CkanCommand):
         # Call the command method
         getattr(self, cmd)()
 
-    def create(self):
+    def create_vocabulary(self):
 
         try:
-            data = {'id': DATASET_CATEGORY}
+            data = {'id': DATASET_TYPE_VOCABULARY}
             toolkit.get_action('vocabulary_show')(self.context, data)
             print("Dataset category vocabulary already exists, skipping.")
 
         except toolkit.ObjectNotFound:
 
-            print "Creating vocab '{0}'".format(DATASET_CATEGORY)
-            data = {'name': DATASET_CATEGORY}
+            print "Creating vocab '{0}'".format(DATASET_TYPE_VOCABULARY)
+            data = {'name': DATASET_TYPE_VOCABULARY}
             vocabulary = toolkit.get_action('vocabulary_create')(self.context, data)
 
-            for term in (u'specimen', 'another'):
-                self._add_term(vocabulary['id'], term)
+            for dataset_type in (DEFAULT_DATASET_TYPES):
+                self.add_type(vocabulary['id'], dataset_type)
 
-    def _add_term(self, vocabulary_id, term):
-        print "Adding tag {0} to vocab '{1}'".format(term, DATASET_CATEGORY)
-        data = {'name': term, 'vocabulary_id': vocabulary_id}
+    def add_type(self, vocabulary_id, dataset_type):
+        print "Adding tag {0} to vocab '{1}'".format(dataset_type, DATASET_TYPE_VOCABULARY)
+        data = {'name': dataset_type, 'vocabulary_id': vocabulary_id}
         toolkit.get_action('tag_create')(self.context, data)
 
-    def add_term(self):
+    def create_type(self):
 
         try:
-            term = self.args[1]
+            dataset_type = self.args[1]
         except IndexError:
-            print 'Please specify the term to add'
+            print 'Please specify the type to add'
         else:
-            data = {'id': DATASET_CATEGORY}
+            data = {'id': DATASET_TYPE_VOCABULARY}
             vocabulary = toolkit.get_action('vocabulary_show')(self.context, data)
-            self._add_term(vocabulary['id'], term)
+            self.add_type(vocabulary['id'], dataset_type)
 
-    def delete_term(self):
+    def delete_type(self):
 
         try:
-            term = self.args[1]
+            dataset_type = self.args[1]
         except IndexError:
-            print 'Please specify the term to delete'
+            print 'Please specify the type to delete'
         else:
-            data = {'id': DATASET_CATEGORY}
+            data = {'id': DATASET_TYPE_VOCABULARY}
             vocabulary = toolkit.get_action('vocabulary_show')(self.context, data)
-            data = {'name': term, 'vocabulary_id': vocabulary['id']}
+            data = {'name': dataset_type, 'vocabulary_id': vocabulary['id']}
             toolkit.get_action('tag_delete')(self.context, data)
