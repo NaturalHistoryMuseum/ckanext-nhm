@@ -1,3 +1,4 @@
+import os
 import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
@@ -22,7 +23,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IConfigurer
     def update_config(self, config):
-        p.toolkit.add_template_directory(config, 'theme/templates')
+
+        # Add template directory - we manually add to extra_template_paths
+        # rather than using add_template_directory to ensure it is always used
+        # to override templates
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        template_dir = os.path.join(root_dir, 'ckanext', 'nhm', 'theme', 'templates')
+        config['extra_template_paths'] = ','.join([template_dir, config.get('extra_template_paths', '')])
+
         p.toolkit.add_public_directory(config, 'theme/public')
         p.toolkit.add_resource('theme/public', 'ckanext-nhm')
         p.toolkit.add_resource('theme/fanstatic', 'nhm_fanstatic')
