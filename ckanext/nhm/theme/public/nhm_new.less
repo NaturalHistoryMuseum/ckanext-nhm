@@ -197,52 +197,6 @@ a{
   background: none;
 }
 
-/* Main */
-[role=main], .main{
-  background: transparent;
-  margin: 20px 0 0 0;
-}
-
-.module-content{
-  padding: 0;
-  margin: 0;
-}
-
-.primary .module-content,
-.box .module-content{
-  padding: 20px;
-}
-
-.module-content:first-child{
-  padding-top: 0;
-}
-
-h1.page-heading{
-  position: relative;
-  top: -6px;
-  margin-bottom: 5px;
-}
-
-h1.page-heading+h4{
-  margin-top: 0;
-}
-
-.actions,
-.page-header .actions,
-.module-resource .actions{
-  top: 0;
-  right: 20px;
-}
-
-.page-header .content_action {
-  margin-right: 0;
-}
-
-
-.page-header+div.module-content{
-  padding-top:0;
-}
-
 
 /****************** Page elements ******************/
 
@@ -757,6 +711,14 @@ table.package-list tr th:last-child{
   border-top: none;
 }
 
+tr.empty{
+  font-style: normal;
+}
+
+.table-hide-empty tr.empty{
+  display: none;
+}
+
 
 /* Pagination */
 
@@ -1250,7 +1212,44 @@ i.mineralogy{
   margin: 20px 0;
 }
 
+/* Record */
 
+.module-record{
+  margin-top: 0;
+}
+
+.record-content table{
+  width: 100%;
+  margin: 20px 0;
+}
+
+.record-content table th,
+.record-content table td{
+  text-align: left;
+  padding: 2px 10px;
+}
+
+.record-content table tbody tr th{
+  width: 220px;
+}
+
+.record-content table tbody tr th a{
+  font-weight: normal;
+}
+
+.record-content table thead tr{
+  border-top: 20px solid #fff;
+  border-bottom: 8px solid #fff;
+}
+
+.record-content table thead tr th{
+ background: @tableHeaderColor;
+ padding-top: 10px;
+ padding-bottom: 10px;
+ font-size: 18px;
+ margin: 5px 0 5px 0;
+ font-weight: normal;
+}
 
 /* About page */
 
@@ -1294,16 +1293,90 @@ ul.reordering{
   color:@baseTextColor
 }
 
-// This breaks the dataset page
-.page_primary_action{
-  margin: 15px -7px 20px 0;
-  text-align: right;
+
+
+
+///* Main */
+[role=main], .main{
+  background: transparent;
+//  margin: 20px 0 0 0;
 }
 
-// Fix dataset page
-.actions .page_primary_action{
-  margin: 0
+.module-content{
+  padding: 0;
 }
+
+.primary .module-content{
+  padding: 0 0 0 20px;
+}
+
+.box .module-content{
+  padding: 20px;
+}
+
+.actions,
+.module-resource .actions{
+  right: 0;
+  top: 0;
+}
+
+.page-header .content_action{
+  margin: 0;
+}
+
+//
+//.module-content{
+//  padding: 0;
+//  margin: 0;
+//}
+//
+//.primary .module-content,
+//.box .module-content{
+//  padding: 20px;
+//}
+//
+//.module-content:first-child{
+//  padding-top: 0;
+//}
+//
+//h1.page-heading{
+//  position: relative;
+//  top: -6px;
+//  margin-bottom: 5px;
+//}
+//
+//h1.page-heading+h4{
+//  margin-top: 0;
+//}
+//
+//.actions,
+//.page-header .actions,
+//.module-resource .actions{
+//  top: 0;
+//  right: 20px;
+//}
+//
+//.page-header .content_action {
+//  margin-right: 0;
+//}
+//
+//
+//.page-header+div.module-content{
+//  padding-top:0;
+//}
+//
+//
+//
+//// This breaks the dataset page
+//.page_primary_action{
+//  margin: 15px -7px 20px 0;
+//  text-align: right;
+//}
+//
+//// Fix dataset page
+//.actions .page_primary_action{
+//  margin: 0
+//}
 
 
 
