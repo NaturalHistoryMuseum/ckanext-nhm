@@ -72,17 +72,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return map
 
-
     # IActions
-
     def get_actions(self):
 
         return {
-            'record_get':  action.record_get,
+            'record_get':  action.record_get
         }
 
     # ITemplateHelpers
-
     def get_helpers(self):
 
         h = {}
