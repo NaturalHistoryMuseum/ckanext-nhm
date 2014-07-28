@@ -9,8 +9,20 @@ class AboutController(p.toolkit.BaseController):
     """
     Controller for displaying about pages
     """
-    def data_usage(self):
-        return p.toolkit.render('about/data_usage.html', {'title': 'Guidelines for data use'})
+    def citation(self):
+        return p.toolkit.render('about/citation.html', {'title': 'Citation & attribution'})
+
+    def download(self):
+        return p.toolkit.render('about/download.html', {'title': 'Download & API'})
+
+    def licensing(self):
+        return p.toolkit.render('about/licensing.html', {'title': 'Data licensing'})
 
     def credits(self):
         return p.toolkit.render('about/credits.html', {'title': 'Credits'})
+
+    def privacy(self):
+        return p.toolkit.render('about/privacy.html', {'title': 'Privacy'})
+
+    def terms(self):
+        return p.toolkit.render('about/terms.html', {'title': 'Terms & conditions'})

@@ -236,7 +236,9 @@ def url_for_collection_view(view_type='recline_grid', **kwargs):
             if view['view_type'] == view_type:
                 break
 
-        return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], **kwargs)
+        filters = '|'.join(['%s:%s' % (k, v) for k, v in kwargs.items()])
+
+        return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
 @cache_region('short_term', 'collection_stats')
@@ -307,7 +309,8 @@ def delimit_number(num):
     return "{:,}".format(num)
 
 def api_doc_link():
-    return link_to(_('API Docs'), 'http://docs.nhm.apiary.io/')
+    attr= {'class': 'external', 'target': '_blank'}
+    return link_to(_('API Docs'), 'http://docs.nhm.apiary.io/', **attr)
 
 def get_google_analytics_config():
 

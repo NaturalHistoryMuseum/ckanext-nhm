@@ -1,0 +1,15 @@
+{% extends "page.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.legal:LegalController', action='privacy' %}</li>
+{% endblock %}
+
+{% block pre_primary %}
+
+    <h1 class="page-heading">{{ title }}</h1>
+
+    <p>[PLACEHOLDER - TODO]</p>
+
+{% endblock %}

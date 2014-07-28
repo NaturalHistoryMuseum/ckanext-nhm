@@ -1,0 +1,21 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.about:AboutController', action='licensing' %}</li>
+{% endblock %}
+
+{% block about_content %}
+
+    {% set api_link = h.link_to(_('API'), h.url_for(controller='api', action='get_api', ver=3)) %}
+    {% set api_doc_link = h.api_doc_link() %}
+
+    <h1 class="page-heading">{{ title }}</h1>
+
+    <p>As a public institution we publish all data under a [TBC] license to encourage the data submission and exchange. However, other licenses may be used for some datasets, for example a specific licence will be used when the Museum is not the sole copyright owner.</p>
+    <p>Learn more about the [Museum’s data policies].</p>
+    <p>TODO: More here when Museum data policy is finalised.</p>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.about:AboutController', action='download' %}</li>
+{% endblock %}
+
+{% block about_content %}
+
+    {% set api_link = h.link_to(_('API'), h.url_for(controller='api', action='get_api', ver=3)) %}
+    {% set api_doc_link = h.api_doc_link() %}
+
+    <h1 class="page-heading">{{ title }}</h1>
+
+    <p>Datasets can be downloaded via the download button on the dataset page.</p>
+    <p>The portal will process the download request, package up the dataset, and email a link to download the data package.  If you have not created an account on the Data Portal, you will need to enter your email address</p>
+    <p>The data format of the download package is dependent on the dataset data type. For the collections dataset this will be as a Darwin Core Archive.</p>
+
+    <h4>API</h4>
+    <p>The data portal provides an API to access the data catalogue.</p>
+
+    <p>The base URL for the API is:  {{ api_link }} </p>
+
+    {% if c.userobj %}
+        <p>To access the API, you will need <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" title="{{ _('View profile') }}">your API key</a>.</p>
+    {% else %}
+        <p>To access the API, please <a href="{{ h.url_for(controller='user', action='register') }}" title="{{ _('Sign up') }}">sign up for an account</a>, to obtain an API key.</p>
+    {% endif %}
+
+    <p>The API provides a RESTful interface, returning data in JSON format.</p>
+    <p>Please read the {{ api_doc_link }} for full documentation.</p>
+
+    <h4>API limits</h4>
+    <p>To ensure a good service for all users, API users must ensure that a request is not sent until a response is received for the previous one (i.e. no concurrency), up to a maximum of 5 requests per second. We reserve the right to block users that go outside of these limits.</p>
+    <p>For our full Terms of Service please see here</p>
+
+{% endblock %}

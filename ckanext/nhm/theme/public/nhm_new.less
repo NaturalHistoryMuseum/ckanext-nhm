@@ -600,6 +600,15 @@ a.btn-danger:hover{
   ul.attribution li strong {
     font-weight: normal;
   }
+
+  div.span1.menu-links{
+    width: 100px;
+  }
+
+  div.span1.menu-links li.extra-divide{
+    margin-top: 20px;
+  }
+
 }
 
 // Secondary column
@@ -921,6 +930,25 @@ tr.empty{
   color: @tabTextColor;
 }
 
+a.external:after{
+content: "\f08e";
+    font-family: FontAwesome;
+    font-weight: lighter;
+    font-style: normal;
+    text-decoration: inherit;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-size: 10px;
+    line-height: 10px;
+    position: relative;
+    top: -3px;
+    left: 3px;
+    margin-right: 5px;
+}
+
+a.external:after:hover{
+  text-decoration: none;
+}
 
 /****************** Pages ******************/
 
@@ -935,6 +963,10 @@ h2.welcome{
   margin: 30px 0 0 0;
   line-height: 1.3;
   text-shadow: 1px 1px #343434;
+}
+
+.homepage .flash-messages div:first-child{
+  margin-top: 40px;
 }
 
 /* Stats */
@@ -1294,6 +1326,18 @@ p.about-doi{
   display: inline-block;
 }
 
+#datacite{
+  margin: 50px 20px 0 0;
+}
+
+ol#credits{
+  list-style: none;
+  margin-left: 20px;
+}
+
+ol#credits li{
+  margin: 5px 0;
+}
 
 
 /* Admin */

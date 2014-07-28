@@ -18,33 +18,42 @@
         </div>
     </div>
 
-    <div class="span3">
+    <div class="span3 no-margin">
       <ul class="nav unstyled">
         {% block footer_links %}
           <li><a href="{{ h.url_for('home') }}">Home</a></li>
             <li><a href="{{ h.url_for('search') }}">Data</a></li>
             <li><a href="{{ h.url_for('about') }}">About</a>
                 <ul>
-                    <li><a href="{{ h.url_for('about_data_usage') }}">Data usage</a></li>
+                    <li><a href="{{ h.url_for('about_citation') }}">Citation & attribution</a></li>
+                    <li><a href="{{ h.url_for('about_download') }}">Download & API</a></li>
+                    <li><a href="{{ h.url_for('about_licensing') }}">Data licensing</a></li>
                     <li><a href="{{ h.url_for('stats_datasets') }}">Site statistics</a></li>
-                    <li><a href="">Privacy statement</a></li>
-                    <li><a href="">Legal</a></li>
                     <li><a href="{{ h.url_for('about_credits') }}">Credits</a></li>
-                    <li>{{ h.api_doc_link() }}</li>
                 </ul>
             </li>
+
         {% endblock %}
       </ul>
     </div>
 
-    <div class="span1 no-margin">
+    <div class="span1 no-margin menu-links">
       <ul class="nav unstyled">
         {% block footer_menu_links %}
-            <li><a href="{{ h.url_for('login') }}">Login</a></li>
-            <li><a href="{{ h.url_for('register') }}">Register</a></li>
+            {% if c.userobj %}
+                <li><a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" title="My account">My account</a></li>
+                <li><a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">Log out</a></li>
+            {% else %}
+                <li><a href="{{ h.url_for('login') }}">Login</a></li>
+                <li><a href="{{ h.url_for('register') }}">Register</a></li>
+            {% endif %}
             <li><a href="{{ h.url_for('contact_form') }}">Contact</a></li>
+            <li class="extra-divide">{{ h.api_doc_link() }}</li>
+            <li class="extra-divide"><a href="{{ h.url_for('legal_privacy') }}">Privacy</a></li>
+            <li><a href="{{ h.url_for('legal_terms') }}">T&C</a></li>
         {% endblock %}
       </ul>
+
     </div>
   </div>
 </div>

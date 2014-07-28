@@ -59,8 +59,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     action='view')
 
         # About pages
-        map.connect('about_data_usage', '/about/data-usage', controller='ckanext.nhm.controllers.about:AboutController', action='data_usage')
+        map.connect('about_citation', '/about/citation', controller='ckanext.nhm.controllers.about:AboutController', action='citation')
+        map.connect('about_download', '/about/download', controller='ckanext.nhm.controllers.about:AboutController', action='download')
+        map.connect('about_licensing', '/about/licensing', controller='ckanext.nhm.controllers.about:AboutController', action='licensing')
         map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.about:AboutController', action='credits')
+
+        # Legal pages
+        map.connect('legal_privacy', '/privacy', controller='ckanext.nhm.controllers.legal:LegalController', action='privacy')
+        map.connect('legal_terms', '/terms-conditions', controller='ckanext.nhm.controllers.legal:LegalController', action='terms')
 
         # About stats pages
         map.connect('stats_datasets', '/about/statistics/datasets', controller='ckanext.nhm.controllers.stats:StatsController', action='datasets', ckan_icon='bar-chart')
