@@ -13,16 +13,20 @@
 
         {% for group, fields in c.field_data.items() %}
 
-            <tr><th colspan="3">{{ group }}</th></tr>
+            <thead>
+                <tr><th colspan="3">{{ group }}</th></tr>
+            </thead>
 
-            {% for label, value in fields.items() %}
+            <tbody>
+                {% for label, value in fields.items() %}
 
-                <tr>
-                    <td><strong>{{ label }}:</strong></td>
-                    <td colspan="2">{{ value }}</td>
-                </tr>
+                    <tr>
+                        <td><strong>{{ label }}:</strong></td>
+                        <td colspan="2">{{ value }}</td>
+                    </tr>
 
-            {% endfor %}
+                {% endfor %}
+            <tbody>
 
         {% endfor %}
 
@@ -46,3 +50,20 @@
     </table>
 
 {% endblock %}
+
+{% block record_additional_information_rows %}
+
+   <tr>
+    <th scope="row">{{ _('Created') }}</th>
+    <td>{{ h.render_datetime(rec.created) }}</td>
+  </tr>
+   <tr>
+    <th scope="row">{{ _('Last updated') }}</th>
+    <td>{{ h.render_datetime(rec.modified) }}</td>
+  </tr>
+
+  {{ super() }}
+
+{% endblock %}
+
+
