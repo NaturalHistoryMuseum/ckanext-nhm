@@ -4,11 +4,11 @@
 
 {% macro field_row(label, value, display_none = False) -%}
 
-    {% if value or display_none: %}
+    {% if value or display_none %}
         <tr>
-        <td><strong>{{label}}:</strong></td>
+        <th>{{label}}:</th>
         <td>
-        {% if value: %}
+        {% if value %}
             {{value}}
         {% endif %}
         </td>
