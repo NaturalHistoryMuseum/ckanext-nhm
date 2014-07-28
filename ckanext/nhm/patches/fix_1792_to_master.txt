@@ -1,0 +1,32 @@
+diff --git a/ckan/public/base/javascript/modules/resource-view-filters-form.js b/ckan/public/base/javascript/modules/resource-view-filters-form.js
+index d29b71d..20b5de4 100644
+--- a/ckan/public/base/javascript/modules/resource-view-filters-form.js
++++ b/ckan/public/base/javascript/modules/resource-view-filters-form.js
+@@ -29,8 +29,9 @@ ckan.module('resource-view-filters-form', function (jQuery) {
+             };
+ 
+             if (term !== '') {
+-              query.q = {};
+-              query.q[filterName] = term + ':*';
++              var q = {};
++              q[filterName] = term + ':*';
++              query.q = JSON.stringify(q);
+             }
+ 
+             return query;
+diff --git a/ckan/public/base/javascript/modules/resource-view-filters.js b/ckan/public/base/javascript/modules/resource-view-filters.js
+index c07c26b..813b14f 100644
+--- a/ckan/public/base/javascript/modules/resource-view-filters.js
++++ b/ckan/public/base/javascript/modules/resource-view-filters.js
+@@ -112,8 +112,9 @@ this.ckan.module('resource-view-filters', function (jQuery, _) {
+             };
+ 
+             if (term !== '') {
+-              query.q = {};
+-              query.q[filterName] = term + ':*';
++              var q = {};
++              q[filterName] = "'" + term.replace("'", "") + "':*";
++              query.q = JSON.stringify(q);
+             }
+ 
+             return query;

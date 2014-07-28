@@ -1,5 +1,5 @@
---- ckanext/reclinepreview/theme/public/vendor/recline/recline.js
-+++ ckanext/reclinepreview/theme/public/vendor/recline/recline.js
+--- ckanext/reclineview/theme/public/vendor/recline/recline.js
++++ ckanext/reclineview/theme/public/vendor/recline/recline.js
 @@ -3447,6 +3448,33 @@
      _.bindAll(this, 'render', 'onRecordChanged');
      this.listenTo(this.model.records, 'add remove reset', this.render);
@@ -87,8 +87,8 @@
  })(jQuery, recline.View);
 
 
---- ckanext/reclinepreview/theme/templates/recline_view.html
-+++ ckanext/reclinepreview/theme/templates/recline_view.html
+--- ckanext/reclineview/theme/templates/recline_view.html
++++ ckanext/reclineview/theme/templates/recline_view.html
 @@ -6,6 +6,7 @@
         data-module-site_url="{{ h.dump_json(h.url('/', locale='default', qualified=true)) }}"
         data-module-resource = "{{ h.dump_json(resource_json) }}";
