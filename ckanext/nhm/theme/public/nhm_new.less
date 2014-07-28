@@ -380,6 +380,7 @@ a{
 
 .form-actions{
   margin: 10px 0;
+  padding: 20px 0;
 }
 
 .form-actions .action-info{
@@ -669,7 +670,7 @@ a.btn-danger:hover{
   }
 
   table {
-    margin: 5px 0 10px 0;
+    margin: 0 0 10px 0;
   }
 
   table th {
@@ -1194,6 +1195,10 @@ i.mineralogy{
       font-weight: normal;
     }
 
+    li.resource-item .btn-group{
+      right: 0;
+    }
+
   }
 }
 
@@ -1252,11 +1257,11 @@ i.mineralogy{
 .record-content table th,
 .record-content table td{
   text-align: left;
-  padding: 2px 10px;
+  padding: 2px 0;
 }
 
 .record-content table tbody tr th{
-  width: 220px;
+  width: 240px;
 }
 
 .record-content table tbody tr th a{
@@ -1293,9 +1298,24 @@ p.about-doi{
 
 /* Admin */
 
-ul.reordering{
+ul.view-list.reordering{
   margin-left: 25px;
 }
+
+ul.view-list.reordering .resource-view-item .handle{
+  height: 20px;
+  top: 0;
+  margin-top: -1px;
+  left: -30px;
+  width: 10px;
+  background: #f6f6f6;
+}
+
+ul.view-list.reordering .resource-view-item .handle i{
+  position: relative;
+  top: 2px;
+}
+
 
 /* Create dataset */
 
@@ -1317,4 +1337,9 @@ ul.reordering{
 #followee-filter ul li.active a{
   background: @toolbarBackgroundColor;
   color:@baseTextColor
+}
+/* Contact form */
+
+.control-group .controls p{
+  margin: 4px 0 0 0;
 }
