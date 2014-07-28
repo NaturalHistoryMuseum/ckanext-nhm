@@ -6,7 +6,7 @@
 
 {% block metadata_fields %}
 
-    {% set datastore_fields = h.form_select_datastore_field_options(data.id) %}
+    {% set datastore_fields = h.form_select_datastore_field_options(data.id, allow_empty=True) %}
 
     {% if datastore_fields %}
         {% set field_attrs = {} %}
