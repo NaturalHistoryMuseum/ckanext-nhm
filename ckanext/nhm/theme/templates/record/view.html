@@ -1,131 +1,162 @@
-{% from 'macros/record.html' import field_row %}
+{% from 'record/macros/fields.html' import field_row %}
+
 {% extends "package/base.html" %}
 
-{% set rec = c.record_dict  %}
+{% set rec = c.record_dict %}
 {% set res = c.resource %}
 {% set pkg = c.pkg_dict or pkg_dict %}
 {% set record_display_name = h.record_display_name(res, rec) %}
 
 {% block head_extras -%}
-  {{ super() }}
-  <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_display_name }} - {{ g.site_title }}">
+    {{ super() }}
+    <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_display_name }} - {{ g.site_title }}">
 {% endblock -%}
 
-{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{record_display_name}} {% endblock %}
+{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ record_display_name }} {% endblock %}
 
 {% block breadcrumb_content_selected %}{% endblock %}
 
 {% block breadcrumb_content %}
-  {{ super() }}
-  <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
-  <li class="active"><a href="">{{ record_display_name|truncate(30) }}</a></li>
+    {{ super() }}
+    <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
+    <li class="active"><a href="">{{ record_display_name|truncate(30) }}</a></li>
 {% endblock %}
 
-{% block primary_content_inner %}
-
-    <section class="module module-record">
-        <div class="module-content">
-
-            {% block heading %}
-                <h1 class="page-heading">{{ record_display_name }}</h1>
-            {% endblock %}
-
-            <div class="actions">
-                <ul>
-                    <li><a class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}"><i class="icon-circle-arrow-left"></i> {{ _('Back to view') }}</a></li>
-                    <li><a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"><i class="icon-download"></i> {{ _('Download') }}</a></li>
-                    <li>{% include "contact/snippets/modal_link.html" %}</li>
-                </ul>
-            </div>
-        </div>
-
-    </section>
+{% block pre_primary %}
 
     {% block record %}
-        {% block record_data  %}
-            <div class="record-content">
-                <table>
-
-                    {% for field_name, value in c.field_data.items() %}
-                        {% if value %}
-                            {{ field_row(field_name, value) }}
-                        {% endif %}
-                    {% endfor %}
-
-                </table>
-            </div>
-        {% endblock %}
-
-        {% block record_images  %}
-            {% if c.images %}
-                <h3>Images</h3>
-                {% snippet 'gallery/snippets/gallery.html', images=c.images %}
-            {% endif %}
-        {% endblock %}
-
-        {% block record_map  %}
-
-            {% if c.record_map %}
-                {% snippet "snippets/record_map.html", extent=c.record_map %}
-            {% endif %}
-
-        {% endblock %}
-
-    {% endblock %}
-
-    {% block record_metadata %}
-
-        <section class="module">
+        <section class="module module-record">
             <div class="module-content">
-              <h2>{{ _('Additional Information') }}</h2>
-              <table class="table table-striped table-bordered table-condensed" data-module="table-toggle-more">
-                <thead>
-                  <tr>
-                    <th scope="col">{{ _('Field') }}</th>
-                    <th scope="col">{{ _('Value') }}</th>
-                  </tr>
-                </thead>
-                <tbody>
 
-                  {% block record_metadata_rows %}
-                       <tr>
-                        <th scope="row">{{ _('Format') }}</th>
-                        <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">{{ _('License') }}</th>
-                        <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
-                      </tr>
-                      <tr class="toggle-more">
-                        <th scope="row">{{ _('Dataset') }}</th>
-                        <td>{{ pkg.name }}</td>
-                      </tr>
-                      <tr class="toggle-more">
-                        <th scope="row">{{ _('Dataset ID') }}</th>
-                        <td>{{ pkg.id }}</td>
-                      </tr>
-                      <tr class="toggle-more">
-                        <th scope="row">{{ _('Resource') }}</th>
-                        <td>{{ res.name }}</td>
-                      </tr>
-                      <tr class="toggle-more">
-                        <th scope="row">{{ _('Resource ID') }}</th>
-                        <td>{{ res.id }}</td>
-                      </tr>
-                  {% endblock %}
 
-                </tbody>
-              </table>
+                {% block page_header %}
+                    <header class="page-header">
+                        <div class="actions">
+                            <ul>
+                                <li>
+                                    <a class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}"><i
+                                        class="icon-circle-arrow-left"></i> {{ _('Back to view') }}</a>
+                                </li>
+                                <li>
+
+                                    {# Taken from ckanpackager/snippets/package_resource.html, but altered anon + auth messages #}
+
+                                    {% resource 'ckanext-ckanpackager/main' %}
+
+                                    <a data-module="ckanpackager-download-link" data-module-anon_message="Please enter your email address below, and the record will be packaged and sent to you." data-module-auth_message="The record will be packaged and sent to the email address registered with your account." class="packager-link btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"
+                                       href="{{ h.url_for_package_resource(pkg.id, res.id) }}">
+                                      <i class="icon-download"></i> Download
+                                    </a>
+
+                                </li>
+                                <li>{% include "contact/snippets/modal_link.html" %}</li>
+                            </ul>
+                        </div>
+
+                        {% if self.content_primary_nav() | trim %}
+                            <ul class="nav nav-tabs">
+                                {% block content_primary_nav %}{% endblock %}
+                            </ul>
+                        {% endif %}
+
+                    </header>
+                {% endblock %}
+
+
             </div>
-          </section>
 
+            <div class="module-content">
+
+                <div class="record-content">
+
+                    {% block heading %}
+                        <h1 class="page-heading">{{ record_display_name }}</h1>
+                    {% endblock %}
+
+
+
+                    {% block record_data %}
+
+                        <table>
+
+                            {% for field_name, value in c.field_data.items() %}
+                                {% if value %}
+                                    {{ field_row(field_name, value) }}
+                                {% endif %}
+                            {% endfor %}
+
+                        </table>
+                    {% endblock %}
+                </div>
+
+                {% block record_images %}
+                    {% if c.images %}
+                        <h3>Images</h3>
+                        {% snippet 'gallery/snippets/gallery.html', images=c.images %}
+                    {% endif %}
+                {% endblock %}
+
+            </div>
+        </section>
+    {% endblock %}
+{% endblock %}
+
+{% block primary_content %}
+    {% block record_additional_information %}
+        {% if res %}
+            <section class="additional-info">
+                {% block record_additional_information_inner %}
+                    <div class="module-content">
+                        <h3>{{ _('Additional Information') }}</h3>
+                        <table class="table table-striped table-bordered table-condensed" data-module="table-toggle-more">
+                            <thead>
+                            <tr>
+                                <th scope="col">{{ _('Field') }}</th>
+                                <th scope="col">{{ _('Value') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {% block record_additional_information_rows %}
+                                <tr>
+                                    <th scope="row">{{ _('Format') }}</th>
+                                    <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">{{ _('License') }}</th>
+                                    <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
+                                </tr>
+                                <tr class="toggle-more">
+                                    <th scope="row">{{ _('Dataset') }}</th>
+                                    <td>{{ pkg.name }}</td>
+                                </tr>
+                                <tr class="toggle-more">
+                                    <th scope="row">{{ _('Dataset ID') }}</th>
+                                    <td>{{ pkg.id }}</td>
+                                </tr>
+                                <tr class="toggle-more">
+                                    <th scope="row">{{ _('Resource') }}</th>
+                                    <td>{{ res.name }}</td>
+                                </tr>
+                                <tr class="toggle-more">
+                                    <th scope="row">{{ _('Resource ID') }}</th>
+                                    <td>{{ res.id }}</td>
+                                </tr>
+                            {% endblock %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                {% endblock %}
+            </section>
+        {% endif %}
     {% endblock %}
 {% endblock %}
 
 {% block secondary_content %}
 
-  {% block resource_license %}
-    {% snippet "snippets/social.html" %}
-  {% endblock %}
+    {% block resource_license %}
+        {% snippet "snippets/social.html" %}
+    {% endblock %}
 
 {% endblock %}
