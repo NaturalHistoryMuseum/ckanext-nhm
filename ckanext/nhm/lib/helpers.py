@@ -9,7 +9,7 @@ from ckanext.issues.model import Issue, ISSUE_STATUS
 from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 from pylons import config
-from ckan.common import c, _
+from ckan.common import c, _, request
 from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects
 from collections import OrderedDict
 from beaker.cache import cache_region
@@ -152,7 +152,7 @@ def form_select_datastore_field_options(resource_id=None, allow_empty=False):
     # And on add there will be no resource_id
     if resource_id:
         datastore_fields = [f['id'] for f in get_datastore_fields(resource_id)]
-        return list_to_form_options(datastore_fields)
+        return list_to_form_options(datastore_fields, allow_empty)
 
     return []
 
@@ -161,7 +161,7 @@ def form_select_update_frequency_options():
     return list_to_form_options(UPDATE_FREQUENCIES)
 
 
-def list_to_form_options(values, allow_empty=False, allow_empty_text='- None -'):
+def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
     """
     Format a list of values into a list of dict suitable for use in forms: [{value: x, name: y}]
     @param values: list or list of tuples [(value, name)]
@@ -354,3 +354,33 @@ def filter_resource_items(key):
     return key.strip() not in blacklist
 
 
+def get_map_styles():
+    """
+    New map config overriding the marker point img
+    @return:
+    """
+    return {
+        'point': {
+            'iconUrl': '/images/leaflet/marker.png',
+            'iconSize': [20, 34],
+            'iconAnchor': [12, 30]
+        }
+    }
+
+
+def get_query_params():
+    """
+    Helper function to build a dict of query params
+    To be used in urls for persistent filters
+    @return: dict
+    """
+    params = dict()
+
+    for key in ['q', 'filters']:
+        value = request.params.get(key)
+        if value:
+            params[key] = value
+
+    print params
+
+    return params
