@@ -25,7 +25,7 @@ index c07c26b..813b14f 100644
 -              query.q = {};
 -              query.q[filterName] = term + ':*';
 +              var q = {};
-+              q[filterName] = "'" + term.replace("'", "") + "':*";
++              q[filterName] = term + ':*';
 +              query.q = JSON.stringify(q);
              }
  
