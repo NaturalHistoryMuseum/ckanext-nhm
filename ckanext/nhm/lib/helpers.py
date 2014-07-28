@@ -384,6 +384,15 @@ def get_query_params():
         if value:
             params[key] = value
 
-    print params
-
     return params
+
+def absolute_url_for(*args, **kw):
+    """
+    Returns URL with site url
+    @param args:
+    @param kw:
+    @return:
+    """
+
+    url = config.get('ckan.site_url', '') + url_for(*args, **kw)
+    return url
