@@ -1,45 +1,44 @@
 {% extends "record/specimen.html" %}
 
-{% block record %}
+{% block record_data %}
 
-    <table>
+    <table class="toggle-empty-rows" data-module="toggle-empty-rows">
 
     {% for group, terms in c.dwc.get_groups() %}
 
-        <tr><th colspan="2">
-            {{ group }}
-        </th></tr>
-
-        {% for term_name in terms %}
-
-            {% set term = c.dwc.get_term(term_name) %}
-
+        <thead>
             <tr>
-                <td width="250">
-                    <a href="{{ term['uri'] }}" title="{{ term['uri'] }} target="_blank">{{term_name}}</a>
-                </td>
-
-                <td>{{ term['value'] if term['value'] != None else '' }}</td>
+                <th colspan="2">{{ group }}</th>
             </tr>
+        </thead>
 
-        {% endfor %}
+        <tbody>
+            {% for term_name in terms %}
+
+                {% set term = c.dwc.get_term(term_name) %}
+                {% if term['value'] == None %}
+                    {% set cls = 'empty' %}
+                    {% set value = '' %}
+                {% else %}
+                    {% set cls = 'not-empty' %}
+                    {% set value = term['value'] %}
+                {% endif %}
+
+                <tr class="{{ cls }}">
+                    <th>
+                        <a href="{{ term['uri'] }}" title="{{ term['uri'] }} target="_blank">{{term_name}}</a>
+                    </th>
+
+                    <td>{{ value }}</td>
+                </tr>
+
+            {% endfor %}
+        </tbody>
 
     {% endfor %}
 
     </table>
 
-{% endblock %}
-
-
-{% block record_metadata_rows %}
-   <tr>
-    <th scope="row">{{ _('Created') }}</th>
-    <td>{{ h.render_datetime(rec.created) }}</td>
-  </tr>
-   <tr>
-    <th scope="row">{{ _('Last updated') }}</th>
-    <td>{{ h.render_datetime(rec.modified) }}</td>
-  </tr>
-   {{ super() }}
+    {% resource 'ckanext-nhm/toggle-empty-rows' %}
 
 {% endblock %}
