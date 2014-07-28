@@ -45,13 +45,16 @@ class RecordController(base.BaseController):
             c.pkg = self.context['package']
             c.pkg_dict = c.package
             c.record_dict = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': record_id})
+
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         image_field = c.resource.get('_image_field', None)
-        if image_field:
+
+        # Sanity check: image field hasn't been set to _id
+        if image_field and image_field != '_id':
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
                 images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
