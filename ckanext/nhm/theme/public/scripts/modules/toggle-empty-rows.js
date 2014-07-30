@@ -2,6 +2,7 @@
  * When a table has more things to it that need to be hidden and then shown more
  */
 this.ckan.module('toggle-empty-rows', function($, _) {
+  var self;
   return {
 
     /* Initialises the module setting up elements and event listeners.
@@ -9,12 +10,13 @@ this.ckan.module('toggle-empty-rows', function($, _) {
      * Returns nothing.
      */
     initialize: function () {
-      $('<a href="#" class="toggle-empty-rows">Toggle empty rows</a>').on('click', {tbl: this.el}, this._toggleDisplay).insertBefore(this.el)
+      self = this;
+      $('<a href="#" class="toggle-empty-rows">Toggle empty rows</a>').on('click', self._toggleDisplay).insertBefore(self.el)
     },
 
     _toggleDisplay: function(e) {
       e.preventDefault();
-        e.data.tbl.toggleClass('table-hide-empty');
+      self.el.toggleClass('table-hide-empty');
     }
 
   }

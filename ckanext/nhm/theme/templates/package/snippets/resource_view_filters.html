@@ -1,0 +1,47 @@
+
+{% set filter_pills = h.get_resource_filter_pills() %}
+{% set query_params = h.get_query_params() %}
+
+<div class="row resource-view-filter-form">
+    <div class="span9">
+        {% snippet 'package/snippets/resource_view_full_text_search.html', resource_view=resource_view, resource=resource, package=package %}
+    </div>
+
+    <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">
+        <div class="resource-view-filters-wrapper">
+            <div
+              class="resource-view-filters"
+              data-module="resource-view-filters"
+              data-module-resource-id="{{ resource['id'] }}"
+              data-module-fields="{{ h.dump_json(h.resource_view_get_fields(resource)) }}"
+              >
+            </div>
+        </div>
+    </div>
+
+    {% resource 'ckanext-nhm/resource-view-filters-ui' %}
+
+</div>
+
+{% if filter_pills %}
+
+    <div class="row resource-view-filter-pills">
+        <div class="span12">
+            <p class="filtered-list">
+                {% for field, pills in filter_pills.items() %}
+                    <span class="facet">{{ field }}:</span>
+                    {% for value, filter in pills.items() %}
+                        <span class="filtered pill">{{ value }}
+                            <a href="{{ h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], filters=filter) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
+                        </span>
+                    {% endfor %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+
+{% endif %}
+
+
+
+

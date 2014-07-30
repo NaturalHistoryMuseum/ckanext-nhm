@@ -1,7 +1,7 @@
 <div id="view-{{ resource_view['id'] }}" class="resource-view" data-id="{{ resource_view['id'] }}" data-title="{{ resource_view['title'] }}" data-description="{{ resource_view['descripion'] }}">
   <div class="m-top ckanext-datapreview">
     {% if not to_preview and h.resource_view_is_filterable(resource_view) %}
-      {% snippet 'package/snippets/resource_view_filters.html', resource=resource %}
+      {% snippet 'package/snippets/resource_view_filters.html', resource_view=resource_view, resource=resource, package=package %}
     {% endif %}
     {% if not h.resource_view_is_iframed(resource_view) %}
       {{ h.rendered_resource_view(resource_view, resource, package) }}

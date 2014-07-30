@@ -284,13 +284,19 @@ a{
     background: rgba(0, 0, 0, 0.2) !important;
   }
 
-
-
 }
 
 /* Extended masthead */
 .extended-masthead{
   .masthead-color-scheme;
+}
+
+.masthead,
+.extended-masthead{
+//  background-image: url("@{images}/header-bg.jpg");
+//  background-repeat: no-repeat;
+//  background-position: top center;
+//  background-size: 100%;
 }
 
 .extended-masthead .masthead{
@@ -1275,6 +1281,13 @@ i.mineralogy{
   margin: 20px 0;
 }
 
+/* Gallery */
+
+#gallery{
+  margin-top: 20px;
+}
+
+
 /* Record */
 
 .module-record{
@@ -1387,3 +1400,193 @@ ul.view-list.reordering .resource-view-item .handle i{
 .control-group .controls p{
   margin: 4px 0 0 0;
 }
+
+.view-list.stacked {
+  background: url('@{images}/light-grey-1x20.gif') repeat-x 0 40px;
+}
+
+.resource-view,
+.ckanext-datapreview{
+margin-top: 0;
+}
+
+.ckanext-datapreview .resource-view-filter-form{
+  background: #F2F2F2;
+  margin-left: 0;
+}
+
+.ckanext-datapreview .row form{
+  padding-top: 10px;
+  padding-bottom: 0;
+}
+
+.ckanext-datapreview .row input{
+  background: #fff;
+}
+
+.recline-query-editor{
+  display: none!important;
+}
+
+a.toggle-view-filters{
+  display: block;
+  text-align: center;
+  margin:10px 20px 0 20px;
+  line-height: 40px;
+}
+
+a.toggle-view-filters:hover{
+  background: #EBEBEB;
+  text-decoration: none;
+}
+
+.resource-view-filters-wrapper{
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  width: 420px;
+  background: #EBEBEB;
+  padding: 20px;
+  display: none;
+}
+
+// Active
+.display-filter .resource-view-filters-wrapper{
+  display: block;
+}
+
+.display-filter a.toggle-view-filters{
+  background: #EBEBEB;
+  border-bottom: 20px solid #EBEBEB;
+}
+
+.resource-view-filters > a{
+  text-align: center;
+  display: block;
+}
+
+.resource-view-filters > a:after,
+a.toggle-view-filters:after{
+  font-family: FontAwesome;
+  font-weight: lighter;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 14px;
+  position: relative;
+  top: 0px;
+  left: 5px;
+  margin-right: 5px;
+}
+
+.resource-view-filters > a:after{
+  content: "\f055";
+}
+
+a.toggle-view-filters:after{
+  content: "\f0b0";
+}
+
+.resource-view-filters > a:hover{
+  text-decoration: none;
+}
+
+.resource-view-filters .resource-view-filter{
+  margin: 8px 0 10px 0;
+}
+
+.resource-view-filters .resource-view-filter label{
+  float: left;
+}
+
+.resource-view-filter-values{
+  margin-left: 180px;
+}
+
+.resource-view-filter-values .select2-container{
+  width: 220px!important;
+  padding-left: 0!important;
+  margin-left: 20px;
+  position: relative;
+}
+
+.resource-view-filter-values .select2-container:not(:first-child)::before{
+  content: 'or';
+  float: left;
+  color: #525252;
+  display: inline-block;
+  width: 20px;
+  margin-top: 4px;
+  position: absolute;
+  top: 0;
+  left: -20px;
+}
+
+.resource-view-filter-values .select2-container .select2-choice {
+  padding-left: 20px;
+}
+
+.resource-view-filter-values .select2-container .select2-choice .select2-search-choice-close{
+  top: 7px;
+}
+
+div.resource-view-filter-pills{
+  padding-bottom: 10px;
+}
+
+.search-form .search-input input{
+  padding: 0 5px;
+  line-height: 40px;
+}
+
+.search-form .search-input button {
+  width: 30px !important;
+  height: 30px !important;
+  margin-top: -15px !important;
+  background: #228900;
+  border-radius: 20px;
+  right: 5px;
+  padding: 0;
+
+}
+
+.search-form .search-input button i {
+  color: #fff;
+  transition: none;
+  font-size: 16px;
+  line-height: 16px;
+}
+
+.search-form .search-input button i:hover{
+  color: #fff;
+}
+
+div.ckanpackager-form,
+div.ckanpackager-tab {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+div.ckanpackager-form{
+  padding: 10px;
+  background: #EBEBEB;
+  position: relative;
+  left: 10px;
+  border-color: #fff;
+  border-width: 1px;
+  border-style: none none solid solid;
+}
+
+div.ckanpackager-form div{
+  text-align: center;
+  padding: 10px 0;
+}
+
+.search-form .search-input.search-giant input {
+  line-height: inherit;
+}
+
+
