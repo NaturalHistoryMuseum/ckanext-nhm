@@ -284,6 +284,11 @@ a{
     background: rgba(0, 0, 0, 0.2) !important;
   }
 
+  // Fix for IE9, which gets the focus state stuck
+    .nav-pills a:focus{
+      background:none!important;
+    }
+
 }
 
 /* Extended masthead */
@@ -293,11 +298,13 @@ a{
 
 .masthead,
 .extended-masthead{
-//  background-image: url("@{images}/header-bg.jpg");
-//  background-repeat: no-repeat;
-//  background-position: top center;
-//  background-size: 100%;
+  background-image: url("@{images}/header-bg.jpg");
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100%;
 }
+
+
 
 .extended-masthead .masthead{
   background: none;
@@ -1065,16 +1072,18 @@ h2.welcome{
 .collection-stats ul li a{
   text-decoration: none;
   position: relative;
+  top: 0;
+  left: 0;
 }
 
 .collection-stats ul li a i{
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 30px;
   height: 30px;
   background-repeat: no-repeat;
   background-position: center center;
+  float: left;
+  position: relative;
+  top: -2px;
 }
 
 .specimen-collection a{
@@ -1410,7 +1419,8 @@ ul.view-list.reordering .resource-view-item .handle i{
 margin-top: 0;
 }
 
-.ckanext-datapreview .resource-view-filter-form{
+.ckanext-datapreview .resource-view-filter-form,
+.ckanext-datapreview .resource-view-filter-pills{
   background: #F2F2F2;
   margin-left: 0;
 }
@@ -1536,9 +1546,14 @@ div.resource-view-filter-pills{
   padding-bottom: 10px;
 }
 
+.search-form .search-input.search-giant input{
+  height: auto;
+}
+
 .search-form .search-input input{
   padding: 0 5px;
   line-height: 40px;
+  height: 40px;
 }
 
 .search-form .search-input button {

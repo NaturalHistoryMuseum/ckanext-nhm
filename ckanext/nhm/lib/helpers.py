@@ -434,10 +434,18 @@ def get_resource_filter_pills():
     pills = {}
 
     for field, values in filter_dict.items():
-        pills[field] = {}
         for value in values:
             filters = get_pill_filters(field, value)
-            pills[field][value] = filters
+
+            #  If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
+            # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
+            if field == '_tmgeom':
+                pills['geometry'] = {'Polygon': filters}
+            else:
+                try:
+                    pills[field][value] = filters
+                except KeyError:
+                    pills[field] = {value: filters}
 
     return pills
 
