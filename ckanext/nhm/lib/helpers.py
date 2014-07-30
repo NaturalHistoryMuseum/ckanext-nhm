@@ -10,7 +10,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 from pylons import config
 from ckan.common import c, _, request
-from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects
+from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_allowed_view_types as ckan_get_allowed_view_types
 from collections import OrderedDict
 from beaker.cache import cache_region
 
@@ -27,7 +27,6 @@ _check_access = logic.check_access
 
 # Make enumerate available to templates
 enumerate = enumerate
-
 
 def get_site_statistics():
     stats = dict()
@@ -85,7 +84,6 @@ def _get_action(action, params):
     @param params:
     @return:
     """
-
     context = {'ignore_auth': True, 'for_view': True}
 
     try:
@@ -396,3 +394,79 @@ def absolute_url_for(*args, **kw):
 
     url = config.get('ckan.site_url', '') + url_for(*args, **kw)
     return url
+
+
+def get_resource_filter_pills():
+
+    filter_dict = {}
+
+    try:
+        filter_params = request.params.get('filters').split('|')
+    except AttributeError:
+        return {}
+
+    filter_params = filter(None, filter_params)
+
+    for filter_param in filter_params:
+        field, value = filter_param.split(':')
+
+        try:
+            filter_dict[field].append(value)
+        except KeyError:
+            filter_dict[field] = [value]
+
+    def get_pill_filters(exclude_field, exclude_value):
+        """
+        Build filter, using filters which aren't exclude_field=exclude_value
+        @param exclude_field:
+        @param exclude_value:
+        @return:
+        """
+
+        filters = []
+        for field, values in filter_dict.items():
+            for value in values:
+                if not (field == exclude_field and value == exclude_value):
+                    filters.append('%s:%s' % (field, value))
+
+        return '|'.join(filters)
+
+    pills = {}
+
+    for field, values in filter_dict.items():
+        pills[field] = {}
+        for value in values:
+            filters = get_pill_filters(field, value)
+            pills[field][value] = filters
+
+    return pills
+
+
+
+def get_allowed_view_types(resource, package):
+    """
+    Overwrite ckan.lib.helpers.get_allowed_view_types
+    We want to edit some of the options - remove Image and change Tiled Map to Map
+    @param resource:
+    @param package:
+    @return:
+    """
+
+    view_types = ckan_get_allowed_view_types(resource, package)
+    blacklisted_types = ['image']
+
+    filtered_types = []
+
+    for view_type in view_types:
+        # Exclude blacklisted types (at the moment just Image)
+        if view_type[0] in blacklisted_types:
+            continue
+
+        # Rename Tiled map => map
+        if view_type[1] == 'Tiled map':
+            view_type = (view_type[0], 'Map', view_type[2])
+
+        filtered_types.append(view_type)
+
+    return filtered_types
+
