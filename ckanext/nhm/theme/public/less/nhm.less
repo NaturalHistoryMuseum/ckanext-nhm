@@ -777,17 +777,19 @@ tr.empty{
     border: none;
   }
 
-  li a {
+  ul li a {
     border-radius: 16px !important;
     -webkit-border-radius: 16px !important;
-    padding: 4px 0!important;
+    padding: 0 3px!important;
     margin: 0 2px!important;
-    min-width: 23px;
+    min-width: 17px;
+    line-height: 22px;
+    height: 23px;
+    display: inline-block;
   }
 
-  ul li,
-  ul li a {
-    line-height: 14px;
+  ul li {
+    height: 14px;
   }
 
   ul > li > a:hover,
@@ -798,11 +800,7 @@ tr.empty{
     color: @baseBackgroundColor;
   }
 
-
-
 }
-
-
 
 /* Leaflet controls */
 

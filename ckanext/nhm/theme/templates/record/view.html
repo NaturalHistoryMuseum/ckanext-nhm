@@ -34,8 +34,12 @@
                         <div class="actions">
                             <ul>
                                 <li>
-                                    <a class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}"><i
-                                        class="icon-circle-arrow-left"></i> {{ _('Back to view') }}</a>
+
+                                    <a data-module="back-button" class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}">
+                                        <i class="icon-circle-arrow-left"></i> {{ _('Back to view') }}
+                                    </a>
+                                    {% resource 'ckanext-nhm/back-button' %}
+
                                 </li>
                                 <li>
 
