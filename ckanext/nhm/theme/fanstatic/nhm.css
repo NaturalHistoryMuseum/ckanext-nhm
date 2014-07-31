@@ -152,6 +152,14 @@ a:hover.no-underline {
 .page-header .content_action {
   margin: 0;
 }
+
+/****************** Beta label ******************/
+img#beta{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 /****************** Page elements ******************/
 /* Masthead */
 .masthead {

@@ -1,5 +1,10 @@
 {% ckan_extends %}
 
+  {% block skip %}
+    <img src="/images/beta.png" alt="Beta" id="beta">
+    {{ super() }}
+  {% endblock %}
+
 {# Move the breadcrumb to the header #}
 {% block header %}
     {{ super() }}
