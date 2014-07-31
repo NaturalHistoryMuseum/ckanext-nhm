@@ -12,6 +12,11 @@ log = logging.getLogger()
 class StatsCommand(CkanCommand):
     """
     Every time this command is run, the datastore_stats table is updated with record counts from the datastore
+
+
+    paster stats -c /vagrant/etc/default/development.ini
+    paster stats  -c /etc/ckan/default/development.ini
+
     """
     summary = __doc__.split('\n')[0]
     usage = __doc__
@@ -27,7 +32,7 @@ class StatsCommand(CkanCommand):
         recent_date = model.Session.query(DatastoreStats.date).order_by(desc(DatastoreStats.date)).limit(1).scalar()
 
         # If we already have values for this date, do not rerun
-        if recent_date.date() == datetime.today().date():
+        if recent_date and recent_date.date() == datetime.today().date():
             print 'Datastore stats already updated today - skipping'
             return
 

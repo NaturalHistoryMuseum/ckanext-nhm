@@ -10,6 +10,10 @@ log = logging.getLogger()
 class InitDBCommand(CkanCommand):
     """
     Initialise the local stats database tables
+
+    paster initdb -c /vagrant/etc/default/development.ini
+    paster initdb  -c /etc/ckan/default/development.ini
+
     """
     summary = __doc__.split('\n')[0]
     usage = __doc__

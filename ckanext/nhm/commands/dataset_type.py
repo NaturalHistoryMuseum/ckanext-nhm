@@ -14,6 +14,7 @@ class DatasetTypeCommand(CkanCommand):
     Commands:
         paster dataset-type create-vocabulary -c <config>
         paster dataset-type create-vocabulary -c /vagrant/etc/default/development.ini
+        paster dataset-type create-vocabulary -c /etc/ckan/default/development.ini
 
         paster dataset-type create-type string -c /vagrant/etc/default/development.ini
 
