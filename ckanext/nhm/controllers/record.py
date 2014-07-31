@@ -63,7 +63,7 @@ class RecordController(base.BaseController):
                 pass
             else:
                 title = record_display_name(c.resource, c.record_dict)
-                c.images = [{'title': title, 'url': image} for image in images]
+                c.images = [{'modal_title': title, 'url': image} for image in images]
 
         # Loop through all the views - if we have a tiled map view with lat/lon fields
         # We'll use those fields to add the map
