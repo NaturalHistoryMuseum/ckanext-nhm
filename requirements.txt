@@ -16,3 +16,4 @@ celery==3.1.7
 -e git+https://github.com/okfn/ckanext-issues.git#egg=ckanext-issues
 distribute==0.6.34
 pytz==2013.9
+python-memcached==1.53
