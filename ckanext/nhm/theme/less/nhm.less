@@ -1,57 +1,4 @@
-
-/****************** Variables & classes ******************/
-
-// Colors
-@mastheadBackgroundColor: #228900;
-@mastheadTextColor: #fff;
-@mastheadLinkColor: @mastheadTextColor;
-@mastheadLinkHoverColor: @toolbarBackgroundColor;
-
-@baseBackgroundColor: #fff;
-@baseTextColor:#444;
-@baseLinkColor:@mastheadBackgroundColor;
-@baseLinkHoverColor: @baseTextColor;
-
-@smallTextColor: #5B5B5B;
-
-@sidebarBackgroundColor: #f6f6f6;
-@sidebarHeaderBackgroundColor: #ddd;
-@sidebarNavHighlightColor: #656565;
-@sidebarNavHoverColor: #eee;
-
-@pillColor: @sidebarNavHighlightColor;
-@pillHoverColor: #E0E0E0;
-
-@footerBackgroundColor: #434343;
-@footerTextColor: #999;
-@footerLinkColor: #fff;
-
-@toolbarBackgroundColor: #BBEDA9;
-
-// Buttons
-@buttonColor: @mastheadBackgroundColor;
-@buttonTextColor: #fff;
-@buttonHoverColor: #015B28;
-@buttonWarningColor: #890022;
-@buttonWarningHoverColor: #6E001B;
-@buttonDisabledColor: #9A9A9A;
-
-// Tabs
-@tabColor: @sidebarBackgroundColor;
-@tabActiveColor: @sidebarNavHighlightColor;
-@tabHoverColor: @sidebarNavHoverColor;
-@tabTextColor: #fff;
-
-// Tables
-@tableHeaderColor: #F2F2F2;
-@tableBorderColor: #F2F2F2;
-
-
-// URLS
-@images: "/images";
-@icons: "/images/icons";
-@fonts: "/fonts";
-
+@import "variables.less";
 
 // Generic classes
 
@@ -802,40 +749,6 @@ tr.empty{
 
 }
 
-/* Leaflet controls */
-
-.leaflet-container {
-
-  .leaflet-bar {
-    border: none;
-    box-shadow: none;
-    background: rgba(255, 255, 255, .4);
-    padding: 3px;
-    border-radius: 20px;
-    -webkit-border-radius: 20px;
-  }
-
-  .leaflet-bar-part {
-    border: 3px solid @baseLinkColor;
-    border-radius: 15px;
-    -webkit-border-radius: 15px;
-    margin-bottom: 5px;
-  }
-
-  .leaflet-bar-part:last-child {
-    margin-bottom: 0;
-  }
-
-  .leaflet-control-zoom a {
-    color: @baseLinkColor;
-  }
-
-  .leaflet-control-draw-rectangle {
-    background-image: url("@{images}/leaflet/pencil.png");
-  }
-
-}
-
 /* Tabs (and view buttons which look the same as tabs) */
 
 // Remove the background for the div behind the tabs
@@ -1414,6 +1327,8 @@ ul.view-list.reordering .resource-view-item .handle i{
 .view-list.stacked {
   background: url('@{images}/light-grey-1x20.gif') repeat-x 0 40px;
 }
+
+// From here down needs tidying up
 
 .resource-view,
 .ckanext-datapreview{

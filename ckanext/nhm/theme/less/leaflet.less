@@ -1,0 +1,35 @@
+@import "variables.less";
+
+/* Leaflet controls */
+
+.leaflet-container {
+
+  .leaflet-bar {
+    border: none;
+    box-shadow: none;
+    background: rgba(255, 255, 255, .4);
+    padding: 3px;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+  }
+
+  .leaflet-bar-part {
+    border: 3px solid @baseLinkColor;
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    margin-bottom: 5px;
+  }
+
+  .leaflet-bar-part:last-child {
+    margin-bottom: 0;
+  }
+
+  .leaflet-control-zoom a {
+    color: @baseLinkColor;
+  }
+
+  .leaflet-control-draw-rectangle {
+    background-image: url("@{images}/leaflet/pencil.png");
+  }
+
+}
