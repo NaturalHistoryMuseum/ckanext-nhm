@@ -478,3 +478,39 @@ def get_allowed_view_types(resource, package):
 
     return filtered_types
 
+
+def get_facet_label_function(facet_name, multi=False):
+    """For a given facet, return the function used to fetch the facet's items labels
+
+    @param facet_name: Facet name
+    @param multi: If True, the function returned should take a list of facets and a filter value to find the matching
+                  facet on the name field
+    @return: A function or None
+    """
+    facet_function = None
+    if facet_name == 'creator_user_id':
+        facet_function = get_creator_id_facet_label
+
+    if facet_function and multi:
+        def filter_facets(facet, filter_value):
+            for f in facet:
+                if f['name'] == filter_value:
+                    return facet_function(f)
+            return filter
+        return filter_facets
+    else:
+        return facet_function
+
+
+def get_creator_id_facet_label(facet):
+    """Return display name for the creator_id facet
+
+    @param facet: A dictionary representing a single value for the facet
+    @return: A string to use for display name
+    """
+    try:
+        user = logic.get_action('user_show')(None, {'id': facet['name']})
+        display_name = user['display_name']
+    except NotFound:
+        display_name = facet['display_name']
+    return display_name

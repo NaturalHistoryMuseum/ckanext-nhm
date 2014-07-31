@@ -34,7 +34,8 @@
     {% snippet "spatial/snippets/spatial_query_no_attr.html" %}
 
     {% for facet in c.facet_titles %}
-        {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet) }}
+        {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet,
+                     label_function=h.get_facet_label_function(facet)) }}
     {% endfor %}
 
 {% endblock %}
