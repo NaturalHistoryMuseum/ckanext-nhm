@@ -1,0 +1,13 @@
+diff --git a/ckan/public/base/javascript/view-filters.js b/ckan/public/base/javascript/view-filters.js
+index 206fb8d..543ce75 100644
+--- a/ckan/public/base/javascript/view-filters.js
++++ b/ckan/public/base/javascript/view-filters.js
+@@ -241,7 +241,7 @@ this.ckan.views.filters = (function (queryString) {
+ 
+     if (searchParams.filters) {
+       var filters = {},
+-          fieldValuesStr = searchParams.filters.split('|'),
++          fieldValuesStr = String(searchParams.filters).split('|'),
+           i,
+           len;
+ 
