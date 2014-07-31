@@ -7,18 +7,31 @@
   border-radius: 20px;
   -webkit-border-radius: 20px;
 }
-.leaflet-container .leaflet-bar-part {
-  border: 3px solid #228900;
-  border-radius: 15px;
-  -webkit-border-radius: 15px;
+.leaflet-container .leaflet-bar a {
+  border: 3px solid #228900 !important;
+  border-radius: 15px !important;
+  -webkit-border-radius: 15px !important;
   margin-bottom: 5px;
 }
-.leaflet-container .leaflet-bar-part:last-child {
+.leaflet-container .leaflet-bar a:last-child {
   margin-bottom: 0;
 }
-.leaflet-container .leaflet-control-zoom a {
+.leaflet-container .leaflet-bar a,
+.leaflet-container .leaflet-bar a:after,
+.leaflet-container .leaflet-bar a:visited {
   color: #228900;
 }
 .leaflet-container .leaflet-control-draw-rectangle {
   background-image: url("/images/leaflet/pencil.png");
+}
+.leaflet-container .leaflet-draw-toolbar a {
+  background-image: url('/images/leaflet/spritesheet.png');
+}
+.leaflet-container .leaflet-draw-actions a,
+.leaflet-container .leaflet-draw-actions a:hover {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  color: #228900 !important;
+}
+.leaflet-container .leaflet-draw-actions {
+  left: 40px!important;
 }

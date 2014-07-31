@@ -13,7 +13,6 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js"></script>
   {% block googleanalytics_event_tracking %}
     {% resource 'ckanext-nhm/google_analytics' %}
     <div class="js-hide" data-module="google-analytics"

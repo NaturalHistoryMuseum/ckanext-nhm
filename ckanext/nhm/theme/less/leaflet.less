@@ -13,18 +13,20 @@
     -webkit-border-radius: 20px;
   }
 
-  .leaflet-bar-part {
-    border: 3px solid @baseLinkColor;
-    border-radius: 15px;
-    -webkit-border-radius: 15px;
+  .leaflet-bar a {
+    border: 3px solid #228900 !important;
+    border-radius: 15px !important;
+    -webkit-border-radius: 15px !important;
     margin-bottom: 5px;
   }
 
-  .leaflet-bar-part:last-child {
+  .leaflet-bar a:last-child {
     margin-bottom: 0;
   }
 
-  .leaflet-control-zoom a {
+ .leaflet-bar a,
+ .leaflet-bar a:after,
+ .leaflet-bar a:visited{
     color: @baseLinkColor;
   }
 
@@ -32,4 +34,19 @@
     background-image: url("@{images}/leaflet/pencil.png");
   }
 
+ .leaflet-draw-toolbar a{
+    background-image: url('@{images}/leaflet/spritesheet.png');
+  }
+
+.leaflet-draw-actions a,
+.leaflet-draw-actions a:hover {
+    background-color: rgba(255, 255, 255, 0.8)!important;
+    color: @baseLinkColor!important;
 }
+
+.leaflet-draw-actions{
+    left: 40px!important;
+}
+
+}
+
