@@ -24,7 +24,7 @@
 .leaflet-container .leaflet-control-draw-rectangle {
   background-image: url("/images/leaflet/pencil.png");
 }
-.leaflet-container .leaflet-draw-toolbar a {
+.leaflet-container .leaflet-draw-section .leaflet-draw-toolbar a {
   background-image: url('/images/leaflet/spritesheet.png');
 }
 .leaflet-container .leaflet-draw-actions a,
