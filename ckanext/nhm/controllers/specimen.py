@@ -298,8 +298,11 @@ class SpecimenController(RecordController):
                     pass
                 else:
                     if value:
-                    # Key by label
-                        field_values[field[1]] = value
+                    # Key by field name
+                        field_values[field[0]] = {
+                            'label': field[1],
+                            'value': value
+                        }
 
             if field_values:
                 c.field_data[group] = field_values

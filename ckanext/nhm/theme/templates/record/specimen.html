@@ -14,15 +14,22 @@
         {% for group, fields in c.field_data.items() %}
 
             <thead>
-                <tr><th colspan="3">{{ group }}</th></tr>
+                <tr><th colspan="4">{{ group }}</th></tr>
             </thead>
 
             <tbody>
-                {% for label, value in fields.items() %}
+                {% for field_name, field in fields.items() %}
 
                     <tr>
-                        <td><strong>{{ label }}:</strong></td>
-                        <td colspan="2">{{ value }}</td>
+                        <td><strong>{{ field['label'] }}:</strong></td>
+                        <td colspan="2">{{ field['value'] }}</td>
+                        <td width="50" class="filterable">
+                            {% if field_name in filter_fields %}
+                                <a title="View all records where {{ field_name }}={{ field['value'] }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, field['value'])) }}">
+                                    <i class="icon-filter"></i>
+                                </a>
+                            {% endif %}
+                        </td>
                     </tr>
 
                 {% endfor %}
