@@ -14,6 +14,15 @@
 {% block header_site_search %}
 {% endblock %}
 
+{# Only show the settings link if user isn't LDAP #}
+{% block header_account_settings_link %}
+
+    {% if not h.is_ldap_user() %}
+        {{ super() }}
+    {% endif %}
+
+{% endblock %}
+
 {% block header_wrapper %}
     <header class="masthead">
         <div class="container">
