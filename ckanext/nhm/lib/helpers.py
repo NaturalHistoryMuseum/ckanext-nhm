@@ -514,3 +514,13 @@ def get_creator_id_facet_label(facet):
     except NotFound:
         display_name = facet['display_name']
     return display_name
+
+def field_name_label(field_name):
+    """
+    Convert a field name into a label - replacing _s and upper casing first character
+    @param field:
+    @return: str label
+    """
+    label = field_name.replace('_', ' ')
+    label = label[0].upper() + label[1:]
+    return label
