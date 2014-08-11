@@ -213,7 +213,7 @@ def dataset_types():
         return []
 
 
-def url_for_collection_view(view_type='recline_grid', **kwargs):
+def url_for_collection_view(view_type='recline_grid_view', **kwargs):
     """
     Return URL to link through to specimen dataset view, with optional search params
     @param view_type: grid to link to - grid or map
