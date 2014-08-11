@@ -1221,7 +1221,7 @@ div.resource-view-filter-pills {
 .search-form .search-input button {
   width: 30px !important;
   height: 30px !important;
-  margin-top: -20px !important;
+  margin-top: -15px !important;
   background: #228900;
   border-radius: 20px;
   right: 5px;
@@ -1232,9 +1232,13 @@ div.resource-view-filter-pills {
   transition: none;
   font-size: 16px;
   line-height: 16px;
+}
+
+.search-form .search-input.search-giant button i{
   top: 1px;
   position: relative;
 }
+
 .search-form .search-input button i:hover {
   color: #fff;
 }
