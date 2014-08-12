@@ -27,7 +27,6 @@
         <section class="module module-record">
             <div class="module-content">
 
-
                 {% block page_header %}
                     <header class="page-header">
                         <div class="actions">
@@ -101,7 +100,17 @@
                             {% endfor %}
 
                         </table>
+
                     {% endblock %}
+
+                    {% block record_map %}
+
+                        {% if c.record_map %}
+                            {% snippet "record/snippets/map.html", extent=c.record_map %}
+                        {% endif %}
+
+                    {% endblock %}
+
                 </div>
 
                 {% block record_images %}

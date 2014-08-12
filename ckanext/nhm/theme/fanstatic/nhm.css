@@ -110,6 +110,11 @@ a:hover.no-underline {
 .default-text-color {
   color: #444444;
 }
+
+.stats .default-text-color{
+    color: #0E4609;
+}
+
 .default-text-color a {
   color: #228900;
 }
@@ -1034,8 +1039,7 @@ i.mineralogy {
 }
 .record-content table thead tr th {
   background: #f2f2f2;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 10px 0 10px 5px;
   font-size: 18px;
   margin: 5px 0 5px 0;
   font-weight: normal;
