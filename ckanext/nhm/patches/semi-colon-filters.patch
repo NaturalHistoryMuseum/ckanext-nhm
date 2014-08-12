@@ -1,0 +1,14 @@
+diff --git a/ckan/public/base/javascript/view-filters.js b/ckan/public/base/javascript/view-filters.js
+index ad6e807..7afff2a 100644
+--- a/ckan/public/base/javascript/view-filters.js
++++ b/ckan/public/base/javascript/view-filters.js
+@@ -50,6 +50,9 @@ String.prototype.queryStringToJSON = String.prototype.queryStringToJSON || funct
+         key = decodeURIComponent(key);
+         value = decodeURIComponent(value);
+ 
++        // Semi colons are reserved character for query params - encode them
++        value = value.replace(/;/g, "%3B");
++
+         // Set
+         // window.console.log({'key':key,'value':value}, split);
+         var keys = key.split('.');
