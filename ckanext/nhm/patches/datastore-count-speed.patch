@@ -1,0 +1,48 @@
+diff --git a/ckanext/datastore/db.py b/ckanext/datastore/db.py
+index b6e38ef..c4ed942 100644
+--- a/ckanext/datastore/db.py
++++ b/ckanext/datastore/db.py
+@@ -919,7 +919,7 @@ def search_data(context, data_dict):
+     else:
+         sort_clause = ''
+ 
+-    sql_string = u'''SELECT {distinct} {select}
++    sql_string = u'''SELECT {distinct} {select}, (SELECT count(*) FROM "{resource}" {ts_query} {where}) AS "_full_count"
+                     FROM "{resource}" {ts_query}
+                     {where} {sort} LIMIT {limit} OFFSET {offset}'''.format(
+         distinct=distinct,
+@@ -931,7 +931,7 @@ def search_data(context, data_dict):
+         limit=limit,
+         offset=offset)
+ 
+-    results = _execute_single_statement(context, sql_string, where_values)
++    results = _execute_single_statement(context, sql_string, where_values*2)
+ 
+     _insert_links(data_dict, limit, offset)
+     return format_results(context, results, data_dict)
+diff --git a/ckanext/datastore/plugin.py b/ckanext/datastore/plugin.py
+index 7cd0c9e..f16980b 100644
+--- a/ckanext/datastore/plugin.py
++++ b/ckanext/datastore/plugin.py
+@@ -369,8 +369,10 @@ class DatastorePlugin(p.SingletonPlugin):
+         sort = self._sort(data_dict, fields_types)
+         where = self._where(data_dict, fields_types)
+ 
+-        select_cols = [u'"{0}"'.format(field_id) for field_id in field_ids] +\
+-                      [u'count(*) over() as "_full_count" %s' % rank_column]
++        select_cols = [u'"{0}"'.format(field_id) for field_id in field_ids]
++
++        if rank_column:
++            select_cols += [rank_column]
+ 
+         query_dict['distinct'] = data_dict.get('distinct', False)
+         query_dict['select'] += select_cols
+@@ -478,7 +480,7 @@ class DatastorePlugin(p.SingletonPlugin):
+                 rank_columns.append(rank)
+ 
+         statements_str = ', ' + ', '.join(statements)
+-        rank_columns_str = ', ' + ', '.join(rank_columns)
++        rank_columns_str = ', '.join(rank_columns)
+         return statements_str, rank_columns_str
+ 
+     def _build_query_and_rank_statements(self, lang, query, plain, field=None):
