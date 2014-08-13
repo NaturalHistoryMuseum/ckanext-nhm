@@ -78,9 +78,9 @@ class SpecimenController(RecordController):
         ]),
         ('Collection event', [
             ('recordNumber', 'Collector number'),
-            ('year', 'Collection date'),  # Year, month & day are joined into one. We use year so the fields match up
-            ('month', ),  # Added to year, so no label
-            ('day', ),
+            ('year', 'Year'),
+            ('month', 'Month'),
+            ('day', 'Day'),
             ('recordedBy', 'Collector'),
             ('eventTime', 'Collection time'),
             ('habitat', 'Habitat'),
@@ -216,28 +216,10 @@ class SpecimenController(RecordController):
         # Organised into groups
         c.field_data = OrderedDict()
 
-        collection_code = c.record_dict.get('collectionCode')
-        c.record_dict['collectionCode'] = '%s (%s)' % (collection_code, get_department(collection_code))
-
-        # Parse collection date
-        collection_date = list()
-        # Loop through all the parts that make up the collectionDate
-        for date_part in ['day', 'month', 'year']:
-            # And pop them off the record_dict so they won't show up in the output
-            date_part_value = c.record_dict.pop(date_part)
-            # If we have a part value, add to the
-            if date_part_value:
-                collection_date.append(date_part_value)
-
-        if collection_date:
-            c.record_dict['year'] = '-'.join(collection_date)
-
-        # Add registeredWeightUnit to registeredWeight
-        try:
-            c.record_dict['registeredWeight'] = '%s%s' % (c.record_dict['registeredWeight'], c.record_dict.pop('registeredWeightUnit'))
-        except KeyError:
-            # If the value doesn't exist in kwargs, we don't care, it won't get added to __dict__
-            pass
+        # Fields to ignore
+        field_blacklist = [
+            'registeredWeightUnit'  # We do not want unit output, as it is added to weight
+        ]
 
         # Related resources
         c.related_records = []
@@ -291,6 +273,11 @@ class SpecimenController(RecordController):
             field_values = OrderedDict()
 
             for field in fields:
+
+                # Skip blacklisted fields
+                if field[0] in field_blacklist:
+                    continue
+
                 try:
                     value = c.record_dict[field[0]]
                 except KeyError:
@@ -299,10 +286,21 @@ class SpecimenController(RecordController):
                 else:
                     if value:
                     # Key by field name
-                        field_values[field[0]] = {
+
+                        field_data = {
                             'label': field[1],
                             'value': value
                         }
+
+                        # Add some extra suffixes info
+                        # Add full department name
+                        if field[0] == 'collectionCode':
+                            field_data['suffix'] = '(%s)' % get_department(value)
+                        # Add registeredWeightUnit to registeredWeight
+                        elif field[0] == 'registeredWeight':
+                            field_data['suffix'] = c.record_dict.get('registeredWeightUnit', None)
+
+                        field_values[field[0]] = field_data
 
             if field_values:
                 c.field_data[group] = field_values

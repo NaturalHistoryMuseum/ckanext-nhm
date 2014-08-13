@@ -22,7 +22,15 @@
 
                     <tr>
                         <td><strong>{{ field['label'] }}:</strong></td>
-                        <td colspan="2">{{ field['value'] }}</td>
+                        <td colspan="2">
+
+                            {{ field['value'] }}
+
+                            {% if field['suffix'] %}
+                                {{ field['suffix'] }}
+                            {% endif %}
+
+                        </td>
                         <td width="50" class="filterable">
                             {% if field_name in filter_fields %}
                                 <a title="View all records where {{ field_name }}={{ field['value'] }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, field['value'])) }}">
