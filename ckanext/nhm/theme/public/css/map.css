@@ -11,5 +11,10 @@ div.tiled-map a:after {
     margin-left: 0!important;
 }
 
+div.point-detail-info a,
+div.point-detail-info a:visited{
+    color: #228900!important;
+}
+
 
 
