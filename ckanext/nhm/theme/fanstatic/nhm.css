@@ -597,7 +597,7 @@ a.btn-danger:hover {
 }
 table.package-list td,
 table.package-list th {
-  width: 60px;
+  width: 70px;
   text-align: center;
   vertical-align: middle;
 }
@@ -947,6 +947,13 @@ i.mineralogy {
 .issue-open a {
   color: #890022;
 }
+
+/* Dataset type labels */
+.label[data-format=dwc], .label[data-format*=dwc] {
+    background-color: #7BB96B;
+    text-transform: uppercase;
+}
+
 /* Dataset activity page */
 .activity {
   margin-top: 30px;
