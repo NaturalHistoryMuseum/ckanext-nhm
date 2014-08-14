@@ -27,7 +27,7 @@
                     {% endif %}
                 {% else %}
                     <a href="{{ h.remove_url_param('_%s_limit' % name, extras=extras, alternative_url=alternative_url) }}"
-                       class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }}</a>
+                       class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }} <i class="icon-minus-sign"></i></a>
                 {% endif %}
             </p>
         {% else %}
