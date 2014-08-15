@@ -10,6 +10,9 @@
   {{ form.input('author', label=_('Author'), id='field-author', placeholder=_('Joe Bloggs'), value=data.author, error=errors.author, classes=['control-medium'], is_required=true) }}
 {% endblock %}
 
+{% block package_basic_fields_org %}
+{% endblock %}
+
 {% block package_basic_fields_tags %}
 
  {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
