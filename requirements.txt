@@ -14,6 +14,8 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-ckanpackager.git#egg=ckanext-ckanpackager
 -e git+https://github.com/okfn/ckanext-spatial.git@stable#egg=ckanext-spatial
 -e git+https://github.com/okfn/ckanext-issues.git#egg=ckanext-issues
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-cacheapi.git#egg=ckanext_cacheapi
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-feedback.git#egg=ckanext_feedback
 distribute==0.6.34
 pytz==2013.9
 python-memcached==1.53
