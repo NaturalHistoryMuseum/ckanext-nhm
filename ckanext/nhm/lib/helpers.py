@@ -12,7 +12,6 @@ from pylons import config
 from ckan.common import c, _, request
 from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_allowed_view_types as ckan_get_allowed_view_types
 from collections import OrderedDict
-from beaker.cache import cache_region
 
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 
@@ -252,8 +251,6 @@ def url_for_collection_view(view_type='recline_grid_view', **kwargs):
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
-
-@cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by collectionCode
