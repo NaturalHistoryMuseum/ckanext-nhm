@@ -251,6 +251,14 @@ def url_for_collection_view(view_type='recline_grid_view', **kwargs):
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
+def get_nhm_organisation_id():
+    """
+    @return:  ID for the NHM organisation
+    """
+
+    return config.get("ldap.organization.id")
+
+
 def collection_stats():
     """
     Get collection stats, grouped by collectionCode
