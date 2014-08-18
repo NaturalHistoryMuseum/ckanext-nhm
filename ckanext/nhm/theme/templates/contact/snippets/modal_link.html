@@ -2,8 +2,9 @@
 
     {% set params = h.get_contact_form_params(pkg=pkg, res=res, rec=rec) %}
 
+
     <a class="btn btn-primary" data-module="modal-contact" data-module-template="{{ h.get_contact_form_template_url(params) }}" href="{{ h.url_for('contact_form', **params) }}" title="{{ _('Contact') }}">
-        <i class="icon-info-sign"></i>{{ _('Contact dataset owner') }}
+        <i class="icon-envelope"></i>{{ link_text if link_text else _('Contact dataset owner') }}
     </a>
 
     {% resource 'ckanext-contact/main' %}

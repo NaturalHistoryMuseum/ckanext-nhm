@@ -22,36 +22,15 @@
       <ul>
         <li>
           <a class="btn btn-primary" href="{{ url }}">
-            {% if res.has_views %}
-              <i class="icon-bar-chart"></i>
-              {{ _('Preview') }}
-            {% else %}
-              <i class="icon-info-sign"></i>
-              {{ _('More information') }}
-            {% endif %}
+              <i class="icon-circle-arrow-right"></i>
+              {{ _('View') }}
           </a>
         </li>
         <li>
-          {% if res.has_views %}
             {% snippet 'ckanpackager/snippets/package_resource.html',
-               res=res, pkg=pkg, bt_class="icon-download", bt_text=_('Download')
+               res=res, pkg=pkg, bt_class="icon-cloud-download", bt_text=_('Download')
             %}
-          {% else %}
-            <a href="{{ res.url }}" class="resource-url-analytics btn btn-primary" target="_blank">
-              <i class="icon-external-link"></i>
-              {{ _('Go to resource') }}
-            </a>
-          {% endif %}
         </li>
-        {% if can_edit %}
-          <li>
-            <a class="btn btn-primary"
-                href="{{ h.url_for(controller='package', action='resource_edit', id=pkg.name, resource_id=res.id) }}">
-              <i class="icon-edit"></i>
-              {{ _('Manage') }}
-            </a>
-          </li>
-        {% endif %}
       </ul>
     </div>
   {% endif %}

@@ -63,13 +63,9 @@
         <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
           <i class="icon-key"></i> {{ _('API Endpoint') }}
         </a>
-      {% elif not res.has_views or not res.can_be_previewed %}
-        {% snippet 'ckanpackager/snippets/package_resource.html',
-                   res=res, pkg=pkg, bt_class="icon-external-link", bt_text=_('Download')
-        %}
       {% else %}
         {% snippet 'ckanpackager/snippets/package_resource.html',
-                   res=res, pkg=pkg, bt_class="icon-download", bt_text=_('Download')
+                   res=res, pkg=pkg, bt_class="icon-cloud-download", bt_text=_('Download')
         %}
       {% endif %}
     </a>
