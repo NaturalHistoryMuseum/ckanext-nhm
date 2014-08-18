@@ -7,7 +7,7 @@
 {% block package_basic_fields_description %}
   {{ form.markdown('notes', id='field-notes', label=_('Abstract'), placeholder=_('eg. An abstract describing the data'), value=data.notes, error=errors.notes, is_required=true) }}
   {# Moved authors to here as it's now a required field - the final step is skippable #}
-  {{ form.input('author', label=_('Author'), id='field-author', placeholder=_('Joe Bloggs'), value=data.author, error=errors.author, classes=['control-medium'], is_required=true) }}
+  {{ form.input('author', label=_('Author(s)'), id='field-author', placeholder=_('Joe Bloggs'), value=data.author, error=errors.author, classes=['control-medium'], is_required=true) }}
 {% endblock %}
 
 {% block package_basic_fields_org %}

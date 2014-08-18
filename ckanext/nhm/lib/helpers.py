@@ -1,6 +1,7 @@
 
 import logging
 import json
+import urllib
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
@@ -92,14 +93,14 @@ def _get_action(action, params):
 
     return None
 
+def get_package(package_id):
+    return _get_action('package_show', {'id': package_id})
 
 def get_resource(resource_id):
     return _get_action('resource_show', {'id': resource_id})
 
-
 def get_record(resource_id, record_id):
     return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
-
 
 def record_display_name(resource, record):
     title_field = resource.get('_title_field', None)
@@ -552,3 +553,47 @@ def field_name_label(field_name):
     label = field_name.replace('_', ' ')
     label = label[0].upper() + label[1:]
     return label
+
+
+def get_contact_form_params(pkg=None, res=None, rec=None):
+    """
+    Get a list of IDS
+
+    @param pkg:
+    @param res:
+    @param rec:
+    @return:
+    """
+
+    params = {}
+
+    if pkg:
+        params['package_id'] = pkg.get('id')
+
+    if res:
+        params['resource_id'] = res.get('id')
+
+    if rec:
+        params['record_id'] = rec.get('_id')
+
+    return params
+
+
+def get_contact_form_template_url(params):
+    """
+    Build a URL suitable for linking to the contact form snippet
+
+    For example: /api/1/util/snippet/contact_form.html?resource_id=123&record_id456
+
+    Can be parsed output from get_contact_form_params
+
+    @param params:
+    @return:
+    """
+
+    url = '/api/1/util/snippet/contact_form.html'
+
+    if params:
+        url += '?%s' % urllib.urlencode(params)
+
+    return url

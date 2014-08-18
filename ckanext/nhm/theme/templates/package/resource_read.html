@@ -78,4 +78,5 @@
 {% if 'datastore' in g.plugins %}
   <li>{% snippet 'package/snippets/data_api_button.html', resource=res, datastore_root_url=c.datastore_api %}</li>
 {% endif %}
+{% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res %}
 {% endblock %}

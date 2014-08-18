@@ -10,6 +10,25 @@
 
     {# Add resource name and ID hidden field#}
 
+    {% set package_id = h.get_request_param('package_id', None) %}
+
+    {% if package_id %}
+
+        {% set package = h.get_package(package_id) %}
+
+        <div class="control-group control-medium">
+            <label class="control-label">Dataset</label>
+            <div class="controls ">
+                <p>{{ package['title'] or package['name'] }}</p>
+            </div>
+        </div>
+
+        {{ form.hidden('package_id', package_id) }}
+
+    {% endif %}
+
+    {# Add resource name and ID hidden field#}
+
     {% set resource_id = h.get_request_param('resource_id', None) %}
 
     {% if resource_id %}
@@ -17,7 +36,7 @@
         {% set resource = h.get_resource(resource_id) %}
 
         <div class="control-group control-medium">
-            <label class="control-label">Dataset</label>
+            <label class="control-label">Resource</label>
             <div class="controls ">
                 <p>{{ resource['name'] or resource['id'] }}</p>
             </div>
@@ -50,6 +69,6 @@
 
     {% endif %}
 
-    {{ form.markdown('content', label=_('Your Request'), id='field-content', value=data.content, error=errors.content, placeholder=_('What do you have to tell us?'), is_required=true) }}
+    {{ form.markdown('content', label=_('Your Request'), id='field-content', value=data.content, error=errors.content, is_required=true) }}
 
 {% endblock %}

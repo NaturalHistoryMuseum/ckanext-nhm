@@ -1,43 +1,86 @@
 {% ckan_extends %}
 
-{% block extras %}
+      {% block package_additional_info %}
+        {% if pkg_dict.url %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Source') }}</th>
+            <td class="dataset-details" property="foaf:homepage">{{ h.link_to(pkg_dict.url, pkg_dict.url, rel='foaf:homepage', target='_blank') }}</td>
+          </tr>
+        {% endif %}
 
-    {% set temporal_extent = pkg_dict.get('temporal_extent', None) %}
-    {% set update_frequency = pkg_dict.get('update_frequency', None) %}
-    {% set dataset_type = pkg_dict.dataset_type.pop() if pkg_dict.dataset_type else None %}
+        {% if pkg_dict.author %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Author(s)") }}</th>
+            <td class="dataset-details" property="dc:creator">{{ pkg_dict.author }}</td>
+          </tr>
+        {% endif %}
 
-    {% if temporal_extent %}
-        <tr>
-            <th scope="row" class="dataset-label">{{ _("Temporal extent") }}</th>
-            <td class="dataset-details">{{ temporal_extent }}</td>
-        </tr>
-    {%  endif %}
+        {% if pkg_dict.maintainer_email %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
+            <td class="dataset-details" property="dc:contributor">{{ h.mail_to(email_address=pkg_dict.maintainer_email, name=pkg_dict.maintainer) }}</td>
+          </tr>
+        {% elif pkg_dict.maintainer %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
+            <td class="dataset-details" property="dc:contributor">{{ pkg_dict.maintainer }}</td>
+          </tr>
+        {% endif %}
 
-    {% if update_frequency %}
-        <tr>
-            <th scope="row" class="dataset-label">{{ _("Update frequency") }}</th>
-            <td class="dataset-details">{{ h.update_frequency_get_label(update_frequency) }}</td>
-        </tr>
-    {%  endif %}
+        {% if pkg_dict.version %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Version") }}</th>
+            <td class="dataset-details">{{ pkg_dict.version }}</td>
+          </tr>
+        {% endif %}
 
-    {% if dataset_type %}
-        <tr>
-            <th scope="row" class="dataset-label">{{ _("Dataset type") }}</th>
-            <td class="dataset-details">{{ dataset_type }}</td>
-        </tr>
-    {%  endif %}
+        {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("State") }}</th>
+            <td class="dataset-details">{{ pkg_dict.state }}</td>
+          </tr>
+        {% endif %}
 
-    <tr>
-        <th scope="row">{{ _('Last updated') }}</th>
-        <td>{{ h.render_datetime(pkg_dict.last_modified) or h.render_datetime(pkg_dict.revision_timestamp) or h.render_datetime(pkg_dict.created) or _('unknown') }}</td>
-        </tr>
-    <tr>
-        <th scope="row">{{ _('Created') }}</th>
-        <td>{{ h.render_datetime(pkg_dict.metadata_created) or _('unknown') }}</td>
-        </tr>
-    <tr>
-        <th scope="row">{{ _('License') }}</th>
-        <td>{% snippet "snippets/license.html", pkg_dict=pkg_dict, text_only=True %}</td>
-        </tr>
+      {% block extras scoped %}
 
-{% endblock %}
+            {% set temporal_extent = pkg_dict.get('temporal_extent', None) %}
+            {% set update_frequency = pkg_dict.get('update_frequency', None) %}
+            {% set dataset_type = pkg_dict.dataset_type.pop() if pkg_dict.dataset_type else None %}
+
+            {% if temporal_extent %}
+                <tr>
+                    <th scope="row" class="dataset-label">{{ _("Temporal extent") }}</th>
+                    <td class="dataset-details">{{ temporal_extent }}</td>
+                </tr>
+            {%  endif %}
+
+            {% if update_frequency %}
+                <tr>
+                    <th scope="row" class="dataset-label">{{ _("Update frequency") }}</th>
+                    <td class="dataset-details">{{ h.update_frequency_get_label(update_frequency) }}</td>
+                </tr>
+            {%  endif %}
+
+            {% if dataset_type %}
+                <tr>
+                    <th scope="row" class="dataset-label">{{ _("Dataset type") }}</th>
+                    <td class="dataset-details">{{ dataset_type }}</td>
+                </tr>
+            {%  endif %}
+
+            <tr>
+                <th scope="row">{{ _('Last updated') }}</th>
+                <td>{{ h.render_datetime(pkg_dict.last_modified) or h.render_datetime(pkg_dict.revision_timestamp) or h.render_datetime(pkg_dict.created) or _('unknown') }}</td>
+                </tr>
+            <tr>
+                <th scope="row">{{ _('Created') }}</th>
+                <td>{{ h.render_datetime(pkg_dict.metadata_created) or _('unknown') }}</td>
+                </tr>
+            <tr>
+                <th scope="row">{{ _('License') }}</th>
+                <td>{% snippet "snippets/license.html", pkg_dict=pkg_dict, text_only=True %}</td>
+                </tr>
+
+      {% endblock %}
+
+      {% endblock %}
