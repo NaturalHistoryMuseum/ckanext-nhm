@@ -3,6 +3,7 @@ import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
+from ckanext.cacheapi.interfaces import ICache
 from collections import OrderedDict
 from pylons import config
 
@@ -20,6 +21,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IDatasetForm, inherit=True)
     p.implements(p.IFacets, inherit=True)
+    p.implements(ICache, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -133,3 +135,15 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         facets_dict['creator_user_id'] = 'User'
 
         return facets_dict
+
+    # ICache
+    def get_caches(self, context, cache_dict):
+
+        # Stats pages to clear by group
+        cache_dict['stats'] = [
+            '/',
+            'about'
+        ]
+
+        return cache_dict
+
