@@ -16,7 +16,7 @@
     {% if update_frequency %}
         <tr>
             <th scope="row" class="dataset-label">{{ _("Update frequency") }}</th>
-            <td class="dataset-details">{{ update_frequency }}</td>
+            <td class="dataset-details">{{ h.update_frequency_get_label(update_frequency) }}</td>
         </tr>
     {%  endif %}
 

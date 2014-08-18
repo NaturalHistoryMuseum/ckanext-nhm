@@ -18,7 +18,9 @@ convert_to/from_extras() as we are with our 'custom_text' field below then
 you need to remove free extras from the form, or editing your custom field
 won't work. #}
 
-    {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('temporal extent'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
+    {{ form.info("What time period does this dataset cover? If inappliable, leave blank.", inline=True) }}
+    {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('1970 - 1985'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
+
     {{ form.select('update_frequency', label=_('Update frequency'), id='field-update-frequency', options=h.form_select_update_frequency_options(), selected=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
     {#  TODO: Add map to pick spatial extent  #}
     {{ form.input('spatial', label=_('Spatial'), id='field-spatial', placeholder=_('{"type": "Point", "coordinates": [-3.145,53.078]}'), value=data.spatial, error=errors.spatial, classes=['control-medium']) }}

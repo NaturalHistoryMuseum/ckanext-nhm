@@ -339,6 +339,12 @@ img#beta{
   font-size: 20px;
   color: #fff;
 }
+
+/* Dataset form */
+.dataset-form #field-temporal-extent{
+    width: 200px;
+}
+
 /* Error messages */
 .alert-danger,
 .alert-error {

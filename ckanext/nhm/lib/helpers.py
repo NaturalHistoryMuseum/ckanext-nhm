@@ -198,6 +198,15 @@ def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
 
     return options
 
+def update_frequency_get_label(value):
+    """
+    Get the label for this update frequency
+    @param value:
+    @return:
+    """
+    for v, label in UPDATE_FREQUENCIES:
+        if v == value:
+            return label
 
 def resource_issue_count(package_id):
 
