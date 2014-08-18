@@ -1281,3 +1281,19 @@ div.ckanpackager-form div {
 .search-form .search-input.search-giant input {
   line-height: inherit;
 }
+
+.placeholder{
+    border: 1px solid #F3F3F3;
+}
+
+.placeholder::after{
+    content: "(Example text)";
+    background: #F3F3F3;
+    font-size: 0.8em;
+    padding: 2px;
+    display: block;
+    width: 120px;
+    margin: 0 auto;
+    text-align: center;
+    text-transform: uppercase;
+}
