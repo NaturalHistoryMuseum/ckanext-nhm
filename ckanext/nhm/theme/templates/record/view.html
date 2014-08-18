@@ -33,14 +33,6 @@
                             <ul>
                                 <li>
 
-                                    <a data-module="back-button" class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}">
-                                        <i class="icon-circle-arrow-left"></i> {{ _('Back to view') }}
-                                    </a>
-                                    {% resource 'ckanext-nhm/back-button' %}
-
-                                </li>
-                                <li>
-
                                     {# Taken from ckanpackager/snippets/package_resource.html, but altered anon + auth messages #}
 
                                     {% resource 'ckanext-ckanpackager/main' %}
