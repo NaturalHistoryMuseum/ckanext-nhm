@@ -99,7 +99,7 @@
 
   <div class="control-group">
     {% set error = errors.dataset_type %}
-    <label class="control-label" for="field-dataset-type">{{ _("Dataset type") }}</label>
+    <label class="control-label" for="field-dataset-type"><span title="This field is required" class="control-required">*</span> {{ _("Dataset type") }}</label>
     <div class="controls">
 
       <select id="field-dataset-type" name="dataset_type" data-module="autocomplete">
