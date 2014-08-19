@@ -21,6 +21,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IDatasetForm, inherit=True)
     p.implements(p.IFacets, inherit=True)
+    p.implements(p.IPackageController, inherit=True)
     p.implements(ICache, inherit=True)
 
     ## IConfigurer
@@ -135,6 +136,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         facets_dict['creator_user_id'] = 'User'
 
         return facets_dict
+
+    # IPackageController
+    def before_search(self, data_dict):
+        # If there's no sort criteria specified, default to promoted
+        if not data_dict.get('sort', None):
+            data_dict['sort'] = u'promoted asc'
+
+        return data_dict
 
     # ICache
     def get_caches(self, context, cache_dict):

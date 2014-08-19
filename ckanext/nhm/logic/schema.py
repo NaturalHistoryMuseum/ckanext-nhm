@@ -18,6 +18,7 @@ ignore_missing = get_validator('ignore_missing')
 not_missing = get_validator('not_missing')
 resource_id_exists = get_validator('resource_id_exists')
 int_validator = get_validator('int_validator')
+boolean_validator = get_validator('boolean_validator')
 
 DATASET_TYPE_VOCABULARY = 'dataset_types'
 
@@ -69,8 +70,8 @@ def _modify_schema(schema):
     schema['dataset_type'] = [not_empty, convert_from_tags(DATASET_TYPE_VOCABULARY)]
     schema['temporal_extent'] = [ignore_missing, unicode, convert_to_extras]
     schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in UPDATE_FREQUENCIES]), convert_to_extras, unicode]
+    schema['promoted'] = [ignore_missing, convert_to_extras, boolean_validator]
     schema['spatial'] = [ignore_missing, convert_to_extras]
-
 
 def show_package_schema():
 
@@ -82,6 +83,7 @@ def show_package_schema():
     schema['dataset_type'] = [convert_to_tags(DATASET_TYPE_VOCABULARY)]
     schema['temporal_extent'] = [convert_from_extras, ignore_missing]
     schema['update_frequency'] = [convert_from_extras, ignore_missing]
+    schema['promoted'] = [convert_from_extras, ignore_missing]
     # This is the same as the extras field with key=spatial for ckanext-spatial
     schema['spatial'] = [convert_from_extras, ignore_missing]
 

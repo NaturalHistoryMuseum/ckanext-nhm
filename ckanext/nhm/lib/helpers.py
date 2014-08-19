@@ -597,3 +597,19 @@ def get_contact_form_template_url(params):
         url += '?%s' % urllib.urlencode(params)
 
     return url
+
+def downloadable(resource):
+    """
+    Is a resource downloadable
+    @param resource:
+    @return: bool
+    """
+    return bool(resource['format'])
+
+def is_sysadmin():
+    """
+    Is user a sysadmin user
+    @return:
+    """
+    if c.userobj.sysadmin:
+        return True

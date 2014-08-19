@@ -577,13 +577,33 @@ a.btn-danger:hover {
   text-align: right;
 }
 /* Pills (for applied facets) */
-.pill {
+.pill,
+a.tag,
+a.tag:hover{
   background-color: #656565;
 }
-.pill a:hover {
-  color: #e0e0e0;
+
+.pill,
+a.tag{
+    color: #ffffff;
+}
+
+a.tag,
+a.tag:hover{
+  border: none;
+ -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  padding: 2px 10px 2px 10px;
+  line-height: 21px;
+}
+
+.pill a:hover,
+a.tag:hover {
+  color: #e0e0e0!important;
   text-decoration: none;
 }
+
 /* Tables */
 .table th,
 .table td {
@@ -1023,6 +1043,24 @@ i.mineralogy {
 .resource-view {
   margin: 20px 0;
 }
+
+/* Resource tags */
+
+.tags{
+    margin-bottom: 20px;
+}
+
+.tags .well{
+    background: none;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.tags ul.tag-list{
+    padding-top: 0;
+}
+
 /* Gallery */
 #gallery {
   margin-top: 20px;
