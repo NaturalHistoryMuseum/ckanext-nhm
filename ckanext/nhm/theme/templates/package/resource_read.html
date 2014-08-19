@@ -3,76 +3,67 @@
 {% block resource_read_url %}{% endblock %}
 
 {% block breadcrumb_content %}
-  {% set dataset = pkg.title or pkg.name %}
-  <li>{% link_for _('Data'), controller='package', action='search' %}</li>
-  <li>{% link_for dataset|truncate(30), controller='package', action='read', id=pkg.name %}</li>
-  {# Added actual URL as IE9 doesn't like empty hrefs & we want to remvoe the filters #}
-  <li class="active"><a href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}">{{ h.resource_display_name(res)|truncate(30) }}</a></li>
+    {% set dataset = pkg.title or pkg.name %}
+    <li>{% link_for _('Data'), controller='package', action='search' %}</li>
+    <li>{% link_for dataset|truncate(30), controller='package', action='read', id=pkg.name %}</li>
+    {# Added actual URL as IE9 doesn't like empty hrefs & we want to remvoe the filters #}
+    <li class="active"><a href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}">{{ h.resource_display_name(res)|truncate(30) }}</a></li>
 {% endblock %}
 
 {% block resource_additional_information %}
     <div class="additional-info">
-    {% if res %}
-      <section class="module">
-        {% block resource_additional_information_inner %}
-        <div class="module-content">
-          <h3>{{ _('Additional Information') }}</h3>
-          <table class="table table-striped table-bordered table-condensed" data-module="table-toggle-more">
-            <tbody>
-              <tr>
-                <th scope="row">{{ _('Last updated') }}</th>
-                <td>{{ h.render_datetime(res.last_modified) or h.render_datetime(res.revision_timestamp) or h.render_datetime(res.created) or _('unknown') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">{{ _('Created') }}</th>
-                <td>{{ h.render_datetime(res.created) or _('unknown') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">{{ _('Format') }}</th>
-                <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">{{ _('License') }}</th>
-                <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
-              </tr>
-              {% for key, value in h.format_resource_items(res.items()) %}
-                  {% if h.filter_resource_items(key) %}
-                    <tr class="toggle-more"><th scope="row">{{ key }}</th><td>{{ value }}</td></tr>
-                  {% endif %}
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% endblock %}
-      </section>
-    {% endif %}
+        {% if res %}
+            <section class="module">
+                {% block resource_additional_information_inner %}
+                    <div class="module-content">
+                        <h3>{{ _('Additional Information') }}</h3>
+                        <table class="table table-striped table-bordered table-condensed" data-module="table-toggle-more">
+                            <tbody>
+                            <tr>
+                                <th scope="row">{{ _('Last updated') }}</th>
+                                <td>{{ h.render_datetime(res.last_modified) or h.render_datetime(res.revision_timestamp) or h.render_datetime(res.created) or _('unknown') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{{ _('Created') }}</th>
+                                <td>{{ h.render_datetime(res.created) or _('unknown') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{{ _('Format') }}</th>
+                                <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{{ _('License') }}</th>
+                                <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
+                            </tr>
+                            {% for key, value in h.format_resource_items(res.items()) %}
+                                {% if h.filter_resource_items(key) %}
+                                    <tr class="toggle-more">
+                                        <th scope="row">{{ key }}</th>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endblock %}
+            </section>
+        {% endif %}
     </div>
 {% endblock %}
 
 {% block resource_actions_inner %}
-{% if h.check_access('package_update', {'id':pkg.id }) %}
-  <li>{% link_for _('Manage'), controller='package', action='resource_edit', id=pkg.name, resource_id=res.id, class_='btn', icon='wrench' %}</li>
-{% endif %}
-{% if res.url %}
-  <li>
-      {% if res.resource_type in ('listing', 'service') %}
-        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-          <i class="icon-eye-open"></i> {{ _('View') }}
-        </a>
-      {% elif  res.resource_type == 'api' %}
-        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-          <i class="icon-key"></i> {{ _('API Endpoint') }}
-        </a>
-      {% else %}
-        {% snippet 'ckanpackager/snippets/package_resource.html',
-                   res=res, pkg=pkg, bt_class="icon-cloud-download", bt_text=_('Download')
-        %}
-      {% endif %}
-    </a>
-  </li>
-{% endif %}
-{% if 'datastore' in g.plugins %}
-  <li>{% snippet 'package/snippets/data_api_button.html', resource=res, datastore_root_url=c.datastore_api %}</li>
-{% endif %}
-{% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res %}
+
+    {% if h.check_access('package_update', {'id':pkg.id }) %}
+        <li>{% link_for _('Manage'), controller='package', action='resource_edit', id=pkg.name, resource_id=res.id, class_='btn', icon='wrench' %}</li>
+    {% endif %}
+
+    {% snippet 'package/snippets/resource_link.html', res=res, pkg=pkg %}
+
+    {% if 'datastore' in g.plugins and res.datastore_active %}
+        <li>{% snippet 'package/snippets/data_api_button.html', resource=res, datastore_root_url=c.datastore_api %}</li>
+    {% endif %}
+
+        <li>{% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res %}</li>
+
 {% endblock %}

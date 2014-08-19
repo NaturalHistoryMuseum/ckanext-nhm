@@ -8,22 +8,17 @@
 
     {% set datastore_fields = h.form_select_datastore_field_options(data.id, allow_empty=True) %}
 
-    {% if datastore_fields %}
-        {% set field_attrs = {} %}
-        {% set image_field_info = _('Does your dataset contain images?.  If so, please select the field here.') %}
-        {% set title_field_info = _('Please select the field to use for the record title.') %}
-    {% else %}
-        {% set field_attrs = {'disabled' : 'disabled'} %}
-        {% set image_field_info = _('This dataset has not been added to the datastore, so we are unable to extract field information.') %}
-        {% set title_field_info = _('') %}
+    {# We allow empty to has to be greater than 1 for there to be fields #}
+    {% if datastore_fields.__len__() > 1 %}
+
+        {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field) %}
+            {{ form.info(_('Does your dataset contain images?.  If so, please select the field here.'), inline=True) }}
+        {% endcall %}
+
+        {% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field) %}
+            {{ form.info(_('Please select the field to use for the record title.'), inline=True) }}
+        {% endcall %}
+
     {% endif %}
-
-    {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs=field_attrs) %}
-        {{ form.info(image_field_info, inline=True) }}
-    {% endcall %}
-
-    {% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field, attrs=field_attrs) %}
-        {{ form.info(title_field_info, inline=True) }}
-    {% endcall %}
 
 {% endblock %}
