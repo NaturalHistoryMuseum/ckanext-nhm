@@ -4,6 +4,7 @@ import ckanext.nhm.logic.action as action
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.cacheapi.interfaces import ICache
+from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
 from pylons import config
 
@@ -23,6 +24,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IFacets, inherit=True)
     p.implements(p.IPackageController, inherit=True)
     p.implements(ICache, inherit=True)
+    p.implements(IDatastore)
 
     ## IConfigurer
     def update_config(self, config):
@@ -156,3 +158,28 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return cache_dict
 
+    ## IDataStore
+    def datastore_validate(self, context, data_dict, all_field_ids):
+        return data_dict
+
+    def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+        # CKAN's auto-completion query is far too slow for our database. We replace it with an equivalent,
+        # but faster, query.
+        if 'q' in data_dict and isinstance(data_dict['q'], dict) and len(data_dict['q']) == 1:
+            field_name = data_dict['q'].keys()[0]
+            if data_dict['fields'] == field_name and data_dict['q'][field_name].endswith(':*'):
+                escaped_field_name = '"' + field_name.replace('"', '') + '"'
+                value = '%' + data_dict['q'][field_name].replace(':*', '%')
+                query_dict = {
+                    'distinct': True,
+                    'limit': query_dict['limit'],
+                    'offset': query_dict['offset'],
+                    'sort': [escaped_field_name],
+                    'where': [(escaped_field_name + ' LIKE %s', value)],
+                    'select': [escaped_field_name],
+                    'ts_query': ''
+                }
+        return query_dict
+
+    def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
+        return query_dict
