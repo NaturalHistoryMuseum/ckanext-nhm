@@ -25,4 +25,8 @@ won't work. #}
     {#  TODO: Add map to pick spatial extent  #}
     {{ form.input('spatial', label=_('Spatial'), id='field-spatial', placeholder=_('{"type": "Point", "coordinates": [-3.145,53.078]}'), value=data.spatial, error=errors.spatial, classes=['control-medium']) }}
 
+    {# Only show promoted checkbox to sysadmin users #}
+    {% if h.is_sysadmin() %}
+        {{ form.checkbox('promoted', label=_('Promoted'), id='field-promoted', value=True, checked=data.promoted, error=errors.promoted) }}
+    {% endif %}
 {% endblock %}
