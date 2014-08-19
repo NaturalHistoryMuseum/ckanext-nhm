@@ -29,4 +29,5 @@ won't work. #}
     {% if h.is_sysadmin() %}
         {{ form.checkbox('promoted', label=_('Promoted'), id='field-promoted', value=True, checked=data.promoted, error=errors.promoted) }}
     {% endif %}
+
 {% endblock %}

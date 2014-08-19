@@ -139,6 +139,7 @@ a:hover.no-underline {
 [role=main],
 .main {
   background: transparent;
+  padding-top: 20px;
 }
 .module-content {
   padding: 0;
@@ -271,6 +272,7 @@ img#beta{
 .toolbar {
   background: #bbeda9;
   padding: 0;
+  margin: 0;
   /* Breadcrumbs */
 }
 .toolbar .breadcrumb {
