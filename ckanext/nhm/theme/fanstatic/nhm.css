@@ -110,11 +110,9 @@ a:hover.no-underline {
 .default-text-color {
   color: #444444;
 }
-
-.stats .default-text-color{
-    color: #0E4609;
+.stats .default-text-color {
+  color: #0E4609;
 }
-
 .default-text-color a {
   color: #228900;
 }
@@ -158,14 +156,12 @@ a:hover.no-underline {
 .page-header .content_action {
   margin: 0;
 }
-
 /****************** Beta label ******************/
-img#beta{
-    position: absolute;
-    top: 0;
-    left: 0;
+img#beta {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
-
 /****************** Page elements ******************/
 /* Masthead */
 .masthead {
@@ -341,12 +337,10 @@ img#beta{
   font-size: 20px;
   color: #fff;
 }
-
 /* Dataset form */
-.dataset-form #field-temporal-extent{
-    width: 200px;
+.dataset-form #field-temporal-extent {
+  width: 200px;
 }
-
 /* Error messages */
 .alert-danger,
 .alert-error {
@@ -579,33 +573,33 @@ a.btn-danger:hover {
   text-align: right;
 }
 /* Pills (for applied facets) */
-.pill,
-a.tag,
-a.tag:hover{
+.pill {
+  color: #ffffff;
   background-color: #656565;
 }
-
-.pill,
-a.tag{
-    color: #ffffff;
+.pill a:hover {
+  color: #e0e0e0;
+  text-decoration: none;
 }
-
+a.tag {
+  color: #ffffff;
+  background-color: #656565;
+}
+a.tag:hover {
+  background-color: #656565;
+  color: #e0e0e0;
+  text-decoration: none;
+}
+/* Override some ckan styling */
 a.tag,
-a.tag:hover{
+a.tag:hover {
   border: none;
- -webkit-box-shadow: none;
+  -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
   padding: 2px 10px 2px 10px;
   line-height: 21px;
 }
-
-.pill a:hover,
-a.tag:hover {
-  color: #e0e0e0!important;
-  text-decoration: none;
-}
-
 /* Tables */
 .table th,
 .table td {
@@ -650,7 +644,7 @@ tr.empty {
 .table-hide-empty tr.empty {
   display: none;
 }
-table td.filterable{
+table td.filterable {
   width: 50px!important;
   text-align: right!important;
   padding-right: 2px!important;
@@ -975,13 +969,12 @@ i.mineralogy {
 .issue-open a {
   color: #890022;
 }
-
 /* Dataset type labels */
-.label[data-format=dwc], .label[data-format*=dwc] {
-    background-color: #7BB96B;
-    text-transform: uppercase;
+.label[data-format=dwc],
+.label[data-format*=dwc] {
+  background-color: #7BB96B;
+  text-transform: uppercase;
 }
-
 /* Dataset activity page */
 .activity {
   margin-top: 30px;
@@ -1045,24 +1038,19 @@ i.mineralogy {
 .resource-view {
   margin: 20px 0;
 }
-
 /* Resource tags */
-
-.tags{
-    margin-bottom: 20px;
+.tags {
+  margin-bottom: 20px;
 }
-
-.tags .well{
-    background: none;
-    border: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
+.tags .well {
+  background: none;
+  border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
-
-.tags ul.tag-list{
-    padding-top: 0;
+.tags ul.tag-list {
+  padding-top: 0;
 }
-
 /* Gallery */
 #gallery {
   margin-top: 20px;
@@ -1290,12 +1278,10 @@ div.resource-view-filter-pills {
   font-size: 16px;
   line-height: 16px;
 }
-
-.search-form .search-input.search-giant button i{
+.search-form .search-input.search-giant button i {
   top: 1px;
   position: relative;
 }
-
 .search-form .search-input button i:hover {
   color: #fff;
 }
@@ -1321,19 +1307,18 @@ div.ckanpackager-form div {
 .search-form .search-input.search-giant input {
   line-height: inherit;
 }
-
-.placeholder{
-    border: 1px solid #F3F3F3;
+/* Placeholder text */
+.placeholder {
+  border: 1px solid #F3F3F3;
 }
-
-.placeholder::after{
-    content: "(Example text)";
-    background: #F3F3F3;
-    font-size: 0.8em;
-    padding: 2px;
-    display: block;
-    width: 120px;
-    margin: 0 auto;
-    text-align: center;
-    text-transform: uppercase;
+.placeholder::after {
+  content: "(Example text)";
+  background: #F3F3F3;
+  font-size: 0.8em;
+  padding: 2px;
+  display: block;
+  width: 120px;
+  margin: 0 auto;
+  text-align: center;
+  text-transform: uppercase;
 }
