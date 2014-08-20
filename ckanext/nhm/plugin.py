@@ -141,9 +141,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     # IPackageController
     def before_search(self, data_dict):
-        # If there's no sort criteria specified, default to promoted
+        # If there's no sort criteria specified, default to promoted and last modified
         if not data_dict.get('sort', None):
-            data_dict['sort'] = u'promoted asc'
+            data_dict['sort'] = u'promoted asc, metadata_modified desc'
 
         return data_dict
 
