@@ -321,7 +321,7 @@ def get_department(collection_code):
         'BMNH(E)': 'Entomology',
         'BOT': 'Botany',
         'MIN': 'Mineralogy',
-        'PAL': 'Paleontology',
+        'PAL': 'Palaeontology',
         'ZOO': 'Zoology',
     }
 
