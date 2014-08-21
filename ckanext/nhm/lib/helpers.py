@@ -538,8 +538,8 @@ def get_creator_id_facet_label(facet):
     @return: A string to use for display name
     """
     try:
-        user = logic.get_action('user_show')(None, {'id': facet['name']})
-        display_name = user['display_name']
+        user = model.User.get(facet['name'])
+        display_name = user.display_name
     except NotFound:
         display_name = facet['display_name']
     return display_name
