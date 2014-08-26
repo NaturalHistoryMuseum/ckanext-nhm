@@ -5,9 +5,8 @@ import urllib
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
-import itertools
 from ckanext.issues.model import Issue, ISSUE_STATUS
-from sqlalchemy.orm import joinedload
+from beaker.cache import cache_region
 from sqlalchemy import func
 from pylons import config
 from ckan.common import c, _, request
@@ -268,7 +267,7 @@ def get_nhm_organisation_id():
 
     return config.get("ldap.organization.id")
 
-
+@cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by collectionCode
