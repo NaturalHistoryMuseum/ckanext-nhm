@@ -1,5 +1,10 @@
 {% ckan_extends %}
 
+{% block meta %}
+ {{ super() }}
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+{% endblock %}
+
 {% block links %}
   {{ super() }}
   {% snippet 'stats/snippets/google_analytics_header.html' %}
