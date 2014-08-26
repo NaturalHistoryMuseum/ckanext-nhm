@@ -1,0 +1,7 @@
+{% ckan_extends %}
+
+{% block user_about %}
+  {% if c.about_formatted %}
+    {{ c.about_formatted }}
+  {% endif %}
+{% endblock %}
