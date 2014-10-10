@@ -9,6 +9,9 @@
     <div class="search-input control-group">
       <input type="text" class="search" name="q" autocomplete="off" value="{{ q }}" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
       <input type="hidden" name="view_id" value="{{ resource_view['id'] }}" />
+      {% if filters %}
+          <input type="hidden" name="filters" value="{{ filters }}" />
+      {% endif %}
       <button type="submit">
         <i class="icon-search"></i>
         <span>{{ _('Search') }}</span>
