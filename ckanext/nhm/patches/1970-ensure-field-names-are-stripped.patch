@@ -1,0 +1,52 @@
+diff --git a/ckanext/datastore/db.py b/ckanext/datastore/db.py
+index c4ed942..9ea18da 100644
+--- a/ckanext/datastore/db.py
++++ b/ckanext/datastore/db.py
+@@ -71,11 +71,13 @@ def _pluck(field, arr):
+ def _is_valid_field_name(name):
+     '''
+     Check that field name is valid:
++    * can't start or end with a space
+     * can't start with underscore
+     * can't contain double quote (")
+     * can't be empty
+     '''
+-    return name.strip() and not name.startswith('_') and not '"' in name
++    return (name and not name.startswith(('_', ' ')) and not name.endswith(' ')
++           and not '"' in name)
+ 
+ 
+ def _is_valid_table_name(name):
+diff --git a/ckanext/datastore/tests/test_create.py b/ckanext/datastore/tests/test_create.py
+index 39dd2e9..6c1a107 100644
+--- a/ckanext/datastore/tests/test_create.py
++++ b/ckanext/datastore/tests/test_create.py
+@@ -339,6 +339,28 @@ class TestDatastoreCreate(tests.WsgiAppCase):
+         res_dict = json.loads(res.body)
+         assert res_dict['success'] is False
+ 
++        data = {
++            'resource_id': resource.id,
++            'fields': [{'id': 'book', 'type': 'text'},
++                       {'id': ' author', 'type': 'text'}]
++        }
++        postparams = '%s=1' % json.dumps(data)
++        res = self.app.post('/api/action/datastore_create', params=postparams,
++                            extra_environ=auth, status=409)
++        res_dict = json.loads(res.body)
++        assert res_dict['success'] is False
++
++        data = {
++            'resource_id': resource.id,
++            'fields': [{'id': 'book', 'type': 'text'},
++                       {'id': 'author ', 'type': 'text'}]
++        }
++        postparams = '%s=1' % json.dumps(data)
++        res = self.app.post('/api/action/datastore_create', params=postparams,
++                            extra_environ=auth, status=409)
++        res_dict = json.loads(res.body)
++        assert res_dict['success'] is False
++
+     def test_create_invalid_record_field(self):
+         resource = model.Package.get('annakarenina').resources[0]
+         data = {
