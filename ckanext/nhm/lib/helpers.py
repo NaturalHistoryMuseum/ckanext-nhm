@@ -14,6 +14,7 @@ from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_all
 from collections import OrderedDict
 
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
+from ckanext.nhm.plugin import resource_filter_options
 
 log = logging.getLogger(__name__)
 
@@ -424,7 +425,38 @@ def absolute_url_for(*args, **kw):
     return url
 
 
-def get_resource_filter_pills():
+def get_resource_filter_options(resource):
+    """Return the available filter options for the given resource
+
+    @type resource: dict
+    @param resource: Dictionary representing a resource
+    @rtype: dict
+    @return: A dictionary associating each option's name to a dict
+            defining:
+                - label: The label to display to users;
+                - checked: True if the option is currently applied.
+    """
+    options = resource_filter_options(resource)
+    filter_list = toolkit.request.params.get('filters', '').split('|')
+    filters = {}
+    for filter_def in filter_list:
+        try:
+            (key, value) = filter_def.split(':')
+        except ValueError:
+            continue
+        if key not in filters:
+            filters[key] = [value]
+        else:
+            filters[key].append(value)
+    for o in options:
+        if o in filters and 'true' in filters[o]:
+            options[o]['checked'] = True
+        else:
+            options[o]['checked'] = False
+    return options
+
+
+def get_resource_filter_pills(resource):
 
     filter_dict = {}
 
@@ -461,6 +493,7 @@ def get_resource_filter_pills():
 
     pills = {}
 
+    options = resource_filter_options(resource)
     for field, values in filter_dict.items():
         for value in values:
             filters = get_pill_filters(field, value)
@@ -469,6 +502,12 @@ def get_resource_filter_pills():
             # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
             if field == '_tmgeom':
                 pills['geometry'] = {'Polygon': filters}
+            elif field in options:
+                label = options[field]['label']
+                try:
+                    pills['options'][label] = filters
+                except KeyError:
+                    pills['options'] = {label: filters}
             else:
                 try:
                     pills[field][value] = filters

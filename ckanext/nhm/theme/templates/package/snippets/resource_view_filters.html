@@ -1,5 +1,5 @@
 
-{% set filter_pills = h.get_resource_filter_pills() %}
+{% set filter_pills = h.get_resource_filter_pills(resource) %}
 {% set query_params = h.get_query_params() %}
 
 <div class="row resource-view-filter-form">
@@ -9,6 +9,12 @@
 
     <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">
         <div class="resource-view-filters-wrapper">
+            <div
+              class="resource-view-filter-options"
+              data-module="resource-view-filter-options"
+              data-module-options="{{ h.dump_json(h.get_resource_filter_options(resource)) }}"
+              >
+            </div>
             <div
               class="resource-view-filters"
               data-module="resource-view-filters"

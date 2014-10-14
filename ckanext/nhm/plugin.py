@@ -1,7 +1,6 @@
 import os
 import ckan.plugins as p
 import ckanext.nhm.logic.action as action
-import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.cacheapi.interfaces import ICache
 from ckanext.datastore.interfaces import IDatastore
@@ -92,6 +91,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     # ITemplateHelpers
     def get_helpers(self):
+        import ckanext.nhm.lib.helpers as helpers
 
         h = {}
 
@@ -160,9 +160,27 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
+        if 'filters' in data_dict:
+            resource_show = p.toolkit.get_action('resource_show')
+            resource = resource_show(context, {'id': data_dict['resource_id']})
+            options = resource_filter_options(resource)
+            for o in options:
+                if o in data_dict['filters']:
+                    del data_dict['filters'][o]
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+        # Add our options filters
+        if 'filters' in data_dict:
+            resource_show = p.toolkit.get_action('resource_show')
+            resource = resource_show(context, {'id': data_dict['resource_id']})
+            options = resource_filter_options(resource)
+            for o in options:
+                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
+                    if 'sql' in options[o]:
+                        query_dict['where'].append(options[o]['sql'])
+                elif 'sql_false' in options[o]:
+                    query_dict['where'].append(options[o]['sql_false'])
         # CKAN's auto-completion query is far too slow for our database. We replace it with an equivalent,
         # but faster, query.
         if 'q' in data_dict and isinstance(data_dict['q'], dict) and len(data_dict['q']) == 1:
@@ -183,3 +201,45 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
         return query_dict
+
+def resource_filter_options(resource):
+    """Return the list of filter options for the given resource.
+
+    Note that this is the master source for the list of available options.
+
+    We may want to have this dependent on available fields (rather than
+    resource format), so it's useful to keep this as a function (rather
+    than a static dict).
+
+    @type resource: dict
+    @param resource: Dictionary representing a resource
+    @rtype: dict
+    @return: A dictionary associating each option's name to a dict
+            defining:
+                - label: The label to display to users;
+                - sql: Optional. The SQL WHERE statement to use when this
+                       option is checked (as a tuple containing statement
+                       and value replacements);
+                - sql_false: Optional. The SQL WHERE statement to use when
+                             this option is unchecked (as a tuple containing
+                             statement and value replacements).
+    """
+    table = resource['id']
+    # Get the resource-dependent filter option list
+    if resource['format'].lower() == 'dwc':
+        return {
+            '_has_type': {
+                'label': 'Has type',
+                'sql': ('"{}"."typeStatus" IS NOT NULL'.format(table),)
+            },
+            '_has_image': {
+                'label': 'Has image',
+                'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(table),)
+            },
+            '_has_lat_long': {
+                'label': 'Has lat/long',
+                'sql': ('"{}"."_geom" IS NOT NULL'.format(table),)
+            }
+        }
+    else:
+        return {}
