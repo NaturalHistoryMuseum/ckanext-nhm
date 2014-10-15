@@ -578,7 +578,7 @@ def get_creator_id_facet_label(facet):
     try:
         user = model.User.get(facet['name'])
         display_name = user.display_name
-    except NotFound:
+    except (NotFound, AttributeError) as e:
         display_name = facet['display_name']
     return display_name
 
