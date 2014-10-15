@@ -1,4 +1,5 @@
 import os
+import re
 import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
@@ -181,8 +182,20 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         query_dict['where'].append(options[o]['sql'])
                 elif 'sql_false' in options[o]:
                     query_dict['where'].append(options[o]['sql_false'])
-        # CKAN's auto-completion query is far too slow for our database. We replace it with an equivalent,
-        # but faster, query.
+
+        # Enhance the full text search, by adding support for double quoted expressions. We leave the
+        # full text search query intact (so we benefit from the full text index) and add an additonal
+        # LIKE statement for each quoted group.
+        if 'q' in data_dict and not isinstance(data_dict['q'], dict):
+            for match in re.findall('"[^"]+"', data_dict['q']):
+                query_dict['where'].append((
+                    '"{}"::text LIKE %s'.format(resource['id']),
+                    '%' + match[1:-1] + '%'
+                ))
+
+        # CKAN's field auto-completion uses full text search on individual fields. This causes
+        # problems because of stemming issues, and is quite slow on our data set (even with an
+        # appropriate index). We detect this type of queries and replace them with a LIKE query.
         if 'q' in data_dict and isinstance(data_dict['q'], dict) and len(data_dict['q']) == 1:
             field_name = data_dict['q'].keys()[0]
             if data_dict['fields'] == field_name and data_dict['q'][field_name].endswith(':*'):
