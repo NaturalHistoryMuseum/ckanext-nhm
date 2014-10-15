@@ -193,7 +193,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'limit': query_dict['limit'],
                     'offset': query_dict['offset'],
                     'sort': [escaped_field_name],
-                    'where': [(escaped_field_name + ' LIKE %s', value)],
+                    'where': [(escaped_field_name + '::citext LIKE %s', value)],
                     'select': [escaped_field_name],
                     'ts_query': ''
                 }
