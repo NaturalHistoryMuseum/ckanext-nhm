@@ -441,7 +441,7 @@ def get_resource_filter_options(resource):
     filters = {}
     for filter_def in filter_list:
         try:
-            (key, value) = filter_def.split(':')
+            (key, value) = filter_def.split(':', 1)
         except ValueError:
             continue
         if key not in filters:
@@ -468,7 +468,7 @@ def get_resource_filter_pills(resource):
     filter_params = filter(None, filter_params)
 
     for filter_param in filter_params:
-        field, value = filter_param.split(':')
+        field, value = filter_param.split(':', 1)
 
         try:
             filter_dict[field].append(value)

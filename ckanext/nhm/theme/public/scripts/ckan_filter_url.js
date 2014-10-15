@@ -105,9 +105,12 @@ this.CkanFilterUrl = function(input_url){
     if (typeof filters == 'string' && filters){
       var split = filters.split('|');
       for (var i in split){
-        var parts = split[i].split(':');
-        if (parts.length == 2){
-          this.set_filter(parts[0], parts[1])
+        var pos = split[i].indexOf(':');
+        if (pos > 0 && pos+1 < split[i].length){
+          this.set_filter(
+            split[i].substring(0, pos),
+            split[i].substring(pos+1)
+          );
         }
       }
     } else if (typeof filters == 'object'){
