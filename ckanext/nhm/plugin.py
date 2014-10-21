@@ -252,6 +252,10 @@ def resource_filter_options(resource):
             '_has_lat_long': {
                 'label': 'Has lat/long',
                 'sql': ('"{}"."_geom" IS NOT NULL'.format(table),)
+            },
+            '_exclude_centroid': {
+                'label': 'Exclude centroids',
+                'sql': ('NOT (LOWER("{}"."Centroid") = ANY(\'{{true,yes,1}}\'))'.format(table),)
             }
         }
     else:
