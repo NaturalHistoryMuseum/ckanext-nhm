@@ -1,0 +1,13 @@
+diff --git a/ckanext/reclineview/theme/public/recline_view.js b/ckanext/reclineview/theme/public/recline_view.js
+index 368e6e8..43a6e27 100644
+--- a/ckanext/reclineview/theme/public/recline_view.js
++++ b/ckanext/reclineview/theme/public/recline_view.js
+@@ -69,7 +69,7 @@ this.ckan.module('recline_view', function (jQuery, _) {
+         }
+       }
+ 
+-      dataset.query(query);
++      dataset.queryState.set(query.toJSON(), {silent: true});
+ 
+       errorMsg = this.options.i18n.errorLoadingPreview + ': ' + this.options.i18n.errorDataStore;
+       dataset.fetch()
