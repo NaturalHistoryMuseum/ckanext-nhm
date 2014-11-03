@@ -8,6 +8,7 @@ import logging
 import re
 from ckanext.nhm.controllers.record import RecordController
 from ckanext.nhm.lib.helpers import get_department
+import numpy as np
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -30,163 +31,168 @@ class SpecimenController(RecordController):
 
     # List of fields and groups
     field_groups = OrderedDict([
-        ('Record', [
-            ('occurrenceID', 'Identifier'),
-            ('modified', 'Date modified'),
-            ('created', 'Date created'),
-            ('recordType', 'Record type'),
-            ('registrationCode', 'Registration code'),
-            ('kindOfObject', 'Kind of object'),
+        ("Classification", [
+            "Scientific name",
+            "Scientific name authorship",
+            "Kingdom",
+            "Phylum",
+            "Class",
+            "Order",
+            "Family",
+            "Genus",
+            "Subgenus",
+            "Specific epithet",
+            "Infraspecific epithet",
+            "Higher classification",
+            "Taxon rank",
         ]),
-        ('Classification', [
-            ('scientificName', 'Scientific name'),
-            ('scientificNameAuthorship', 'Authorship'),
-            ('kingdom', 'Kingdom'),
-            ('phylum', 'Phylum'),
-            ('class', 'Class'),
-            ('order', 'Order'),
-            ('family', 'Family'),
-            ('genus', 'Genus'),
-            ('subgenus', 'Subgenus'),
-            ('specificEpithet', 'Species'),
-            ('infraspecificEpithet', 'Subspecies'),
-            ('higherClassification', 'Higher classification'),
-            ('taxonRank', 'Rank')
+        ("Location", [
+            "Label locality",
+            "Locality",
+            "State province",
+            "Mine",
+            "Mining district",
+            "Vice country",
+            "Country",
+            "Continent",
+            "Island",
+            "Island group",
+            "Water body",
+            "Higher geography",
+            "Decimal latitude",
+            "Decimal longitude",
+            "Verbatim latitude",
+            "Verbatim longitude",
+            "Centroid",
+            "Max error",
+            "Geodetic datum",
+            "Georeference protocol",
+            "Minimum elevation in meters",
+            "Maximum elevation in meters",
+            "Minimum depth in meters",
+            "Maximum depth in meters",
         ]),
-        ('Location', [
-            ('siteDescription', 'Site description'),
-            ('locality', 'Locality'),
-            ('stateProvince', 'State / province'),
-            ('mine', 'Mine'),
-            ('miningDistrict', 'Mining district'),
-            ('country', 'Country'),
-            ('continent', 'Continent'),
-            ('island', 'Island'),
-            ('islandGroup', 'Island group'),
-            ('waterBody', 'Water body'),
-            ('higherGeography', 'Higher geography'),
-
-            ('decimalLatitude','Decimal latitude'),
-            ('decimalLongitude','Decimal longitude'),
-            ('geodeticDatum','Geodetic datum'),
-            ('georeferenceProtocol','Georeferencing protocol'),
-
-            ('minimumElevationInMeters','Minimum elevation (meters)'),
-            ('maximumElevationInMeters','Maximum elevation (meters)'),
-            ('minimumDepthInMeters','Minimum depth (meters)'),
-            ('maximumDepthInMeters','Maximum depth (meters)'),
+        ("Collection event", [
+            "Recorded by",
+            "Record number",
+            "Collection date",
+            # "Year", Merged into collection date
+            # "Month", Merged into collection date
+            # "Day", Merged into collection date
+            "Event time",
+            "Expedition",
+            "Habitat",
         ]),
-        ('Collection event', [
-            ('recordNumber', 'Collector number'),
-            ('year', 'Year'),
-            ('month', 'Month'),
-            ('day', 'Day'),
-            ('recordedBy', 'Collector'),
-            ('eventTime', 'Collection time'),
-            ('habitat', 'Habitat'),
-            ('fieldNumber', 'Field number'),
+        ("Identification", [
+            "Identified by",
+            "Date identified",
+            "Identification qualifier",
+            "Type status",
+            "Determinations"
         ]),
-        ('Identification', [
-            ('identifiedBy', 'Identified by'),
-            ('dateIdentified', 'Date identified'),
-            ('identificationQualifier', 'Identification qualifier'),
-            ('typeStatus', 'Type status'),
-            ('identificationAsRegistered', 'Identification as registered'),
+        ("Specimen", [
+            "Catalog number",
+            "Collection code",
+            "Sub department",
+            "Other catalog numbers",
+            "Preparations",
+            "Preparation type",
+            "Preservative",
+            "Collection kind",
+            "Collection name",
+            "Donor name",
+            "Kind of collection",
+            "Observed weight",
+            "Individual count",
+            "Sex",
+            "Life stage",
         ]),
-        ('Specimen', [
-            ('catalogNumber', 'Catalogue number'),
-            ('collectionCode', 'Collection code'),
-            ('subDepartment', 'Collection sub-department'),
-            ('otherCatalogNumbers', 'Other catalogue numbers'),
-            ('preparations', 'Preparations'),
-            ('preparationType', 'Preparation type'),
-            ('preservative', 'Preservative'),
-            ('collectionKind', 'Collection kind'),
-            ('collectionName', 'Collection name'),
-            ('donorName', 'Donor name'),
-            ('kindOfCollection', 'Kind of collection'),
-            ('observedWeight', 'Weight'),
-            ('individualCount', 'Count'),
-            ('sex', 'Sex'),
-            ('lifeStage', 'Stage'),
+        ("Mineralogy", [
+            "Date registered",
+            "Occurrence",
+            "Commodity",
+            "Deposit type",
+            "Texture",
+            "Identification as registered",
+            "Identification description",
+            "Identification variety",
+            "Identification other",
+            "Host rock",
+            "Age",
+            "Age type",
+            "Geology region",
+            "Mineral complex",
+            "Earliest eon or lowest eonothem",
+            "Latest eon or highest eonothem",
+            "Earliest era or lowest erathem",
+            "Latest era or highest erathem",
+            "Earliest period or lowest system",
+            "Latest period or highest system",
+            "Earliest epoch or lowest series",
+            "Latest epoch or highest series",
+            "Earliest age or lowest stage",
+            "Latest age or highest stage",
+            "Lowest biostratigraphic zone",
+            "Highest biostratigraphic zone",
+            "Group",
+            "Formation",
+            "Member",
+            "Bed",
+            "Chronostratigraphy",
+            "Lithostratigraphy",
+            "Tectonic province",
+            "Registered weight",
+            # "Registered weight unit",  # Merged into Registered weight
         ]),
-        ('Mineralogy', [
-            ('dateRegistered', 'Date registered'),
-            ('occurrence', 'occurrence'),
-            ('commodity', 'Commodity'),
-            ('depositType', 'Deposit type'),
-            ('texture', 'Texture'),
-            ('identificationVariety', 'Identification variety'),
-            ('identificationOther', 'Other identification'),
-            ('hostRock', 'Host rock'),
-            ('age', 'Age'),
-            ('ageType', 'Age type'),
-            ('geologyRegion', 'Geology region'),
-            ('mineralComplex', 'Mineral complex'),
-            ('earliestEonOrLowestEonothem', 'Earliest eon or lowest eonothem'),
-            ('latestEonOrHighestEonothem', 'Latest eon or highest eonothem'),
-            ('earliestEraOrLowestErathem', 'Earliest era or lowest erathem'),
-            ('latestEraOrHighestErathem', 'Latest era or highest erathem'),
-            ('earliestPeriodOrLowestSystem', 'Earliest period or lowest system'),
-            ('latestPeriodOrHighestSystem', 'Latest period or highest system'),
-            ('earliestEpochOrLowestSeries', 'Earliest epoch or lowest series'),
-            ('latestEpochOrHighestSeries', 'Latest epoch or highest series'),
-            ('earliestAgeOrLowestStage', 'Earliest age or lowest stage'),
-            ('latestAgeOrHighestStage', 'Latest age or highest stage'),
-            ('lowestBiostratigraphicZone', 'Lowest biostratigraphic zone'),
-            ('highestBiostratigraphicZone', 'Highest biostratigraphic zone'),
-            ('group', 'Group'),
-            ('formation', 'Formation'),
-            ('member', 'Member'),
-            ('bed', 'Bed'),
-            ('chronostratigraphy', 'Chronostratigraphy'),
-            ('lithostratigraphy', 'Lithostratigraphy'),
-            ('tectonicProvince', 'Tectonic province'),
-            ('registeredWeight', 'Registered weight'),
-            ('registeredWeightUnit', 'Weight unit'),
+        ("Meteorite", [
+            "Meteorite type",
+            "Meteorite group",
+            "Chondrite achondrite",
+            "Meteorite class",
+            "Petrology type",
+            "Petrology subtype",
+            "Recovery",
+            "Recovery date",
+            "Recovery weight",
         ]),
-        ('Meteorite', [
-            ('meteoriteType', 'Meteorite type'),
-            ('meteoriteGroup', 'meteorite group'),
-            ('chondriteAchondrite', 'Chondrite / achondrite'),
-            ('meteoriteClass', 'Meteorite class'),
-            ('petType', 'Petrology type'),
-            ('petSubType', 'Petrology subtype'),
-            ('recovery', 'Recovery'),
-            ('recoveryDate', 'Recovery date'),
-            ('recoveryWeight', 'Recovery weight'),
+        ("Botany", [
+            "Exsiccati",
+            "Exsiccati number",
+            "Plant description",
+            "Cultivated",
         ]),
-        ('Botany', [
-            ('exsiccati', 'Exsiccati'),
-            ('exsiccatiNumber', 'Exsiccati number'),
-            ('plantDescription', 'Plant description'),
-            ('cultivated', 'Cultivated'),
-            ('plantForm', 'Plant form'),
+        ("Silica gel", [
+            "Population code",
         ]),
-        ('Silica gel', [
-            ('populationCode', 'Population code'),
+        ("Nest", [
+            "Nest shape",
+            "Nest site",
         ]),
-        ('Nest', [
-            ('nestShape', 'Nest shape'),
-            ('nestSite', 'Nest site'),
+        ("Egg", [
+            "Clutch size",
+            "Set mark",
         ]),
-        ('Egg', [
-            ('clutchSize', 'Clutch size'),
-            ('setMark', 'Set mark'),
+        ("Parasite card", [
+            "Barcode",
         ]),
-        ('Parasite card', [
-            ('barcode', 'Barcode'),
+        ("DNA Preparation", [
+            "Extraction method",
+            "Resuspended in",
+            "Total volume",
         ]),
-        ('DNA Preparation', [
-            ('extractionMethod', 'Extraction method'),
-            ('resuspendedIn', 'Resuspended in'),
-            ('totalVolume', 'Total volume')
+        ("Part", [
+            "Part type",
         ]),
-        ('Part', [
-            ('partType', 'Part type')
+        ("Palaeontology", [
+            "Catalogue description",
         ]),
-        ('Palaeontology', [
-            ('catalogueDescription', 'Catalogue description'),
+        ("Record", [
+            "Occurrence ID",
+            "Modified",
+            "Created",
+            "Record type",
+            "Registration code",
+            "Kind of object",
         ])
     ])
 
@@ -201,114 +207,98 @@ class SpecimenController(RecordController):
         """
         self._load_data(package_name, resource_id, record_id)
 
-        c.record_title = c.record_dict['occurrenceID']
+        log.info('Viewing record %s', c.record_dict.get('Occurrence ID', None))
 
-        # Unpack the dynamic properties so they cna be used as just field values
-        for prop in c.record_dict.pop('dynamicProperties').strip().split(';'):
-            try:
-                key, value = prop.strip().split('=')
-            except ValueError:
-                pass
-            else:
-                c.record_dict[key] = value
+        c.record_title = c.record_dict.get('Catalog number', None) or c.record_dict.get('Occurrence ID', None)
 
-        # Build an ordered dict for the field data
-        # Organised into groups
-        c.field_data = OrderedDict()
+        c.field_groups = self.field_groups
 
-        # Fields to ignore
-        field_blacklist = [
-            'registeredWeightUnit'  # We do not want unit output, as it is added to weight
-        ]
+        # Some fields are being merged together - in which case we'll need custom filters
+        # This can be set to bool false to not display a filter
+        c.custom_filters = {}
 
-        # Related resources
-        c.related_records = []
+        if c.record_dict.get('Registered weight', None) and c.record_dict.get('Registered weight unit', None):
+            # Create custom filter which acts on both weight and units
+            c.custom_filters['Registered weight'] = 'Registered weight:%s|Registered weight unit:%s' % (c.record_dict['Registered weight'], c.record_dict['Registered weight unit'])
+            # Merge unit into the field
+            c.record_dict['Registered weight'] += ' %s' % c.record_dict['Registered weight unit']
 
+        #  Build a sub dictionary of parts to use in collection date
+        collection_date = OrderedDict((k, c.record_dict[k]) for k in ('Day', 'Month', 'Year') if c.record_dict.get(k, None))
+
+        # Join the date for the record view
+        c.record_dict['Collection date'] = ' / '.join(collection_date.values())
+
+        # Create a custom filter, so collection date filters on day, month and year
+        c.custom_filters['Collection date'] = '|'.join(['%s:%s' % (k, v) for k, v in collection_date.iteritems()])
+
+        # Some fields need stripping to remove empty string characters
         try:
-            related_resources = c.record_dict.pop('relatedResourceID').split(';')
+            c.record_dict['Max error'] = c.record_dict['Max error'].strip()
         except AttributeError:
             pass
-        else:
-            for related_resource in related_resources:
-                m = re.search('IRN: ([0-9]+), ([0-9a-zA-Z ]+)', related_resource)
-                try:
-                    irn = m.group(1)
-                    type = m.group(2)
-                except AttributeError:
-                    pass
-                else:
 
-                    try:
-                        # Make sure it exists - there only ever seems to be one related record
-                        # But if this changes, we will need to change lookup code
-                        record = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': irn})
-                    except NotFound:
-                        pass
-                    else:
-                        c.related_records.append({
-                            '_id': irn,
-                            'title': '%s: %s' % (type, record['occurrenceID']),
-                        })
+        # Pattern for matching key in determination date
+        regex = re.compile('^([a-z ]+)=(.*)', re.IGNORECASE)
+        determinations = []
 
-        try:
-            part_refs = c.record_dict.pop('partRefs').split(';')
-        except (AttributeError, KeyError):
-            pass
-        else:
-
+        # Parse the determinations string
+        for determination in c.record_dict['Determinations'].split('|'):
+            result = regex.match(determination)
             try:
-                # And remove this records IRN
-                part_refs.remove(str(record_id))
-            except ValueError:
+                determinations.append([result.group(1)] + result.group(2).split(';'))
+            except AttributeError:
                 pass
 
-            for part_ref in part_refs:
-                c.related_records.append({
-                    '_id': part_ref,
-                    'title': '%s: %s' % ('Part', part_ref),
-                })
+        if determinations:
+            # Transpose list of determinations & fill in missing values so they are all the same length
+            c.record_dict['Determinations'] = map(lambda *row: list(row), *determinations)
+            # We do not want custom filters for determinations
+            c.custom_filters['Determinations'] = None
+        else:
+            c.record_dict['Determinations'] = None
 
-        for group, fields in self.field_groups.items():
 
-            field_values = OrderedDict()
+        # TODO Determinations
+        # http://10.11.12.13:5000/dataset/nhm-specimens-test/resource/56628466-44e3-4a53-b6f9-84f7e44c010f/record/111317
+        # http://10.11.12.13:5000/dataset/nhm-specimens-test/resource/56628466-44e3-4a53-b6f9-84f7e44c010f/record/1887464
+        # http://10.11.12.13:5000/dataset/nhm-specimens-test/resource/56628466-44e3-4a53-b6f9-84f7e44c010f/record/394435
 
-            for field in fields:
+        # TODO: Test related resources & parts etc.,
 
-                # Skip blacklisted fields
-                if field[0] in field_blacklist:
-                    continue
+        # # Related resources
+        # c.related_records = []
+        #
+        # try:
+        #     related_resources = c.record_dict.pop('relatedResourceID').split(';')
+        # except AttributeError:
+        #     pass
+        # else:
+        #     for related_resource in related_resources:
+        #         m = re.search('IRN: ([0-9]+), ([0-9a-zA-Z ]+)', related_resource)
+        #         try:
+        #             irn = m.group(1)
+        #             type = m.group(2)
+        #         except AttributeError:
+        #             pass
+        #         else:
+        #
+        #             try:
+        #                 # Make sure it exists - there only ever seems to be one related record
+        #                 # But if this changes, we will need to change lookup code
+        #                 record = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': irn})
+        #             except NotFound:
+        #                 pass
+        #             else:
+        #                 c.related_records.append({
+        #                     '_id': irn,
+        #                     'title': '%s: %s' % (type, record['occurrenceID']),
+        #                 })
 
-                try:
-                    value = c.record_dict[field[0]]
-                except KeyError:
-                    # If the value doesn't exist in kwargs, we don't care, it won't get added to the values
-                    pass
-                else:
-                    if value:
-                    # Key by field name
-
-                        field_data = {
-                            'label': field[1],
-                            'value': value
-                        }
-
-                        # Add some extra suffixes info
-                        # Add full department name
-                        if field[0] == 'collectionCode':
-                            field_data['suffix'] = '(%s)' % get_department(value)
-                        # Add registeredWeightUnit to registeredWeight
-                        elif field[0] == 'registeredWeight':
-                            field_data['suffix'] = c.record_dict.get('registeredWeightUnit', None)
-
-                        field_values[field[0]] = field_data
-
-            if field_values:
-                c.field_data[group] = field_values
-
-        # Add thumbnails to images
-        for image in c.images:
-            # Width is required in the image URL (This will change when we move to DAMS)
-            image['url'] += '&width=600'
-            image['thumbnail'] = '%s&width=100&height=100' % image['url']
+        # # Add thumbnails to images
+        # for image in c.images:
+        #     # Width is required in the image URL (This will change when we move to DAMS)
+        #     image['url'] += '&width=600'
+        #     image['thumbnail'] = '%s&width=100&height=100' % image['url']
 
         return p.toolkit.render('record/specimen.html')

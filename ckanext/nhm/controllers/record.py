@@ -53,6 +53,9 @@ class RecordController(base.BaseController):
 
         image_field = c.resource.get('_image_field', None)
 
+        # TODO: Move record title here
+        # {% set record_display_name = h.record_display_name(res, rec) %}
+
         # Sanity check: image field hasn't been set to _id
         if image_field and image_field != '_id':
             try:

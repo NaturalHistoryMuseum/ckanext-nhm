@@ -296,9 +296,6 @@ def collection_stats():
     else:
 
         for record in result['records']:
-            # TEMP: After next run, this will not be needed
-            if not record['collectionCode']:
-                continue
             count = int(record['count'])
             collections[record['collectionCode']] = count
             total += count
@@ -651,3 +648,32 @@ def is_sysadmin():
     """
     if c.userobj.sysadmin:
         return True
+
+def record_display_field(field_name, value):
+    """
+    Decide whether to display a field
+    Evaluates whether a field has value
+    @param field_name:
+    @param value:
+    @return: bool - true to display field; false not to
+    """
+
+    # If this is a string, strip it before evaluating
+    if isinstance(value, basestring):
+        value = value.strip()
+
+    return bool(value)
+
+
+def group_fields_have_data(record_dict, fields):
+    """
+    Are any of the fields in the group populated
+    Return true if they are; false if not
+    @param record_dict: record data
+    @param fields: fields to test
+    @return: bool
+    """
+
+    for field in fields:
+        if record_dict.get(field, None):
+            return True

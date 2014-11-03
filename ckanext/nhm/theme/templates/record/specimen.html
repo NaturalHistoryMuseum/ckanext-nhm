@@ -2,8 +2,8 @@
 
 {% block content_primary_nav %}
 
-  {{ h.build_nav_icon('specimen', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-  {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+{{ h.build_nav_icon('specimen', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+{{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
 
 {% endblock %}
 
@@ -11,37 +11,76 @@
 
     <table>
 
-        {% for group, fields in c.field_data.items() %}
+        {% for group, fields in c.field_groups.items() %}
 
-            <thead>
-                <tr><th colspan="4">{{ group }}</th></tr>
-            </thead>
+            {% if h.group_fields_have_data(c.record_dict, fields) %}
 
-            <tbody>
-                {% for field_name, field in fields.items() %}
+                <thead>
+                    <tr><th colspan="4">{{ group }}</th></tr>
+                </thead>
 
-                    <tr>
-                        <td><strong>{{ field['label'] }}:</strong></td>
-                        <td colspan="2">
+                <tbody>
+                    {% for field in fields %}
 
-                            {{ field['value'] }}
+                        {% if c.record_dict[field] %}
 
-                            {% if field['suffix'] %}
-                                {{ field['suffix'] }}
-                            {% endif %}
+                            <tr>
 
-                        </td>
-                        <td width="50" class="filterable">
-                            {% if field_name in filter_fields %}
-                                <a title="View all records where {{ field_name }}={{ field['value'] }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, field['value'])) }}">
-                                    <i class="icon-filter"></i>
-                                </a>
-                            {% endif %}
-                        </td>
-                    </tr>
+                                <td><strong>{{ field }}:</strong></td>
+                                <td colspan="2">
 
-                {% endfor %}
-            <tbody>
+                                    {% if field == 'Determinations' %}
+
+                                        <table id="determinations">
+
+                                            <tr>
+                                                {% for label in c.record_dict['Determinations'][0] %}
+                                                    <th>{{ label }}</th>
+                                                {% endfor %}
+                                            </tr>
+
+                                            {% for determination in c.record_dict['Determinations'][1:] %}
+                                                <tr>
+                                                    {% for value in determination %}
+                                                        <td> {{ value }}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+
+                                        </table>
+
+                                    {% elif field == 'Collection code' %}
+                                        {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
+                                    {% else %}
+                                        {{ c.record_dict[field] }}
+                                    {% endif %}
+
+                                </td>
+
+                                <td width="50" class="filterable">
+
+                                    {% if field in c.custom_filters %}
+                                        {% set filter = c.custom_filters[field] %}
+                                    {% else %}
+                                        {% set filter = '%s:%s' % (field, c.record_dict[field]) %}
+                                    {% endif %}
+
+                                    {% if filter %}
+
+                                        <a title="View all records where {{ filter }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters=filter) }}">
+                                            <i class="icon-filter"></i>
+                                        </a>
+
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        {% endif %}
+
+                    {% endfor %}
+                <tbody>
+
+            {% endif %}
 
         {% endfor %}
 

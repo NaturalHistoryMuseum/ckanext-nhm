@@ -1,0 +1,13 @@
+Test to check all fields are being displayed.
+
+        # Build an ordered dict for the field data
+        # Organised into groups
+        c.field_data = OrderedDict()
+
+        for group, fields in self.field_groups.items():
+            for field in fields:
+                # print field, c.record_dict.get(field)
+                # c.record_dict.pop(field)
+                del c.record_dict[field]
+
+        print c.record_dict
