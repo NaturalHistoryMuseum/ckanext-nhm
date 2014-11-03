@@ -36,7 +36,7 @@
       <h4>{{ _('Total number of contributors') }}</h4>
 
       {% set xaxis = {'mode': 'time', 'timeformat': '%d-%m-%y'} %}
-      {% set yaxis = {'min': 0} %}
+      {% set yaxis = {'min': 0, 'tickDecimals': 0} %}
       <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
         <thead>
           <tr>
