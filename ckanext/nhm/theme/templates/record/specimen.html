@@ -109,11 +109,11 @@
 
    <tr>
     <th scope="row">{{ _('Created') }}</th>
-    <td>{{ h.render_datetime(rec.created) }}</td>
+    <td>{{ h.render_datetime(c.record_dict['Created']) }}</td>
   </tr>
    <tr>
     <th scope="row">{{ _('Last updated') }}</th>
-    <td>{{ h.render_datetime(rec.modified) }}</td>
+    <td>{{ h.render_datetime(c.record_dict['Modified']) }}</td>
   </tr>
 
   {{ super() }}
