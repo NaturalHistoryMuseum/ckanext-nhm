@@ -6,6 +6,7 @@ import ckan.plugins as p
 from ckan.common import _, c
 import logging
 import json
+from ckan.lib.render import find_template
 from ckanext.nhm.lib.helpers import get_datastore_fields
 from collections import OrderedDict
 
@@ -102,5 +103,17 @@ class RecordController(base.BaseController):
             if not field['id'].startswith('_'):
                 c.field_data[field['id']] = c.record_dict.get(field['id'], None)
 
-        # Image and map should be a block in main record view
-        return p.toolkit.render('record/view.html')
+
+        # Try and use a template file based on the resource name
+        template_file = 'record/{dataset}_{resource}.html'.format(
+            # TODO: Change back
+            # dataset=c.package['name'].lower(),
+            dataset='nhm-collection',
+            resource=c.resource['name'].lower()
+        )
+
+        # If we don't have a specific template file, use the generic one
+        if not find_template(template_file):
+            template_file = 'record/view.html'
+
+        return p.toolkit.render(template_file)
