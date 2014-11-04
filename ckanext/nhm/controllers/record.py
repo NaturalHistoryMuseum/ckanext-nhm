@@ -105,7 +105,7 @@ class RecordController(base.BaseController):
 
 
         # Try and use a template file based on the resource name
-        template_file = 'record/{dataset}_{resource}.html'.format(
+        template_file = 'record/{dataset}-{resource}.html'.format(
             # TODO: Change back
             # dataset=c.package['name'].lower(),
             dataset='nhm-collection',
