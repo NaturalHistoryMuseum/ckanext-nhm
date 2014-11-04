@@ -207,9 +207,11 @@ class SpecimenController(RecordController):
         """
         self._load_data(package_name, resource_id, record_id)
 
-        log.info('Viewing record %s', c.record_dict.get('Occurrence ID', None))
+        occurrence_id = c.record_dict.get('Occurrence ID')
 
-        c.record_title = c.record_dict.get('Catalog number', None) or c.record_dict.get('Occurrence ID', None)
+        log.info('Viewing record %s', occurrence_id)
+
+        c.record_title = c.record_dict.get('Catalog number', None) or occurrence_id
 
         c.field_groups = self.field_groups
 
@@ -258,41 +260,34 @@ class SpecimenController(RecordController):
         else:
             c.record_dict['Determinations'] = None
 
+        # Related resources
+        c.related_records = []
 
-        # TODO Determinations
-        # http://10.11.12.13:5000/dataset/nhm-specimens-test/resource/56628466-44e3-4a53-b6f9-84f7e44c010f/record/111317
-        # http://10.11.12.13:5000/dataset/nhm-specimens-test/resource/56628466-44e3-4a53-b6f9-84f7e44c010f/record/1887464
-        # http://10.11.12.13:5000/dataset/nhm-specimens-test/resource/56628466-44e3-4a53-b6f9-84f7e44c010f/record/394435
+        related_resources = c.record_dict.get('Related resource ID').split(';')
 
-        # TODO: Test related resources & parts etc.,
+        try:
+            related_resources.remove(occurrence_id)
+        except ValueError:
+            pass
 
-        # # Related resources
-        # c.related_records = []
-        #
-        # try:
-        #     related_resources = c.record_dict.pop('relatedResourceID').split(';')
-        # except AttributeError:
-        #     pass
-        # else:
-        #     for related_resource in related_resources:
-        #         m = re.search('IRN: ([0-9]+), ([0-9a-zA-Z ]+)', related_resource)
-        #         try:
-        #             irn = m.group(1)
-        #             type = m.group(2)
-        #         except AttributeError:
-        #             pass
-        #         else:
-        #
-        #             try:
-        #                 # Make sure it exists - there only ever seems to be one related record
-        #                 # But if this changes, we will need to change lookup code
-        #                 record = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': irn})
-        #             except NotFound:
-        #                 pass
-        #             else:
-        #                 c.related_records.append({
-        #                     '_id': irn,
-        #                     'title': '%s: %s' % (type, record['occurrenceID']),
-        #                 })
+        if related_resources:
+            result = get_action('datastore_search')(
+                self.context,
+                    {
+                        'resource_id': resource_id,
+                        'filters': {'Occurrence ID': related_resources},
+                        'fields': ['_id', 'Occurrence ID', 'Catalog number']
+                    }
+            )
+
+            for record in result['records']:
+                c.related_records.append({
+                    '_id': record['_id'],
+                    'title': 'Part: %s' % (record['Catalog number'] or record['Occurrence ID']),
+                })
+
+        for image in c.images:
+            # Create a thumbnail image by replacing the max image dimensions we've located from KE EMu with thumbnail 100x100
+            image['thumbnail'] = re.sub("width=[0-9]+&height=[0-9]+", "width=100&height=100", image['url'])
 
         return p.toolkit.render('record/specimen.html')
