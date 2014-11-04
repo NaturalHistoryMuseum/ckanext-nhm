@@ -102,12 +102,6 @@ def get_resource(resource_id):
 def get_record(resource_id, record_id):
     return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
 
-def record_display_name(resource, record):
-    title_field = resource.get('_title_field', None)
-    display_name = record.get(title_field, 'Record %s' % record.get('_id'))
-    return str(display_name)
-
-
 def resource_view_state(resource_view_json):
     """
     Alter the recline view resource, adding in state info

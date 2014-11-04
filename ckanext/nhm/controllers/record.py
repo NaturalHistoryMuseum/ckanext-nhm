@@ -6,7 +6,7 @@ import ckan.plugins as p
 from ckan.common import _, c
 import logging
 import json
-from ckanext.nhm.lib.helpers import get_datastore_fields, record_display_name
+from ckanext.nhm.lib.helpers import get_datastore_fields
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -52,9 +52,9 @@ class RecordController(base.BaseController):
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
         image_field = c.resource.get('_image_field', None)
+        title_field = c.resource.get('_title_field', None)
 
-        # TODO: Move record title here
-        # {% set record_display_name = h.record_display_name(res, rec) %}
+        c.record_title = c.record_dict.get(title_field, 'Record %s' % c.record_dict.get('_id'))
 
         # Sanity check: image field hasn't been set to _id
         if image_field and image_field != '_id':
@@ -65,8 +65,8 @@ class RecordController(base.BaseController):
                 # Skip errors - there are no images
                 pass
             else:
-                title = record_display_name(c.resource, c.record_dict)
-                c.images = [{'modal_title': title, 'url': image} for image in images]
+                c.images = [{'modal_title': c.record_title, 'url': image} for image in images]
+                pass
 
         # Loop through all the views - if we have a tiled map view with lat/lon fields
         # We'll use those fields to add the map
