@@ -283,7 +283,7 @@ class SpecimenController(RecordController):
             for record in result['records']:
                 c.related_records.append({
                     '_id': record['_id'],
-                    'title': 'Part: %s' % (record['Catalog number'] or record['Occurrence ID']),
+                    'title': 'Other part: %s' % (record['Catalog number'] or record['Occurrence ID']),
                 })
 
         for image in c.images:
