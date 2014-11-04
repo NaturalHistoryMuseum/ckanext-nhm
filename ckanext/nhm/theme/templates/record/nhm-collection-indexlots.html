@@ -11,13 +11,13 @@
     {% if c.record_dict['Original name'] %}
         <tr>
             <th>Currently accepted name</th>
-            <td>{{ c.record_dict['Currently accepted name'] }}</td>
+            <td><em>{{ c.record_dict['Currently accepted name'] }}</em></td>
         </tr>
     {% endif %}
     {% if c.record_dict['Original name'] %}
         <tr>
             <th>Original name</th>
-            <td>{{ c.record_dict['Original name'] }}</td>
+            <td><em>{{ c.record_dict['Original name'] }}</em></td>
         </tr>
     {% endif %}
     {% if c.record_dict['Kingdom'] %}
@@ -71,7 +71,7 @@
     {% if c.record_dict['Genus'] %}
         <tr>
             <th>Genus</th>
-            <td>{{ c.record_dict['Genus'] }}</td>
+            <td><em>{{ c.record_dict['Genus'] }}</em></td>
         </tr>
     {% endif %}
     {% if c.record_dict['Subgenus'] %}
@@ -83,7 +83,7 @@
     {% if c.record_dict['Species'] %}
         <tr>
             <th>Species</th>
-            <td>{{ c.record_dict['Species'] }}</td>
+            <td><em>{{ c.record_dict['Species'] }}</em></td>
         </tr>
     {% endif %}
     {% if c.record_dict['Subspecies'] %}

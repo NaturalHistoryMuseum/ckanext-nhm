@@ -235,6 +235,7 @@ class SpecimenController(RecordController):
         except AttributeError:
             pass
 
+
         # Pattern for matching key in determination date
         regex = re.compile('^([a-z ]+)=(.*)', re.IGNORECASE)
         determinations = []
