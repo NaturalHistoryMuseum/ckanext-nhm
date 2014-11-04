@@ -1,14 +1,10 @@
-from pylons import config
 import ckan.logic as logic
 import ckan.lib.base as base
-import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 import logging
 import re
 from ckanext.nhm.controllers.record import RecordController
-from ckanext.nhm.lib.helpers import get_department
-import numpy as np
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -21,7 +17,6 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
-
 
 
 class SpecimenController(RecordController):
