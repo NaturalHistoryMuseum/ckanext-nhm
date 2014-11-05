@@ -120,7 +120,7 @@ def resource_view_state(resource_view_json):
     num_fields = len(get_datastore_fields(resource_view['resource_id']))
 
     viewport_max_width = 920
-    col_width = 82
+    col_width = 100
     fit_columns = (num_fields * col_width) < viewport_max_width
 
     resource_view['state'] = {
@@ -129,8 +129,9 @@ def resource_view_state(resource_view_json):
             'defaultFormatter': 'NHMFormatter',
             'enableCellRangeSelection': False,
             'enableTextSelectionOnCells': False,
-            'enableCellNavigation': False,
+            'enableCellNavigation': False
         }
+
     }
 
     return json.dumps(resource_view)
@@ -674,6 +675,11 @@ def group_fields_have_data(record_dict, fields):
 
 
 def indexlot_material_details(record_dict):
+    """
+    Parse the material details into an array, with first column the header
+    @param record_dict:
+    @return:
+    """
 
     material_details = []
 
