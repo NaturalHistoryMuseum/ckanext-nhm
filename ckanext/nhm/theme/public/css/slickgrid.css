@@ -50,3 +50,7 @@ padding-right: 5px;
     height: 30px!important;
     line-height: 30px!important;
 }
+
+.slick-viewport .slick-row.odd{
+    background-color: #f3f3f3!important;
+}
