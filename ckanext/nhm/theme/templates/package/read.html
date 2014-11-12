@@ -5,7 +5,7 @@
 
     {% set dataset_extent = c.pkg_dict.get('spatial', '') %}
 
-    {% if dataset_extent %}
+    {% if dataset_extent and pkg.state != 'deleted' %}
       {% snippet "spatial/snippets/dataset_map.html", extent=dataset_extent %}
     {% endif %}
 

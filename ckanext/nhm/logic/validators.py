@@ -20,6 +20,8 @@ def string_max_length(max_length):
     '''
     def callable(value, context):
 
+        print context
+
         if len(value) > max_length:
             raise Invalid(
                 _('Length must be less than {0} characters')

@@ -15,9 +15,6 @@ class AboutController(p.toolkit.BaseController):
     def download(self):
         return p.toolkit.render('about/download.html', {'title': 'Download & API'})
 
-    def licensing(self):
-        return p.toolkit.render('about/licensing.html', {'title': 'Data licensing'})
-
     def credits(self):
         return p.toolkit.render('about/credits.html', {'title': 'Credits'})
 

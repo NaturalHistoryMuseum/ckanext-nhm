@@ -133,6 +133,16 @@ a:hover.no-underline {
   border-radius: 0;
   background: none;
 }
+
+/* Columns */
+
+[role=main] .primary {
+  width: 687px;
+}
+[role=main] .secondary {
+  width: 250px;
+}
+
 /* Main */
 [role=main],
 .main {
@@ -558,7 +568,7 @@ a.btn-danger:hover {
 .secondary p small {
   display: block;
   color: #5b5b5b;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 15px;
   margin: 15px 0;
 }
@@ -966,9 +976,12 @@ i.mineralogy {
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply:after {
   content: '\f0a9';
 }
-.issue-open a {
-  color: #890022;
+
+.doi a{
+    display: inline-block;
+    margin: 5px 0;
 }
+
 /* Dataset type labels */
 .label[data-format=dwc],
 .label[data-format*=dwc] {
@@ -1310,15 +1323,4 @@ div.ckanpackager-form div {
 /* Placeholder text */
 .placeholder {
   border: 1px solid #F3F3F3;
-}
-.placeholder::after {
-  content: "(Example text)";
-  background: #F3F3F3;
-  font-size: 0.8em;
-  padding: 2px;
-  display: block;
-  width: 120px;
-  margin: 0 auto;
-  text-align: center;
-  text-transform: uppercase;
 }

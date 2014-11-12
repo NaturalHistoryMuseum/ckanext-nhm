@@ -11,7 +11,7 @@ class LegalController(p.toolkit.BaseController):
     """
 
     def privacy(self):
-        return p.toolkit.render('legal/privacy.html', {'title': 'Privacy'})
+        return p.toolkit.render('legal/privacy.html', {'title': 'Privacy policy and cookies'})
 
     def terms(self):
         return p.toolkit.render('legal/terms.html', {'title': 'Terms & conditions'})

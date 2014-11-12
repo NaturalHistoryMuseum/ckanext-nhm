@@ -329,7 +329,8 @@ def delimit_number(num):
 
 def api_doc_link():
     attr= {'class': 'external', 'target': '_blank'}
-    return link_to(_('API Docs'), 'http://docs.nhm.apiary.io/', **attr)
+    # TODO: Change to http://docs.nhm.apiary.io/
+    return link_to(_('API Docs'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 def get_google_analytics_config():
 

@@ -7,6 +7,10 @@ from ckan.logic.schema import (
     )
 
 from ckanext.nhm.logic.validators import string_max_length
+from ckanext.doi.logic.schema import (
+    _modify_create_package_schema,
+    _modify_update_package_schema
+)
 from formencode.validators import OneOf
 
 get_converter = p.toolkit.get_converter
@@ -46,12 +50,16 @@ def record_get_schema():
 def create_package_schema():
     schema = default_create_package_schema()
     _modify_schema(schema)
+    _modify_create_package_schema(schema)
     return schema
 
 
 def update_package_schema():
     schema = default_update_package_schema()
     _modify_schema(schema)
+    _modify_update_package_schema(schema)
+
+    print schema
     return schema
 
 
