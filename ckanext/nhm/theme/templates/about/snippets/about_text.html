@@ -1,16 +1,25 @@
 {% set collection_stats = h.collection_stats() %}
 {% set collection_codes = collection_stats['collections'].keys() %}
 
-<p>The Natural History Museum’s main dataset is the collection database that currently holds <a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> records, a number due to rise to 20 million over the next 5 years.</p>
-<p>The digital collection programme plans to digitise 20 million specimens from the Museum’s
+<p>The Natural History Museum is committed to open access and open science, and has launched the Data Portal to make its research and collections datasets available online. It allows anyone to explore, download and reuse the data for their own research.</p>
+
+<h4>Museum collection</h4>
+
+<p>Our natural history collection is one of the most important in the world, documenting 4.5 billion years of life, the Earth and the solar system.  Almost all animal, plant, mineral and fossil groups are represented.</p>
+<p>The portal's main dataset consists of specimens from the Museum's collection database, with <a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> records from the Museum’s
+
 {% for key, collection_code in h.enumerate(collection_codes) %}
-    <a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ h.get_department(collection_code) }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
+    {% set dept = h.get_department(collection_code) %}
+    <a title="{{ dept }} specimens" href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ dept }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
 {%  endfor %}
 
-collections in 5 years, a quarter of the Museum’s 80 million specimens.</p>
-<p>The Museum has over 600 curators, researchers, scientific associates, students and volunteers. Our scientists generate over 1,000 scientific papers published annually and datasets from these publications will be available through the portal.</p>
-<h3>The collection</h3>
-<p>Our collection holds more than 80 million specimens and one million type specimens. Almost all animal, plant, mineral and fossil groups are represented. </p>
-<p>It is one of the most important natural history collections in the world, documenting 4.5 billion years of life, the Earth and the solar system.</p>
-<p>The collections dataset is evolving, and some records may contain erroneous data.  If you do find a record that needs correcting, please tell us about it at <a href="mailto:data@nhm.ac.uk">data@nhm.ac.uk</a>.</p>
+collections.
+<p>We also have <a title="Index lots" href="{{ h.url_for_indexlot_view() }}">{{ h.indexlot_count() }} species-level</a> (index lot) records, which denote the presence of a taxon in the Museum collection.</p>
+<p>These datasets will increase exponentially: Under the Museum's ambitious digital collections programme, we aim to have 20 million specimens digitised in the next five years.</p>
 <p><a class="external" target="_blank" href="http://www.nhm.ac.uk/research-curation/collections/our-collections/index.html">More about our collections</a></p>
+
+<h4>Research datasets</h4>
+<p>The Museum has over 600 curators, researchers, scientific associates, students and volunteers. Our scientists generate over 1,000 scientific papers published annually and datasets from these publications will be available through the portal.</p>
+
+<h4>Help us improve our collection</h4>
+<p>Digitising and databasing our vast collections is a huge and evolving task.  As a result some records on the Data Portal may contain erroneous data.  If you do find a record that needs correcting, please tell us about it at <a href="mailto:data@nhm.ac.uk">data@nhm.ac.uk</a>.</p>

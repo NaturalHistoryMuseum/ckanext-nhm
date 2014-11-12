@@ -3,7 +3,6 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), controller='home', action='about' %}</li>
   <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.legal:LegalController', action='terms' %}</li>
 {% endblock %}
 
@@ -12,8 +11,9 @@
     <h1 class="page-heading">{{ title }}</h1>
 
     <h4>Licensing</h4>
-    <p>The data and information available through data.nhm.ac.uk are available under terms described in the <em>licence</em> field of individual dataset records (meta-data).  Multimedia assets within datasets may be subject to additional licence restrictions.</p>
+    <p>The data and information available through data.nhm.ac.uk are available under terms described in the <em>licence</em> field of individual dataset records (meta-data).</p>
     <p>All dataset meta-data published on data.nhm.ac.uk are licensed under <a class="external" target="_blank" href="http://www.opendefinition.org/licenses/cc-zero" rel="dc:rights">Creative Commons CCZero</a>.</p>
+    <p>Multimedia assets within datasets are subject to additional licence restrictions - by default this will be <a class="external" target="_blank" href="http://www.opendefinition.org/licenses/cc-by" rel="dc:rights">Creative Commons Attribution CCBy</a>.</p>
 
     <h4>Data usage</h4>
     <p>You may use the data contained in this site for any purpose, providing it does not infringe the licence and terms &amp; conditions.</p>

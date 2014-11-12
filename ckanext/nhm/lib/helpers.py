@@ -256,6 +256,12 @@ def url_for_collection_view(view_type='recline_grid_view', **kwargs):
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
+def url_for_indexlot_view():
+    return ''
+
+def indexlot_count():
+    return delimit_number(700000)
+
 def get_nhm_organisation_id():
     """
     @return:  ID for the NHM organisation
