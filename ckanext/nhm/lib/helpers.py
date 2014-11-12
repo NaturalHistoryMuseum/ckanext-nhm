@@ -231,7 +231,7 @@ def dataset_types():
         return []
 
 
-def url_for_collection_view(view_type='recline_grid_view', **kwargs):
+def url_for_collection_view(view_type='recline_grid_view', filters={}):
     """
     Return URL to link through to specimen dataset view, with optional search params
     @param view_type: grid to link to - grid or map
@@ -252,7 +252,7 @@ def url_for_collection_view(view_type='recline_grid_view', **kwargs):
             if view['view_type'] == view_type:
                 break
 
-        filters = '|'.join(['%s:%s' % (k, v) for k, v in kwargs.items()])
+        filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
@@ -269,10 +269,10 @@ def get_nhm_organisation_id():
 
     return config.get("ldap.organization.id")
 
-@cache_region('short_term', 'collection_stats')
+# @cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
-    Get collection stats, grouped by collectionCode
+    Get collection stats, grouped by Collection code
     @return:
     """
 
@@ -283,22 +283,22 @@ def collection_stats():
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    sql = '''SELECT "collectionCode", COUNT(*) AS count
+    sql = '''SELECT "Collection code", COUNT(*) AS count
            FROM "{resource_id}"
-           GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
+           GROUP BY "Collection code" ORDER BY count DESC'''.format(resource_id=resource_id)
 
     total = 0
     collections = OrderedDict()
 
     try:
         result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
-    except ValidationError:
-        pass
+    except ValidationError, e:
+        log.critical('Error retrieving collection statistics %s', e)
     else:
 
         for record in result['records']:
             count = int(record['count'])
-            collections[record['collectionCode']] = count
+            collections[record['Collection code']] = count
             total += count
 
     stats = {

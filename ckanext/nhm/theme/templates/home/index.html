@@ -7,8 +7,6 @@
 
 {% set collection_stats = h.collection_stats() %}
 
-  {{ collection_stats }}
-
   {% block header %}
 
    <div class="extended-masthead">
@@ -61,7 +59,7 @@
                     <ul class="unstyled inline">
                        {% for collection_code, count in collection_stats['collections'].items() %}
                           {% set dept = h.get_department(collection_code) %}
-                          <li><a href="{{ h.url_for_collection_view(collectionCode=collection_code) }}"><i class="{{ dept|lower }}"></i><span>{{ h.delimit_number(count) }}</span><span class="default-text-color">{{ dept }}</span></a></li>
+                          <li><a href="{{ h.url_for_collection_view(filters={"Collection code": collection_code}) }}"><i class="{{ dept|lower }}"></i><span>{{ h.delimit_number(count) }}</span><span class="default-text-color">{{ dept }}</span></a></li>
                        {%  endfor %}
                    </ul>
                </div>

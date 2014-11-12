@@ -10,7 +10,7 @@
 
 {% for key, collection_code in h.enumerate(collection_codes) %}
     {% set dept = h.get_department(collection_code) %}
-    <a title="{{ dept }} specimens" href="{{ h.url_for_collection_view(collectionCode=collection_code) }}">{{ dept }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
+    <a title="{{ dept }} specimens" href="{{ h.url_for_collection_view({'Collection code': collection_code}) }}">{{ dept }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
 {%  endfor %}
 
 collections.
