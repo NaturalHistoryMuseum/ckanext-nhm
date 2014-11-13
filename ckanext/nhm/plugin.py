@@ -1,8 +1,14 @@
 import os
 import re
 import ckan.plugins as p
+import ckan.logic as logic
+import ckan.model as model
+from ckan.common import c
+from ckan.lib.helpers import url_for
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
+import ckanext.nhm.lib.helpers as helpers
+from ckanext.nhm.lib.resource_filters import resource_filter_options
 # TODO: Remove ICache
 from ckanext.cacheapi.interfaces import ICache
 from ckanext.contact.interfaces import IContact
@@ -10,7 +16,19 @@ from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
 from pylons import config
 
+get_action = logic.get_action
+
 Invalid = p.toolkit.Invalid
+
+# Contact addresses to route specimen contact request to
+collection_contacts = {
+    'Entomology': 'b.scott@nhm.ac.uk',
+    'Botany': 'b.scott@nhm.ac.uk',
+    'Mineralogy': 'b.scott@nhm.ac.uk',
+    'Palaeontology': 'b.scott@nhm.ac.uk',
+    'Zoology': 'b.scott@nhm.ac.uk'
+}
+
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
@@ -49,12 +67,18 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IRoutes
     def before_map(self, map):
 
-        resource_id = config.get("ckanext.nhm.collection_resource_id")
+        specimen_resource_id = config.get("ckanext.nhm.specimen_resource_id")
+        indexlot_resource_id = config.get("ckanext.nhm.indexlot_resource_id")
 
         # Add controller for KE EMu specimen records
-        map.connect('specimen', '/dataset/{package_name}/resource/%s/record/{record_id}' % resource_id,
+        map.connect('specimen', '/dataset/{package_name}/resource/%s/record/{record_id}' % specimen_resource_id,
                     controller='ckanext.nhm.controllers.specimen:SpecimenController',
-                    action='view', resource_id=resource_id)
+                    action='view', resource_id=specimen_resource_id)
+
+        # # Add controller for KE EMu Index Lot records
+        # map.connect('indexlots', '/dataset/{package_name}/resource/%s/record/{record_id}' % indexlot_resource_id,
+        #             controller='ckanext.nhm.controllers.indexlot:IndexLotController',
+        #             action='view', resource_id=indexlot_resource_id)
 
         # Add view record
         map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
@@ -95,7 +119,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     # ITemplateHelpers
     def get_helpers(self):
-        import ckanext.nhm.lib.helpers as helpers
+
 
         h = {}
 
@@ -112,9 +136,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return h
 
-   # IDatasetForm - CKAN Metadata
-   # See See http://docs.ckan.org/en/latest/extensions/adding-custom-fields.html
-
+    ## IDatasetForm - CKAN Metadata
     def package_types(self):
         return []
 
@@ -130,7 +152,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def show_package_schema(self):
         return nhm_schema.show_package_schema()
 
-    # IFacets
+    ## IFacets
     def dataset_facets(self, facets_dict, package_type):
 
         # Remove organisations and groups
@@ -143,7 +165,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return facets_dict
 
-    # IPackageController
+    ## IPackageController
     def before_search(self, data_dict):
         # If there's no sort criteria specified, default to promoted and last modified
         if not data_dict.get('sort', None):
@@ -151,7 +173,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return data_dict
 
-    # ICache
+    ## ICache
     def get_caches(self, context, cache_dict):
 
         # Stats pages to clear by group
@@ -221,56 +243,66 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
 
-        # TODO: Contact
+        specimen_resource_id = config.get("ckanext.nhm.specimen_resource_id")
+        indexlot_resource_id = config.get("ckanext.nhm.indexlot_resource_id")
 
-        print data_dict
+        # Get the submitted data values
+        package_id = data_dict.get('package_id', None)
+        resource_id = data_dict.get('resource_id', None)
+        record_id = data_dict.get('record_id', None)
 
-        mail_dict['recipient_name'] = 'Entom collection manager'
+        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+
+        # URL to provide as link to contact email body
+        # Over written by linking to record / resource etc., - see below
+        url = None
+
+        # If we have a record ID, this is a contact/form request from a record page
+        if record_id and resource_id in [specimen_resource_id, indexlot_resource_id]:
+
+            # Load the record to retrieve the collection code
+            record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
+
+            if resource_id == specimen_resource_id:
+                department = helpers.get_department(record_dict.get('Collection code'))
+                named_route = 'specimen'
+                mail_dict['subject'] = 'Specimen enquiry'
+            else:
+                department = record_dict.get('Department')
+                named_route = 'indexlot'
+                mail_dict['subject'] = 'Index lot enquiry'
+
+            # Add the specific email contact to the built in one (data@nhm.ac.uk)
+            mail_dict['recipient_email'] += ', ' + collection_contacts[department]
+            mail_dict['recipient_name'] = '%s collection manager' % department
+
+            url = url_for(named_route, action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
+
+        else:  # Not a specimen or indexlot record
+
+            # If we have a package ID, load the package
+            if package_id:
+
+                package_dict = get_action('package_show')(context, {'id': package_id})
+                # Load the user - using model rather user_show API which loads all the users packages etc.,
+                user_obj = model.User.get(package_dict['creator_user_id'])
+
+                # Update send to with creator username
+                mail_dict['recipient_email'] += ', ' + user_obj.email
+                mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
+
+                if resource_id:
+
+                    if record_id:
+                        url = url_for('record', action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
+                    else:
+                        url = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
+
+                else:
+                    url = url_for(controller='package', action='read', id=package_id, qualified=True)
+
+        # If we have a URL append it to the message body
+        if url:
+            mail_dict['body'] += '\n' + url
+
         return mail_dict
-
-
-def resource_filter_options(resource):
-    """Return the list of filter options for the given resource.
-
-    Note that this is the master source for the list of available options.
-
-    We may want to have this dependent on available fields (rather than
-    resource format), so it's useful to keep this as a function (rather
-    than a static dict).
-
-    @type resource: dict
-    @param resource: Dictionary representing a resource
-    @rtype: dict
-    @return: A dictionary associating each option's name to a dict
-            defining:
-                - label: The label to display to users;
-                - sql: Optional. The SQL WHERE statement to use when this
-                       option is checked (as a tuple containing statement
-                       and value replacements);
-                - sql_false: Optional. The SQL WHERE statement to use when
-                             this option is unchecked (as a tuple containing
-                             statement and value replacements).
-    """
-    table = resource['id']
-    # Get the resource-dependent filter option list
-    if resource['format'].lower() == 'dwc':
-        return {
-            '_has_type': {
-                'label': 'Has type',
-                'sql': ('"{}"."typeStatus" IS NOT NULL'.format(table),)
-            },
-            '_has_image': {
-                'label': 'Has image',
-                'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(table),)
-            },
-            '_has_lat_long': {
-                'label': 'Has lat/long',
-                'sql': ('"{}"."_geom" IS NOT NULL'.format(table),)
-            },
-            '_exclude_centroid': {
-                'label': 'Exclude centroids',
-                'sql': ('NOT (LOWER("{}"."Centroid") = ANY(\'{{true,yes,1}}\'))'.format(table),)
-            }
-        }
-    else:
-        return {}
