@@ -4,9 +4,9 @@
 
 {% block contact_form_fields %}
 
-    {{ form.input('name', label=_('Contact Name'), id='field-name', value=data.name, error=errors.name, classes=['control-medium'], is_required=true) }}
+    {{ form.input('name', label=_('Your name'), id='field-name', value=data.name, error=errors.name, classes=['control-medium'], is_required=true) }}
 
-    {{ form.input('email', label=_('Email'), id='field-email', type='email', value=data.email, error=errors.email, classes=['control-medium'], is_required=true) }}
+    {{ form.input('email', label=_('Your email'), id='field-email', type='email', value=data.email, error=errors.email, classes=['control-medium'], is_required=true) }}
 
     {# Add resource name and ID hidden field#}
 
@@ -56,10 +56,21 @@
 
             {% if record %}
 
+                {# Add title of record #}
                 <div class="control-group control-medium">
                     <label class="control-label">Record</label>
                     <div class="controls ">
-                        <p>{{ h.record_display_name(resource, record) }}</p>
+
+                        <p>
+                            {% if record['Catalog number'] %}
+                                {{ record['Catalog number'] }}
+                            {% elif record['Occurrence ID'] %}
+                                {{ record['Occurrence ID'] }}
+                            {% else %}
+                                {{ record['_id'] }}
+                            {% endif %}
+                        </p>
+
                     </div>
                 </div>
 
@@ -69,6 +80,6 @@
 
     {% endif %}
 
-    {{ form.markdown('content', label=_('Your Request'), id='field-content', value=data.content, error=errors.content, is_required=true) }}
+    {{ form.markdown('content', label=_('Your request'), id='field-content', value=data.content, error=errors.content, is_required=true) }}
 
 {% endblock %}

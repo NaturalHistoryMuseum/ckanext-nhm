@@ -235,7 +235,6 @@ class SpecimenController(RecordController):
         except AttributeError:
             pass
 
-
         # Pattern for matching key in determination date
         regex = re.compile('^([a-z ]+)=(.*)', re.IGNORECASE)
         determinations = []
@@ -259,28 +258,31 @@ class SpecimenController(RecordController):
         # Related resources
         c.related_records = []
 
-        related_resources = c.record_dict.get('Related resource ID').split(';')
-
-        try:
-            related_resources.remove(occurrence_id)
-        except ValueError:
-            pass
+        related_resources = c.record_dict.get('Related resource ID')
 
         if related_resources:
-            result = get_action('datastore_search')(
-                self.context,
-                    {
-                        'resource_id': resource_id,
-                        'filters': {'Occurrence ID': related_resources},
-                        'fields': ['_id', 'Occurrence ID', 'Catalog number']
-                    }
-            )
+            related_resources = related_resources.split(';')
 
-            for record in result['records']:
-                c.related_records.append({
-                    '_id': record['_id'],
-                    'title': 'Other part: %s' % (record['Catalog number'] or record['Occurrence ID']),
-                })
+            try:
+                related_resources.remove(occurrence_id)
+            except ValueError:
+                pass
+
+            if related_resources:
+                result = get_action('datastore_search')(
+                    self.context,
+                        {
+                            'resource_id': resource_id,
+                            'filters': {'Occurrence ID': related_resources},
+                            'fields': ['_id', 'Occurrence ID', 'Catalog number']
+                        }
+                )
+
+                for record in result['records']:
+                    c.related_records.append({
+                        '_id': record['_id'],
+                        'title': 'Other part: %s' % (record['Catalog number'] or record['Occurrence ID']),
+                    })
 
         for image in c.images:
             # Create a thumbnail image by replacing the max image dimensions we've located from KE EMu with thumbnail 100x100

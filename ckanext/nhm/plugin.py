@@ -3,7 +3,9 @@ import re
 import ckan.plugins as p
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
+# TODO: Remove ICache
 from ckanext.cacheapi.interfaces import ICache
+from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
 from pylons import config
@@ -25,6 +27,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IPackageController, inherit=True)
     p.implements(ICache, inherit=True)
     p.implements(IDatastore)
+    p.implements(IContact)
 
     ## IConfigurer
     def update_config(self, config):
@@ -214,6 +217,17 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
         return query_dict
+
+    ## IContact
+    def mail_alter(self, mail_dict, data_dict):
+
+        # TODO: Contact
+
+        print data_dict
+
+        mail_dict['recipient_name'] = 'Entom collection manager'
+        return mail_dict
+
 
 def resource_filter_options(resource):
     """Return the list of filter options for the given resource.
