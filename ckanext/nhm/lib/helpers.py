@@ -14,7 +14,7 @@ from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_all
 from collections import OrderedDict
 
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.plugin import resource_filter_options
+from ckanext.nhm.lib.resource_filters import resource_filter_options
 
 log = logging.getLogger(__name__)
 
@@ -239,7 +239,7 @@ def url_for_collection_view(view_type='recline_grid_view', filters={}):
     @return: url
     """
 
-    resource_id = config.get("ckanext.nhm.collection_resource_id")
+    resource_id = config.get("ckanext.nhm.specimen_resource_id")
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
     try:
@@ -269,6 +269,7 @@ def get_nhm_organisation_id():
 
     return config.get("ldap.organization.id")
 
+# TEMP: Turn back caching
 # @cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
@@ -276,7 +277,7 @@ def collection_stats():
     @return:
     """
 
-    resource_id = config.get("ckanext.nhm.collection_resource_id")
+    resource_id = config.get("ckanext.nhm.specimen_resource_id")
 
     if not resource_id:
         log.error('Please configure collection resource ID')
