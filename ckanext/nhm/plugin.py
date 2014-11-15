@@ -9,8 +9,6 @@ import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 from ckanext.nhm.lib.resource_filters import resource_filter_options
-# TODO: Remove ICache
-from ckanext.cacheapi.interfaces import ICache
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
@@ -43,7 +41,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IDatasetForm, inherit=True)
     p.implements(p.IFacets, inherit=True)
     p.implements(p.IPackageController, inherit=True)
-    p.implements(ICache, inherit=True)
     p.implements(IDatastore)
     p.implements(IContact)
 
@@ -172,17 +169,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             data_dict['sort'] = u'promoted asc, metadata_modified desc'
 
         return data_dict
-
-    ## ICache
-    def get_caches(self, context, cache_dict):
-
-        # Stats pages to clear by group
-        cache_dict['stats'] = [
-            '/',
-            'about'
-        ]
-
-        return cache_dict
 
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
