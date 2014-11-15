@@ -3,60 +3,49 @@
 
 {% block primary_content_inner %}
 
-    <section id="stats-datasets-citations" class="placeholder">
-        <h4>{{ _('Dataset cited in') }}</h4>
-
-        <ul>
-            <li>Author E G. Example title. Example Journal 2014; 6: 22. <a href="">[CrossRef]</a></li>
-            <li>Author E G. Example title. Example Journal 2014; 6: 22. <a href="">[CrossRef]</a></li>
-        </ul>
-
-        <p class="info">Citations are retrieved from articles in CrossRef. This isn't a definitive list.</p>
-
-    </section>
+{#    <section id="stats-datasets-citations" class="placeholder">#}
+{#        <h4>{{ _('Dataset cited in') }}</h4>#}
+{##}
+{#        <ul>#}
+{#            <li>Author E G. Example title. Example Journal 2014; 6: 22. <a href="">[CrossRef]</a></li>#}
+{#            <li>Author E G. Example title. Example Journal 2014; 6: 22. <a href="">[CrossRef]</a></li>#}
+{#        </ul>#}
+{##}
+{#        <p class="info">Citations are retrieved from articles in CrossRef. This isn't a definitive list.</p>#}
+{##}
+{#    </section>#}
 
     <section id="stats-datasets-views">
         <h4>{{ _('Dataset views') }}</h4>
-        <table class="table table-chunky table-bordered table-striped">
-            <thead>
-                <tr>
-                    {% for date in c.pageviews %}
-                        <th>{{ date }}</th>
-                    {% endfor %}
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for value in c.pageviews.values() %}
-                        <td>{{ value }}</td>
-                    {% endfor %}
-                    <td>{{ c.total_pageviews }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <p>Showing dataset views per month.</p>
+        <div data-module="graph" data-module-data="{{ h.dump_json(c.pageviews) }}" data-module-config="{{ h.dump_json(c.pageviews_options) }}" style="width:100%; height:300px;"></div>
     </section>
 
-    <section id="stats-datasets-downloads">
-        <h4>{{ _('Downloads') }}</h4>
-        <table class="table table-chunky table-bordered table-striped">
-            <thead>
-                <tr>
-                    {% for date in c.pageviews %}
-                        <th>{{ date }}</th>
-                    {% endfor %}
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for value in c.pageviews.values() %}
-                        <td>0</td>
-                    {% endfor %}
-                    <td>0</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+
+
+    {% resource 'ckanext-graph/main' %}
+
+{#    <section id="stats-datasets-downloads">#}
+{#        <h4>{{ _('Downloads') }}</h4>#}
+{#        <table class="table table-chunky table-bordered table-striped">#}
+{#            <thead>#}
+{#                <tr>#}
+{#                    {% for date in c.pageviews %}#}
+{#                        <th>{{ date }}</th>#}
+{#                    {% endfor %}#}
+{#                    <th>Total</th>#}
+{#                </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#                <tr>#}
+{#                    {% for value in c.pageviews.values() %}#}
+{#                        <td>0</td>#}
+{#                    {% endfor %}#}
+{#                    <td>0</td>#}
+{#                </tr>#}
+{#            </tbody>#}
+{#        </table>#}
+{#    </section>#}
+
 
 {% endblock %}

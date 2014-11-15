@@ -11,6 +11,7 @@ import ckanext.stats.stats as stats_lib
 from datetime import datetime, timedelta
 from ckanext.ga_report.ga_model import GA_Url, GA_Publisher
 from sqlalchemy import and_
+from datetime import datetime
 
 render = base.render
 abort = base.abort
@@ -38,7 +39,6 @@ class StatsController(p.toolkit.BaseController):
 
     def datasets(self):
 
-        stats = stats_lib.Stats()
         rev_stats = stats_lib.RevisionStats()
 
         c.num_packages_by_week = rev_stats.get_num_packages_by_week()
@@ -90,14 +90,60 @@ class StatsController(p.toolkit.BaseController):
 
         urls = model.Session.query(GA_Url).filter(and_(GA_Url.package_id == c.pkg_dict['name'], GA_Url.period_name != 'All')).order_by(GA_Url.period_name.asc()).all()
 
-        c.pageviews = OrderedDict()
-        c.total_pageviews = 0
+        c.pageviews = []
+        c.pageviews_options = {
+            'grid': {
+                'borderWidth': {'top': 0, 'right': 0, 'bottom': 1, 'left': 1},
+                'borderColor': "#D4D4D4"
+            },
+            'xaxis': {
+                'ticks': [],
+                'tickLength': 0
+            },
+            'yaxis': {
+                'tickLength': 0
+            },
+            'bars': {
+                'show': 1,
+                'align': "center",
+                'zero': 1,
+                'fill': 1,
+                'fillColor': '#D7EDFD',
+                'lineWidth': 0,
+                'barWidth': 0.99,
+                'showNumbers': 1,
+                'numbers': {
+                    'xAlign': 1,
+                    'yAlign': 1
+                }
+            }
+        }
 
-        c.pageviews['2014-05'] = 0
+        # https://github.com/joetsoi/flot-barnumbers
 
-        for url in urls:
-                c.pageviews[url.period_name] = url.pageviews
-                c.total_pageviews += int(url.pageviews)
+        for i, url in enumerate(urls):
+
+            # Add the data
+            c.pageviews.append([i, int(url.pageviews)])
+
+            # Add the tick values
+            #  Convert the period name into something a bit nicer: 2014-11 => Nov 2014
+            label = datetime.strptime(url.period_name, '%Y-%m').strftime('%b %Y')
+            c.pageviews_options['xaxis']['ticks'].append([i, label])
+
+
+        # Add some extras
+        c.pageviews_options['xaxis']['ticks'].append([1, '2014-08'])
+        c.pageviews.append([1, 50])
+
+        c.pageviews_options['xaxis']['ticks'].append([2, '2014-07'])
+        c.pageviews.append([2, 100])
+
+        c.pageviews_options['xaxis']['ticks'].append([3, '2014-06'])
+        c.pageviews.append([3, 150])
+
+        c.pageviews_options['xaxis']['ticks'].append([4, '2014-04'])
+        c.pageviews.append([4, 100])
 
         return render('stats/dataset_metrics.html')
 

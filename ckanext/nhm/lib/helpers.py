@@ -129,9 +129,26 @@ def resource_view_state(resource_view_json):
             'defaultFormatter': 'NHMFormatter',
             'enableCellRangeSelection': False,
             'enableTextSelectionOnCells': False,
-            'enableCellNavigation': False
-        }
-
+            'enableCellNavigation': False,
+            'enableColumnReorder': False
+        },
+        # Sorted
+        'hiddenColumns': [
+            # We never want to display these columns
+            # TODO: This hides. But do we want to use columns?
+            # http://okfnlabs.org/recline/docs/src/view.slickgrid.html
+            'Modified',
+            'Created',
+            'Centroid',
+            'Occurrence ID',
+            'Basis of record',
+            'Determinations',
+            'Related resource ID',
+            'Relationship of resource',
+            'Associated media',
+            'Institution code',
+            'Record type'
+        ]
     }
 
     return json.dumps(resource_view)
@@ -266,7 +283,7 @@ def get_nhm_organisation_id():
     """
     @return:  ID for the NHM organisation
     """
-
+    # TODO: There is also an organisation id setting
     return config.get("ldap.organization.id")
 
 # TEMP: Turn back caching

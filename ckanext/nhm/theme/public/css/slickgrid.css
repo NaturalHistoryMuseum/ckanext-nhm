@@ -54,3 +54,8 @@ padding-right: 5px;
 .slick-viewport .slick-row.odd{
     background-color: #f3f3f3!important;
 }
+
+
+ul.slick-contextmenu{
+    display: none!important;
+}
