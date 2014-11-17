@@ -7,6 +7,7 @@ import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from ckanext.issues.model import Issue, ISSUE_STATUS
 from beaker.cache import cache_region
+from ckanext.nhm.lib.resource_filters import get_resource_filters, parse_request_filters
 from sqlalchemy import func
 from pylons import config
 from ckan.common import c, _, request
@@ -14,7 +15,7 @@ from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_all
 from collections import OrderedDict
 
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource_filters import resource_filter_options
+from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_GROUP_FILTER
 
 log = logging.getLogger(__name__)
 
@@ -110,6 +111,14 @@ def resource_view_state(resource_view_json):
     """
     resource_view = json.loads(resource_view_json)
 
+    filter_dict = parse_request_filters()
+
+    # TODO: We now have the field groups ready to use
+    field_group = filter_dict.get('_field_group', None)
+
+    # TODO: We will also need to make sure filtered fields are displayed. - clicking links from record page
+    # TODO: What if a user enters text in another tab before clicking? Make that impossible?
+
     # There is an annoying feature/bug in slickgrid, that if fitColumns=True
     # And grid is wider than available viewport, slickgrid columns cannot
     # Be resized until fitColumns is deactivated
@@ -117,14 +126,14 @@ def resource_view_state(resource_view_json):
     # To decide whether or not to turn on fitColumns
     # Messy, but better than trying to hack around with slickgrid
 
-    num_fields = len(get_datastore_fields(resource_view['resource_id']))
-
-    viewport_max_width = 920
-    col_width = 100
-    fit_columns = (num_fields * col_width) < viewport_max_width
+    # num_fields = len(get_datastore_fields(resource_view['resource_id']))
+    #
+    # viewport_max_width = 920
+    # col_width = 100
+    # fit_columns = (num_fields * col_width) < viewport_max_width
 
     resource_view['state'] = {
-        'fitColumns': fit_columns,
+        # 'fitColumns': fit_columns,
         'gridOptions': {
             'defaultFormatter': 'NHMFormatter',
             'enableCellRangeSelection': False,
@@ -442,6 +451,35 @@ def absolute_url_for(*args, **kw):
     return url
 
 
+# TODO: THIS IS DUPLICATING THE LIB FUNCTION
+def parse_request_filters():
+    """
+    Get the filters from the request object
+    @return:
+    """
+    filter_dict = {}
+
+    try:
+        filter_params = request.params.get('filters').split('|')
+    except AttributeError:
+        return {}
+
+    filter_params = filter(None, filter_params)
+
+    for filter_param in filter_params:
+        field, value = filter_param.split(':', 1)
+
+        if field in filter_dict:
+            try:
+                filter_dict[field].append(value)
+            except KeyError:
+                filter_dict[field] = [filter_dict[field], value]
+        else:
+            filter_dict[field] = value
+
+    return filter_dict
+
+
 def get_resource_filter_options(resource):
     """Return the available filter options for the given resource
 
@@ -474,65 +512,27 @@ def get_resource_filter_options(resource):
 
 
 def get_resource_filter_pills(resource):
+    """
+    Get filter pills
+    We don't want the field group pills - these are handled separately in get_resource_field_groups
+    @param resource:
+    @return:
+    """
 
-    filter_dict = {}
+    filters = get_resource_filters(resource)
 
-    try:
-        filter_params = request.params.get('filters').split('|')
-    except AttributeError:
-        return {}
+    # Remove the field group key, if it exists
+    filters.pop(FIELD_GROUP_FILTER, None)
+    return filters
 
-    filter_params = filter(None, filter_params)
-
-    for filter_param in filter_params:
-        field, value = filter_param.split(':', 1)
-
-        try:
-            filter_dict[field].append(value)
-        except KeyError:
-            filter_dict[field] = [value]
-
-    def get_pill_filters(exclude_field, exclude_value):
-        """
-        Build filter, using filters which aren't exclude_field=exclude_value
-        @param exclude_field:
-        @param exclude_value:
-        @return:
-        """
-
-        filters = []
-        for field, values in filter_dict.items():
-            for value in values:
-                if not (field == exclude_field and value == exclude_value):
-                    filters.append('%s:%s' % (field, value))
-
-        return '|'.join(filters)
-
-    pills = {}
-
-    options = resource_filter_options(resource)
-    for field, values in filter_dict.items():
-        for value in values:
-            filters = get_pill_filters(field, value)
-
-            #  If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
-            # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
-            if field == '_tmgeom':
-                pills['geometry'] = {'Polygon': filters}
-            elif field in options:
-                label = options[field]['label']
-                try:
-                    pills['options'][label] = filters
-                except KeyError:
-                    pills['options'] = {label: filters}
-            else:
-                try:
-                    pills[field][value] = filters
-                except KeyError:
-                    pills[field] = {value: filters}
-
-    return pills
-
+def get_resource_field_groups(resource):
+    """
+    Get field group filters
+    @param resource:
+    @return:
+    """
+    filters = get_resource_filters(resource)
+    return filters.pop(FIELD_GROUP_FILTER, None)
 
 
 def get_allowed_view_types(resource, package):

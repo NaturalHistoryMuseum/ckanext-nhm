@@ -1,3 +1,4 @@
+/* Headers */
 .no-box-shadow {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -12,18 +13,14 @@
 @font-face {
   font-family: 'nhm_ingrid_lightregular';
   src: url('/fonts/nhmingligreg-webfont.eot');
-  src: url('/fonts/nhmingligreg-webfont.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */ url('/fonts/nhmingligreg-webfont.ttf') format('truetype');
-  font-style: normal;
-  
-  /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  src: url('/fonts/nhmingligreg-webfont.woff') format('woff');
+  font-style: normal;/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 @font-face {
   font-family: 'nhm_ingridregular';
   src: url('/fonts/nhmingreg-webfont.eot');
-  src: url('/fonts/nhmingreg-webfont.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */ url('/fonts/nhmingreg-webfont.ttf') format('truetype');
-  font-style: normal;
-  
-  /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  src: url('/fonts/nhmingreg-webfont.woff') format('woff');
+  font-style: normal;/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* Headers */
 h1,
@@ -133,16 +130,13 @@ a:hover.no-underline {
   border-radius: 0;
   background: none;
 }
-
 /* Columns */
-
 [role=main] .primary {
   width: 687px;
 }
 [role=main] .secondary {
   width: 250px;
 }
-
 /* Main */
 [role=main],
 .main {
@@ -179,6 +173,7 @@ img#beta {
   background: #228900;
   color: #ffffff;
   /* Navigation */
+
 }
 .masthead a {
   color: #ffffff;
@@ -280,6 +275,7 @@ img#beta {
   padding: 0;
   margin: 0;
   /* Breadcrumbs */
+
 }
 .toolbar .breadcrumb {
   font-size: 13px;
@@ -724,6 +720,7 @@ table td.filterable {
   min-height: inherit;
   padding: 10px 12px;
   border: none;
+  border: none;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
@@ -976,12 +973,10 @@ i.mineralogy {
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply:after {
   content: '\f0a9';
 }
-
-.doi a{
-    display: inline-block;
-    margin: 5px 0;
+.doi a {
+  display: inline-block;
+  margin: 5px 0;
 }
-
 /* Dataset type labels */
 .label[data-format=dwc],
 .label[data-format*=dwc] {
@@ -1193,7 +1188,7 @@ a.toggle-view-filters:hover {
   position: absolute;
   top: 70px;
   right: 20px;
-  width: 420px;
+  width: 860px;
   background: #EBEBEB;
   padding: 20px;
   display: none;
@@ -1230,40 +1225,55 @@ a.toggle-view-filters:after {
 a.toggle-view-filters:after {
   content: "\f0b0";
 }
-.resource-view-filters > a:hover {
-  text-decoration: none;
-}
-.resource-view-filters .resource-view-filter {
-  margin: 8px 0 10px 0;
-}
-.resource-view-filters .resource-view-filter label {
+.advanced-filter-field {
+  width: 300px;
+  height: 80px;
   float: left;
+  border: 1px soild red;
+  overflow: hidden;
 }
-.resource-view-filter-values {
-  margin-left: 180px;
+.advanced-filter-field label,
+.advanced-filter-field div,
+.advanced-filter-field span,
+.select2-hidden-accessible {
+  font-size: 12px!important;
 }
-.resource-view-filter-values .select2-container {
-  width: 220px!important;
-  padding-left: 0!important;
-  margin-left: 20px;
-  position: relative;
+.select2-result-label span,
+.select2-results {
+  font-size: 11px!important;
 }
-.resource-view-filter-values .select2-container:not(:first-child)::before {
-  content: 'or';
+.select2-container .select2-choice abbr {
+  top: 6px;
+}
+.select2-chosen {
+  padding-left: 10px;
+}
+.advanced-filter-field > label {
   float: left;
-  color: #525252;
+  width: 130px;
+  text-align: right;
+  line-height: 20px;
+}
+.advanced-filter-field .advanced-filter-field-value {
+  margin-left: 140px;
+}
+.advanced-filter-field .advanced-filter-field-value label {
   display: inline-block;
-  width: 20px;
-  margin-top: 4px;
-  position: absolute;
+  line-height: 2em;
+  margin-top: 5px;
+  margin-right: 5px;
+  font-weight: normal;
+}
+.advanced-filter-field .advanced-filter-field-value input[type=checkbox] {
   top: 0;
-  left: -20px;
 }
-.resource-view-filter-values .select2-container .select2-choice {
-  padding-left: 20px;
+.button-group {
+  clear: both;
 }
-.resource-view-filter-values .select2-container .select2-choice .select2-search-choice-close {
-  top: 7px;
+.resource-view-filter-form .form-actions {
+  clear: both;
+  margin-top: 5px;
+  border-top: 1px solid red;
 }
 div.resource-view-filter-pills {
   padding-bottom: 10px;

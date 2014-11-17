@@ -21,16 +21,14 @@
 @font-face {
   font-family: 'nhm_ingrid_lightregular';
   src: url('@{fonts}/nhmingligreg-webfont.eot');
-  src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-  url('@{fonts}/nhmingligreg-webfont.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
   font-style: normal;
 }
 
 @font-face {
   font-family: 'nhm_ingridregular';
   src: url('@{fonts}/nhmingreg-webfont.eot');
-  src: url('@{fonts}/nhmingreg-webfont.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-  url('@{fonts}/nhmingreg-webfont.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+  src: url('@{fonts}/nhmingreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
   font-style: normal;
 }
 
@@ -146,6 +144,15 @@ a{
   .no-box-shadow;
   .no-border-radius;
   background: none;
+}
+
+/* Columns */
+[role=main] .primary {
+  width: 687px;
+}
+
+[role=main] .secondary {
+  width: 250px;
 }
 
 /* Main */
@@ -653,7 +660,7 @@ a.btn-danger:hover{
   p small {
     display: block;
     color: @smallTextColor;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 15px;
     margin: 15px 0;
   }
@@ -1443,7 +1450,7 @@ a.toggle-view-filters:hover{
   position: absolute;
   top: 70px;
   right: 20px;
-  width: 420px;
+  width: 860px;
   background: #EBEBEB;
   padding: 20px;
   display: none;
@@ -1488,48 +1495,115 @@ a.toggle-view-filters:after{
   content: "\f0b0";
 }
 
-.resource-view-filters > a:hover{
-  text-decoration: none;
-}
+//NEW:
 
-.resource-view-filters .resource-view-filter{
-  margin: 8px 0 10px 0;
-}
 
-.resource-view-filters .resource-view-filter label{
+.advanced-filter-field{
+  width: 300px;
+  height: 80px;
   float: left;
+  border: 1px soild red;
+  overflow: hidden;
 }
 
-.resource-view-filter-values{
-  margin-left: 180px;
+.advanced-filter-field label,
+.advanced-filter-field div,
+.advanced-filter-field span,
+.select2-hidden-accessible{
+  font-size: 12px!important;
 }
 
-.resource-view-filter-values .select2-container{
-  width: 220px!important;
-  padding-left: 0!important;
-  margin-left: 20px;
-  position: relative;
+.select2-result-label span,
+.select2-results{
+  font-size: 11px!important;
 }
 
-.resource-view-filter-values .select2-container:not(:first-child)::before{
-  content: 'or';
+.select2-container .select2-choice abbr{
+  top: 6px;
+}
+
+.select2-chosen{
+  padding-left: 10px;
+}
+
+.advanced-filter-field > label{
   float: left;
-  color: #525252;
+  width: 130px;
+  text-align: right;
+  line-height: 20px;
+}
+
+.advanced-filter-field .advanced-filter-field-value{
+  margin-left: 140px;
+}
+
+.advanced-filter-field .advanced-filter-field-value label{
   display: inline-block;
-  width: 20px;
-  margin-top: 4px;
-  position: absolute;
+  line-height: 2em;
+  margin-top: 5px;
+  margin-right: 5px;
+//  color: #757575;
+  font-weight: normal;
+}
+
+.advanced-filter-field .advanced-filter-field-value input[type=checkbox]{
   top: 0;
-  left: -20px;
 }
 
-.resource-view-filter-values .select2-container .select2-choice {
-  padding-left: 20px;
+.button-group{
+  clear: both;
 }
 
-.resource-view-filter-values .select2-container .select2-choice .select2-search-choice-close{
-  top: 7px;
+
+.resource-view-filter-form .form-actions{
+  clear: both;
+  margin-top: 5px;
+  border-top: 1px solid red;
+
 }
+
+
+// OLD:
+
+
+//.resource-view-filters > a:hover{
+//  text-decoration: none;
+//}
+//
+//.resource-view-filters .resource-view-filter{
+//  margin: 8px 0 10px 0;
+//}
+//
+//.resource-view-filters .resource-view-filter label{
+//  float: left;
+//}
+//
+//
+//.resource-view-filter-values{
+//  margin-left: 180px;
+//}
+//
+
+//
+//.resource-view-filter-values .select2-container:not(:first-child)::before{
+//  content: 'or';
+//  float: left;
+//  color: #525252;
+//  display: inline-block;
+//  width: 20px;
+//  margin-top: 4px;
+//  position: absolute;
+//  top: 0;
+//  left: -20px;
+//}
+//
+//.resource-view-filter-values .select2-container .select2-choice {
+//  padding-left: 20px;
+//}
+//
+//.resource-view-filter-values .select2-container .select2-choice .select2-search-choice-close{
+//  top: 7px;
+//}
 
 div.resource-view-filter-pills{
   padding-bottom: 10px;

@@ -3,18 +3,22 @@ import re
 import ckan.plugins as p
 import ckan.logic as logic
 import ckan.model as model
-from ckan.common import c
+from ckan.common import c, request
 from ckan.lib.helpers import url_for
+from itertools import chain
+import ckan.lib.navl.dictization_functions as dictization_functions
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
-from ckanext.nhm.lib.resource_filters import resource_filter_options
+from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_GROUP_FILTER
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
 from pylons import config
 
 get_action = logic.get_action
+
+unflatten = dictization_functions.unflatten
 
 Invalid = p.toolkit.Invalid
 
@@ -175,13 +179,39 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         if 'filters' in data_dict:
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
-            options = resource_filter_options(resource)
+            # Remove both filter options and field groups from filters
+            # These will be handled separately
+            options = chain(resource_filter_options(resource).keys(), [FIELD_GROUP_FILTER])
             for o in options:
                 if o in data_dict['filters']:
                     del data_dict['filters'][o]
+
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+
+        try:
+            print request.headers['Referer']
+        except:
+            pass
+
+        # print context
+        # print data_dict
+
+        # field_group = core, taxonomy, botany etc.,
+
+        # TODO: Add field group
+
+        # query_dict['select'] = ['"Catalog number"', '"_id"']
+
+        # request_dict = logic.clean_dict(unflatten(logic.tuplize_dict(logic.parse_params(request.params))))
+        # # print request_dict
+        #
+        # for i in dir(request):
+        #     print getattr(request, i)
+
+        # print request.query_string
+
         # Add our options filters
         if 'filters' in data_dict:
             resource_show = p.toolkit.get_action('resource_show')

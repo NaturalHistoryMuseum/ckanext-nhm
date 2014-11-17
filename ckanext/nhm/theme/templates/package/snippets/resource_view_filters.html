@@ -1,5 +1,6 @@
 
 {% set filter_pills = h.get_resource_filter_pills(resource) %}
+{% set field_groups = h.get_resource_field_groups(resource) %}
 {% set query_params = h.get_query_params() %}
 
 <div class="row resource-view-filter-form">
@@ -7,33 +8,36 @@
         {% snippet 'package/snippets/resource_view_full_text_search.html', resource_view=resource_view, resource=resource, package=package, filters=query_params['filters'] %}
     </div>
 
-    <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">
-        <div class="resource-view-filters-wrapper">
             <div
-              class="resource-view-filter-options"
-              data-module="resource-view-filter-options"
-              data-module-options="{{ h.dump_json(h.get_resource_filter_options(resource)) }}"
-              >
-            </div>
-            <div
-              class="resource-view-filters"
-              data-module="resource-view-filters"
+              class="resource-view-advanced-filters"
+              data-module="resource-view-advanced-filters"
               data-module-resource-id="{{ resource['id'] }}"
               data-module-fields="{{ h.dump_json(h.resource_view_get_fields(resource)) }}"
-              data-module-dropdown-template="<div class='resource-view-filter'><label>{filter}</label><div class='resource-view-filter-values'></div></div>"
               >
             </div>
-        </div>
-    </div>
 
-    {% resource 'ckanext-nhm/resource-view-filters-ui' %}
+{#    <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">#}
+{##}
+{#        <div class="resource-view-filters-wrapper">#}
+{#             TODO: Move into advanced filters #}
+{#            <div#}
+{#              class="resource-view-filter-options"#}
+{#              data-module="resource-view-filter-options"#}
+{#              data-module-options="{{ h.dump_json(h.get_resource_filter_options(resource)) }}"#}
+{#              >#}
+{#            </div>#}
+{##}
+{#        </div>#}
+{#    </div>#}
+
+    {% resource 'ckanext-nhm/resource-view-advanced-filters' %}
 
 </div>
 
-{% if filter_pills %}
+{% if filter_pills or field_groups %}
 
     <div class="row resource-view-filter-pills">
-        <div class="span12">
+        <div class="span8">
             <p class="filtered-list">
                 {% for field, pills in filter_pills.items() %}
                     <span class="facet">{{ field }}:</span>
@@ -43,6 +47,18 @@
                         </span>
                     {% endfor %}
                 {% endfor %}
+            </p>
+        </div>
+        <div class="span4">
+            <p class="filtered-list">
+                {% if field_groups %}
+                    <span class="facet">Fields:</span>
+                    {% for value, filter in field_groups.items() %}
+                        <span class="filtered pill">{{ value }}
+                            <a href="{{ h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], filters=filter) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
+                        </span>
+                    {% endfor %}
+                {% endif %}
             </p>
         </div>
     </div>
