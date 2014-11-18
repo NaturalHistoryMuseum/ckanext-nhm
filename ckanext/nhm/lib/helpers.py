@@ -2,20 +2,26 @@
 import logging
 import json
 import urllib
+
+# TODO: Remove Issue
+from ckanext.issues.model import Issue, ISSUE_STATUS
+
+# TEMP: Turn back on
+from beaker.cache import cache_region
+from sqlalchemy import func
+from pylons import config
+from collections import OrderedDict
+
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
-from ckanext.issues.model import Issue, ISSUE_STATUS
-from beaker.cache import cache_region
-from ckanext.nhm.lib.resource_filters import get_resource_filters, parse_request_filters
-from sqlalchemy import func
-from pylons import config
 from ckan.common import c, _, request
 from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_allowed_view_types as ckan_get_allowed_view_types
-from collections import OrderedDict
 
+from ckanext.nhm.lib.resource_filters import get_display_fields, parse_request_filters
+from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_GROUP_FILTER
+from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_DISPLAY_FILTER
 
 log = logging.getLogger(__name__)
 
@@ -94,89 +100,33 @@ def _get_action(action, params):
 
     return None
 
+
 def get_package(package_id):
     return _get_action('package_show', {'id': package_id})
+
 
 def get_resource(resource_id):
     return _get_action('resource_show', {'id': resource_id})
 
+
 def get_record(resource_id, record_id):
     return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
 
-def resource_view_state(resource_view_json):
+
+def resource_view_get_ordered_fields(resource_id):
     """
-    Alter the recline view resource, adding in state info
-    @param resource_view_json:
+    This is a replacement for resource_view_get_fields, but this function
+    handles errors internally, and return the fields in their original order
+    @param resource_id:
     @return:
     """
-    resource_view = json.loads(resource_view_json)
-
-    filter_dict = parse_request_filters()
-
-    # TODO: We now have the field groups ready to use
-    field_group = filter_dict.get('_field_group', None)
-
-    # TODO: We will also need to make sure filtered fields are displayed. - clicking links from record page
-    # TODO: What if a user enters text in another tab before clicking? Make that impossible?
-
-    # There is an annoying feature/bug in slickgrid, that if fitColumns=True
-    # And grid is wider than available viewport, slickgrid columns cannot
-    # Be resized until fitColumns is deactivated
-    # So to fix, we're going to work out how many columns are in the dataset
-    # To decide whether or not to turn on fitColumns
-    # Messy, but better than trying to hack around with slickgrid
-
-    # num_fields = len(get_datastore_fields(resource_view['resource_id']))
-    #
-    # viewport_max_width = 920
-    # col_width = 100
-    # fit_columns = (num_fields * col_width) < viewport_max_width
-
-    resource_view['state'] = {
-        # 'fitColumns': fit_columns,
-        'gridOptions': {
-            'defaultFormatter': 'NHMFormatter',
-            'enableCellRangeSelection': False,
-            'enableTextSelectionOnCells': False,
-            'enableCellNavigation': False,
-            'enableColumnReorder': False
-        },
-        # Sorted
-        'hiddenColumns': [
-            # We never want to display these columns
-            # TODO: This hides. But do we want to use columns?
-            # http://okfnlabs.org/recline/docs/src/view.slickgrid.html
-            'Modified',
-            'Created',
-            'Centroid',
-            'Occurrence ID',
-            'Basis of record',
-            'Determinations',
-            'Related resource ID',
-            'Relationship of resource',
-            'Associated media',
-            'Institution code',
-            'Record type'
-        ]
-    }
-
-    return json.dumps(resource_view)
-
-
-def get_datastore_fields(resource_id):
-    """
-    Get list of fields for a resource
-    @param resource_id:
-    @return: list
-    """
-
     data = {'resource_id': resource_id, 'limit': 0}
     try:
-        return toolkit.get_action('datastore_search')({}, data)['fields']
+        result = toolkit.get_action('datastore_search')({}, data)
     except NotFound:
-        pass
+        return []
 
-    return []
+    return [field['id'] for field in result.get('fields', [])]
 
 
 def form_select_datastore_field_options(resource_id=None, allow_empty=False):
@@ -184,41 +134,19 @@ def form_select_datastore_field_options(resource_id=None, allow_empty=False):
     # Need to check for resource_id as this form gets loaded on add, nut just edit
     # And on add there will be no resource_id
     if resource_id:
-        datastore_fields = [f['id'] for f in get_datastore_fields(resource_id)]
+        datastore_fields = resource_view_get_ordered_fields(resource_id)
         return list_to_form_options(datastore_fields, allow_empty)
 
     return []
 
 
 def form_select_update_frequency_options():
-    return list_to_form_options(UPDATE_FREQUENCIES)
-
-
-def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
     """
-    Format a list of values into a list of dict suitable for use in forms: [{value: x, name: y}]
-    @param values: list or list of tuples [(value, name)]
-    @param allow_empty: If true, will add none option
-    @param allow_empty_name: Label for none value
+    Get update frequencies as a form list
     @return:
     """
-    options = []
+    return list_to_form_options(UPDATE_FREQUENCIES)
 
-    if allow_empty:
-        options.append({'value': None, 'text': allow_empty_text or None})
-
-    for value in values:
-
-        if isinstance(value, basestring):
-            name = value
-        else:
-            # If this is a tuple or list use (value, name)
-            name = value[1]
-            value = value[0]
-
-        options.append({'value': value, 'text': name})
-
-    return options
 
 def update_frequency_get_label(value):
     """
@@ -229,6 +157,7 @@ def update_frequency_get_label(value):
     for v, label in UPDATE_FREQUENCIES:
         if v == value:
             return label
+
 
 def resource_issue_count(package_id):
 
@@ -360,12 +289,21 @@ def delimit_number(num):
     """
     return "{:,}".format(num)
 
+
 def api_doc_link():
+    """
+    Link to API documentation
+    @return:
+    """
     attr= {'class': 'external', 'target': '_blank'}
     # TODO: Change to http://docs.nhm.apiary.io/
     return link_to(_('API Docs'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 def get_google_analytics_config():
+    """
+    Get Google Analytic configuration
+    @return:
+    """
 
     return {
         'id': config.get("googleanalytics.id"),
@@ -439,6 +377,7 @@ def get_query_params():
 
     return params
 
+
 def absolute_url_for(*args, **kw):
     """
     Returns URL with site url
@@ -451,33 +390,91 @@ def absolute_url_for(*args, **kw):
     return url
 
 
-# TODO: THIS IS DUPLICATING THE LIB FUNCTION
-def parse_request_filters():
+
+# Resource view and filters
+def resource_view_state(resource_view_json):
     """
-    Get the filters from the request object
+    Alter the recline view resource, adding in state info
+    @param resource_view_json:
     @return:
     """
-    filter_dict = {}
+    resource_view = json.loads(resource_view_json)
 
-    try:
-        filter_params = request.params.get('filters').split('|')
-    except AttributeError:
-        return {}
+    # There is an annoying feature/bug in slickgrid, that if fitColumns=True
+    # And grid is wider than available viewport, slickgrid columns cannot
+    # Be resized until fitColumns is deactivated
+    # So to fix, we're going to work out how many columns are in the dataset
+    # To decide whether or not to turn on fitColumns
+    # Messy, but better than trying to hack around with slickgrid
 
-    filter_params = filter(None, filter_params)
+    # FIXME: WHat do we want to do
+    # num_fields = len(get_datastore_fields(resource_view['resource_id']))
+    #
+    # viewport_max_width = 920
+    # col_width = 100
+    # fit_columns = (num_fields * col_width) < viewport_max_width
 
-    for filter_param in filter_params:
-        field, value = filter_param.split(':', 1)
+    resource_view['state'] = {
+        'fitColumns': True,
+        'gridOptions': {
+            'defaultFormatter': 'NHMFormatter',
+            'enableCellRangeSelection': False,
+            'enableTextSelectionOnCells': False,
+            'enableCellNavigation': False,
+            'enableColumnReorder': False,
+            'columns': []
+        }
+    }
 
-        if field in filter_dict:
-            try:
-                filter_dict[field].append(value)
-            except KeyError:
-                filter_dict[field] = [filter_dict[field], value]
-        else:
-            filter_dict[field] = value
+    # Add hidden fields
+    # The way Slickgrid is implemented, we cannot pass in an array of columns
+    # Instead if display fields is set, we will mark all other columns as hidden
 
-    return filter_dict
+    # Retrieve the hidden fields from the filters
+    display_fields = get_display_fields()
+
+    if display_fields:
+
+        # Make sure _id is never hidden
+        display_fields.append('_id')
+
+        # Hidden fields are all other resource fields not in the display field array
+        resource_fields = resource_view_get_ordered_fields(resource_view['resource_id'])
+        hidden_fields = list(set(resource_fields) - set(display_fields))
+        resource_view['state']['hiddenColumns'] = hidden_fields
+
+
+        # Sorted
+        # 'hiddenColumns': [
+        #     # We never want to display these columns
+        #     # TODO: This hides. But do we want to use columns?
+        #     # http://okfnlabs.org/recline/docs/src/view.slickgrid.html
+        #     'Modified',
+        #     'Created',
+        #     'Centroid',
+        #     'Occurrence ID',
+        #     'Basis of record',
+        #     'Determinations',
+        #     'Related resource ID',
+        #     'Relationship of resource',
+        #     'Associated media',
+        #     'Institution code',
+        #     'Record type'
+        # ]
+
+    return json.dumps(resource_view)
+
+
+def resource_view_get_filter_fields(resource):
+    """
+    This is an alternative implementation of ckan.lib.helpers.resource_view_get_fields
+    Used in resource_view_filters.html
+    Which returns a dictionary denoting (field id, display boolean, group name)
+    @param resource:
+    @return:
+    """
+
+    return resource_view_get_ordered_fields(resource['id'])
 
 
 def get_resource_filter_options(resource):
@@ -519,20 +516,50 @@ def get_resource_filter_pills(resource):
     @return:
     """
 
-    filters = get_resource_filters(resource)
+    filter_dict = parse_request_filters()
+
+    def get_pill_filters(exclude_field, exclude_value):
+        """
+        Build filter, using filters which aren't exclude_field=exclude_value
+        @param exclude_field:
+        @param exclude_value:
+        @return:
+        """
+
+        filters = []
+        for field, values in filter_dict.items():
+            for value in values:
+                if not (field == exclude_field and value == exclude_value):
+                    filters.append('%s:%s' % (field, value))
+
+        return '|'.join(filters)
+
+    pills = {}
+
+    options = resource_filter_options(resource)
+    for field, values in filter_dict.items():
+        for value in values:
+            filters = get_pill_filters(field, value)
+
+            #  If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
+            # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
+            if field == '_tmgeom':
+                pills['geometry'] = {'Polygon': filters}
+            elif field in options:
+                label = options[field]['label']
+                try:
+                    pills['options'][label] = filters
+                except KeyError:
+                    pills['options'] = {label: filters}
+            else:
+                try:
+                    pills[field][value] = filters
+                except KeyError:
+                    pills[field] = {value: filters}
 
     # Remove the field group key, if it exists
-    filters.pop(FIELD_GROUP_FILTER, None)
-    return filters
-
-def get_resource_field_groups(resource):
-    """
-    Get field group filters
-    @param resource:
-    @return:
-    """
-    filters = get_resource_filters(resource)
-    return filters.pop(FIELD_GROUP_FILTER, None)
+    pills.pop(FIELD_DISPLAY_FILTER, None)
+    return pills
 
 
 def get_allowed_view_types(resource, package):
@@ -598,6 +625,7 @@ def get_creator_id_facet_label(facet):
     except (NotFound, AttributeError) as e:
         display_name = facet['display_name']
     return display_name
+
 
 def field_name_label(field_name):
     """

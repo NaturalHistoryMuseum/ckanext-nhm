@@ -7,7 +7,7 @@ from ckan.common import _, c
 import logging
 import json
 from ckan.lib.render import find_template
-from ckanext.nhm.lib.helpers import get_datastore_fields
+from ckanext.nhm.lib.helpers import resource_view_get_ordered_fields
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -96,12 +96,12 @@ class RecordController(base.BaseController):
         """
         self._load_data(package_name, resource_id, record_id)
 
-        # The record_dict does not have field sin the correct order
+        # The record_dict does not have fields in the correct order
         # So load the fields, and create an OrderedDict with field: value
         c.field_data = OrderedDict()
-        for field in get_datastore_fields(resource_id):
-            if not field['id'].startswith('_'):
-                c.field_data[field['id']] = c.record_dict.get(field['id'], None)
+        for field in resource_view_get_ordered_fields(resource_id):
+            if not field.startswith('_'):
+                c.field_data[field] = c.record_dict.get(field, None)
 
 
         # Try and use a template file based on the resource name

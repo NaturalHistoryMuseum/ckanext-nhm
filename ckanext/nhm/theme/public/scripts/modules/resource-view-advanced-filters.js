@@ -44,18 +44,25 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     * Loop through all the fields, making a filed and appending to the filters div
     */
 
+    var displayFields = filters['_f'] || []
+
     $.each(fields, function (i, fieldName) {
+
+        var value
+
         // Do we a have a filter for this field
         if (filters.hasOwnProperty(fieldName)) {
             // We no longer allow multiple OR values
-            var value = filters[fieldName][0]
+            value = filters[fieldName][0]
         }
 
-       $filtersDiv.append(_makeField(fieldName, value));
+        var displayField = ($.inArray(fieldName, displayFields) != -1) || (value !== undefined)
+
+        $filtersDiv.append(_makeField(fieldName, value, displayField));
 
     });
 
-    function _makeField(fieldName, value) {
+    function _makeField(fieldName, value, displayField) {
         /**
          * Make a field filter, comprising label, select2 auto-lookup
          * list and a checkbox for controlling display of the field - if checked field will be displayed
@@ -65,8 +72,26 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      // Build the filter, including a field display checkbox
      var $filter = $('<div class="advanced-filter-field-value"></div>')
          .append($('<input type="hidden" name="filters['+fieldName+']" />'))
-         .append($('<label for="field_display['+fieldName+']">Display field in grid</label>'))
-         .append($('<input type="checkbox" name="field_display['+fieldName+']" value="1" />'));
+
+     // Field _id is a required fields; cannot be shown/hidden
+     if (fieldName != '_id'){
+
+         var $fieldDisplayCheckbox = $('<input type="checkbox"  name="field_display['+fieldName+']" value="1" />')
+
+         // If we have a populated filter value or this is a display field, check the box
+         if (displayField || value){
+             $fieldDisplayCheckbox.prop('checked', true)
+             if (value){
+                 // If we have a value, this must be disabled and checked
+                 // User must remove the filter value, to uncheck the box
+                 $fieldDisplayCheckbox.prop('disabled', true)
+             }
+         }
+
+         // Add field display checkbox to the filter
+         $filter.append($('<label for="field_display['+fieldName+']">Display field in grid</label>'))
+         .append($fieldDisplayCheckbox);
+     }
 
      // Build a field consisting of label and input
      var $field = $('<div class="advanced-filter-field"></div>')
@@ -134,10 +159,8 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
    * On updating the filter, if we are filtering on the field lock field for display
    * Or if value is removed, unlock the field display
    */
-
     var name = evt.currentTarget.name.replace('filters', 'field_display')
     var $checkbox = $('input[name="'+ name +'"]', self.el)
-
 
     if (evt.val){
         // User has entered a filter for this field - so we want to return the field in the results
@@ -166,7 +189,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         display_fields.push(this.name.match(re_field_display)[1]);
      })
 
-     ckan.views.filters.set('_display_field', display_fields);
+     ckan.views.filters.set('_f', display_fields);
 
      self.el.find('input[name^="filters"]').each(function(){
 

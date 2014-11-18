@@ -10,7 +10,7 @@ import ckan.lib.navl.dictization_functions as dictization_functions
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
-from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_GROUP_FILTER
+from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_DISPLAY_FILTER
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
@@ -181,7 +181,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             resource = resource_show(context, {'id': data_dict['resource_id']})
             # Remove both filter options and field groups from filters
             # These will be handled separately
-            options = chain(resource_filter_options(resource).keys(), [FIELD_GROUP_FILTER])
+            options = chain(resource_filter_options(resource).keys(), [FIELD_DISPLAY_FILTER])
             for o in options:
                 if o in data_dict['filters']:
                     del data_dict['filters'][o]

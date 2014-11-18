@@ -1,6 +1,5 @@
 
 {% set filter_pills = h.get_resource_filter_pills(resource) %}
-{% set field_groups = h.get_resource_field_groups(resource) %}
 {% set query_params = h.get_query_params() %}
 
 <div class="row resource-view-filter-form">
@@ -12,7 +11,7 @@
               class="resource-view-advanced-filters"
               data-module="resource-view-advanced-filters"
               data-module-resource-id="{{ resource['id'] }}"
-              data-module-fields="{{ h.dump_json(h.resource_view_get_fields(resource)) }}"
+              data-module-fields="{{ h.dump_json(h.resource_view_get_filter_fields(resource)) }}"
               >
             </div>
 
@@ -34,10 +33,10 @@
 
 </div>
 
-{% if filter_pills or field_groups %}
+{% if filter_pills %}
 
     <div class="row resource-view-filter-pills">
-        <div class="span8">
+        <div class="span12">
             <p class="filtered-list">
                 {% for field, pills in filter_pills.items() %}
                     <span class="facet">{{ field }}:</span>
@@ -47,18 +46,6 @@
                         </span>
                     {% endfor %}
                 {% endfor %}
-            </p>
-        </div>
-        <div class="span4">
-            <p class="filtered-list">
-                {% if field_groups %}
-                    <span class="facet">Fields:</span>
-                    {% for value, filter in field_groups.items() %}
-                        <span class="filtered pill">{{ value }}
-                            <a href="{{ h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], filters=filter) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
-                        </span>
-                    {% endfor %}
-                {% endif %}
             </p>
         </div>
     </div>

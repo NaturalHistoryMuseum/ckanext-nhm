@@ -1227,7 +1227,7 @@ a.toggle-view-filters:after {
 }
 .advanced-filter-field {
   width: 300px;
-  height: 80px;
+  height: 70px;
   float: left;
   border: 1px soild red;
   overflow: hidden;
@@ -1238,12 +1238,19 @@ a.toggle-view-filters:after {
 .select2-hidden-accessible {
   font-size: 12px!important;
 }
+.advanced-filter-field label {
+  margin-top: 3px;
+}
 .select2-result-label span,
 .select2-results {
   font-size: 11px!important;
 }
+.select2-container .select2-choice {
+  height: 22px;
+  line-height: 22px;
+}
 .select2-container .select2-choice abbr {
-  top: 6px;
+  top: 5px;
 }
 .select2-chosen {
   padding-left: 10px;
@@ -1260,7 +1267,6 @@ a.toggle-view-filters:after {
 .advanced-filter-field .advanced-filter-field-value label {
   display: inline-block;
   line-height: 2em;
-  margin-top: 5px;
   margin-right: 5px;
   font-weight: normal;
 }
