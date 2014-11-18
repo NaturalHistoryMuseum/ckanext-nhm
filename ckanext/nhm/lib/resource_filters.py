@@ -5,11 +5,14 @@ Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
 
-from ckan.common import request
+import json
+from ckan.common import request, response
 
 # Filter used for filter groups
 FIELD_DISPLAY_FILTER = '_f'
 
+# Name of the field display cookie for sotring hidden fields
+HIDDEN_FIELDS_COOKIE = 'hidden_fields'
 
 def resource_filter_options(resource):
     """
@@ -60,6 +63,7 @@ def resource_filter_options(resource):
 
 
 def parse_request_filters():
+
     """
     Get the filters from the request object
     @return:
@@ -84,21 +88,48 @@ def parse_request_filters():
     return filter_dict
 
 
-def get_display_fields():
+## Hidden field cookie handling
+
+def resource_filter_get_cookie(resource_id=None):
     """
-    Parse display fields from the URL filter params
-    @return: list, empty if there are no display fields
+    Retrieve the resource filter cookie
+    @param resource_id:
+    @return:
     """
+    try:
+        cookie = json.loads(request.cookies[HIDDEN_FIELDS_COOKIE])
+    except KeyError:
+        return
 
-    filter_dict = parse_request_filters()
-    # Get all display fields explicitly set
-    display_fields = filter_dict.get(FIELD_DISPLAY_FILTER, None)
-
-    # And add all fields with a filter set
-    print filter_dict
-
-    # Ensure display ID is a list
-    if display_fields:
-        return display_fields if isinstance(display_fields, list) else [display_fields]
+    if resource_id:
+        return cookie.get(resource_id, None)
     else:
-        return []
+        return cookie
+
+
+def resource_filter_set_cookie(resource_id, hidden_fields):
+    """
+    Set the resource filter hidden fields cookie
+    @param resource_id:
+    @param hidden_fields:
+    @return:
+    """
+
+    cookie = resource_filter_get_cookie()
+    cookie[resource_id] = hidden_fields
+
+    response.set_cookie(HIDDEN_FIELDS_COOKIE, json.dumps(cookie))
+
+
+def resource_filter_delete_cookie(resource_id):
+    """
+    Delete the hidden fields for this resource ID
+    @param resource_id:
+    @return:
+    """
+
+    cookie = resource_filter_get_cookie()
+    # Remove the dictionary item for this resource ID
+    cookie.pop(resource_id, None)
+    # And reset the cookie
+    response.set_cookie(HIDDEN_FIELDS_COOKIE, json.dumps(cookie))

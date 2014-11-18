@@ -23,6 +23,7 @@ get_action = logic.get_action
 
 TILED_MAP_TYPE = 'tiledmap'  # The view type for the tiledmap
 
+
 class RecordController(base.BaseController):
     """
     Controller for displaying an individual record

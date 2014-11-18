@@ -121,7 +121,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     # ITemplateHelpers
     def get_helpers(self):
 
-
         h = {}
 
         #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers

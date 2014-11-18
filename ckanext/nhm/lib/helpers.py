@@ -18,10 +18,16 @@ import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
 from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_allowed_view_types as ckan_get_allowed_view_types
 
-from ckanext.nhm.lib.resource_filters import get_display_fields, parse_request_filters
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_DISPLAY_FILTER
+from ckanext.nhm.lib.resource_filters import (
+    resource_filter_options,
+    parse_request_filters,
+    FIELD_DISPLAY_FILTER,
+    resource_filter_get_cookie,
+    resource_filter_set_cookie,
+    resource_filter_delete_cookie
+)
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +40,7 @@ _check_access = logic.check_access
 
 # Make enumerate available to templates
 enumerate = enumerate
+
 
 def get_site_statistics():
     stats = dict()
@@ -211,11 +218,14 @@ def url_for_collection_view(view_type='recline_grid_view', filters={}):
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
+
 def url_for_indexlot_view():
     return ''
 
+
 def indexlot_count():
     return delimit_number(700000)
+
 
 def get_nhm_organisation_id():
     """
@@ -223,6 +233,7 @@ def get_nhm_organisation_id():
     """
     # TODO: There is also an organisation id setting
     return config.get("ldap.organization.id")
+
 
 # TEMP: Turn back caching
 # @cache_region('short_term', 'collection_stats')
@@ -281,6 +292,7 @@ def get_department(collection_code):
 
     return departments[collection_code]
 
+
 def delimit_number(num):
     """
     Separate long number into thousands 1000000 => 1,000,000
@@ -298,6 +310,7 @@ def api_doc_link():
     attr= {'class': 'external', 'target': '_blank'}
     # TODO: Change to http://docs.nhm.apiary.io/
     return link_to(_('API Docs'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
+
 
 def get_google_analytics_config():
     """
@@ -390,7 +403,6 @@ def absolute_url_for(*args, **kw):
     return url
 
 
-
 # Resource view and filters
 def resource_view_state(resource_view_json):
     """
@@ -429,52 +441,81 @@ def resource_view_state(resource_view_json):
     # Add hidden fields
     # The way Slickgrid is implemented, we cannot pass in an array of columns
     # Instead if display fields is set, we will mark all other columns as hidden
+    hidden_fields = resource_view_get_hidden_fields(resource_view['resource_id'])
 
-    # Retrieve the hidden fields from the filters
-    display_fields = get_display_fields()
-
-    if display_fields:
-
-        # Make sure _id is never hidden
-        display_fields.append('_id')
-
-        # Hidden fields are all other resource fields not in the display field array
-        resource_fields = resource_view_get_ordered_fields(resource_view['resource_id'])
-        hidden_fields = list(set(resource_fields) - set(display_fields))
+    if hidden_fields:
+        resource_filter_set_cookie(resource_view['resource_id'], hidden_fields)
         resource_view['state']['hiddenColumns'] = hidden_fields
-
-
-        # Sorted
-        # 'hiddenColumns': [
-        #     # We never want to display these columns
-        #     # TODO: This hides. But do we want to use columns?
-        #     # http://okfnlabs.org/recline/docs/src/view.slickgrid.html
-        #     'Modified',
-        #     'Created',
-        #     'Centroid',
-        #     'Occurrence ID',
-        #     'Basis of record',
-        #     'Determinations',
-        #     'Related resource ID',
-        #     'Relationship of resource',
-        #     'Associated media',
-        #     'Institution code',
-        #     'Record type'
-        # ]
+    else:
+        resource_filter_delete_cookie(resource_view['resource_id'])
 
     return json.dumps(resource_view)
 
 
-def resource_view_get_filter_fields(resource):
+def resource_view_get_hidden_fields(resource_id):
     """
-    This is an alternative implementation of ckan.lib.helpers.resource_view_get_fields
-    Used in resource_view_filters.html
-    Which returns a dictionary denoting (field id, display boolean, group name)
-    @param resource:
-    @return:
+    Get a list of hidden fields
+    @param resource id:
+    @return: list of hidden fields
     """
 
-    return resource_view_get_ordered_fields(resource['id'])
+    """
+    Parse hidden fields from the filter dictionary
+    @param filter_dict:
+    """
+
+    filter_dict = parse_request_filters()
+
+    # Get all display fields explicitly set
+    display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
+
+    hidden_fields_cookie = resource_filter_get_cookie(resource_id)
+
+    # If user has set display fields, loop through display fields
+    # And available fields, to build a list of hidden fields
+    if display_fields:
+
+        # Ensure it's a list
+        if not isinstance(display_fields, list):
+            display_fields = [display_fields]
+
+        # Make sure _id is never hidden
+        display_fields.append('_id')
+
+        # Make sure all filtered fields are never hidden
+        display_fields += filter_dict.keys()
+
+        # Hidden fields are all other resource fields not in the display field array
+        resource_fields = resource_view_get_ordered_fields(resource_id)
+
+        return list(set(resource_fields) - set(display_fields))
+
+    elif hidden_fields_cookie:
+
+        # Make sure that even if we're using the hidden fields cookie
+        # All filtered fields are removed from the hidden field list
+        hidden_fields_cookie = list(set(hidden_fields_cookie) - set(filter_dict.keys()))
+        return hidden_fields_cookie
+    else:
+        return {}
+
+    # Sorted
+    # 'hiddenColumns': [
+    #     # We never want to display these columns
+    #     # TODO: This hides. But do we want to use columns?
+    #     # http://okfnlabs.org/recline/docs/src/view.slickgrid.html
+    #     'Modified',
+    #     'Created',
+    #     'Centroid',
+    #     'Occurrence ID',
+    #     'Basis of record',
+    #     'Determinations',
+    #     'Related resource ID',
+    #     'Relationship of resource',
+    #     'Associated media',
+    #     'Institution code',
+    #     'Record type'
+    # ]
 
 
 def get_resource_filter_options(resource):
@@ -516,7 +557,9 @@ def get_resource_filter_pills(resource):
     @return:
     """
 
-    filter_dict = parse_request_filters()
+    # filter_dict = parse_request_filters()
+
+    filter_dict = {}
 
     def get_pill_filters(exclude_field, exclude_value):
         """

@@ -14,20 +14,21 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     self = this
 
     var resourceId = self.options.resourceId,
+        hiddenFields = self.options.hiddenFields,
         fields = self.options.fields,
         $filtersDiv = $('<div></div>');
 
     var filters = ckan.views.filters.get();
 
     // Append the filters
-    _appendFieldFilters($filtersDiv, resourceId, fields, filters);
+    _appendFieldFilters($filtersDiv, resourceId, fields, filters, hiddenFields);
     $(this).select2('destroy');
     self.el.append($filtersDiv);
 
     var $formActions = $('<div class="form-actions"></div>')
 
     $formActions.append($('<button class="btn btn-primary save" type="submit"><i class="icon-search"></i><span>Search</span></button>').click(_submitSearch));
-    $formActions.append($('<label for"display-all-fields">Display all fields</label><input type="checkbox" name="display-all-fields" />').click(_toggleDisplayAllFields))
+    $formActions.append($('<label for"display-all-fields">Display all fields</label><input type="checkbox" checked="checked" name="display-all-fields" />').click(_toggleDisplayAllFields))
 
     // Add submit button
     self.el.append($formActions)
@@ -39,13 +40,10 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     checkBoxes.prop("checked", !checkBoxes.prop("checked"));
   }
 
-  function _appendFieldFilters($filtersDiv, resourceId, fields, filters) {
+  function _appendFieldFilters($filtersDiv, resourceId, fields, filters, hiddenFields) {
    /**
     * Loop through all the fields, making a filed and appending to the filters div
     */
-
-    var displayFields = filters['_f'] || []
-
     $.each(fields, function (i, fieldName) {
 
         var value
@@ -56,18 +54,16 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
             value = filters[fieldName][0]
         }
 
-        var displayField = ($.inArray(fieldName, displayFields) != -1) || (value !== undefined)
-
-        $filtersDiv.append(_makeField(fieldName, value, displayField));
+        $filtersDiv.append(_makeField(fieldName, value, ($.inArray(fieldName, hiddenFields) == -1)));
 
     });
 
     function _makeField(fieldName, value, displayField) {
-        /**
-         * Make a field filter, comprising label, select2 auto-lookup
-         * list and a checkbox for controlling display of the field - if checked field will be displayed
-         * @type {*|jQuery}
-         */
+    /**
+     * Make a field filter, comprising label, select2 auto-lookup
+     * list and a checkbox for controlling display of the field - if checked field will be displayed
+     * @type {*|jQuery}
+     */
 
      // Build the filter, including a field display checkbox
      var $filter = $('<div class="advanced-filter-field-value"></div>')
@@ -147,14 +143,14 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
           var data = {id: element.val(), text: element.val()};
           callback(data);
         }
-      }).on('change', _toggleFieldDisplay).select2("val", value)
+      }).on('change', _onChange).select2("val", value)
 
       return $field;
 
     }
   }
 
-  function _toggleFieldDisplay(evt) {
+  function _onChange(evt) {
   /**
    * On updating the filter, if we are filtering on the field lock field for display
    * Or if value is removed, unlock the field display
@@ -176,10 +172,10 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
   }
 
   function _submitSearch(){
-      /**
-       * Submit the filter form
-       * Loop through all values on the form, adding them to the CKAN view filter object
-       */
+     /**
+     * Submit the filter form
+     * Loop through all values on the form, adding them to the CKAN view filter object
+     */
 
      var re_filters = new RegExp(/filters\[(.*?)\]/);
      var re_field_display = new RegExp(/field_display\[(.*?)\]/);
@@ -193,9 +189,12 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
      self.el.find('input[name^="filters"]').each(function(){
 
+         var filterName = this.name.match(re_filters)[1]
+
          if ($(this).val()){
-            var filter_name = this.name.match(re_filters)[1]
-            ckan.views.filters.set(filter_name, $(this).val());
+            ckan.views.filters.set(filterName, $(this).val());
+         }else{
+             ckan.views.filters.unset(filterName);
          }
 
      })
