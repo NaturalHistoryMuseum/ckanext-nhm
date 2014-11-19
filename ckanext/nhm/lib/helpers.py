@@ -455,6 +455,9 @@ def resource_view_state(resource_view_json):
 def resource_view_get_hidden_fields(resource_id):
     """
     Get a list of hidden fields
+    This is called from resource_view_filters.html and helper resource_view_state
+    So the same fields are hidden in the form and Slickgrid
+
     @param resource id:
     @return: list of hidden fields
     """
@@ -499,6 +502,7 @@ def resource_view_get_hidden_fields(resource_id):
     else:
         return {}
 
+    # TODO: 
     # Sorted
     # 'hiddenColumns': [
     #     # We never want to display these columns

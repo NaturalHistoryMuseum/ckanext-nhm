@@ -28,16 +28,29 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     var $formActions = $('<div class="form-actions"></div>')
 
     $formActions.append($('<button class="btn btn-primary save" type="submit"><i class="icon-search"></i><span>Search</span></button>').click(_submitSearch));
-    $formActions.append($('<label for"display-all-fields">Display all fields</label><input type="checkbox" checked="checked" name="display-all-fields" />').click(_toggleDisplayAllFields))
+
+    var $displayAllFields = $('<input type="checkbox" name="display-all-fields" />').click(_toggleDisplayAllFields)
+
+    console.log($('input[name^="field_display"]:checked', self.el).length);
+    console.log($('input[name^="field_display"]', self.el).length);
+
+    // Only if all checkboxes are checked, should the checkbox be checked for toggling off all fields
+    if ($('input[name^="field_display"]:checked', self.el).length == $('input[name^="field_display"]', self.el).length){
+        $displayAllFields.prop('checked', true);
+    }
+
+
+    $formActions.append($('<label for"display-all-fields">Display all fields</label>'))
+        .append($displayAllFields)
 
     // Add submit button
     self.el.append($formActions)
 
   }
 
-  function _toggleDisplayAllFields(){
+  function _toggleDisplayAllFields(e){
     var checkBoxes = $('input[name^="field_display"]:not(:disabled)', self.el);
-    checkBoxes.prop("checked", !checkBoxes.prop("checked"));
+    checkBoxes.prop("checked", $(this).prop('checked'));
   }
 
   function _appendFieldFilters($filtersDiv, resourceId, fields, filters, hiddenFields) {

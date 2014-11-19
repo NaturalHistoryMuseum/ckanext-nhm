@@ -12,7 +12,8 @@ from ckan.common import request, response
 FIELD_DISPLAY_FILTER = '_f'
 
 # Name of the field display cookie for sotring hidden fields
-HIDDEN_FIELDS_COOKIE = 'hidden_fields'
+HIDDEN_FIELDS_COOKIE_NAME = 'hidden_fields'
+
 
 def resource_filter_options(resource):
     """
@@ -97,9 +98,9 @@ def resource_filter_get_cookie(resource_id=None):
     @return:
     """
     try:
-        cookie = json.loads(request.cookies[HIDDEN_FIELDS_COOKIE])
+        cookie = json.loads(request.cookies[HIDDEN_FIELDS_COOKIE_NAME])
     except KeyError:
-        return
+        return {}
 
     if resource_id:
         return cookie.get(resource_id, None)
@@ -118,7 +119,7 @@ def resource_filter_set_cookie(resource_id, hidden_fields):
     cookie = resource_filter_get_cookie()
     cookie[resource_id] = hidden_fields
 
-    response.set_cookie(HIDDEN_FIELDS_COOKIE, json.dumps(cookie))
+    response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
 
 
 def resource_filter_delete_cookie(resource_id):
@@ -132,4 +133,4 @@ def resource_filter_delete_cookie(resource_id):
     # Remove the dictionary item for this resource ID
     cookie.pop(resource_id, None)
     # And reset the cookie
-    response.set_cookie(HIDDEN_FIELDS_COOKIE, json.dumps(cookie))
+    response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
