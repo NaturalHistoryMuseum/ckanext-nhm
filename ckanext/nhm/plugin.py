@@ -68,8 +68,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IRoutes
     def before_map(self, map):
 
-        specimen_resource_id = config.get("ckanext.nhm.specimen_resource_id")
-        indexlot_resource_id = config.get("ckanext.nhm.indexlot_resource_id")
+        specimen_resource_id = helpers.get_specimen_resource_id()
+        indexlot_resource_id = helpers.get_indexlot_resource_id()
 
         # Add controller for KE EMu specimen records
         map.connect('specimen', '/dataset/{package_name}/resource/%s/record/{record_id}' % specimen_resource_id,
@@ -258,8 +258,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
 
-        specimen_resource_id = config.get("ckanext.nhm.specimen_resource_id")
-        indexlot_resource_id = config.get("ckanext.nhm.indexlot_resource_id")
+        specimen_resource_id = helpers.get_specimen_resource_id()
+        indexlot_resource_id = helpers.get_indexlot_resource_id()
 
         # Get the submitted data values
         package_id = data_dict.get('package_id', None)

@@ -1449,8 +1449,8 @@ a.toggle-view-filters:hover{
 .resource-view-filters-wrapper{
   position: absolute;
   top: 70px;
-  right: 20px;
-  width: 860px;
+  left: 0;
+  width: 900px;
   background: #EBEBEB;
   padding: 20px;
   display: none;
@@ -1495,15 +1495,29 @@ a.toggle-view-filters:after{
   content: "\f0b0";
 }
 
-//NEW:
-
-
-.advanced-filter-field{
-  width: 300px;
-  height: 70px;
+.resource-view-advanced-filters .advanced-filter-field{
+  width: 290px;
+  height: 55px;
   float: left;
-  border: 1px soild red;
-  overflow: hidden;
+}
+
+.liteTabs div{
+  // Override some tab settings
+  padding: 0;
+  background: none;
+}
+
+.liteTabs ul{
+  margin-bottom: 20px;
+}
+
+.liteTabs ul li a{
+  padding: 6px 9px;
+}
+
+.liteTabs a.selected,
+.liteTabs a.selected:hover{
+  background: none;
 }
 
 .advanced-filter-field label,
@@ -1537,81 +1551,79 @@ a.toggle-view-filters:after{
 
 .advanced-filter-field > label{
   float: left;
-  width: 130px;
+  width: 120px;
   text-align: right;
-  line-height: 20px;
+  line-height: 1.3;
 }
 
-.advanced-filter-field .advanced-filter-field-value{
-  margin-left: 140px;
+.advanced-filter-field div{
+  // Override some of the tab settings
+  float: none;
+  width: auto;
 }
 
-.advanced-filter-field .advanced-filter-field-value label{
-  display: inline-block;
-  line-height: 2em;
-  margin-right: 5px;
-//  color: #757575;
-  font-weight: normal;
+.advanced-filter-field div.advanced-filter-field-value{
+  margin-left: 125px;
 }
 
-.advanced-filter-field .advanced-filter-field-value input[type=checkbox]{
-  top: 0;
+.advanced-filter-field div.advanced-filter-field-value label{
+  width: 20px;
+  height: 16px;
+  overflow: hidden;
 }
+
+.advanced-filter-field div.advanced-filter-field-value input.toggle-field-display{
+  float: right;
+}
+
+.advanced-filter-field div.advanced-filter-field-value label:after{
+  content: '';
+}
+
+.advanced-filter-field div.advanced-filter-field-value label .show,
+.advanced-filter-field div.advanced-filter-field-value label.hidden-field .hide{
+  display: block;
+}
+
+.advanced-filter-field div.advanced-filter-field-value label .hide,
+.advanced-filter-field div.advanced-filter-field-value label.hidden-field .show{
+  display: none;
+}
+
+//input.toggle-field-display{
+//  display: none;
+//}
+
+
 
 .button-group{
   clear: both;
 }
 
-
 .resource-view-filter-form .form-actions{
   clear: both;
-  margin-top: 5px;
-  border-top: 1px solid red;
-
+  text-align: center;
 }
 
+.resource-view-filter-form .form-actions button{
+  margin-left: 150px;
+}
 
-// OLD:
+.resource-view-filter-form .form-actions .toggle-all-fields{
+  float: right;
+  margin-right: 40px;
+}
 
+.resource-view-filter-form .form-actions .toggle-all-fields label{
+  display: inline-block;
+  font-weight: normal;
+  margin-top: 6px;
+  margin-right: 7px;
+}
 
-//.resource-view-filters > a:hover{
-//  text-decoration: none;
-//}
-//
-//.resource-view-filters .resource-view-filter{
-//  margin: 8px 0 10px 0;
-//}
-//
-//.resource-view-filters .resource-view-filter label{
-//  float: left;
-//}
-//
-//
-//.resource-view-filter-values{
-//  margin-left: 180px;
-//}
-//
-
-//
-//.resource-view-filter-values .select2-container:not(:first-child)::before{
-//  content: 'or';
-//  float: left;
-//  color: #525252;
-//  display: inline-block;
-//  width: 20px;
-//  margin-top: 4px;
-//  position: absolute;
-//  top: 0;
-//  left: -20px;
-//}
-//
-//.resource-view-filter-values .select2-container .select2-choice {
-//  padding-left: 20px;
-//}
-//
-//.resource-view-filter-values .select2-container .select2-choice .select2-search-choice-close{
-//  top: 7px;
-//}
+.resource-view-filter-form .form-actions .toggle-all-fields input{
+  top: 1px;
+}
 
 div.resource-view-filter-pills{
   padding-bottom: 10px;

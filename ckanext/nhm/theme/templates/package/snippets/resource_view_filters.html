@@ -7,18 +7,21 @@
         {% snippet 'package/snippets/resource_view_full_text_search.html', resource_view=resource_view, resource=resource, package=package, filters=query_params['filters'] %}
     </div>
 
-    <div
-      class="resource-view-advanced-filters"
-      data-module="resource-view-advanced-filters"
-      data-module-resource-id="{{ resource['id'] }}"
-      data-module-fields="{{ h.dump_json(h.resource_view_get_ordered_fields(resource['id'])) }}"
-      data-module-hidden-fields="{{ h.dump_json(h.resource_view_get_hidden_fields(resource['id'])) }}"
-      >
-    </div>
+            <div
+              class="resource-view-advanced-filters"
+              data-module="resource-view-advanced-filters"
+              data-module-resource-id="{{ resource['id'] }}"
+              data-module-fields="{{ h.dump_json(h.resource_view_get_ordered_fields(resource['id'])) }}"
+              data-module-hidden-fields="{{ h.dump_json(h.resource_view_get_hidden_fields(resource['id'])) }}"
+              data-module-field-groups="{{ h.dump_json(h.resource_view_get_groups(resource['id'])) }}"
+              >
+            </div>
 
 {#    <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">#}
 {##}
 {#        <div class="resource-view-filters-wrapper">#}
+{##}
+{##}
 {##}
 {#            <div#}
 {#              class="resource-view-advanced-filters"#}

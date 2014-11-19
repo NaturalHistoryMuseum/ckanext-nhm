@@ -6,7 +6,6 @@ import urllib
 # TODO: Remove Issue
 from ckanext.issues.model import Issue, ISSUE_STATUS
 
-# TEMP: Turn back on
 from beaker.cache import cache_region
 from sqlalchemy import func
 from pylons import config
@@ -40,7 +39,6 @@ _check_access = logic.check_access
 
 # Make enumerate available to templates
 enumerate = enumerate
-
 
 def get_site_statistics():
     stats = dict()
@@ -201,7 +199,7 @@ def url_for_collection_view(view_type='recline_grid_view', filters={}):
     @return: url
     """
 
-    resource_id = config.get("ckanext.nhm.specimen_resource_id")
+    resource_id = get_specimen_resource_id()
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
     try:
@@ -231,19 +229,31 @@ def get_nhm_organisation_id():
     """
     @return:  ID for the NHM organisation
     """
-    # TODO: There is also an organisation id setting
     return config.get("ldap.organization.id")
 
 
-# TEMP: Turn back caching
-# @cache_region('short_term', 'collection_stats')
+def get_specimen_resource_id():
+    """
+    @return:  ID for the specimen resource
+    """
+    return config.get("ckanext.nhm.specimen_resource_id")
+
+
+def get_indexlot_resource_id():
+    """
+    @return:  ID for indexlot resource
+    """
+    return config.get("ckanext.nhm.indexlot_resource_id")
+
+
+@cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by Collection code
     @return:
     """
 
-    resource_id = config.get("ckanext.nhm.specimen_resource_id")
+    resource_id = get_specimen_resource_id()
 
     if not resource_id:
         log.error('Please configure collection resource ID')
@@ -502,7 +512,7 @@ def resource_view_get_hidden_fields(resource_id):
     else:
         return {}
 
-    # TODO: 
+    # TODO:
     # Sorted
     # 'hiddenColumns': [
     #     # We never want to display these columns
@@ -520,6 +530,213 @@ def resource_view_get_hidden_fields(resource_id):
     #     'Institution code',
     #     'Record type'
     # ]
+
+
+def resource_view_get_groups(resource_id):
+
+    specimen_resource_id = get_specimen_resource_id()
+
+    # TODO: This should be for all DwC
+
+    # Is this the specimen resource
+    if resource_id == specimen_resource_id:
+        field_groups = darwin_core_field_groups()
+        # We don't want to display field group fields in filters
+        del field_groups['Record']
+        return field_groups
+
+    return {}
+
+
+def darwin_core_field_groups():
+    """
+    Ordered dictionary of resource field groups
+    This is used to theme both the grid search and the record view search
+
+    # TODO:
+
+    @return:
+    """
+    return OrderedDict([
+        ("Classification", [
+            "Scientific name",
+            "Scientific name authorship",
+            "Kingdom",
+            "Phylum",
+            "Class",
+            "Order",
+            "Family",
+            "Genus",
+            "Subgenus",
+            "Specific epithet",
+            "Infraspecific epithet",
+            "Higher classification",
+            "Taxon rank",
+        ]),
+        ("Location", [
+            "Label locality",
+            "Locality",
+            "State province",
+            "Mine",
+            "Mining district",
+            "Vice country",
+            "Country",
+            "Continent",
+            "Island",
+            "Island group",
+            "Water body",
+            "Higher geography",
+            "Decimal latitude",
+            "Decimal longitude",
+            "Verbatim latitude",
+            "Verbatim longitude",
+            "Centroid",
+            "Max error",
+            "Geodetic datum",
+            "Georeference protocol",
+            "Minimum elevation in meters",
+            "Maximum elevation in meters",
+            "Minimum depth in meters",
+            "Maximum depth in meters",
+        ]),
+        ("Collection event", [
+            "Recorded by",
+            "Record number",
+            # "Collection date",
+            "Year",
+            "Month",
+            "Day",
+            "Event time",
+            "Expedition",
+            "Habitat",
+        ]),
+        ("Identification", [
+            "Identified by",
+            "Date identified",
+            "Identification qualifier",
+            "Type status",
+            "Determinations"
+        ]),
+        ("Specimen", [
+            "Catalog number",
+            "Collection code",
+            "Sub department",
+            "Other catalog numbers",
+            "Registration code",
+            "Kind of object",
+            "Preparations",
+            "Preparation type",
+            "Preservative",
+            "Collection kind",
+            "Collection name",
+            "Donor name",
+            "Kind of collection",
+            "Observed weight",
+            "Individual count",
+            "Sex",
+            "Life stage",
+        ]),
+        ("Mineralogy", [
+            "Date registered",
+            "Occurrence",
+            "Commodity",
+            "Deposit type",
+            "Texture",
+            "Identification as registered",
+            "Identification description",
+            "Identification variety",
+            "Identification other",
+            "Host rock",
+            "Age",
+            "Age type",
+            "Geology region",
+            "Mineral complex",
+            "Tectonic province",
+            "Registered weight",
+            # "Registered weight unit",  # Merged into Registered weight
+        ]),
+        ('Stratigraphy', [
+            "Earliest eon or lowest eonothem",
+            "Latest eon or highest eonothem",
+            "Earliest era or lowest erathem",
+            "Latest era or highest erathem",
+            "Earliest period or lowest system",
+            "Latest period or highest system",
+            "Earliest epoch or lowest series",
+            "Latest epoch or highest series",
+            "Earliest age or lowest stage",
+            "Latest age or highest stage",
+            "Lowest biostratigraphic zone",
+            "Highest biostratigraphic zone",
+            "Group",
+            "Formation",
+            "Member",
+            "Bed",
+            "Chronostratigraphy",
+            "Lithostratigraphy",
+        ]),
+        ("Meteorites", [
+            "Meteorite type",
+            "Meteorite group",
+            "Chondrite achondrite",
+            "Meteorite class",
+            "Petrology type",
+            "Petrology subtype",
+            "Recovery",
+            "Recovery date",
+            "Recovery weight",
+        ]),
+        ("Botany", [
+            "Exsiccati",
+            "Exsiccati number",
+            "Plant description",
+            "Cultivated",
+        ]),
+        ("Zoology", [
+            "Population code",
+            "Nest shape",
+            "Nest site",
+            "Clutch size",
+            "Set mark",
+            "Barcode",
+            "Extraction method",
+            "Resuspended in",
+            "Total volume",
+            "Part type",
+        ]),
+
+        # ("Silica gel", [
+        #     "Population code",
+        # ]),
+        # ("Nest", [
+        #     "Nest shape",
+        #     "Nest site",
+        # ]),
+        # ("Egg", [
+        #     "Clutch size",
+        #     "Set mark",
+        # ]),
+        # ("Parasite card", [
+        #     "Barcode",
+        # ]),
+        # ("DNA Preparation", [
+        #     "Extraction method",
+        #     "Resuspended in",
+        #     "Total volume",
+        # ]),
+        # ("Part", [
+        #     "Part type",
+        # ]),
+        ("Palaeontology", [
+            "Catalogue description",
+        ]),
+        ("Record", [
+            "Occurrence ID",
+            "Modified",
+            "Created",
+            "Record type"
+        ])
+    ])
 
 
 def get_resource_filter_options(resource):
@@ -561,9 +778,7 @@ def get_resource_filter_pills(resource):
     @return:
     """
 
-    # filter_dict = parse_request_filters()
-
-    filter_dict = {}
+    filter_dict = parse_request_filters()
 
     def get_pill_filters(exclude_field, exclude_value):
         """
