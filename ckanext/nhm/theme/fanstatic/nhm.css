@@ -1269,9 +1269,10 @@ a.toggle-view-filters:after {
 }
 .advanced-filter-field > label {
   float: left;
-  width: 120px;
+  width: 105px;
   text-align: right;
   line-height: 1.3;
+  padding-left: 15px;
 }
 .advanced-filter-field div {
   float: none;
@@ -1280,24 +1281,9 @@ a.toggle-view-filters:after {
 .advanced-filter-field div.advanced-filter-field-value {
   margin-left: 125px;
 }
-.advanced-filter-field div.advanced-filter-field-value label {
-  width: 20px;
-  height: 16px;
-  overflow: hidden;
-}
 .advanced-filter-field div.advanced-filter-field-value input.toggle-field-display {
   float: right;
-}
-.advanced-filter-field div.advanced-filter-field-value label:after {
-  content: '';
-}
-.advanced-filter-field div.advanced-filter-field-value label .show,
-.advanced-filter-field div.advanced-filter-field-value label.hidden-field .hide {
-  display: block;
-}
-.advanced-filter-field div.advanced-filter-field-value label .hide,
-.advanced-filter-field div.advanced-filter-field-value label.hidden-field .show {
-  display: none;
+  top: 8px;
 }
 .button-group {
   clear: both;

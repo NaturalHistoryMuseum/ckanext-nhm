@@ -84,21 +84,6 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
   }
 
-  function _toggleFieldDisplay(){
-      /**
-       * Toggle display of an individual field
-       */
-
-       var $label = $('label[for="' + $(this).prop('name') + '"]')
-
-       if ($(this).is(':checked') &! $(this).is(':disabled')){
-            $label.removeClass(hiddenFieldClass);
-       }else{
-            $label.addClass(hiddenFieldClass)
-       }
-
-  }
-
   function _makeFieldFilters(resourceId, fields, filters, hiddenFields) {
    /**
     * Loop through all the fields, making a filed and appending to the filters div
@@ -134,17 +119,14 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      // Build the filter, including a field display checkbox
      var $filter = $('<div class="advanced-filter-field-value"></div>');
 
-     var $fieldDisplayCheckbox = $('<input title="Show/hide field '+ fieldName +' in grid" class="toggle-field-display" type="checkbox" name="field_display['+fieldName+']" value="1" />');
-
-     // Label to show / hide field
-//     var $label = $('<label for="field_display['+fieldName+']"><i class="icon icon-eye-open show"></i><i class="icon icon-eye-close hide"></i></label>');
+     var $fieldDisplayCheckbox = $('<input title="Show/hide field" class="toggle-field-display" type="checkbox" name="field_display['+fieldName+']" value="1" />');
 
      // If we have a populated filter value or this is a display field, check the box
      if (displayField || value){
          $fieldDisplayCheckbox.prop('checked', true)
          if (value){
              // If we have a value, this must be disabled and checked
-             // User must remove the filter value, to uncheck the box
+             // User must remove the filter value, to un-check the box
              $fieldDisplayCheckbox.prop('disabled', true)
          }
      }
@@ -162,7 +144,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      $field.find('input[name^="filters"]').select2({
         allowClear: true,
         placeholder: ' ', // select2 needs a placeholder to allow clearing
-        width: 160,
+        width: 145,
         minimumInputLength: 0,
         ajax: {
           url: '/api/3/action/datastore_search',
