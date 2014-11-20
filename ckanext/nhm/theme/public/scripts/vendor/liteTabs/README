@@ -1,0 +1,11 @@
+liteTabs is a lightweight tab plugin for jQuery.
+
+Options:
+borders : false,        // draw borders around tabs
+boxed : false,          // draw bordered box around tab container
+fadeIn : false,         // fade in tab contents
+height : 'auto',        // set height
+hideHash : false,       // hide the url hash (not recommended)
+rounded : false,        // rounded corners
+selectedTab : 1,        // initially selected tab
+width : 500             // set width
