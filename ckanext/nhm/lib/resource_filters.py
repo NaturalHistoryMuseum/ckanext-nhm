@@ -56,7 +56,7 @@ def resource_filter_options(resource):
             },
             '_exclude_centroid': {
                 'label': 'Exclude centroids',
-                'sql': ('NOT (LOWER("{}"."Centroid") = ANY(\'{{true,yes,1}}\'))'.format(table),)
+                'sql': ('NOT (LOWER("{}"."Centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(table),)
             }
         }
     else:
