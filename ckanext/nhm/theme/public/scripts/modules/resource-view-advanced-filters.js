@@ -10,6 +10,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
   'use strict';
   var self;
   var hiddenFieldClass = 'hidden-field';
+  var disabledFieldClass = 'disabled-field'
 
   function initialize() {
 
@@ -84,6 +85,27 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
   }
 
+  function _toggleFieldDisplay(){
+      /**
+       * Toggle display of an individual field
+       */
+
+       var $label = $('label[for="' + $(this).prop('name') + '"]');
+
+       if ($(this).is(':checked')){
+           $label.removeClass(hiddenFieldClass)
+       }else{
+           $label.addClass(hiddenFieldClass);
+       }
+
+       if($(this).is(':disabled')){
+           $label.addClass(disabledFieldClass)
+       }else{
+           $label.removeClass(disabledFieldClass)
+       }
+
+  }
+
   function _makeFieldFilters(resourceId, fields, filters, hiddenFields) {
    /**
     * Loop through all the fields, making a filed and appending to the filters div
@@ -91,25 +113,25 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
     var $filtersDiv = $('<div></div>');
 
-    $.each(fields, function (i, fieldName) {
+    $.each(fields, function (i, field) {
 
         // We don't show the ID field - cannot be hidden anyway
-        if (fieldName != '_id') {
+        if (field.name != '_id') {
 
             var value
 
             // Do we a have a filter for this field
-            if (filters.hasOwnProperty(fieldName)) {
+            if (filters.hasOwnProperty(field.name)) {
                 // We no longer allow multiple OR values
-                value = filters[fieldName][0]
+                value = filters[field.name][0]
             }
 
-            $filtersDiv.append(_makeField(fieldName, value, ($.inArray(fieldName, hiddenFields) == -1)));
+            $filtersDiv.append(_makeField(field, value, ($.inArray(field.name, hiddenFields) == -1)));
         }
 
     });
 
-    function _makeField(fieldName, value, displayField) {
+    function _makeField(field, value, displayField) {
     /**
      * Make a field filter, comprising label, select2 auto-lookup
      * list and a checkbox for controlling display of the field - if checked field will be displayed
@@ -117,9 +139,13 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      */
 
      // Build the filter, including a field display checkbox
-     var $filter = $('<div class="advanced-filter-field-value"></div>');
+     var $filter = $('<div class="advanced-filter-field-value"></div>')
+         .append($('<input type="hidden" name="filters[' + field.name + ']" />'))
 
-     var $fieldDisplayCheckbox = $('<input title="Show/hide field" class="toggle-field-display" type="checkbox" name="field_display['+fieldName+']" value="1" />');
+     var $fieldDisplayCheckbox = $('<input class="toggle-field-display" type="checkbox" name="field_display[' + field.name + ']" id="field_display[' + field.name + ']" value="1" />').change(_toggleFieldDisplay)
+
+     // Label to show / hide field
+     var $label = $('<label for="field_display[' + field.name + ']"><span class="show">SHOW</span><span class="hide">HIDE</span></label>');
 
      // If we have a populated filter value or this is a display field, check the box
      if (displayField || value){
@@ -128,23 +154,29 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
              // If we have a value, this must be disabled and checked
              // User must remove the filter value, to un-check the box
              $fieldDisplayCheckbox.prop('disabled', true)
+             $label.addClass(disabledFieldClass);
          }
+     }else{
+         // On load, add the hidden field label class
+         // We will theme the label based on whether or not the field is hidden
+         $label.addClass(hiddenFieldClass);
      }
 
      // Add field display label
-     $filter.append($fieldDisplayCheckbox).append($('<input type="hidden" name="filters['+fieldName+']" />'));
+     $filter.append($fieldDisplayCheckbox).append($label);
 
      // Build a field consisting of label and input
      var $field = $('<div class="advanced-filter-field"></div>')
-         .append($('<label for="filters['+fieldName+']">' + fieldName + '</label>'))
+         .append($('<label for="filters[' + field.name + ']">' + field.label + '</label>'))
          .append($filter);
 
      var queryLimit = 20;
 
+     // Add the select2 lookup list
      $field.find('input[name^="filters"]').select2({
         allowClear: true,
         placeholder: ' ', // select2 needs a placeholder to allow clearing
-        width: 145,
+        width: 135,
         minimumInputLength: 0,
         ajax: {
           url: '/api/3/action/datastore_search',
@@ -159,14 +191,14 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
               resource_id: resourceId,
               limit: queryLimit,
               offset: offset,
-              fields: fieldName,
+              fields: field.name,
               distinct: true,
-              sort: fieldName
+              sort: field.name
             };
 
             if (term !== '') {
               var q = {};
-              q[fieldName] = term + ':*';
+              q[field.name] = term + ':*';
               query.q = JSON.stringify(q);
             }
 
@@ -178,7 +210,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
                 results;
 
             results = $.map(records, function (record) {
-              return { id: record[fieldName], text: String(record[fieldName]) };
+              return { id: record[field.name], text: String(record[field.name]) };
             });
 
             return { results: results, more: hasMore };
@@ -210,14 +242,15 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         // User has entered a filter for this field - so we want to return the field in the results
         // To let the user know this is happening, automatically select the field, and lock out changes
         $checkbox.prop('checked', true);
-        // Trigger the change event
-        $checkbox.trigger('change');
         $checkbox.prop('disabled', true);
     }else{
         // We no longer have a value in this filter, so the field isn't automatically selected
         // Enable the field - but do not change the value
         $checkbox.prop('disabled', false);
     }
+
+    // Trigger the change event
+    $checkbox.trigger('change');
 
   }
 

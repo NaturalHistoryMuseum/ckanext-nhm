@@ -11,6 +11,7 @@ if (baseURL.indexOf('?') > -1){
 
 // Slickgrid formatter for making the _id field into a link
 var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
+
     if(columnDef.id == "del"){
         return self.templates.deleterow
     }

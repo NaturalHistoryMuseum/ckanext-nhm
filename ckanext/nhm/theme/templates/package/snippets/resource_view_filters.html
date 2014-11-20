@@ -12,8 +12,8 @@
               data-module="resource-view-advanced-filters"
               data-module-resource-id="{{ resource['id'] }}"
               data-module-fields="{{ h.dump_json(h.resource_view_get_ordered_fields(resource['id'])) }}"
-              data-module-hidden-fields="{{ h.dump_json(h.resource_view_get_hidden_fields(resource['id'])) }}"
-              data-module-field-groups="{{ h.dump_json(h.resource_view_get_groups(resource['id'])) }}"
+              data-module-hidden-fields="{{ h.dump_json(h.resource_view_get_hidden_fields(resource)) }}"
+              data-module-field-groups="{{ h.dump_json(h.resource_view_get_field_groups(resource)) }}"
               >
             </div>
 

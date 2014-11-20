@@ -58,8 +58,6 @@ def update_package_schema():
     schema = default_update_package_schema()
     _modify_schema(schema)
     _modify_update_package_schema(schema)
-
-    print schema
     return schema
 
 

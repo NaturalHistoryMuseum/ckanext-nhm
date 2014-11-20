@@ -189,10 +189,10 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
 
-        try:
-            print request.headers['Referer']
-        except:
-            pass
+        # try:
+        #     print request.headers['Referer']
+        # except:
+        #     pass
 
         # print context
         # print data_dict
