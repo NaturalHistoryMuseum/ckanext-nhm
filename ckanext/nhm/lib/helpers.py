@@ -462,6 +462,7 @@ def resource_view_state(resource_view_json, resource_json):
             'enableTextSelectionOnCells': False,
             'enableCellNavigation': False,
             'enableColumnReorder': False,
+            'defaultColumnWidth': 100
         },
         'columnsWidth': [
             {
@@ -480,26 +481,15 @@ def resource_view_state(resource_view_json, resource_json):
     # If this is a DWC resource, so we're going to add the DwC group ToolTip text
     if resource_is_dwc(resource):
 
-        # Add tool tip text and easier to read column title
-        resource_view['state']['columnsToolTip'] = []
-        resource_view['state']['columnsTitle'] = []
+        def _add_field(field, label, group=None):
 
-        dwc = DwC()
-
-        for field in fields:
-
-            label = dwc_field_to_label(field)
-
-            try:
-                dwc_definition = dwc.get_term(field)
-            except KeyError:
-                # If we don't have a DwC field definition
-                pass
-            else:
+            # If we have a group, add a tooltip
+            # Otherwise will use title text
+            if group:
                 resource_view['state']['columnsToolTip'].append(
                     {
                         'column': field,
-                        'value': '%s: %s' % (dwc_definition['group'], label)
+                        'value': '%s: %s' % (group, label)
                     }
                 )
 
@@ -510,6 +500,36 @@ def resource_view_state(resource_view_json, resource_json):
                     'title': label
                 }
             )
+
+        # Add tool tip text and easier to read column title
+        resource_view['state']['columnsToolTip'] = []
+
+        # If this the specimen resource ID we have custom label names to use
+        if resource['id'] == get_specimen_resource_id():
+
+            # Loop through all the resource fields adding column & title text
+            for group, fields in resource_view_specimen_field_groups().items():
+
+                for field in fields:
+                    _add_field(field['name'], field['label'], group)
+
+        else:
+
+            dwc = DwC()
+
+            for field in fields:
+
+                label = dwc_field_to_label(field)
+
+                try:
+                    dwc_definition = dwc.get_term(field)
+                except KeyError:
+                    # If we don't have a DwC field definition
+                    group = None
+                else:
+                    group = dwc_definition['group']
+
+                _add_field(field, label, group)
 
         # Lets also increase the width for some of the core columns
         resource_view['state']['columnsWidth'] += [
@@ -604,6 +624,8 @@ def resource_view_get_hidden_fields(resource):
             '_id',
             'scientificName',
             'scientificNameAuthorship',
+            'specificEpithet',
+            'infraspecificEpithet',
             'family',
             'genus',
             'class',
@@ -720,7 +742,7 @@ def resource_view_specimen_field_groups():
     return OrderedDict([
         ("Classification", [
             {"name": "scientificName", "label": "Scientific name"},
-            {"name": "scientificNameAuthorship", "label": "Scientific name authorship"},
+            {"name": "scientificNameAuthorship", "label": "Author"},
             {"name": "kingdom", "label": "Kingdom"},
             {"name": "phylum", "label": "Phylum"},
             {"name": "class", "label": "Class"},
@@ -728,8 +750,8 @@ def resource_view_specimen_field_groups():
             {"name": "family", "label": "Family"},
             {"name": "genus", "label": "Genus"},
             {"name": "subgenus", "label": "Subgenus"},
-            {"name": "specificEpithet", "label": "Specific epithet"},
-            {"name": "infraspecificEpithet", "label": "Infraspecific epithet"},
+            {"name": "specificEpithet", "label": "Species"},
+            {"name": "infraspecificEpithet", "label": "Subspecies"},
             {"name": "higherClassification", "label": "Higher classification"},
             {"name": "taxonRank", "label": "Taxon rank"},
         ]),

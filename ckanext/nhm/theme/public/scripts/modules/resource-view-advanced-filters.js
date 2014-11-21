@@ -10,7 +10,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
   'use strict';
   var self;
   var hiddenFieldClass = 'hidden-field';
-  var disabledFieldClass = 'disabled-field'
+  var disabledFieldClass = 'disabled-field';
 
   function initialize() {
 
@@ -19,6 +19,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     var resourceId = self.options.resourceId,
         hiddenFields = self.options.hiddenFields,
         fieldGroups = self.options.fieldGroups,
+        filterOptions = self.options.filterOptions,
         fields = self.options.fields;
 
     var filters = ckan.views.filters.get();
@@ -30,6 +31,8 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     if ($.isEmptyObject(fieldGroups)) {
 
         $filtersWrapper.append(_makeFieldFilters(resourceId, fields, filters, hiddenFields))
+        // Add selected class, mirroring the class on selected tab
+        $filtersWrapper.addClass('selected')
 
     }else{
 
@@ -39,7 +42,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
             var groupID = i.replace(/\s+/g, '-').toLowerCase();
 
-            $tabs.append($('<li >').append($('<a href="#' + groupID + '">' + i + '</a>')))
+            $tabs.append($('<li >').append($('<a href="#' + groupID + '">' + i + '</a>').on( "click", { group: i }, _toggleTab)))
 
             var $filters = _makeFieldFilters(resourceId, groupFields, filters, hiddenFields)
             $filtersWrapper.append($('<div name="#' + groupID + '"></div>').append($filters));
@@ -51,21 +54,24 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
     }
 
+    $filtersWrapper.append(_makeFieldFilterOptions(filterOptions));
+
     self.el.append($filtersWrapper);
 
     var $formActions = $('<div class="form-actions"></div>')
 
-//    var $displayAllFieldCheckbox = $('<input type="checkbox" name="display-all-fields" />').click(_toggleDisplayAllFields)
-//
-//    // Only if all checkboxes are checked, should the checkbox be checked for toggling off all fields
-//    if ($('input[name^="field_display"]:checked', self.el).length == $('input[name^="field_display"]', self.el).length){
-//        $displayAllFieldCheckbox.prop('checked', true);
-//    }
-//
-//    $formActions.append($('<div class="toggle-all-fields"></div>')
-//        .append($('<label for"display-all-fields">Display all fields</label>'))
-//        .append($displayAllFieldCheckbox)
-//    );
+    var $displayAllFieldCheckbox = $('<input type="checkbox" id="display-all-fields" name="display-all-fields" />').click(_toggleDisplayAllFields)
+    var $tab = $('div.selected', self.el);
+
+    // Only if all checkboxes are checked, should the checkbox be checked for toggling off all fields
+    if ($('input[name^="field_display"]:checked', $tab).length == $('input[name^="field_display"]', $tab).length){
+        $displayAllFieldCheckbox.prop('checked', true);
+    }
+
+    $formActions.append($('<div class="toggle-all-fields"></div>')
+        .append($('<label for="display-all-fields">Display all fields</label>'))
+        .append($displayAllFieldCheckbox)
+    );
 
     $formActions.append($('<button class="btn btn-primary save" type="submit"><i class="icon-search"></i><span>Search</span></button>').click(_submitSearch));
 
@@ -80,8 +86,9 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         * @type {*|jQuery|HTMLElement}
        */
 
-    var checkBoxes = $('input[name^="field_display"]:not(:disabled)', self.el);
+    var checkBoxes = $('input[name^="field_display"]:not(:disabled)', self.el.find('div.selected'));
     checkBoxes.prop("checked", $(this).prop('checked'));
+    checkBoxes.trigger('change');
 
   }
 
@@ -106,6 +113,43 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
   }
 
+  function _toggleTab(event){
+
+      // Update reset display fields checkbox
+      $('.toggle-all-fields label').html('Display all ' + event.data.group.toLowerCase() + ' fields');
+
+      // Reset display all fields checkbox
+      var $tab = $('div[name=' + event.currentTarget.hash + ']');
+
+      // Only if all checkboxes are checked, should the checkbox be checked for toggling off all fields
+      var checked = $('input[name^="field_display"]:checked', $tab).length == $('input[name^="field_display"]', $tab).length
+      $('input#display-all-fields').prop('checked', checked);
+
+  }
+
+  function _makeFieldFilterOptions(filterOptions){
+
+    var $filterOptions = $('<div></div>');
+
+    // Add filter options checkboxes
+      for (var name in filterOptions){
+        if (!filterOptions.hasOwnProperty(name)){
+          continue;
+        }
+        var checked = filterOptions[name]['checked'] ? 'checked' : '';
+        var label = filterOptions[name]['label'];
+        $filterOptions.append([
+          '<label class="resource-view-filter-option">',
+          '<input type="checkbox" value="1" name="filters[' + name + ']"' + checked + ' />',
+          '<span>' + label + '</span>',
+          '</label>'
+        ].join(""));
+      }
+
+      return $filterOptions
+
+  }
+
   function _makeFieldFilters(resourceId, fields, filters, hiddenFields) {
    /**
     * Loop through all the fields, making a filed and appending to the filters div
@@ -114,6 +158,14 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     var $filtersDiv = $('<div></div>');
 
     $.each(fields, function (i, field) {
+
+        if(typeof field == 'string'){
+            field = {
+                name: field,
+                label: field
+            }
+        }
+
 
         // We don't show the ID field - cannot be hidden anyway
         if (field.name != '_id') {
@@ -145,7 +197,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      var $fieldDisplayCheckbox = $('<input class="toggle-field-display" type="checkbox" name="field_display[' + field.name + ']" id="field_display[' + field.name + ']" value="1" />').change(_toggleFieldDisplay)
 
      // Label to show / hide field
-     var $label = $('<label for="field_display[' + field.name + ']"><span class="show">SHOW</span><span class="hide">HIDE</span></label>');
+     var $label = $('<label for="field_display[' + field.name + ']"><span class="show" title="Visible"><i class="icon-eye-open" /></span><span class="hide" title="Hidden"><i class="icon-eye-close" /></span></label>');
 
      // If we have a populated filter value or this is a display field, check the box
      if (displayField || value){
@@ -176,7 +228,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      $field.find('input[name^="filters"]').select2({
         allowClear: true,
         placeholder: ' ', // select2 needs a placeholder to allow clearing
-        width: 135,
+        width: 142,
         minimumInputLength: 0,
         ajax: {
           url: '/api/3/action/datastore_search',
@@ -274,10 +326,16 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
          var filterName = this.name.match(re_filters)[1]
 
-         if ($(this).val()){
+         if ($(this).prop('type') == 'checkbox'){
+            if ($(this).prop('checked')){
+                ckan.views.filters.set(filterName, 'true');
+            }else{
+                ckan.views.filters.unset(filterName);
+            }
+         }else if ($(this).val()){
             ckan.views.filters.set(filterName, $(this).val());
          }else{
-             ckan.views.filters.unset(filterName);
+            ckan.views.filters.unset(filterName);
          }
 
      })
@@ -287,7 +345,10 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
   return {
     initialize: initialize,
     options: {
-        fieldGroups: undefined
+        fields: [],  // List of fields. Required
+        hiddenFields: [], // List of fields to hide
+        fieldGroups: {},  // Groupings of fields. Optional
+        filterOptions: {}  // Extra filter options - has type etc.,
     }
   };
 });

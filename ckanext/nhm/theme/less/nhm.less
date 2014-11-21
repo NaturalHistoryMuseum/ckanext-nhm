@@ -1501,6 +1501,11 @@ a.toggle-view-filters:after{
   float: left;
 }
 
+.liteTabs{
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
 .liteTabs div{
   // Override some tab settings
   padding: 0;
@@ -1529,6 +1534,7 @@ a.toggle-view-filters:after{
 
 .advanced-filter-field label{
   margin-top: 3px;
+  font-weight: normal;
 }
 
 .select2-result-label span,
@@ -1569,30 +1575,27 @@ a.toggle-view-filters:after{
 }
 
 .advanced-filter-field div.advanced-filter-field-value label{
-  width: 28px;
+  width: 22px;
   overflow: hidden;
   position: absolute;
   top: 0;
   right: 0;
   text-align: center;
   line-height: 22px;
-}
-
-.advanced-filter-field div.advanced-filter-field-value label span{
-  font-size: 8px!important;
-  font-weight: normal;
-}
-
-.advanced-filter-field div.advanced-filter-field-value input.toggle-field-display{
-  display: none;
-}
-
-.advanced-filter-field div.advanced-filter-field-value label{
   border: 1px solid #C3C3C3;
   border-radius: 4px;
   moz-border-radius: 4px;
   margin-top: 1px;
   background: #F8F8F8;
+  overflow: hidden;
+}
+
+.advanced-filter-field div.advanced-filter-field-value label span{
+  font-weight: normal;
+}
+
+.advanced-filter-field div.advanced-filter-field-value input.toggle-field-display{
+  display: none;
 }
 
 .advanced-filter-field div.advanced-filter-field-value label:after{
