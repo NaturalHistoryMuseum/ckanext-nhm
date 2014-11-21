@@ -7,7 +7,8 @@ from ckan.common import _, c
 import logging
 import json
 from ckan.lib.render import find_template
-from ckanext.nhm.lib.helpers import resource_view_get_ordered_fields
+from ckanext.nhm.lib.resource import resource_get_ordered_fields
+
 from collections import OrderedDict
 
 log = logging.getLogger(__name__)
@@ -28,6 +29,14 @@ class RecordController(base.BaseController):
     """
     Controller for displaying an individual record
     """
+
+    field_groups = {}
+
+    # Default columns to show in grid
+    grid_default_columns = []
+
+    # Specific column widths
+    grid_column_widths = {}
 
     def _load_data(self, package_name, resource_id, record_id):
         """
@@ -100,21 +109,8 @@ class RecordController(base.BaseController):
         # The record_dict does not have fields in the correct order
         # So load the fields, and create an OrderedDict with field: value
         c.field_data = OrderedDict()
-        for field in resource_view_get_ordered_fields(resource_id):
+        for field in resource_get_ordered_fields(resource_id):
             if not field.startswith('_'):
                 c.field_data[field] = c.record_dict.get(field, None)
 
-
-        # Try and use a template file based on the resource name
-        template_file = 'record/{dataset}-{resource}.html'.format(
-            # TODO: Change back
-            # dataset=c.package['name'].lower(),
-            dataset='nhm-collection',
-            resource=c.resource['name'].lower()
-        )
-
-        # If we don't have a specific template file, use the generic one
-        if not find_template(template_file):
-            template_file = 'record/view.html'
-
-        return p.toolkit.render(template_file)
+        return p.toolkit.render('record/view.html')

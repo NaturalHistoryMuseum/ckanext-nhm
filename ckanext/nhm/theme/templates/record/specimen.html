@@ -13,33 +13,33 @@
 
         {% for group, fields in c.field_groups.items() %}
 
-            {% if h.group_fields_have_data(c.record_dict, fields) %}
+            {% if h.group_fields_have_data(c.record_dict, fields.keys()) %}
 
                 <thead>
                     <tr><th colspan="4">{{ group }}</th></tr>
                 </thead>
 
                 <tbody>
-                    {% for field in fields %}
+                    {% for field, label in fields.items() %}
 
                         {% if c.record_dict[field] %}
 
                             <tr>
 
-                                <td><strong>{{ field }}:</strong></td>
+                                <td><strong>{{ label }}:</strong></td>
                                 <td colspan="2">
 
-                                    {% if field == 'Determinations' %}
+                                    {% if field == 'determinations' %}
 
                                         <table id="determinations">
 
                                             <tr>
-                                                {% for label in c.record_dict['Determinations'][0] %}
+                                                {% for label in c.record_dict['determinations'][0] %}
                                                     <th>{{ label }}</th>
                                                 {% endfor %}
                                             </tr>
 
-                                            {% for determination in c.record_dict['Determinations'][1:] %}
+                                            {% for determination in c.record_dict['determinations'][1:] %}
                                                 <tr>
                                                     {% for value in determination %}
                                                         <td> {{ value }}</td>
@@ -49,9 +49,9 @@
 
                                         </table>
 
-                                    {% elif field == 'Collection code' %}
+                                    {% elif field == 'collectionCode' %}
                                         {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
-                                    {% elif field in ['Scientific name', 'Genus', 'Specific epithet'] %}
+                                    {% elif field in ['scientificName', 'genus', 'specificEpithet'] %}
                                         <em>{{ c.record_dict[field] }}</em>
                                     {% else %}
                                         {{ c.record_dict[field] }}

@@ -23,8 +23,7 @@ class DwC(object):
     # All DwC terms
     terms = OrderedDict()
 
-    # Dictionary of group names, with a list of fields
-    groups = OrderedDict()
+    term_uris = {}
 
     def __init__(self, **kwargs):
 
@@ -36,28 +35,30 @@ class DwC(object):
 
         for group in root.iterfind("xs:group", namespaces=root.nsmap):
 
-            group_label = self._get_group_label(group.get('name'))
+            group_label = self._group_label(group.get('name'))
 
             # Create a list for the group terms
-            group_terms = []
+            group_terms = OrderedDict()
 
             for term in group.iterfind("xs:sequence/xs:element", namespaces=root.nsmap):
 
                 ns, name = term.get("ref").split(':')
 
-                # Add to terms dictionary
-                self.terms[name] = {
-                    'group': group_label,
-                    'uri': '{ns}{name}'.format(ns=root.nsmap[ns], name=name),
-                }
+                self.term_uris[name] = '{ns}{name}'.format(ns=root.nsmap[ns], name=name)
+
+                # # Add to terms dictionary
+                # self.terms[name] = {
+                #     'group': group_label,
+                #     'uri': '{ns}{name}'.format(ns=root.nsmap[ns], name=name),
+                # }
 
                 # Add to group terms
-                group_terms.append(name)
+                group_terms[name] = self._field_label(name)
 
             # If we have terms for this group, add the group
             # We don't want empty groups
             if group_terms:
-                self.groups[group_label] = group_terms
+                self.terms[group_label] = group_terms
 
 
 
@@ -123,7 +124,7 @@ class DwC(object):
 
 
     @staticmethod
-    def _get_group_label(group_name):
+    def _group_label(group_name):
         """
         Get a label for the group
         Takes the original group name, removes Term, de-pluralises and splits on capital
@@ -136,6 +137,13 @@ class DwC(object):
         if label.endswith('s'):
             label = label[:-1]
 
+        return label
+
+    @staticmethod
+    def _field_label(field):
+
+        label = re.sub('([A-Z]+)', r' \1', field).capitalize()
+        label = label.replace(' id', ' ID')
         return label
 
     def get_groups(self):

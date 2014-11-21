@@ -18,10 +18,11 @@ import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
 from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_allowed_view_types as ckan_get_allowed_view_types
 
-from ckanext.nhm.lib.dwc import DwC
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource_filters import (
+from ckanext.nhm.controllers import *
+from ckanext.nhm.lib.resource import (
+    resource_get_ordered_fields,
     resource_filter_options,
     parse_request_filters,
     FIELD_DISPLAY_FILTER,
@@ -122,20 +123,20 @@ def get_record(resource_id, record_id):
     return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
 
 
-def resource_view_get_ordered_fields(resource_id):
-    """
-    This is a replacement for resource_view_get_fields, but this function
-    handles errors internally, and return the fields in their original order
-    @param resource_id:
-    @return:
-    """
-    data = {'resource_id': resource_id, 'limit': 0}
-    try:
-        result = toolkit.get_action('datastore_search')({}, data)
-    except NotFound:
-        return []
-
-    return [field['id'] for field in result.get('fields', [])]
+# def resource_view_get_ordered_fields(resource_id):
+#     """
+#     This is a replacement for resource_view_get_fields, but this function
+#     handles errors internally, and return the fields in their original order
+#     @param resource_id:
+#     @return:
+#     """
+#     data = {'resource_id': resource_id, 'limit': 0}
+#     try:
+#         result = toolkit.get_action('datastore_search')({}, data)
+#     except NotFound:
+#         return []
+#
+#     return [field['id'] for field in result.get('fields', [])]
 
 
 def form_select_datastore_field_options(resource_id=None, allow_empty=False):
@@ -143,7 +144,7 @@ def form_select_datastore_field_options(resource_id=None, allow_empty=False):
     # Need to check for resource_id as this form gets loaded on add, nut just edit
     # And on add there will be no resource_id
     if resource_id:
-        datastore_fields = resource_view_get_ordered_fields(resource_id)
+        datastore_fields = resource_get_ordered_fields(resource_id)
         return list_to_form_options(datastore_fields, allow_empty)
 
     return []
@@ -240,14 +241,14 @@ def get_specimen_resource_id():
     """
     @return:  ID for the specimen resource
     """
-    return config.get("ckanext.nhm.specimen_resource_id")
+    return
 
 
 def get_indexlot_resource_id():
     """
     @return:  ID for indexlot resource
     """
-    return config.get("ckanext.nhm.indexlot_resource_id")
+    return
 
 
 @cache_region('short_term', 'collection_stats')
@@ -417,11 +418,37 @@ def absolute_url_for(*args, **kw):
     return url
 
 
-def dwc_field_to_label(field):
+def resource_view_get_record_controller(resource):
+    """
+    Retrieve the controller for a resource
+    Try and match on resource ID, or on format
+    So we can provide a custom controller for all format types - e.g. DwC
+    @param resource:
+    @return: controller class
+    """
 
-    label = re.sub('([A-Z]+)', r' \1', field).capitalize()
-    label = label.replace(' id', ' ID')
-    return label
+    for cls in RecordController.__subclasses__():
+
+        # Does the resource ID match the record controller
+        if hasattr(cls, 'resource_id') and cls.resource_id == resource['id']:
+            return cls
+        # Or do we have a controller for a particular format type (eg. DwC)
+        elif hasattr(cls, 'format') and cls.format == resource['format']:
+            return cls
+
+    return RecordController
+
+
+def resource_view_get_field_groups(resource):
+    """
+    Return dictionary of field groups
+
+    @param resource: resource dict
+    @return: OrderedDict of fields
+    """
+    record_ctrl = resource_view_get_record_controller(resource)
+
+    return record_ctrl().get_field_groups()
 
 
 # Resource view and filters
@@ -441,14 +468,14 @@ def resource_view_state(resource_view_json, resource_json):
     # To decide whether or not to turn on fitColumns
     # Messy, but better than trying to hack around with slickgrid
 
-    fields = resource_view_get_ordered_fields(resource_view['resource_id'])
+    resource_fields = resource_get_ordered_fields(resource_view['resource_id'])
 
     # Add hidden fields
     # The way Slickgrid is implemented, we cannot pass in an array of columns
     # Instead if display fields is set, we will mark all other columns as hidden
     hidden_fields = resource_view_get_hidden_fields(resource)
 
-    num_fields = len(fields) - len(hidden_fields)
+    num_fields = len(resource_fields) - len(hidden_fields)
 
     viewport_max_width = 920
     col_width = 100
@@ -475,77 +502,44 @@ def resource_view_state(resource_view_json, resource_json):
                 'column': '_id',
                 'title': ''  # This is just converted into a link so lets hide the field
             }
-        ]
+        ],
+        'columnsToolTip': []
     }
 
-    # If this is a DWC resource, so we're going to add the DwC group ToolTip text
-    if resource_is_dwc(resource):
+    for group, fields in resource_view_get_field_groups(resource).items():
 
-        def _add_field(field, label, group=None):
+        for field, label in fields.items():
 
-            # If we have a group, add a tooltip
-            # Otherwise will use title text
-            if group:
-                resource_view['state']['columnsToolTip'].append(
+            if field in resource_fields:
+
+                # If we have a group, add a tooltip
+                # Otherwise will use title text
+                if group:
+                    resource_view['state']['columnsToolTip'].append(
+                        {
+                            'column': field,
+                            'value': '%s: %s' % (group, label)
+                        }
+                    )
+
+                # Add custom titles
+                resource_view['state']['columnsTitle'].append(
                     {
                         'column': field,
-                        'value': '%s: %s' % (group, label)
+                        'title': label
                     }
                 )
 
-            # Add custom titles
-            resource_view['state']['columnsTitle'].append(
+    # Do we have custom column widths set in the controller
+    record_ctrl = resource_view_get_record_controller(resource)
+    if record_ctrl.grid_column_widths:
+        for column, width in record_ctrl.grid_column_widths.items():
+            resource_view['state']['columnsWidth'].append(
                 {
-                    'column': field,
-                    'title': label
+                    'column': column,
+                    'width': width
                 }
             )
-
-        # Add tool tip text and easier to read column title
-        resource_view['state']['columnsToolTip'] = []
-
-        # If this the specimen resource ID we have custom label names to use
-        if resource['id'] == get_specimen_resource_id():
-
-            # Loop through all the resource fields adding column & title text
-            for group, fields in resource_view_specimen_field_groups().items():
-
-                for field in fields:
-                    _add_field(field['name'], field['label'], group)
-
-        else:
-
-            dwc = DwC()
-
-            for field in fields:
-
-                label = dwc_field_to_label(field)
-
-                try:
-                    dwc_definition = dwc.get_term(field)
-                except KeyError:
-                    # If we don't have a DwC field definition
-                    group = None
-                else:
-                    group = dwc_definition['group']
-
-                _add_field(field, label, group)
-
-        # Lets also increase the width for some of the core columns
-        resource_view['state']['columnsWidth'] += [
-            {
-                'column': 'scientificName',
-                'width': 160
-            },
-            {
-                'column': 'scientificNameAuthorship',
-                'width': 180
-            },
-            {
-                'column': 'catalogNumber',
-                'width': 120
-            },
-        ]
 
     if hidden_fields:
         resource_filter_set_cookie(resource_view['resource_id'], hidden_fields)
@@ -591,7 +585,7 @@ def resource_view_get_hidden_fields(resource):
     hidden_fields_cookie = None
 
     # Retrieve the fields for this resource
-    resource_fields = resource_view_get_ordered_fields(resource['id'])
+    resource_fields = resource_get_ordered_fields(resource['id'])
 
     # If user has set display fields, loop through display fields
     # And available fields, to build a list of hidden fields
@@ -617,286 +611,16 @@ def resource_view_get_hidden_fields(resource):
         hidden_fields_cookie = list(set(hidden_fields_cookie) - set(filter_dict.keys()))
         return hidden_fields_cookie
 
-    elif resource_is_dwc(resource):
-        # Custom hidden fields for DwC resources
-
-        show_columns = [
-            '_id',
-            'scientificName',
-            'scientificNameAuthorship',
-            'specificEpithet',
-            'infraspecificEpithet',
-            'family',
-            'genus',
-            'class',
-            'locality',
-            'country',
-            'viceCountry',
-            'recordedBy',
-            'typeStatus',
-            'catalogNumber',
-            'collectionCode'
-        ]
-
-        return [f for f in resource_fields if f not in show_columns]
-
     else:
-        return {}
 
+        # User has nto customised the grid - so see if we have custom display
+        # fields set in the controller
+        record_ctrl = resource_view_get_record_controller(resource)
 
+        if record_ctrl.grid_default_columns:
+            return [f for f in resource_fields if f not in record_ctrl.grid_default_columns]
 
-
-def resource_view_get_field_groups(resource):
-    """
-    Return dictionary of field groups
-    If this a DwC these will be sorted into DwC specification groups
-    Or customised for the specimen dataset
-
-    This function is used for displaying filter tabs and on the record view
-
-    Creates an OrderedDict in the format:
-
-    ("Classification", [
-        "Scientific name",
-        "Scientific name authorship",
-        ...
-
-
-    @param resource: resource dict
-    @return: OrderedDict of fields
-    """
-
-    field_groups = OrderedDict()
-    specimen_resource_id = get_specimen_resource_id()
-
-    if resource['id'] == specimen_resource_id:
-
-        field_groups = resource_view_specimen_field_groups()
-        # We do not want the record fields - Record type etc.,
-        del field_groups['Record']
-
-    elif resource_is_dwc(resource):
-
-        fields = resource_view_get_ordered_fields(resource['id'])
-
-        dwc = DwC()
-
-        for field in fields:
-
-            label = dwc_field_to_label(field)
-
-            try:
-                dwc_definition = dwc.get_term(field)
-            except KeyError:
-                # If we don't have a DwC field definition
-                group = 'Dynamic properties'
-            else:
-                group = dwc_definition['group']
-
-            if not group in field_groups:
-                field_groups[group] = []
-
-            field_groups[group].append({
-                'name': field,
-                'label': label
-            });
-
-    return field_groups
-
-
-def resource_view_specimen_field_groups():
-    """
-    Custom Ordered dictionary for specimen resource fields
-    This is used to theme both the grid search and the record view search
-
-    @return:
-    """
-
-    # TODO: Put back custom record view
-
-    # TODO: # "Collection date", Year etc.,
-
-    # TODO: There may be hidden fields here. To fix
-
-        # ("Silica gel", [
-        #     "Population code",
-        # ]),
-        # ("Nest", [
-        #     "Nest shape",
-        #     "Nest site",
-        # ]),
-        # ("Egg", [
-        #     "Clutch size",
-        #     "Set mark",
-        # ]),
-        # ("Parasite card", [
-        #     "Barcode",
-        # ]),
-        # ("DNA Preparation", [
-        #     "Extraction method",
-        #     "Resuspended in",
-        #     "Total volume",
-        # ]),
-        # ("Part", [
-        #     "Part type",
-        # ]),
-
-    return OrderedDict([
-        ("Classification", [
-            {"name": "scientificName", "label": "Scientific name"},
-            {"name": "scientificNameAuthorship", "label": "Author"},
-            {"name": "kingdom", "label": "Kingdom"},
-            {"name": "phylum", "label": "Phylum"},
-            {"name": "class", "label": "Class"},
-            {"name": "order", "label": "Order"},
-            {"name": "family", "label": "Family"},
-            {"name": "genus", "label": "Genus"},
-            {"name": "subgenus", "label": "Subgenus"},
-            {"name": "specificEpithet", "label": "Species"},
-            {"name": "infraspecificEpithet", "label": "Subspecies"},
-            {"name": "higherClassification", "label": "Higher classification"},
-            {"name": "taxonRank", "label": "Taxon rank"},
-        ]),
-        ("Location", [
-            {"name": "labelLocality", "label": "Label locality"},
-            {"name": "locality", "label": "Locality"},
-            {"name": "stateProvince", "label": "State province"},
-            {"name": "mine", "label": "Mine"},
-            {"name": "miningDistrict", "label": "Mining district"},
-            {"name": "viceCountry", "label": "Vice country"},
-            {"name": "country", "label": "Country"},
-            {"name": "continent", "label": "Continent"},
-            {"name": "island", "label": "Island"},
-            {"name": "islandGroup", "label": "Island group"},
-            {"name": "waterBody", "label": "Water body"},
-            {"name": "higherGeography", "label": "Higher geography"},
-            {"name": "decimalLatitude", "label": "Decimal latitude"},
-            {"name": "decimalLongitude", "label": "Decimal longitude"},
-            {"name": "verbatimLatitude", "label": "Verbatim latitude"},
-            {"name": "verbatimLongitude", "label": "Verbatim longitude"},
-            {"name": "centroid", "label": "Centroid"},
-            {"name": "maxError", "label": "Max error"},
-            {"name": "geodeticDatum", "label": "Geodetic datum"},
-            {"name": "georeferenceProtocol", "label": "Georeference protocol"},
-            {"name": "minimumElevationInMeters", "label": "Minimum elevation(m)"},
-            {"name": "maximumElevationInMeters", "label": "Maximum elevation(m)"},
-            {"name": "minimumDepthInMeters", "label": "Minimum depth(m)"},
-            {"name": "maximumDepthInMeters", "label": "Maximum depth(m)"},
-        ]),
-        ("Collection event", [
-            {"name": "recordedBy", "label": "Recorded by"},
-            {"name": "recordNumber", "label": "Record number"},
-            {"name": "year", "label": "Year"},
-            {"name": "month", "label": "Month"},
-            {"name": "day", "label": "Day"},
-            {"name": "eventTime", "label": "Event time"},
-            {"name": "expedition", "label": "Expedition"},
-            {"name": "habitat", "label": "Habitat"},
-        ]),
-        ("Identification", [
-            {"name": "identifiedBy", "label": "Identified by"},
-            {"name": "dateIdentified", "label": "Date identified"},
-            {"name": "identificationQualifier", "label": "Identification qualifier"},
-            {"name": "typeStatus", "label": "Type status"},
-            {"name": "determinations", "label": "Determinations"},
-        ]),
-        ("Specimen", [
-            {"name": "catalogNumber", "label": "Catalogue number"},
-            {"name": "collectionCode", "label": "Collection code"},
-            {"name": "subDepartment", "label": "Sub department"},
-            {"name": "otherCatalogNumbers", "label": "Other catalog numbers"},
-            {"name": "registrationCode", "label": "Registration code"},
-            {"name": "kindOfObject", "label": "Kind of object"},
-            {"name": "preparations", "label": "Preparations"},
-            {"name": "preparationType", "label": "Preparation type"},
-            {"name": "preservative", "label": "Preservative"},
-            {"name": "collectionKind", "label": "Collection kind"},
-            {"name": "collectionName", "label": "Collection name"},
-            {"name": "donorName", "label": "Donor name"},
-            {"name": "kindOfCollection", "label": "Kind of collection"},
-            {"name": "observedWeight", "label": "Observed weight"},
-            {"name": "individualCount", "label": "Individual count"},
-            {"name": "sex", "label": "Sex"},
-            {"name": "lifeStage", "label": "Life stage"},
-        ]),
-        ("Mineralogy", [
-            {"name": "dateRegistered", "label": "Date registered"},
-            {"name": "occurrence", "label": "Occurrence"},
-            {"name": "commodity", "label": "Commodity"},
-            {"name": "depositType", "label": "Deposit type"},
-            {"name": "texture", "label": "Texture"},
-            {"name": "identificationAsRegistered", "label": "Identification as registered"},
-            {"name": "identificationDescription", "label": "Identification description"},
-            {"name": "identificationVariety", "label": "Identification variety"},
-            {"name": "identificationOther", "label": "Identification other"},
-            {"name": "hostRock", "label": "Host rock"},
-            {"name": "age", "label": "Age"},
-            {"name": "ageType", "label": "Age type"},
-            {"name": "geologyRegion", "label": "Geology region"},
-            {"name": "mineralComplex", "label": "Mineral complex"},
-            {"name": "tectonicProvince", "label": "Tectonic province"},
-            {"name": "registeredWeight", "label": "Registered weight"},
-        ]),
-        ("Stratigraphy", [
-            {"name": "earliestEonOrLowestEonothem", "label": "Earliest eon/lowest eonothem"},
-            {"name": "latestEonOrHighestEonothem", "label": "Latest eon/highest eonothem"},
-            {"name": "earliestEraOrLowestErathem", "label": "Earliest era/lowest erathem"},
-            {"name": "latestEraOrHighestErathem", "label": "Latest era/highest erathem"},
-            {"name": "earliestPeriodOrLowestSystem", "label": "Earliest period/lowest system"},
-            {"name": "latestPeriodOrHighestSystem", "label": "Latest period/highest system"},
-            {"name": "earliestEpochOrLowestSeries", "label": "Earliest epoch/lowest series"},
-            {"name": "latestEpochOrHighestSeries", "label": "Latest epoch/highest series"},
-            {"name": "earliestAgeOrLowestStage", "label": "Earliest age/lowest stage"},
-            {"name": "latestAgeOrHighestStage", "label": "Latest age/highest stage"},
-            {"name": "lowestBiostratigraphicZone", "label": "Lowest biostratigraphic zone"},
-            {"name": "highestBiostratigraphicZone", "label": "Highest biostratigraphic zone"},
-            {"name": "group", "label": "Group"},
-            {"name": "formation", "label": "Formation"},
-            {"name": "member", "label": "Member"},
-            {"name": "bed", "label": "Bed"},
-            {"name": "chronostratigraphy", "label": "Chronostratigraphy"},
-            {"name": "lithostratigraphy", "label": "Lithostratigraphy"},
-        ]),
-        ("Meteorites", [
-            {"name": "meteoriteType", "label": "Meteorite type"},
-            {"name": "meteoriteGroup", "label": "Meteorite group"},
-            {"name": "chondriteAchondrite", "label": "Chondrite Achondrite"},
-            {"name": "meteoriteClass", "label": "Meteorite class"},
-            {"name": "petrologyType", "label": "Petrology type"},
-            {"name": "petrologySubtype", "label": "Petrology subtype"},
-            {"name": "recovery", "label": "Recovery"},
-            {"name": "recoveryDate", "label": "Recovery date"},
-            {"name": "recoveryWeight", "label": "Recovery weight"},
-            # "Registered weight unit",  # Merged into Registered weight
-        ]),
-        ("Botany", [
-            {"name": "exsiccati", "label": "Exsiccati"},
-            {"name": "exsiccatiNumber", "label": "Exsiccati number"},
-            {"name": "plantDescription", "label": "Plant description"},
-            {"name": "cultivated", "label": "Cultivated"},
-        ]),
-        ("Zoology", [
-            {"name": "populationCode", "label": "Population code"},
-            {"name": "nestShape", "label": "Nest shape"},
-            {"name": "nestSite", "label": "Nest site"},
-            {"name": "clutchSize", "label": "Clutch size"},
-            {"name": "setMark", "label": "Set mark"},
-            {"name": "barcode", "label": "Barcode"},
-            {"name": "extractionMethod", "label": "Extraction method"},
-            {"name": "resuspendedIn", "label": "Resuspended in"},
-            {"name": "totalVolume", "label": "Total volume"},
-            {"name": "partType", "label": "Part type"},
-        ]),
-        ("Palaeontology", [
-            {"name": "catalogueDescription", "label": "Catalogue description"},
-        ]),
-        ("Record", [
-            {"name": "occurrenceId", "label": "Occurrence ID"},
-            {"name": "modified", "label": "Modified"},
-            {"name": "created", "label": "Created"},
-            {"name": "recordType", "label": "Record type"},
-        ]),
-    ])
+    return {}
 
 
 def get_resource_filter_options(resource):
@@ -962,10 +686,12 @@ def get_resource_filter_pills(resource):
 
     field_labels = {}
 
-    if resource['id'] == get_specimen_resource_id():
-        for fields in resource_view_specimen_field_groups().values():
-            for field in fields:
-                field_labels[field['name']] = field['label']
+    field_groups = resource_view_get_field_groups(resource)
+
+    if field_groups:
+        for fields in field_groups.values():
+            for field_name, label in fields.items():
+                field_labels[field_name] = label
 
     for field, values in filter_dict.items():
         for value in values:
@@ -983,11 +709,9 @@ def get_resource_filter_pills(resource):
                     pills['Options'] = {label: filters}
             else:
 
-                if field_labels and field in field_labels:
+                try:
                     label = field_labels[field]
-                elif resource_is_dwc(resource):
-                    label = dwc_field_to_label(field)
-                else:
+                except KeyError:
                     label = field
 
                 try:

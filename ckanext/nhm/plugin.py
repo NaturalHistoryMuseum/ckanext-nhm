@@ -10,11 +10,11 @@ import ckan.lib.navl.dictization_functions as dictization_functions
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
-from ckanext.nhm.lib.resource_filters import resource_filter_options, FIELD_DISPLAY_FILTER
+from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
+from ckanext.nhm.controllers import *
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
-from pylons import config
 
 get_action = logic.get_action
 
@@ -30,7 +30,6 @@ collection_contacts = {
     'Palaeontology': 'b.scott@nhm.ac.uk',
     'Zoology': 'b.scott@nhm.ac.uk'
 }
-
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
@@ -68,27 +67,24 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IRoutes
     def before_map(self, map):
 
-        specimen_resource_id = helpers.get_specimen_resource_id()
-        indexlot_resource_id = helpers.get_indexlot_resource_id()
+        # Add controllers for custom record display
+        for controller in [IndexLotController, SpecimenController]:
 
-        # Add controller for KE EMu specimen records
-        map.connect('specimen', '/dataset/{package_name}/resource/%s/record/{record_id}' % specimen_resource_id,
-                    controller='ckanext.nhm.controllers.specimen:SpecimenController',
-                    action='view', resource_id=specimen_resource_id)
+            # Create unique name for route - specimen, indexlot etc.,
+            name = controller.__name__.replace('Controller', '').lower()
 
-        # # Add controller for KE EMu Index Lot records
-        # map.connect('indexlots', '/dataset/{package_name}/resource/%s/record/{record_id}' % indexlot_resource_id,
-        #             controller='ckanext.nhm.controllers.indexlot:IndexLotController',
-        #             action='view', resource_id=indexlot_resource_id)
+            map.connect(name, '/dataset/{package_name}/resource/%s/record/{record_id}' % controller.resource_id,
+                        controller='ckanext.nhm.controllers:%s' % controller.__name__,
+                        action='view', resource_id=controller.resource_id)
 
         # Add view record
         map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                    controller='ckanext.nhm.controllers.record:RecordController',
+                    controller='ckanext.nhm.controllers:RecordController',
                     action='view')
 
         # Add dwc view
         map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
-                    controller='ckanext.nhm.controllers.dwc:DarwinCoreController',
+                    controller='ckanext.nhm.controllers:DarwinCoreController',
                     action='view')
 
         # About pages
@@ -188,28 +184,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
-
-        # try:
-        #     print request.headers['Referer']
-        # except:
-        #     pass
-
-        # print context
-        # print data_dict
-
-        # field_group = core, taxonomy, botany etc.,
-
-        # TODO: Add field group
-
-        # query_dict['select'] = ['"Catalog number"', '"_id"']
-
-        # request_dict = logic.clean_dict(unflatten(logic.tuplize_dict(logic.parse_params(request.params))))
-        # # print request_dict
-        #
-        # for i in dir(request):
-        #     print getattr(request, i)
-
-        # print request.query_string
 
         # Add our options filters
         if 'filters' in data_dict:

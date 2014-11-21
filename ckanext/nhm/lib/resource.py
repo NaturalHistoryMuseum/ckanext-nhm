@@ -6,13 +6,33 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 """
 
 import json
+import ckan.logic as logic
+import ckan.plugins.toolkit as toolkit
 from ckan.common import request, response
+
+NotFound = logic.NotFound
 
 # Filter used for filter groups
 FIELD_DISPLAY_FILTER = '_f'
 
 # Name of the field display cookie for sotring hidden fields
 HIDDEN_FIELDS_COOKIE_NAME = 'hidden_fields'
+
+
+def resource_get_ordered_fields(resource_id):
+    """
+    This is a replacement for resource_view_get_fields, but this function
+    handles errors internally, and return the fields in their original order
+    @param resource_id:
+    @return:
+    """
+    data = {'resource_id': resource_id, 'limit': 0}
+    try:
+        result = toolkit.get_action('datastore_search')({}, data)
+    except NotFound:
+        return []
+
+    return [field['id'] for field in result.get('fields', [])]
 
 
 def resource_filter_options(resource):
@@ -134,3 +154,5 @@ def resource_filter_delete_cookie(resource_id):
     cookie.pop(resource_id, None)
     # And reset the cookie
     response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
+
+
