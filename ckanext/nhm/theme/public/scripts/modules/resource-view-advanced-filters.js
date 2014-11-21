@@ -34,6 +34,8 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         // Add selected class, mirroring the class on selected tab
         $filtersWrapper.addClass('selected')
 
+        var displayAllFieldsLabel = 'Display all fields'
+
     }else{
 
         var $tabs = $('<ul />');
@@ -51,6 +53,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
         $filtersWrapper.prepend($tabs);
         $filtersWrapper.liteTabs({width: 900});
+        var displayAllFieldsLabel = 'Display all ' + Object.keys(fieldGroups)[0] + ' fields';
 
     }
 
@@ -69,7 +72,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     }
 
     $formActions.append($('<div class="toggle-all-fields"></div>')
-        .append($('<label for="display-all-fields">Display all fields</label>'))
+        .append($('<label for="display-all-fields">' + displayAllFieldsLabel + '</label>'))
         .append($displayAllFieldCheckbox)
     );
 
@@ -129,7 +132,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
   function _makeFieldFilterOptions(filterOptions){
 
-    var $filterOptions = $('<div></div>');
+    var $filterOptions = $('<div class="filter-options"></div>');
 
     // Add filter options checkboxes
       for (var name in filterOptions){
@@ -165,7 +168,6 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
                 label: field
             }
         }
-
 
         // We don't show the ID field - cannot be hidden anyway
         if (field.name != '_id') {
@@ -345,6 +347,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
   return {
     initialize: initialize,
     options: {
+        resourceId: '',
         fields: [],  // List of fields. Required
         hiddenFields: [], // List of fields to hide
         fieldGroups: {},  // Groupings of fields. Optional

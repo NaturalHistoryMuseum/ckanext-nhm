@@ -1241,11 +1241,18 @@ a.toggle-view-filters:after {
 .liteTabs ul {
   margin-bottom: 20px;
 }
+.liteTabs a:hover {
+  background: #fff;
+}
 .liteTabs ul li a {
   padding: 6px 9px;
 }
-.liteTabs a.selected,
-.liteTabs a.selected:hover {
+.liteTabs li a,
+.liteTabs li a:hover {
+  background: #C7C7C7;
+}
+.liteTabs li a.selected,
+.liteTabs li a.selected:hover {
   background: none;
 }
 .advanced-filter-field label,
@@ -1287,6 +1294,9 @@ a.toggle-view-filters:after {
   margin-left: 123px;
   position: relative;
 }
+.advanced-filter-field div.advanced-filter-field-value input.toggle-field-display {
+  display: none;
+}
 .advanced-filter-field div.advanced-filter-field-value label {
   width: 22px;
   overflow: hidden;
@@ -1304,9 +1314,6 @@ a.toggle-view-filters:after {
 }
 .advanced-filter-field div.advanced-filter-field-value label span {
   font-weight: normal;
-}
-.advanced-filter-field div.advanced-filter-field-value input.toggle-field-display {
-  display: none;
 }
 .advanced-filter-field div.advanced-filter-field-value label:after {
   content: '';
@@ -1328,12 +1335,14 @@ a.toggle-view-filters:after {
 .advanced-filter-field div.advanced-filter-field-value label.disabled-field span {
   color: #AFAFAF;
 }
-.button-group {
-  clear: both;
+.resource-view-filter-form .filter-options {
+  text-align: center;
 }
 .resource-view-filter-form .form-actions {
   clear: both;
   text-align: center;
+  border-top: None;
+  padding-bottom: 0;
 }
 .resource-view-filter-form .form-actions button {
   margin-left: 150px;
@@ -1349,7 +1358,16 @@ a.toggle-view-filters:after {
   margin-right: 7px;
 }
 .resource-view-filter-form .form-actions .toggle-all-fields input {
-  top: 1px;
+  top: 0;
+}
+label.resource-view-filter-option {
+  font-weight: normal;
+  display: inline-block;
+  margin: 0 15px;
+}
+label.resource-view-filter-option input {
+  top: 0;
+  margin-right: 4px;
 }
 div.resource-view-filter-pills {
   padding-bottom: 10px;

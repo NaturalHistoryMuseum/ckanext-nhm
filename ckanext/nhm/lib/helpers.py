@@ -644,6 +644,8 @@ def resource_view_get_hidden_fields(resource):
         return {}
 
 
+
+
 def resource_view_get_field_groups(resource):
     """
     Return dictionary of field groups
@@ -957,25 +959,41 @@ def get_resource_filter_pills(resource):
     pills = {}
 
     options = resource_filter_options(resource)
+
+    field_labels = {}
+
+    if resource['id'] == get_specimen_resource_id():
+        for fields in resource_view_specimen_field_groups().values():
+            for field in fields:
+                field_labels[field['name']] = field['label']
+
     for field, values in filter_dict.items():
         for value in values:
             filters = get_pill_filters(field, value)
 
-            #  If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
+            # If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
             # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
             if field == '_tmgeom':
                 pills['geometry'] = {'Polygon': filters}
             elif field in options:
                 label = options[field]['label']
                 try:
-                    pills['options'][label] = filters
+                    pills['Options'][label] = filters
                 except KeyError:
-                    pills['options'] = {label: filters}
+                    pills['Options'] = {label: filters}
             else:
+
+                if field_labels and field in field_labels:
+                    label = field_labels[field]
+                elif resource_is_dwc(resource):
+                    label = dwc_field_to_label(field)
+                else:
+                    label = field
+
                 try:
-                    pills[field][value] = filters
+                    pills[label][value] = filters
                 except KeyError:
-                    pills[field] = {value: filters}
+                    pills[label] = {value: filters}
 
     # Remove the field group key, if it exists
     pills.pop(FIELD_DISPLAY_FILTER, None)
