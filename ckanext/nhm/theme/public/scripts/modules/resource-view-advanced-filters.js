@@ -197,7 +197,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      var $fieldDisplayCheckbox = $('<input class="toggle-field-display" type="checkbox" name="field_display[' + field_name + ']" id="field_display[' + field_name + ']" value="1" />').change(_toggleFieldDisplay)
 
      // Label to show / hide field
-     var $label = $('<label for="field_display[' + field_name + ']"><span class="visible" title="Hide field">HIDE</span><span class="hidden" title="Show field">SHOW</span></label>');
+     var $label = $('<label for="field_display[' + field_name + ']"><span class="visible" title="Hide field">SHOW</span><span class="hidden" title="Show field">HIDE</span></label>');
 
      // If we have a populated filter value or this is a display field, check the box
      if (displayField || value){

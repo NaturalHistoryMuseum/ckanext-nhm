@@ -3,6 +3,7 @@ import re
 import ckan.logic as logic
 import ckan.plugins as p
 from ckan.common import c
+from copy import deepcopy
 import ckan.model as model
 from pylons import config
 from collections import OrderedDict
@@ -194,7 +195,8 @@ class SpecimenView(DefaultView):
 
         c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
 
-        c.field_groups = self.field_groups
+        # Act on a deep copy of field groups, so deleting element will not have any impact
+        c.field_groups = deepcopy(self.field_groups)
 
         # Some fields are being merged together - in which case we'll need custom filters
         # This can be set to bool false to not display a filter
@@ -211,7 +213,6 @@ class SpecimenView(DefaultView):
 
         # Merge day, month, year into one collection date field
         for k in ('day', 'month', 'year'):
-
             # Delete the exists field
             try:
                 del c.field_groups['Collection event'][k]
@@ -294,7 +295,7 @@ class SpecimenView(DefaultView):
 
     def get_field_groups(self, resource):
         # Modify field groups for grid display
-        field_groups = self.field_groups.copy()
+        field_groups = deepcopy(self.field_groups)
         # We do not want to show the record data in the grid or filters
         del field_groups['Record']
         return field_groups
