@@ -20,7 +20,7 @@ from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_all
 
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.controllers import *
+from ckanext.nhm.views import *
 from ckanext.nhm.lib.resource import (
     resource_get_ordered_fields,
     resource_filter_options,
@@ -123,20 +123,14 @@ def get_record(resource_id, record_id):
     return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
 
 
-# def resource_view_get_ordered_fields(resource_id):
-#     """
-#     This is a replacement for resource_view_get_fields, but this function
-#     handles errors internally, and return the fields in their original order
-#     @param resource_id:
-#     @return:
-#     """
-#     data = {'resource_id': resource_id, 'limit': 0}
-#     try:
-#         result = toolkit.get_action('datastore_search')({}, data)
-#     except NotFound:
-#         return []
-#
-#     return [field['id'] for field in result.get('fields', [])]
+def resource_view_get_ordered_fields(resource_id):
+    """
+    This is a replacement for resource_view_get_fields, but this function
+    handles errors internally, and return the fields in their original order
+    @param resource_id:
+    @return:
+    """
+    return resource_get_ordered_fields(resource_id)
 
 
 def form_select_datastore_field_options(resource_id=None, allow_empty=False):
@@ -418,7 +412,7 @@ def absolute_url_for(*args, **kw):
     return url
 
 
-def resource_view_get_record_controller(resource):
+def resource_view_get_view(resource):
     """
     Retrieve the controller for a resource
     Try and match on resource ID, or on format
@@ -427,16 +421,20 @@ def resource_view_get_record_controller(resource):
     @return: controller class
     """
 
-    for cls in RecordController.__subclasses__():
+    subclasses = DefaultView.__subclasses__()
 
+    for cls in subclasses:
         # Does the resource ID match the record controller
-        if hasattr(cls, 'resource_id') and cls.resource_id == resource['id']:
-            return cls
-        # Or do we have a controller for a particular format type (eg. DwC)
-        elif hasattr(cls, 'format') and cls.format == resource['format']:
-            return cls
+        if cls.resource_id == resource['id']:
+            return cls()
 
-    return RecordController
+    # Or do we have a controller for a particular format type (eg. DwC)
+    # Run in separate loop so this is lower specificity
+    for cls in subclasses:
+        if cls.format == resource['format']:
+            return cls()
+
+    return DefaultView()
 
 
 def resource_view_get_field_groups(resource):
@@ -446,9 +444,9 @@ def resource_view_get_field_groups(resource):
     @param resource: resource dict
     @return: OrderedDict of fields
     """
-    record_ctrl = resource_view_get_record_controller(resource)
+    view_cls = resource_view_get_view(resource)
 
-    return record_ctrl().get_field_groups()
+    return view_cls.get_field_groups(resource)
 
 
 # Resource view and filters
@@ -531,9 +529,9 @@ def resource_view_state(resource_view_json, resource_json):
                 )
 
     # Do we have custom column widths set in the controller
-    record_ctrl = resource_view_get_record_controller(resource)
-    if record_ctrl.grid_column_widths:
-        for column, width in record_ctrl.grid_column_widths.items():
+    view_cls = resource_view_get_view(resource)
+    if view_cls.grid_column_widths:
+        for column, width in view_cls.grid_column_widths.items():
             resource_view['state']['columnsWidth'].append(
                 {
                     'column': column,
@@ -582,6 +580,7 @@ def resource_view_get_hidden_fields(resource):
     # Load the hidden fields cookie
     # hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
 
+    # TEMP: Just for debugging
     hidden_fields_cookie = None
 
     # Retrieve the fields for this resource
@@ -615,10 +614,10 @@ def resource_view_get_hidden_fields(resource):
 
         # User has nto customised the grid - so see if we have custom display
         # fields set in the controller
-        record_ctrl = resource_view_get_record_controller(resource)
+        view_cls = resource_view_get_view(resource)
 
-        if record_ctrl.grid_default_columns:
-            return [f for f in resource_fields if f not in record_ctrl.grid_default_columns]
+        if view_cls.grid_default_columns:
+            return [f for f in resource_fields if f not in view_cls.grid_default_columns]
 
     return {}
 

@@ -1590,13 +1590,13 @@ a.toggle-view-filters:after{
 }
 
 .advanced-filter-field div.advanced-filter-field-value label{
-  width: 22px;
+  width: 26px;
   overflow: hidden;
   position: absolute;
   top: 0;
   right: 0;
   text-align: center;
-  line-height: 22px;
+  height: 22px;
   border: 1px solid #C3C3C3;
   border-radius: 4px;
   moz-border-radius: 4px;
@@ -1607,6 +1607,9 @@ a.toggle-view-filters:after{
 
 .advanced-filter-field div.advanced-filter-field-value label span{
   font-weight: normal;
+  font-size: 7px!important;
+  font-family: arial, helvetica, sans-serif;
+  line-height: 23px;
 }
 
 .advanced-filter-field div.advanced-filter-field-value label:after{
@@ -1614,16 +1617,16 @@ a.toggle-view-filters:after{
 }
 
 .advanced-filter-field div.advanced-filter-field-value label span,
-.advanced-filter-field div.advanced-filter-field-value label.hidden-field .show{
+.advanced-filter-field div.advanced-filter-field-value label.hidden-field .visible{
   display: none;
 }
 
-.advanced-filter-field div.advanced-filter-field-value label.hidden-field .hide,
-.advanced-filter-field div.advanced-filter-field-value label .show{
+.advanced-filter-field div.advanced-filter-field-value label.hidden-field .hidden,
+.advanced-filter-field div.advanced-filter-field-value label .visible{
   display: block;
 }
 
-.advanced-filter-field div.advanced-filter-field-value label .show{
+.advanced-filter-field div.advanced-filter-field-value label .visible{
   color: #59B200;
 }
 

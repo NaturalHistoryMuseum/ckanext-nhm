@@ -1,10 +1,19 @@
 {% extends "record/specimen.html" %}
 
+{% block content_primary_nav %}
+    {% if c.additional_view %}
+
+        {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+        {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+
+    {% endif %}
+{% endblock %}
+
 {% block record_data %}
 
     <table class="toggle-empty-rows" data-module="toggle-empty-rows">
 
-    {% for group, terms in c.dwc.get_groups() %}
+    {% for group, fields in c.field_groups.items() %}
 
         <thead>
             <tr>
@@ -13,26 +22,27 @@
         </thead>
 
         <tbody>
-            {% for term_name in terms %}
 
-                {% set term = c.dwc.get_term(term_name) %}
-                {% if term['value'] == None %}
+            {% for field, label in fields.items() %}
+
+                {% set value = c.record_dict[field] %}
+                {% if not value %}
                     {% set cls = 'empty' %}
                     {% set value = '' %}
                 {% else %}
                     {% set cls = 'not-empty' %}
-                    {% set value = term['value'] %}
                 {% endif %}
 
                 <tr class="{{ cls }}">
                     <th>
-                        <a href="{{ term['uri'] }}" target="_blank" title="{{ term['uri'] }}">{{term_name}}</a>
+                        <a href="{{ c.uris[field] }}" target="_blank" title="{{ c.uris[field] }}">{{field}}</a>
                     </th>
 
                     <td>{{ value }}</td>
                 </tr>
 
             {% endfor %}
+
         </tbody>
 
     {% endfor %}

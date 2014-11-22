@@ -6,10 +6,9 @@ import ckan.plugins as p
 from ckan.common import _, c
 import logging
 import json
-from ckan.lib.render import find_template
-from ckanext.nhm.lib.resource import resource_get_ordered_fields
+from ckanext.nhm.lib.helpers import resource_view_get_view
+from ckanext.nhm.views import DarwinCoreView
 
-from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
@@ -28,15 +27,9 @@ TILED_MAP_TYPE = 'tiledmap'  # The view type for the tiledmap
 class RecordController(base.BaseController):
     """
     Controller for displaying an individual record
+
+    Loads all the data and then defers render function to view objects
     """
-
-    field_groups = {}
-
-    # Default columns to show in grid
-    grid_default_columns = []
-
-    # Specific column widths
-    grid_column_widths = {}
 
     def _load_data(self, package_name, resource_id, record_id):
         """
@@ -104,13 +97,27 @@ class RecordController(base.BaseController):
         :param record_id:
         :return: html
         """
+
         self._load_data(package_name, resource_id, record_id)
 
-        # The record_dict does not have fields in the correct order
-        # So load the fields, and create an OrderedDict with field: value
-        c.field_data = OrderedDict()
-        for field in resource_get_ordered_fields(resource_id):
-            if not field.startswith('_'):
-                c.field_data[field] = c.record_dict.get(field, None)
+        view_cls = resource_view_get_view(c.resource)
 
-        return p.toolkit.render('record/view.html')
+        return view_cls.render_record(c)
+
+    def dwc(self, package_name, resource_id, record_id):
+        """
+        Explicit DwC view
+        @param package_name:
+        @param resource_id:
+        @param record_id:
+        @return:
+        """
+
+        self._load_data(package_name, resource_id, record_id)
+
+        # Is this a DwC view of an additional dataset?
+        # In which case, provide links back to the original record view
+        c.additional_view = True
+
+        view = DarwinCoreView()
+        return view.render_record(c)

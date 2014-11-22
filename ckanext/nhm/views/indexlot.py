@@ -27,3 +27,6 @@ class IndexLotController(RecordController):
 
     resource_id = config.get("ckanext.nhm.indexlot_resource_id")
 
+    def render_record(self):
+        pass
+

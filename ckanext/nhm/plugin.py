@@ -11,7 +11,6 @@ import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
-from ckanext.nhm.controllers import *
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
@@ -67,25 +66,15 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IRoutes
     def before_map(self, map):
 
-        # Add controllers for custom record display
-        for controller in [IndexLotController, SpecimenController]:
-
-            # Create unique name for route - specimen, indexlot etc.,
-            name = controller.__name__.replace('Controller', '').lower()
-
-            map.connect(name, '/dataset/{package_name}/resource/%s/record/{record_id}' % controller.resource_id,
-                        controller='ckanext.nhm.controllers:%s' % controller.__name__,
-                        action='view', resource_id=controller.resource_id)
-
         # Add view record
         map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                    controller='ckanext.nhm.controllers:RecordController',
+                    controller='ckanext.nhm.controllers.record:RecordController',
                     action='view')
 
         # Add dwc view
         map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
-                    controller='ckanext.nhm.controllers:DarwinCoreController',
-                    action='view')
+                    controller='ckanext.nhm.controllers.record:RecordController',
+                    action='dwc')
 
         # About pages
         map.connect('about_citation', '/about/citation', controller='ckanext.nhm.controllers.about:AboutController', action='citation')

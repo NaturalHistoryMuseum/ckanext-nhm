@@ -1,31 +1,27 @@
-import ckan.logic as logic
-import ckan.lib.base as base
-import ckan.plugins as p
-from ckan.common import _, c
 import logging
 import re
-from ckanext.nhm.controllers.record import RecordController
+import ckan.logic as logic
+import ckan.plugins as p
+from ckan.common import c
+import ckan.model as model
 from pylons import config
 from collections import OrderedDict
+from ckanext.nhm.views.default import DefaultView
+from ckanext.nhm.views.dwc import DarwinCoreView
 
 log = logging.getLogger(__name__)
 
-render = base.render
-abort = base.abort
-redirect = base.redirect
-
-NotFound = logic.NotFound
-NotAuthorized = logic.NotAuthorized
-ValidationError = logic.ValidationError
 get_action = logic.get_action
 
 
-class SpecimenController(RecordController):
+class SpecimenView(DefaultView):
     """
     Controller for displaying a specimen record
     """
-
     resource_id = config.get("ckanext.nhm.specimen_resource_id")
+
+    grid_default_columns = DarwinCoreView.grid_default_columns
+    grid_column_widths = DarwinCoreView.grid_column_widths
 
     field_groups = OrderedDict([
         ("Classification", OrderedDict([
@@ -184,22 +180,17 @@ class SpecimenController(RecordController):
         ])),
     ])
 
-    def view(self, package_name, resource_id, record_id):
-
+    def render_record(self, c):
         """
-        View an individual record
-        :param id:
-        :param resource_id:
-        :param record_id:
-        :return: html
+        Render a record
+        Called from record controller, when viewing a record page
+        @return: html
         """
+        # TODO: Put back custom record view
 
+        # TODO: # "Collection date", Year etc.,
 
-            # TODO: Put back custom record view
-
-    # TODO: # "Collection date", Year etc.,
-
-    # TODO: There may be hidden fields here. To fix
+        # TODO: There may be hidden fields here. To fix
 
         # ("Silica gel", [
         #     "Population code",
@@ -224,7 +215,7 @@ class SpecimenController(RecordController):
         #     "Part type",
         # ]),
 
-        self._load_data(package_name, resource_id, record_id)
+        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         occurrence_id = c.record_dict.get('occurrenceID')
 
@@ -251,7 +242,10 @@ class SpecimenController(RecordController):
         for k in ('day', 'month', 'year'):
 
             # Delete the exists field
-            del c.field_groups['Collection event'][k]
+            try:
+                del c.field_groups['Collection event'][k]
+            except KeyError:
+                pass
 
             # Add to collection date field
             if c.record_dict.get(k, None):
@@ -307,9 +301,9 @@ class SpecimenController(RecordController):
 
             if related_resources:
                 result = get_action('datastore_search')(
-                    self.context,
+                    context,
                     {
-                        'resource_id': resource_id,
+                        'resource_id': c.resource['id'],
                         'filters': {'occurrenceID': related_resources},
                         'fields': ['_id', 'occurrenceID', 'catalogNumber']
                     }
@@ -321,8 +315,17 @@ class SpecimenController(RecordController):
                         'title': 'Other part: %s' % (record['catalogNumber'] or record['occurrenceID']),
                     })
 
+        print c.images
+
         for image in c.images:
             # Create a thumbnail image by replacing the max image dimensions we've located from KE EMu with thumbnail 100x100
             image['thumbnail'] = re.sub("width=[0-9]+&height=[0-9]+", "width=100&height=100", image['url'])
 
         return p.toolkit.render('record/specimen.html')
+
+    def get_field_groups(self, resource):
+        # Modify field groups for grid display
+        field_groups = self.field_groups.copy()
+        # We do not want to show the record data in the grid or filters
+        del field_groups['Record']
+        return field_groups

@@ -160,32 +160,30 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
     var $filtersDiv = $('<div></div>');
 
-    $.each(fields, function (i, field) {
+    $.each(fields, function (field_name, field_label) {
 
-        if(typeof field == 'string'){
-            field = {
-                name: field,
-                label: field
-            }
+        if ($.isArray(fields)){
+            field_name = field_label
         }
 
         // We don't show the ID field - cannot be hidden anyway
-        if (field.name != '_id') {
+        // And double check the fields are present in the resource
+        if (field_name != '_id'){
 
             var value
 
             // Do we a have a filter for this field
-            if (filters.hasOwnProperty(field.name)) {
+            if (filters.hasOwnProperty(field_name)) {
                 // We no longer allow multiple OR values
-                value = filters[field.name][0]
+                value = filters[field_name][0]
             }
 
-            $filtersDiv.append(_makeField(field, value, ($.inArray(field.name, hiddenFields) == -1)));
+            $filtersDiv.append(_makeField(field_name, field_label, value, ($.inArray(field_name, hiddenFields) == -1)));
         }
 
     });
 
-    function _makeField(field, value, displayField) {
+    function _makeField(field_name, field_label, value, displayField) {
     /**
      * Make a field filter, comprising label, select2 auto-lookup
      * list and a checkbox for controlling display of the field - if checked field will be displayed
@@ -194,12 +192,12 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
      // Build the filter, including a field display checkbox
      var $filter = $('<div class="advanced-filter-field-value"></div>')
-         .append($('<input type="hidden" name="filters[' + field.name + ']" />'))
+         .append($('<input type="hidden" name="filters[' + field_name + ']" />'))
 
-     var $fieldDisplayCheckbox = $('<input class="toggle-field-display" type="checkbox" name="field_display[' + field.name + ']" id="field_display[' + field.name + ']" value="1" />').change(_toggleFieldDisplay)
+     var $fieldDisplayCheckbox = $('<input class="toggle-field-display" type="checkbox" name="field_display[' + field_name + ']" id="field_display[' + field_name + ']" value="1" />').change(_toggleFieldDisplay)
 
      // Label to show / hide field
-     var $label = $('<label for="field_display[' + field.name + ']"><span class="show" title="Visible"><i class="icon-eye-open" /></span><span class="hide" title="Hidden"><i class="icon-eye-close" /></span></label>');
+     var $label = $('<label for="field_display[' + field_name + ']"><span class="visible" title="Hide field">HIDE</span><span class="hidden" title="Show field">SHOW</span></label>');
 
      // If we have a populated filter value or this is a display field, check the box
      if (displayField || value){
@@ -221,7 +219,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
      // Build a field consisting of label and input
      var $field = $('<div class="advanced-filter-field"></div>')
-         .append($('<label for="filters[' + field.name + ']">' + field.label + '</label>'))
+         .append($('<label for="filters[' + field_name + ']">' + field_label + '</label>'))
          .append($filter);
 
      var queryLimit = 20;
@@ -230,7 +228,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
      $field.find('input[name^="filters"]').select2({
         allowClear: true,
         placeholder: ' ', // select2 needs a placeholder to allow clearing
-        width: 142,
+        width: 138,
         minimumInputLength: 0,
         ajax: {
           url: '/api/3/action/datastore_search',
@@ -245,14 +243,14 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
               resource_id: resourceId,
               limit: queryLimit,
               offset: offset,
-              fields: field.name,
+              fields: field_name,
               distinct: true,
-              sort: field.name
+              sort: field_name
             };
 
             if (term !== '') {
               var q = {};
-              q[field.name] = term + ':*';
+              q[field_name] = term + ':*';
               query.q = JSON.stringify(q);
             }
 
@@ -264,7 +262,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
                 results;
 
             results = $.map(records, function (record) {
-              return { id: record[field.name], text: String(record[field.name]) };
+              return { id: record[field_name], text: String(record[field_name]) };
             });
 
             return { results: results, more: hasMore };

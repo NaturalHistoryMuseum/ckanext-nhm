@@ -2,7 +2,7 @@
 
 {% block content_primary_nav %}
 
-{{ h.build_nav_icon('specimen', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+{{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
 {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
 
 {% endblock %}
@@ -111,11 +111,11 @@
 
    <tr>
     <th scope="row">{{ _('Created') }}</th>
-    <td>{{ h.render_datetime(c.record_dict['Created']) }}</td>
+    <td>{{ h.render_datetime(c.record_dict['created']) }}</td>
   </tr>
    <tr>
     <th scope="row">{{ _('Last updated') }}</th>
-    <td>{{ h.render_datetime(c.record_dict['Modified']) }}</td>
+    <td>{{ h.render_datetime(c.record_dict['modified']) }}</td>
   </tr>
 
   {{ super() }}
