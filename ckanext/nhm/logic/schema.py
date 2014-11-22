@@ -8,8 +8,8 @@ from ckan.logic.schema import (
 
 from ckanext.nhm.logic.validators import string_max_length
 from ckanext.doi.logic.schema import (
-    _modify_create_package_schema,
-    _modify_update_package_schema
+    _modify_create_package_schema as doi_modify_create_package_schema,
+    _modify_update_package_schema as doi_modify_update_package_schema
 )
 from formencode.validators import OneOf
 
@@ -50,14 +50,14 @@ def record_get_schema():
 def create_package_schema():
     schema = default_create_package_schema()
     _modify_schema(schema)
-    _modify_create_package_schema(schema)
+    doi_modify_create_package_schema(schema)
     return schema
 
 
 def update_package_schema():
     schema = default_update_package_schema()
     _modify_schema(schema)
-    _modify_update_package_schema(schema)
+    doi_modify_update_package_schema(schema)
     return schema
 
 
@@ -78,6 +78,7 @@ def _modify_schema(schema):
     schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in UPDATE_FREQUENCIES]), convert_to_extras, unicode]
     schema['promoted'] = [ignore_missing, convert_to_extras, boolean_validator]
     schema['spatial'] = [ignore_missing, convert_to_extras]
+
 
 def show_package_schema():
 
