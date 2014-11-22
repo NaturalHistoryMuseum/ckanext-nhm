@@ -62,14 +62,12 @@ class RecordController(base.BaseController):
 
         # Sanity check: image field hasn't been set to _id
         if image_field and image_field != '_id':
+
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                images = [image.strip() for image in c.record_dict.pop(image_field).split(';')]
+                c.images = [{'modal_title': c.record_title, 'url': image.strip()} for image in c.record_dict.pop(image_field).split(';') if image.strip()]
             except (KeyError, AttributeError):
                 # Skip errors - there are no images
-                pass
-            else:
-                c.images = [{'modal_title': c.record_title, 'url': image} for image in images]
                 pass
 
         # Loop through all the views - if we have a tiled map view with lat/lon fields

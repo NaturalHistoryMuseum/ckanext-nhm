@@ -186,35 +186,6 @@ class SpecimenView(DefaultView):
         Called from record controller, when viewing a record page
         @return: html
         """
-        # TODO: Put back custom record view
-
-        # TODO: # "Collection date", Year etc.,
-
-        # TODO: There may be hidden fields here. To fix
-
-        # ("Silica gel", [
-        #     "Population code",
-        # ]),
-        # ("Nest", [
-        #     "Nest shape",
-        #     "Nest site",
-        # ]),
-        # ("Egg", [
-        #     "Clutch size",
-        #     "Set mark",
-        # ]),
-        # ("Parasite card", [
-        #     "Barcode",
-        # ]),
-        # ("DNA Preparation", [
-        #     "Extraction method",
-        #     "Resuspended in",
-        #     "Total volume",
-        # ]),
-        # ("Part", [
-        #     "Part type",
-        # ]),
-
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         occurrence_id = c.record_dict.get('occurrenceID')
@@ -314,8 +285,6 @@ class SpecimenView(DefaultView):
                         '_id': record['_id'],
                         'title': 'Other part: %s' % (record['catalogNumber'] or record['occurrenceID']),
                     })
-
-        print c.images
 
         for image in c.images:
             # Create a thumbnail image by replacing the max image dimensions we've located from KE EMu with thumbnail 100x100
