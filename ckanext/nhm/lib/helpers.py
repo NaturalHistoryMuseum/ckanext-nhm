@@ -400,18 +400,6 @@ def get_query_params():
     return params
 
 
-def absolute_url_for(*args, **kw):
-    """
-    Returns URL with site url
-    @param args:
-    @param kw:
-    @return:
-    """
-
-    url = config.get('ckan.site_url', '') + url_for(*args, **kw)
-    return url
-
-
 def resource_view_get_view(resource):
     """
     Retrieve the controller for a resource
