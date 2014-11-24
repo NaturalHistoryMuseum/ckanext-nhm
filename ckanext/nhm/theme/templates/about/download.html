@@ -9,7 +9,9 @@
 
 {% block about_content %}
 
-    {% set api_absolute_link = h.absolute_url_for(controller='api', action='get_api', ver=3) %}
+    {{ h.url_for(controller='api', action='get_api', ver=3) }}
+
+{#    {% set api_absolute_link = h.absolute_url_for(controller='api', action='get_api', ver=3) %}#}
     {% set api_link = h.link_to(api_absolute_link, h.url_for(controller='api', action='get_api', ver=3), target='_blank') %}
     {% set api_doc_link = h.api_doc_link() %}
 

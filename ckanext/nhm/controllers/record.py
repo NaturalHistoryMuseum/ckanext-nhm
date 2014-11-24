@@ -61,11 +61,21 @@ class RecordController(base.BaseController):
         c.record_title = c.record_dict.get(title_field, 'Record %s' % c.record_dict.get('_id'))
 
         # Sanity check: image field hasn't been set to _id
+
+        from ckan.lib.helpers import url_for, link_to
+
         if image_field and image_field != '_id':
+
+            description = None
+            licence_id = c.resource.get('_image_licence', None)
+
+            if licence_id:
+                licence = model.Package.get_license_register()[licence_id]
+                description = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                c.images = [{'modal_title': c.record_title, 'url': image.strip()} for image in c.record_dict.pop(image_field).split(';') if image.strip()]
+                c.images = [{'modal_title': c.record_title, 'url': image.strip(), 'description': description} for image in c.record_dict.pop(image_field).split(';') if image.strip()]
             except (KeyError, AttributeError):
                 # Skip errors - there are no images
                 pass

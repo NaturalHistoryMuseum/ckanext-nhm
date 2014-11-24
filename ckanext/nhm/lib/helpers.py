@@ -919,3 +919,16 @@ def indexlot_material_details(record_dict):
         material_details = map(lambda *row: list(row), *material_details)
 
     return material_details
+
+
+def get_image_licence_options():
+    """
+    Return list of image licences
+    Currently this is the same list as dataset licences
+    @return:
+    """
+
+    licenses = [('', '')] + model.Package.get_license_options()
+
+    # Format licences as form options list of dicts
+    return [{'value': value, 'text': text} for text, value in licenses]
