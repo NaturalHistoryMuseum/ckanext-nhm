@@ -13,40 +13,6 @@ Example:
 
       <section class="module module-narrow module-shallow">
 
-          <h2 class="module-heading"><i class="icon-medium icon-exclamation-sign"></i> {{ _('Data issues') }}</h2>
-
-           <div class="module-content">
-            {% block issues %}
-              <div class="issues">
-
-                <table class="table table-no-border">
-                    <tr>
-                        <th><a href="{{ h.url_for('issues_home', package_id=pkg.name) }}">Issues</a></th>
-                        {% for status, count in h.resource_issue_count(pkg.id).items() %}
-                            <td class="issue-{{ status }}">
-                                <a href="{{ h.url_for('issues_home', package_id=pkg.name, status=status) }}">{{ count }}</a>
-                            </td>
-                        {% endfor %}
-                    </tr>
-                </table>
-              </div>
-            {% endblock %}
-
-            {% block issue_button %}
-                <div class="issue_button">
-                    <a href="{{ h.url_for('issues_new', package_id=pkg.name)}}" class="btn btn-success">
-                        <i class="icon-plus-sign"></i>
-                        {{ _('Report issue') }}
-                    </a>
-                </div>
-            {% endblock %}
-
-           </div>
-
-      </section>
-
-      <section class="module module-narrow module-shallow">
-
         <h2 class="module-heading"><i class="icon-medium icon-eye-open"></i> {{ _('Follow dataset') }}</h2>
 
            <div class="module-content">

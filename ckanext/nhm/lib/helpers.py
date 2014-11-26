@@ -5,9 +5,6 @@ import urllib
 import re
 import os
 
-# TODO: Remove Issue
-from ckanext.issues.model import Issue, ISSUE_STATUS
-
 from beaker.cache import cache_region
 from sqlalchemy import func
 from pylons import config
@@ -162,23 +159,6 @@ def update_frequency_get_label(value):
     for v, label in UPDATE_FREQUENCIES:
         if v == value:
             return label
-
-
-def resource_issue_count(package_id):
-
-    issues_count = {}
-    # Get the counts from the issues model
-    result = dict(model.Session.query(Issue.status, func.count(Issue.id)).group_by(Issue.status).filter(Issue.dataset_id==package_id).all())
-
-    # Lop through the issue status (open and closed) and assign the count if there's a value; otherwise use 0
-    for status in ISSUE_STATUS:
-        try:
-            issues_count[status] = result[status]
-        except KeyError:
-            issues_count[status] = 0
-
-    return issues_count
-
 
 def dataset_types():
     """
