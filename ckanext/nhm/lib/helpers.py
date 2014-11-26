@@ -3,6 +3,7 @@ import logging
 import json
 import urllib
 import re
+import os
 
 # TODO: Remove Issue
 from ckanext.issues.model import Issue, ISSUE_STATUS
@@ -920,3 +921,26 @@ def get_image_licence_options():
 
     # Format licences as form options list of dicts
     return [{'value': value, 'text': text} for text, value in licenses]
+
+
+def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
+    """
+    Generate social share text for a package
+    @param pkg_dict:
+    @return:
+    """
+
+    text = list()
+
+    if rec_dict:
+        text.append(rec_dict.get(res_dict['_title_field'], 'Record %s' % rec_dict['_id']))
+    elif res_dict:
+        text.append('%s' % (res_dict['name']))
+    elif pkg_dict:
+        text.append('%s' % (pkg_dict['title'] or pkg_dict['name']))
+
+    text.append('on the @NHM_London Data Portal')
+
+    text.append('DOI: %s' % os.path.join('http://dx.doi.org', pkg_dict['doi']))
+
+    return ' '.join(text)

@@ -12,7 +12,6 @@ this.ckan.module('social', function ($, _) {
         initialize: function () {
 
             self = this;
-
             $('a', this.el).each(function() {
                 $(this).on("click", self._on_click);
             });
@@ -21,6 +20,9 @@ this.ckan.module('social', function ($, _) {
 
         _on_click: function(e){
             e.preventDefault();
+
+            console.log(this.title);
+
             window.open(this.href, this.title, 'width=600,height=400');
             return false;
         }

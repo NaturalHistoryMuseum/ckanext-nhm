@@ -171,7 +171,7 @@
 {% block secondary_content %}
 
     {% block resource_license %}
-        {% snippet "snippets/social.html" %}
+        {% snippet "snippets/social.html", pkg_dict=pkg, res_dict=res, rec_dict=rec %}
     {% endblock %}
 
 {% endblock %}

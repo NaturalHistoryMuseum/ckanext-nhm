@@ -67,3 +67,7 @@
         <li>{% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res %}</li>
 
 {% endblock %}
+
+  {% block resource_license %}
+    {% snippet "snippets/social.html", pkg_dict=pkg, res_dict=res %}
+  {% endblock %}
