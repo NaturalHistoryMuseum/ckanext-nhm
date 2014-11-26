@@ -216,14 +216,14 @@ def get_specimen_resource_id():
     """
     @return:  ID for the specimen resource
     """
-    return
+    return config.get("ckanext.nhm.specimen_resource_id")
 
 
 def get_indexlot_resource_id():
     """
     @return:  ID for indexlot resource
     """
-    return
+    return config.get("ckanext.nhm.indexlot_resource_id")
 
 
 @cache_region('short_term', 'collection_stats')
@@ -913,7 +913,14 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     text = list()
 
     if rec_dict:
-        text.append(rec_dict.get(res_dict['_title_field'], 'Record %s' % rec_dict['_id']))
+
+        try:
+            title = rec_dict.get(res_dict['_title_field'], 'Record %s' % rec_dict['_id'])
+        except KeyError:
+            title = 'Record %s' % rec_dict['_id']
+
+        text.append(title)
+
     elif res_dict:
         text.append('%s' % (res_dict['name']))
     elif pkg_dict:
@@ -921,6 +928,9 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
 
     text.append('on the @NHM_London Data Portal')
 
-    text.append('DOI: %s' % os.path.join('http://dx.doi.org', pkg_dict['doi']))
+    try:
+        text.append('DOI: %s' % os.path.join('http://dx.doi.org', pkg_dict['doi']))
+    except KeyError:
+        pass
 
     return ' '.join(text)

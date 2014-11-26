@@ -34,15 +34,15 @@
                                         <table id="determinations">
 
                                             <tr>
-                                                {% for label in c.record_dict['determinations'][0] %}
-                                                    <th>{{ label }}</th>
+                                                {% for label in c.determinations.keys() %}
+                                                    <th class="{{ label|lower }}">{{ label }}</th>
                                                 {% endfor %}
                                             </tr>
 
-                                            {% for determination in c.record_dict['determinations'][1:] %}
+                                            {% for i in range(c.determinations_count) %}
                                                 <tr>
-                                                    {% for value in determination %}
-                                                        <td> {{ value }}</td>
+                                                    {% for key in c.determinations.keys() %}
+                                                        <td> {{ c.determinations[key][i] }}</td>
                                                     {% endfor %}
                                                 </tr>
                                             {% endfor %}

@@ -3,6 +3,7 @@ import re
 import ckan.logic as logic
 import ckan.plugins as p
 from ckan.common import c
+import json
 from copy import deepcopy
 import ckan.model as model
 from pylons import config
@@ -238,25 +239,18 @@ class SpecimenView(DefaultView):
         except AttributeError:
             pass
 
-        # Pattern for matching key in determination date
-        regex = re.compile('^([a-z ]+)=(.*)', re.IGNORECASE)
-        determinations = []
+        c.determinations = {}
+        c.determinations_count = 0
 
-        # Parse the determinations string
-        for determination in c.record_dict['determinations'].split('|'):
-            result = regex.match(determination)
-            try:
-                determinations.append([result.group(1)] + result.group(2).split(';'))
-            except AttributeError:
-                pass
+        if c.record_dict.get('determinations'):
+            for det_type, det_value in json.loads(c.record_dict['determinations']).items():
+                det_type = 'Filed as' if det_type == 'filedAs' else det_type.title()
+                c.determinations[det_type] = det_value.split(';')
+                # Want to use the largest number of determination value
+                c.determinations_count = max(c.determinations_count, len(c.determinations[det_type]))
 
-        if determinations:
-            # Transpose list of determinations & fill in missing values so they are all the same length
-            c.record_dict['determinations'] = map(lambda *row: list(row), *determinations)
-            # We do not want custom filters for determinations
-            c.custom_filters['determinations'] = None
-        else:
-            c.record_dict['determinations'] = None
+        # We do not want custom filters for determinations
+        c.custom_filters['determinations'] = None
 
         # Related resources
         c.related_records = []
