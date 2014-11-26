@@ -9,6 +9,33 @@
     {% endif %}
 {% endblock %}
 
+{% macro dwc_row(field) %}
+    {%- set extra_html = caller() if caller -%}
+    {% set value = c.record_dict[field] %}
+
+    {% if not value %}
+        {% set cls = 'empty' %}
+        {% set value = '' %}
+    {% else %}
+        {% set cls = 'not-empty' %}
+    {% endif %}
+
+    <tr class="{{ cls }}">
+        <th>
+
+            {% if c.uris[field] %}
+                <a href="{{ c.uris[field] }}" target="_blank" title="{{ c.uris[field] }}">{{field}}</a>
+            {% else %}
+                {{field}}
+            {% endif %}
+
+        </th>
+
+        <td>{{ value }}</td>
+    </tr>
+
+{% endmacro %}
+
 {% block record_data %}
 
     <table class="toggle-empty-rows" data-module="toggle-empty-rows">
@@ -53,13 +80,8 @@
             </tr>
             </thead>
 
-            {% for field, value in c.dynamic_properties.items() %}
-
-                <tr class="{{ cls }}">
-                    <th>{{ field }}</th>
-                    <td>{{ value }}</td>
-                </tr>
-
+            {% for field in c.dynamic_properties %}
+                {{ dwc_row(field) }}
             {% endfor %}
 
     </table>
