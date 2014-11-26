@@ -47,6 +47,21 @@
 
     {% endfor %}
 
+            <thead>
+            <tr>
+                <th colspan="2">Dynamic properties</th>
+            </tr>
+            </thead>
+
+            {% for field, value in c.dynamic_properties.items() %}
+
+                <tr class="{{ cls }}">
+                    <th>{{ field }}</th>
+                    <td>{{ value }}</td>
+                </tr>
+
+            {% endfor %}
+
     </table>
 
     {% resource 'ckanext-nhm/toggle-empty-rows' %}

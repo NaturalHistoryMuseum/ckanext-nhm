@@ -117,6 +117,19 @@ class DarwinCoreView(DefaultView):
         c.field_groups = self.get_field_groups(c.resource)
         c.uris = self.uris
 
+        dynamic_properties = {}
+
+        for field in c.record_dict:
+
+            # URIs are keyed by field name, so we can just use that
+            if field not in c.uris and not field.startswith('_'):
+                value = c.record_dict.get(field, None)
+                if value:
+                    dynamic_properties[field] = value
+
+        # Order by key (field name)
+        c.dynamic_properties = OrderedDict(sorted(dynamic_properties.items()))
+
         return p.toolkit.render('record/dwc.html')
 
     def get_field_groups(self, resource):
