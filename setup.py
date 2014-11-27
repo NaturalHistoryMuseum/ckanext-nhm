@@ -30,5 +30,6 @@ setup(
             dataset-type=ckanext.nhm.commands.dataset_type:DatasetTypeCommand
             initdb=ckanext.nhm.commands.initdb:InitDBCommand
             stats=ckanext.nhm.commands.stats:StatsCommand
+            update-fulltext=ckanext.nhm.commands.update_full_text:UpdateFullTextCommand
 	""",
 )
