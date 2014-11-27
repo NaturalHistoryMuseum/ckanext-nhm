@@ -547,10 +547,7 @@ def resource_view_get_hidden_fields(resource):
     display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
 
     # Load the hidden fields cookie
-    # hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
-
-    # TEMP: Just for debugging
-    hidden_fields_cookie = None
+    hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
 
     # Retrieve the fields for this resource
     resource_fields = resource_get_ordered_fields(resource['id'])
@@ -811,6 +808,16 @@ def get_contact_form_template_url(params):
 
     return url
 
+
+def get_contact_form_category_options():
+    """
+    Contact form category
+    @return:
+    """
+    options = ['None', 'Request Information', 'Suggest improvement']
+    return list_to_form_options(options)
+
+
 def downloadable(resource):
     """
     Is a resource downloadable
@@ -818,6 +825,7 @@ def downloadable(resource):
     @return: bool
     """
     return bool(resource['format'])
+
 
 def is_sysadmin():
     """
