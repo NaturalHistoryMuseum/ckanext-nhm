@@ -160,6 +160,7 @@ def update_frequency_get_label(value):
         if v == value:
             return label
 
+
 def dataset_types():
     """
     Return list of dataset category terms
@@ -178,8 +179,21 @@ def url_for_collection_view(view_type='recline_grid_view', filters={}):
     @param kwargs: search filter params
     @return: url
     """
-
     resource_id = get_specimen_resource_id()
+    return url_for_resource_view(resource_id, view_type, filters)
+
+
+def url_for_indexlot_view():
+    """
+    Return URL to link through to index lot resource view
+    @return: url
+    """
+    resource_id = get_indexlot_resource_id()
+    return url_for_resource_view(resource_id)
+
+
+def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}):
+
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
     try:
@@ -197,12 +211,30 @@ def url_for_collection_view(view_type='recline_grid_view', filters={}):
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
-def url_for_indexlot_view():
-    return ''
-
-
 def indexlot_count():
-    return delimit_number(700000)
+
+    resource_id = get_indexlot_resource_id()
+
+    if not resource_id:
+        log.error('Please configure index lot resource ID')
+
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+
+    sql = 'SELECT COUNT(_id) AS count FROM "{resource_id}"'.format(resource_id=resource_id)
+
+    try:
+        result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
+    except ValidationError, e:
+        log.critical('Error retrieving indexlot statistics %s', e)
+    else:
+
+        try:
+            return delimit_number(int(result['records'][0]['count']))
+        except IndexError, e:
+            log.critical('Error retrieving indexlot statistics %s', e)
+
+    # Return 0 as default value
+    return 0
 
 
 def get_nhm_organisation_id():
@@ -240,9 +272,9 @@ def collection_stats():
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    sql = '''SELECT "Collection code", COUNT(*) AS count
+    sql = '''SELECT "collectionCode", COUNT(*) AS count
            FROM "{resource_id}"
-           GROUP BY "Collection code" ORDER BY count DESC'''.format(resource_id=resource_id)
+           GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
 
     total = 0
     collections = OrderedDict()
