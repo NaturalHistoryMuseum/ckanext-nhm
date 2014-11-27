@@ -8,6 +8,9 @@
 
     {{ form.input('email', label=_('Your email'), id='field-email', type='email', value=data.email, error=errors.email, classes=['control-medium'], is_required=true) }}
 
+    {# Add contact type #}
+    {{ form.select('contact_type', label=_('Contact type'), options=h.get_contact_form_category_options(), selected=data.contact_type, error=errors.contact_type) }}
+
     {# Add resource name and ID hidden field#}
 
     {% set package_id = h.get_request_param('package_id', None) %}
