@@ -131,19 +131,5 @@ class StatsController(p.toolkit.BaseController):
             label = datetime.strptime(url.period_name, '%Y-%m').strftime('%b %Y')
             c.pageviews_options['xaxis']['ticks'].append([i, label])
 
-
-        # Add some extras
-        c.pageviews_options['xaxis']['ticks'].append([1, '2014-08'])
-        c.pageviews.append([1, 50])
-
-        c.pageviews_options['xaxis']['ticks'].append([2, '2014-07'])
-        c.pageviews.append([2, 100])
-
-        c.pageviews_options['xaxis']['ticks'].append([3, '2014-06'])
-        c.pageviews.append([3, 150])
-
-        c.pageviews_options['xaxis']['ticks'].append([4, '2014-04'])
-        c.pageviews.append([4, 100])
-
         return render('stats/dataset_metrics.html')
 
