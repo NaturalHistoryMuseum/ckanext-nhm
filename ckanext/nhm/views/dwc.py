@@ -53,6 +53,7 @@ class DarwinCoreView(DefaultView):
     # All DwC terms
     terms = OrderedDict()
 
+    # Dictionary of term URIs, keyed by term name
     uris = {}
 
     def __init__(self, **kwargs):

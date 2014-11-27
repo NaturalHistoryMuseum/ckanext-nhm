@@ -7,6 +7,7 @@ from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
 # Dataset type to be automatically added to the vocabulary
 DEFAULT_DATASET_TYPES = ['Collections', 'Library and archives']
 
+
 class DatasetTypeCommand(CkanCommand):
     """
     Create / Add / Delete type from the dataset type vocabulary

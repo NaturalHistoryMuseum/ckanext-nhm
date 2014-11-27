@@ -7,6 +7,7 @@ from ckanext.nhm.model.stats import Base
 
 log = logging.getLogger()
 
+
 class InitDBCommand(CkanCommand):
     """
     Initialise the local stats database tables

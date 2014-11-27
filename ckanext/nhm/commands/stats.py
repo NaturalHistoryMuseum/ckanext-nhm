@@ -25,7 +25,7 @@ class StatsCommand(CkanCommand):
 
     def command(self):
 
-        # Update datasotre
+        # Update datastore
 
         self._load_config()
 

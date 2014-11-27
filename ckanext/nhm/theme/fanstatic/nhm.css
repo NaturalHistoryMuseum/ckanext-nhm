@@ -1192,6 +1192,7 @@ a.toggle-view-filters:hover {
   background: #EBEBEB;
   padding: 20px;
   display: none;
+  z-index: 999;
 }
 .display-filter .resource-view-filters-wrapper {
   display: block;
