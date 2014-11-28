@@ -72,7 +72,9 @@ def resource_filter_options(resource):
             },
             '_has_lat_long': {
                 'label': 'Has lat/long',
-                'sql': ('"{}"."_geom" IS NOT NULL'.format(table),)
+                 # BS: Changed to look for latitude field,as _geom is only available after a map has been added
+                 # As this works for all DwC, we might get datasets without a map
+                'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(table),)
             },
             '_exclude_centroid': {
                 'label': 'Exclude centroids',
