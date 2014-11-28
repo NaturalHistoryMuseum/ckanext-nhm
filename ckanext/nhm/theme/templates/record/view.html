@@ -30,19 +30,36 @@
                     <header class="page-header">
                         <div class="actions">
                             <ul>
+
+                                <li>
+
+                                    <a data-module="back-button" class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}">
+                                        <i class="icon-circle-arrow-left"></i>
+                                    </a>
+
+                                    {% resource 'ckanext-nhm/back-button' %}
+
+                                </li>
+
                                 <li>
 
                                     {# Taken from ckanpackager/snippets/package_resource.html, but altered anon + auth messages #}
 
                                     {% resource 'ckanext-ckanpackager/main' %}
 
-                                    <a data-module="ckanpackager-download-link" data-module-anon_message="Please enter your email address below, and the record will be packaged and sent to you." data-module-auth_message="The record will be packaged and sent to the email address registered with your account." class="packager-link btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"
+                                    <a data-module="ckanpackager-download-link" data-module-anon_message="Please enter your email address below, and the record will be packaged and sent to you."
+                                       data-module-auth_message="The record will be packaged and sent to the email address registered with your account."
+                                       class="packager-link btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}"
                                        href="{{ h.url_for_package_resource(pkg.id, res.id, extra_filters={'_id': rec['_id']}) }}">
-                                      <i class="icon-download"></i> Download
+                                        <i class="icon-download"></i> Download
                                     </a>
 
                                 </li>
-                                <li>{% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res, rec=rec, link_text="Contact record curator" %}</li>
+
+                                <li>
+                                    {% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res, rec=rec, link_text="Contact record curator" %}
+                                </li>
+
                             </ul>
                         </div>
 
@@ -72,14 +89,15 @@
                             {% for field_name, value in c.field_data.items() %}
                                 {% if h.record_display_field(field_name, value) %}
 
-                                     <tr>
+                                    <tr>
                                         <th>{{ h.field_name_label(field_name) }}:</th>
 
-                                        <td>{{value}}</td>
+                                        <td>{{ value }}</td>
 
                                         <td width="50" class="filterable">
                                             {% if field_name in filter_fields %}
-                                                <a title="View all records where {{ field_name }}={{ value }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
+                                                <a title="View all records where {{ field_name }}={{ value }}"
+                                                   href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
                                                     <i class="icon-filter"></i>
                                                 </a>
                                             {% endif %}
