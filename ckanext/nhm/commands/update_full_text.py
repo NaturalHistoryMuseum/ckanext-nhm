@@ -13,7 +13,7 @@ class UpdateFullTextCommand(CkanCommand):
     Update full text indexes
     Param: ID of the resource to update
 
-    paster update-fulltext -i d1684e71-062a-4514-b98c-f6cbed61c000 -c /vagrant/etc/default/development.ini
+    paster update-fulltext -i b21328c1-2b24-411a-9036-4da280d3eaac -c /vagrant/etc/default/development.ini
     paster update-fulltext -i d1684e71-062a-4514-b98c-f6cbed61c000 -c /etc/ckan/default/development.ini
 
     """
