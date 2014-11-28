@@ -5,7 +5,6 @@ this.ckan.module('back-button', function ($, _) {
 
     var pattern = /view\/([0-9a-z\-]+)/;
 
-
     return {
 
         /* Initialises the module setting up elements and event listeners.
@@ -44,7 +43,6 @@ this.ckan.module('back-button', function ($, _) {
                     return
 
                 }
-
 
             }
 
