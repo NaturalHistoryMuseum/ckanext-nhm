@@ -112,15 +112,16 @@
 
                     {% endblock %}
 
-                    {% block record_map %}
-
-                        {% if c.record_map %}
-                            {% snippet "record/snippets/map.html", extent=c.record_map %}
-                        {% endif %}
-
-                    {% endblock %}
-
                 </div>
+
+                {% block record_map %}
+
+                    {% if c.record_map %}
+                        <h3>Location</h3>
+                        {% snippet "record/snippets/map.html", extent=c.record_map %}
+                    {% endif %}
+
+                {% endblock %}
 
                 {% block record_images %}
                     {% if c.images %}
