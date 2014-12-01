@@ -5,8 +5,13 @@ from ckan.lib.cli import CkanCommand
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
 
 # Dataset type to be automatically added to the vocabulary
-DEFAULT_DATASET_TYPES = ['Collections', 'Library and archives']
-
+DEFAULT_DATASET_TYPES = [
+    'Collections',
+    'Corporate',
+    'Library and archives',
+    'Public engagement',
+    'Research'
+]
 
 class DatasetTypeCommand(CkanCommand):
     """
