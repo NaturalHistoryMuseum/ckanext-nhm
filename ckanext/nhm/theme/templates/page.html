@@ -1,6 +1,7 @@
 {% ckan_extends %}
 
   {% block skip %}
+    {% snippet 'snippets/google_analytics.html' %}
     <img src="/images/beta.png" alt="Beta" id="beta">
     {{ super() }}
   {% endblock %}

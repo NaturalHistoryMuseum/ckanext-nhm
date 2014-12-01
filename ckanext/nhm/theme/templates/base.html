@@ -1,22 +1,7 @@
 {% ckan_extends %}
 
-{% block links %}
-  {{ super() }}
-  {% snippet 'snippets/google_analytics.html' %}
-{% endblock %}
-
 {% block styles %}
   {{ super() }}
   {% resource 'ckanext-nhm-fanstatic/nhm.css' %}
   {% resource 'ckanext-nhm-fanstatic/leaflet.css' %}
-{% endblock %}
-
-{% block scripts %}
-  {{ super() }}
-  {% block googleanalytics_event_tracking %}
-    {% resource 'ckanext-nhm/google_analytics' %}
-    <div class="js-hide" data-module="google-analytics"
-      data-module-googleanalytics_resource_prefix="{{ g.googleanalytics_resource_prefix }}">
-    </div>
-  {% endblock %}
 {% endblock %}
