@@ -1,6 +1,6 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set id = "" %}
+{% set id = h.get_indexlot_resource_id() %}
 {% set title = "Index Lots" %}
 
 {% block image %}
@@ -8,5 +8,5 @@
 {% endblock %}
 
 {% block description %}
-    Hey
+    Species-level records are shown under a record type called an Index Lot. An Index Lot record denotes the presence of that taxon at a particular location in the museum e.g. in the main dry, British dry, slide or spirit collection.
 {% endblock %}
