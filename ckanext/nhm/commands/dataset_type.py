@@ -23,6 +23,7 @@ class DatasetTypeCommand(CkanCommand):
         paster dataset-type create-vocabulary -c /etc/ckan/default/development.ini
 
         paster dataset-type create-type string -c /vagrant/etc/default/development.ini
+        paster dataset-type delete-type specimen -c /etc/ckan/default/development.ini
 
     Where:
         <config> = path to your ckan config file
