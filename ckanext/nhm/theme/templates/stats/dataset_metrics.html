@@ -15,11 +15,19 @@
 {##}
 {#    </section>#}
 
-    <section id="stats-datasets-views">
-        <h4>{{ _('Dataset views') }}</h4>
-        <p>Showing dataset views per month.</p>
-        <div data-module="graph" data-module-data="{{ h.dump_json(c.pageviews) }}" data-module-config="{{ h.dump_json(c.pageviews_options) }}" style="width:100%; height:300px;"></div>
-    </section>
+
+
+        <section id="stats-datasets-views">
+            <h4>{{ _('Dataset views') }}</h4>
+
+            {% if c.pageviews %}
+                <p>Showing dataset views per month.</p>
+                <div data-module="graph" data-module-data="{{ h.dump_json(c.pageviews) }}" data-module-config="{{ h.dump_json(c.pageviews_options) }}" style="width:100%; height:300px;"></div>
+            {% else %}
+                <p>Sorry, we do not have any view statistics for this dataset yet.</p>
+            {% endif %}
+
+        </section>
 
 
 
