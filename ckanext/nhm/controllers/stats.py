@@ -1,7 +1,9 @@
 
+import os
 import ckan.plugins as p
 from ckan.common import _, g, c
 from collections import OrderedDict
+import requests
 import ckan.model as model
 import ckan.logic as logic
 import ckan.lib.base as base
@@ -9,9 +11,10 @@ from ckanext.nhm.lib.helpers import get_datastore_stats, get_contributor_count
 import ckan.lib.helpers as h
 import ckanext.stats.stats as stats_lib
 from datetime import datetime, timedelta
-from ckanext.ga_report.ga_model import GA_Url, GA_Publisher
+from ckan.model import TrackingSummary
 from sqlalchemy import and_
-from datetime import datetime
+from pylons import config
+from sqlalchemy import func
 
 render = base.render
 abort = base.abort
@@ -88,7 +91,18 @@ class StatsController(p.toolkit.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read package %s') % id)
 
-        urls = model.Session.query(GA_Url).filter(and_(GA_Url.package_id == c.pkg_dict['name'], GA_Url.period_name != 'All')).order_by(GA_Url.period_name.asc()).all()
+        date_func = func.date_trunc('month', TrackingSummary.tracking_date)
+
+        q = model.Session.query(
+            date_func.label('date'),
+            func.sum(TrackingSummary.count).label('sum')
+        )
+
+        q = q.filter(and_(TrackingSummary.package_id == c.pkg_dict['id']))
+        q = q.order_by(date_func)
+        q = q.group_by(date_func)
+
+        stats = q.all()
 
         c.pageviews = []
         c.pageviews_options = {
@@ -120,16 +134,53 @@ class StatsController(p.toolkit.BaseController):
         }
 
         # https://github.com/joetsoi/flot-barnumbers
-
-        for i, url in enumerate(urls):
+        for i, stat in enumerate(stats):
 
             # Add the data
-            c.pageviews.append([i, int(url.pageviews)])
+            c.pageviews.append([i, int(stat.sum)])
 
-            # Add the tick values
             #  Convert the period name into something a bit nicer: 2014-11 => Nov 2014
-            label = datetime.strptime(url.period_name, '%Y-%m').strftime('%b %Y')
+            label = stat.date.strftime('%b %Y')
+
+            # label = str(stat.date)
             c.pageviews_options['xaxis']['ticks'].append([i, label])
 
-        return render('stats/dataset_metrics.html')
+        # Try and get resource download metrics - these are per resource
+        # So need to loop through all resources, looking up download stats
+        # Post to /dataset with secret and resource_id, and receive back:
+        #   {
+        #    "status": "success",
+        #    "totals": {
+        #        "..the resource id you specified...": {
+        #            "emails": 2,
+        #            "errors": 0,
+        #            "requests": 2
+        #        }
+        #    }
+        # }
 
+        c.resource_downloads = OrderedDict()
+        c.total_downloads = 0
+
+        endpoint = os.path.join(config.get('ckan.site_url', ''), 'dataset')
+
+        for resource in c.pkg_dict['resources']:
+
+            params = {
+                'secret': config.get("ckanpackager.secret"),
+                'resource_id': resource['id']
+            }
+
+            r = requests.post(endpoint, params)
+
+            try:
+                result = r.json()
+            except ValueError:   # includes simplejson.decoder.JSONDecodeError
+                # No downloads for this resource
+                pass
+            else:
+                total = int(result.totals.emails)
+                c.resource_downloads[resource['name']] = total
+                c.total_downloads += total
+
+        return render('stats/dataset_metrics.html')
