@@ -39,7 +39,7 @@ this.ckan.module('back-button', function ($, _) {
                     });
 
                     this.el.attr('href', href);
-                    this.el.append('Back to search')
+                    this.el.append('Back to resource')
                     return
 
                 }
