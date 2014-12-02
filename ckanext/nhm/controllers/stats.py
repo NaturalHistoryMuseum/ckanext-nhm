@@ -169,8 +169,6 @@ class StatsController(p.toolkit.BaseController):
 
         for resource in c.pkg_dict['resources']:
 
-            resource['id'] = 'b3e83c6c-9415-44ab-9241-31206d80559e'
-
             params = {
                 'secret': config.get("ckanpackager.secret"),
                 'resource_id': resource['id']
