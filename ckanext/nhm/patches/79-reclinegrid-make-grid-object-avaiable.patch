@@ -1,0 +1,16 @@
+diff --git a/ckanext/reclineview/theme/public/vendor/recline/recline.js b/ckanext/reclineview/theme/public/vendor/recline/recline.js
+index 7d348b1..d090270 100644
+--- a/ckanext/reclineview/theme/public/vendor/recline/recline.js
++++ b/ckanext/reclineview/theme/public/vendor/recline/recline.js
+@@ -3706,6 +3706,11 @@ my.SlickGrid = Backbone.View.extend({
+     });
+ 
+     this.grid = new Slick.Grid(this.el, data, visibleColumns, options);
++
++    // Make the grid object available to other plugins, eg.
++    // jQuery('div.recline-slickgrid').get(0).grid
++    this.el.grid = this.grid;
++
+     // Column sorting
+     var sortInfo = this.model.queryState.get('sort');
+     if (sortInfo){
