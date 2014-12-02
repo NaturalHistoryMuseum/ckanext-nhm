@@ -97,5 +97,10 @@ class DatasetTypeCommand(CkanCommand):
         else:
             data = {'id': DATASET_TYPE_VOCABULARY}
             vocabulary = toolkit.get_action('vocabulary_show')(self.context, data)
-            data = {'name': dataset_type, 'vocabulary_id': vocabulary['id']}
-            toolkit.get_action('tag_delete')(self.context, data)
+
+            for tag in vocabulary['tags']:
+                if tag['display_name'] == dataset_type:
+                    print 'Deleting tag %s in vocabulary %s' % (tag['id'], vocabulary['id'])
+                    data = {'id': tag['id'], 'vocabulary_id': vocabulary['id']}
+                    toolkit.get_action('tag_delete')(self.context, data)
+                    break
