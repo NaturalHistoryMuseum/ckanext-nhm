@@ -162,7 +162,7 @@ class StatsController(p.toolkit.BaseController):
         c.resource_downloads = OrderedDict()
         c.total_downloads = 0
 
-        endpoint = os.path.join(config.get('ckan.site_url', ''), 'dataset')
+        endpoint = os.path.join(config.get('ckan.site_url', ''), 'statistics')
 
         for resource in c.pkg_dict['resources']:
 
