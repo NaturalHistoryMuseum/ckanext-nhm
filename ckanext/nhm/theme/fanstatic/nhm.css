@@ -1016,6 +1016,9 @@ i.mineralogy {
 .resources ul.resource-list li.resource-item .btn-group {
   right: 0;
 }
+.resources ul.resource-list li.resource-item .description {
+  max-width: 350px;
+}
 .module-resource {
   border-bottom: none;
 }
