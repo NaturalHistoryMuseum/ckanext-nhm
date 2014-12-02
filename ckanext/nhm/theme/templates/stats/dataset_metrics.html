@@ -33,27 +33,44 @@
 
     {% resource 'ckanext-graph/main' %}
 
-{#    <section id="stats-datasets-downloads">#}
-{#        <h4>{{ _('Downloads') }}</h4>#}
-{#        <table class="table table-chunky table-bordered table-striped">#}
-{#            <thead>#}
-{#                <tr>#}
-{#                    {% for date in c.pageviews %}#}
-{#                        <th>{{ date }}</th>#}
-{#                    {% endfor %}#}
-{#                    <th>Total</th>#}
-{#                </tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#                <tr>#}
-{#                    {% for value in c.pageviews.values() %}#}
-{#                        <td>0</td>#}
-{#                    {% endfor %}#}
-{#                    <td>0</td>#}
-{#                </tr>#}
-{#            </tbody>#}
-{#        </table>#}
-{#    </section>#}
+    <section id="stats-datasets-downloads">
+        <h4>{{ _('Downloads') }}</h4>
+
+        {% if c.resource_downloads %}
+
+            <p>Showing total downloads for this dataset resources</p>
+
+            <table class="table table-chunky table-bordered">
+
+                <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Total downloads</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for resource in c.resource_downloads  %}
+                    <tr>
+                        <th>{% link_for resource['name'], controller='package', action='resource_read', id=c.pkg.name, resource_id=resource['id'] %}</th>
+                        <td>{{ resource['total'] }}</td>
+                    </tr>
+                {% endfor %}
+
+                <tr>
+                    <th>Total</th>
+                    <td>{{ c.total_downloads }}</td>
+                </tr>
+
+                </tbody>
+            </table>
+        {% else %}
+
+            <p>Sorry, we do not have any download statistics for this dataset yet.</p>
+            
+        {% endif %}
+
+    </section>
 
 
 {% endblock %}

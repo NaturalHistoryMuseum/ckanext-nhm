@@ -162,12 +162,14 @@ class StatsController(p.toolkit.BaseController):
         #    }
         # }
 
-        c.resource_downloads = OrderedDict()
+        c.resource_downloads = []
         c.total_downloads = 0
 
         endpoint = os.path.join(config.get("ckanpackager.url"), 'statistics')
 
         for resource in c.pkg_dict['resources']:
+
+            resource['id'] = 'b3e83c6c-9415-44ab-9241-31206d80559e'
 
             params = {
                 'secret': config.get("ckanpackager.secret"),
@@ -182,16 +184,20 @@ class StatsController(p.toolkit.BaseController):
                 # Unable to retrieve download stats for this resource
                 log.critical('ERROR %s: Unable to retrieve download stats for resource %s', r.status_code, resource['id'])
             else:
-
-                print result
-
                 try:
-                    total = int(result.totals.emails)
+                    total = int(result['totals'][resource['id']]['emails'])
                 except AttributeError:
                     # We do not have stats for this resource
                     pass
                 else:
-                    c.resource_downloads[resource['name']] = total
+                    c.resource_downloads.append(
+                        {
+                            'name': resource['name'],
+                            'id': resource['id'],
+                            'total': total
+                         }
+                    )
+
                     c.total_downloads += total
 
         return render('stats/dataset_metrics.html')
