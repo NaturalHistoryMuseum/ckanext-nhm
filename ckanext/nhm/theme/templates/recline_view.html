@@ -1,8 +1,7 @@
 {% ckan_extends %}
 
 {% block page %}
-
-  <div data-module="recline_view"
+  <div data-module="recline_view grid-view-fullscreen"
        data-module-site_url="{{ h.dump_json(h.url('/', locale='default', qualified=true)) }}"
        data-module-resource = "{{ h.dump_json(resource_json) }}"
        data-module-resource-view = "{{ h.dump_json(h.resource_view_state(resource_view_json, resource_json)) }}"
@@ -16,5 +15,6 @@
 
   {% resource 'ckanext-reclineview/main' %}
   {% resource 'ckanext-nhm/slickgrid' %}
+  {% resource 'ckanext-nhm/grid-view-fullscreen' %}
 
 {% endblock %}
