@@ -172,15 +172,18 @@ class StatsController(p.toolkit.BaseController):
             }
 
             r = requests.post(endpoint, params)
+            print r
+            print r.json()
 
-            try:
-                result = r.json()
-            except ValueError:   # includes simplejson.decoder.JSONDecodeError
-                # No downloads for this resource
-                pass
-            else:
-                total = int(result.totals.emails)
-                c.resource_downloads[resource['name']] = total
-                c.total_downloads += total
+
+            # try:
+            #     result = r.json()
+            # except ValueError:   # includes simplejson.decoder.JSONDecodeError
+            #     # No downloads for this resource
+            #     pass
+            # else:
+            #     total = int(result.totals.emails)
+            #     c.resource_downloads[resource['name']] = total
+            #     c.total_downloads += total
 
         return render('stats/dataset_metrics.html')

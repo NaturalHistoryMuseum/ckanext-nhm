@@ -16,7 +16,7 @@ this.ckan.module('resource-view-filters-ui', function($, _) {
     initialize: function () {
       jQuery.proxyAll(this, /_on/);
       self = this;
-      $('<a href="#" class="toggle-view-filters">Advanced search</a>').on('click', this._toggleDisplay).appendTo(self.el);
+      $('<a title="Toggle display of fields and advanced filters" href="#" class="toggle-view-filters">Configure fields & filters</a>').on('click', this._toggleDisplay).appendTo(self.el);
 
       $('body').click(function(e){
           if($(e.target).closest('.resource-view-filters-wrapper').length === 0){

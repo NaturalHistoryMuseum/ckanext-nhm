@@ -220,7 +220,7 @@ img#beta {
 .masthead .nav-pills > .active > a:hover,
 .masthead .nav-pills > .active > a:focus {
   background-color: transparent;
-  background: #2E72A3;
+  background: #195D0D;
   background: rgba(0, 0, 0, 0.2) !important;
 }
 .masthead .nav-pills a:focus {
@@ -1341,6 +1341,9 @@ a.toggle-view-filters:after {
 }
 .resource-view-filter-form .filter-options {
   text-align: center;
+}
+.resource-view-filter-form .filter-options label:after {
+  content: '';
 }
 .resource-view-filter-form .form-actions {
   clear: both;
