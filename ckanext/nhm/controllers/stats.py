@@ -4,6 +4,7 @@ import ckan.plugins as p
 from ckan.common import _, g, c
 from collections import OrderedDict
 import requests
+import logging
 import ckan.model as model
 import ckan.logic as logic
 import ckan.lib.base as base
@@ -24,6 +25,8 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 get_action = logic.get_action
 check_access = logic.check_access
+
+log = logging.getLogger(__name__)
 
 class StatsController(p.toolkit.BaseController):
     """
@@ -162,7 +165,7 @@ class StatsController(p.toolkit.BaseController):
         c.resource_downloads = OrderedDict()
         c.total_downloads = 0
 
-        endpoint = os.path.join(config.get('ckan.site_url', ''), 'statistics')
+        endpoint = os.path.join(config.get("ckanpackager.url"), 'statistics')
 
         for resource in c.pkg_dict['resources']:
 
@@ -172,18 +175,21 @@ class StatsController(p.toolkit.BaseController):
             }
 
             r = requests.post(endpoint, params)
-            print r
-            print r.json()
 
+            try:
+                result = r.json()
+            except ValueError:   # includes simplejson.decoder.JSONDecodeError
+                # Unable to retrieve download stats for this resource
+                log.critical('ERROR %s: Unable to retrieve download stats for resource %s', r.status_code, resource['id'])
+            else:
 
-            # try:
-            #     result = r.json()
-            # except ValueError:   # includes simplejson.decoder.JSONDecodeError
-            #     # No downloads for this resource
-            #     pass
-            # else:
-            #     total = int(result.totals.emails)
-            #     c.resource_downloads[resource['name']] = total
-            #     c.total_downloads += total
+                try:
+                    total = int(result.totals.emails)
+                except AttributeError:
+                    # We do not have stats for this resource
+                    pass
+                else:
+                    c.resource_downloads[resource['name']] = total
+                    c.total_downloads += total
 
         return render('stats/dataset_metrics.html')
