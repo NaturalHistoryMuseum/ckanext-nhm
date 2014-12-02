@@ -955,7 +955,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     if rec_dict:
 
         try:
-            title = rec_dict.get(res_dict['_title_field'], 'Record %s' % rec_dict['_id'])
+            title = rec_dict.get(res_dict['_title_field'], None) or 'Record %s' % rec_dict['_id']
         except KeyError:
             title = 'Record %s' % rec_dict['_id']
 
