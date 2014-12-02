@@ -183,6 +183,8 @@ class StatsController(p.toolkit.BaseController):
                 log.critical('ERROR %s: Unable to retrieve download stats for resource %s', r.status_code, resource['id'])
             else:
 
+                print result
+
                 try:
                     total = int(result.totals.emails)
                 except AttributeError:
