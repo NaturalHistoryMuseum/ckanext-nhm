@@ -184,7 +184,7 @@ class StatsController(p.toolkit.BaseController):
             else:
                 try:
                     total = int(result['totals'][resource['id']]['emails'])
-                except AttributeError:
+                except KeyError:
                     # We do not have stats for this resource
                     pass
                 else:
