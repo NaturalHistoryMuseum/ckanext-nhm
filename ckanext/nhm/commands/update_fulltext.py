@@ -14,7 +14,7 @@ class UpdateFullTextCommand(CkanCommand):
     Param: ID of the resource to update
 
     paster update-fulltext -i b21328c1-2b24-411a-9036-4da280d3eaac -c /vagrant/etc/default/development.ini
-    paster update-fulltext -i d1684e71-062a-4514-b98c-f6cbed61c000 -c /etc/ckan/default/development.ini
+    paster update-fulltext -i de8f5572-cb5a-4e03-9f34-917cb25d2e89 -c /etc/ckan/default/development.ini
 
     """
     summary = __doc__.split('\n')[0]
@@ -52,7 +52,7 @@ class UpdateFullTextCommand(CkanCommand):
         # They need to be wrapped in double quotes (field names; not literal value)
         text_fields = '","'.join([str(field['id']) for field in result.get('fields', []) if field['type'] in ['text', 'citext'] and field['id'] not in self.blacklist])
 
-        sql = u'UPDATE "{resource_id}" SET _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY["{text_fields}"], \' \'))'.format(
+        sql = u'UPDATE "{resource_id}" SET _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY["{text_fields}"], \' \')) WHERE _id=%s'.format(
             resource_id=self.options.resource_id,
             text_fields=text_fields
         )
@@ -61,4 +61,36 @@ class UpdateFullTextCommand(CkanCommand):
             'connection_url': pylons.config['ckan.datastore.write_url']
         }
 
-        _get_engine(data_dict).execute(sql, "catalogNumber", "institutionCode")
+        engine = _get_engine(data_dict)
+
+        connection = engine.raw_connection()
+
+        read_cursor = connection.cursor()
+        write_cursor = connection.cursor()
+
+        read_cursor.execute('SELECT _id FROM "{resource_id}"'.format(
+            resource_id=self.options.resource_id
+        ))
+
+        count = 0
+        incremental_commit_size = 1000
+
+        while 1:
+
+            output = read_cursor.fetchmany(incremental_commit_size)
+
+            if not output:
+                break
+
+            for row in output:
+                write_cursor.execute(sql,([row[0]]))
+
+            #commit, invoked every incremental commit size
+            connection.commit()
+            count = count + incremental_commit_size
+
+            print '%s records updated' % count
+
+        connection.commit()
+
+        print 'Updated full text index for resource %s' % self.options.resource_id

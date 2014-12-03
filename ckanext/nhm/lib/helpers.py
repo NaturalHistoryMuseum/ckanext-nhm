@@ -258,7 +258,7 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
-# @cache_region('short_term', 'collection_stats')
+@cache_region('short_term', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by Collection code

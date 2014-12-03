@@ -175,7 +175,7 @@ class SpecimenView(DefaultView):
             ("catalogueDescription", "Catalogue description"),
         ])),
         ("Record", OrderedDict([
-            ("occurrenceId", "Occurrence ID"),
+            ("occurrenceID", "Occurrence ID"),
             ("modified", "Modified"),
             ("created", "Created"),
             ("recordType", "Record type"),
@@ -239,15 +239,21 @@ class SpecimenView(DefaultView):
         except AttributeError:
             pass
 
-        c.determinations = {}
+        print type(c.record_dict.get('determinations'))
+        print len(c.record_dict.get('determinations', {}))
+
+
+        determinations = json.loads(c.record_dict.get('determinations', '{}'))
+
+        c.record_dict['determinations'] = {}
         c.determinations_count = 0
 
-        if c.record_dict.get('determinations'):
-            for det_type, det_value in json.loads(c.record_dict['determinations']).items():
-                det_type = 'Filed as' if det_type == 'filedAs' else det_type.title()
-                c.determinations[det_type] = det_value.split(';')
-                # Want to use the largest number of determination value
-                c.determinations_count = max(c.determinations_count, len(c.determinations[det_type]))
+        for det_type, det_value in determinations.items():
+            det_type = 'Filed as' if det_type == 'filedAs' else det_type.title()
+            c.record_dict['determinations'][det_type] = det_value.split(';')
+            # Want to use the largest number of determination value
+            c.determinations_count = max(c.determinations_count, len(c.record_dict['determinations'][det_type]))
+
 
         # We do not want custom filters for determinations
         c.custom_filters['determinations'] = None
