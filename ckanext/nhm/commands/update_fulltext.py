@@ -75,7 +75,7 @@ class UpdateFullTextCommand(CkanCommand):
         ))
 
         count = 0
-        incremental_commit_size = 10
+        incremental_commit_size = 1000
 
         while 1:
 
