@@ -38,6 +38,8 @@ class UpdateFullTextCommand(CkanCommand):
 
     def command(self):
 
+        print 'Updating full text index'
+
         # Create the tables
         self._load_config()
 
