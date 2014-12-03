@@ -54,7 +54,7 @@ class UpdateFullTextCommand(CkanCommand):
         # They need to be wrapped in double quotes (field names; not literal value)
         text_fields = '","'.join([str(field['id']) for field in result.get('fields', []) if field['type'] in ['text', 'citext'] and field['id'] not in self.blacklist])
 
-        sql = u'UPDATE "{resource_id}" SET _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY["{text_fields}"], \' \')) WHERE _id=%s'.format(
+        sql = u'UPDATE "{resource_id}" SET _full_text = to_tsvector(ARRAY_TO_STRING(ARRAY["{text_fields}"], \' \'))'.format(
             resource_id=self.options.resource_id,
             text_fields=text_fields
         )
@@ -63,36 +63,6 @@ class UpdateFullTextCommand(CkanCommand):
             'connection_url': pylons.config['ckan.datastore.write_url']
         }
 
-        engine = _get_engine(data_dict)
-
-        connection = engine.raw_connection()
-
-        read_cursor = connection.cursor()
-        write_cursor = connection.cursor()
-
-        read_cursor.execute('SELECT _id FROM "{resource_id}"'.format(
-            resource_id=self.options.resource_id
-        ))
-
-        count = 0
-        incremental_commit_size = 1000
-
-        while 1:
-
-            output = read_cursor.fetchmany(incremental_commit_size)
-
-            if not output:
-                break
-
-            for row in output:
-                write_cursor.execute(sql,([row[0]]))
-
-            #commit, invoked every incremental commit size
-            connection.commit()
-            count = count + incremental_commit_size
-
-            print '%s records updated' % count
-
-        connection.commit()
+        _get_engine(data_dict).execute(sql)
 
         print 'Updated full text index for resource %s' % self.options.resource_id
