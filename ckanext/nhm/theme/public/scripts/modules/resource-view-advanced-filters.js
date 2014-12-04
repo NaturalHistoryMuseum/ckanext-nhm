@@ -76,7 +76,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         .append($displayAllFieldCheckbox)
     );
 
-    $formActions.append($('<button class="btn btn-primary save" type="submit"><i class="icon-search"></i><span>Search</span></button>').click(_submitSearch));
+    $formActions.append($('<button class="btn btn-primary save" type="submit"><i class="icon-search"></i><span>Submit</span></button>').click(_submitSearch));
 
     // Add submit button
     self.el.append($formActions)
