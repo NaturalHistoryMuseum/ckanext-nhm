@@ -63,21 +63,21 @@ ul.slick-contextmenu{
 .controls a.expand {
     display: block;
     float: right;
-    margin-right: 4px;
-    margin-top: 3px;
+    margin-right: 5px;
+    margin-top: 5px;
     width: 26px;
     height: 26px;
     line-height: 26px;
     text-align: center;
     color: #228900;
-    border: 3px solid #228900;
+    border: 1px solid #fff;
     border-radius: 15px;
-    background: #FFF;
 }
 
 .controls a.expand:hover {
     color: #000;
     text-decoration: none;
+    background: #EEE;
 }
 
 /* Fullscreen mode */
