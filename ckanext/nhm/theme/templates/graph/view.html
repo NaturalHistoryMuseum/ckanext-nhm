@@ -1,5 +1,8 @@
 {% ckan_extends %}
 {# Add explanation text about graphs #}
 {% block graph_intro %}
+
+    {% if h.get_specimen_resource_id() == resource['id'] %}
     <p class="text-center empty" style="margin: 10px 0 0 0"><small>These graphs show the date a specimen record was added to the Museum's collection database, and are not indicative of total specimens held in the Museum's collection.</small></p>
+    {% endif %}
 {% endblock %}

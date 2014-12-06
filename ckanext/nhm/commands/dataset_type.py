@@ -10,7 +10,8 @@ DEFAULT_DATASET_TYPES = [
     'Corporate',
     'Library and archives',
     'Public engagement',
-    'Research'
+    'Research',
+    'Citizen Science'
 ]
 
 class DatasetTypeCommand(CkanCommand):
