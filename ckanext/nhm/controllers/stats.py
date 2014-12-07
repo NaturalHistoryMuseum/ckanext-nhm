@@ -4,6 +4,7 @@ import ckan.plugins as p
 from ckan.common import _, g, c
 from collections import OrderedDict
 import requests
+from requests import ConnectionError
 import logging
 import ckan.model as model
 import ckan.logic as logic
@@ -174,13 +175,14 @@ class StatsController(p.toolkit.BaseController):
                 'resource_id': resource['id']
             }
 
-            r = requests.post(endpoint, params)
-
             try:
+                r = requests.post(endpoint, params)
                 result = r.json()
             except ValueError:   # includes simplejson.decoder.JSONDecodeError
                 # Unable to retrieve download stats for this resource
                 log.critical('ERROR %s: Unable to retrieve download stats for resource %s', r.status_code, resource['id'])
+            except ConnectionError, e:
+                log.critical(e)
             else:
                 try:
                     total = int(result['totals'][resource['id']]['emails'])
