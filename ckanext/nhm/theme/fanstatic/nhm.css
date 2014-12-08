@@ -431,7 +431,7 @@ a.btn-danger:hover {
   margin: 0;
 }
 .box .box-text {
-  min-height: 130px;
+  min-height: 90px;
 }
 .box .box-text p {
   margin-bottom: 10px;
