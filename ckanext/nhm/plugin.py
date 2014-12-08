@@ -30,6 +30,15 @@ collection_contacts = {
     'Zoology': 'b.scott@nhm.ac.uk'
 }
 
+# For live
+# collection_contacts = {
+#     'Entomology': 't.howard@nhm.ac.uk',
+#     'Botany': 't.howard@nhm.ac.uk',
+#     'Mineralogy': 'a.hart@nhm.ac.uk',
+#     'Palaeontology': 'm.munt@nhm.ac.uk',
+#     'Zoology': 'c.valentine@nhm.ac.uk'
+# }
+
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
     NHM CKAN modifications
