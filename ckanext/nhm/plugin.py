@@ -166,6 +166,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             # Remove both filter options and field groups from filters
             # These will be handled separately
             options = chain(resource_filter_options(resource).keys(), [FIELD_DISPLAY_FILTER])
+
             for o in options:
                 if o in data_dict['filters']:
                     del data_dict['filters'][o]
@@ -244,11 +245,11 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             if resource_id == specimen_resource_id:
                 department = helpers.get_department(record_dict.get('Collection code'))
                 named_route = 'specimen'
-                mail_dict['subject'] = 'Specimen enquiry'
+                mail_dict['subject'] = 'Collection specimen enquiry'
             else:
                 department = record_dict.get('Department')
                 named_route = 'indexlot'
-                mail_dict['subject'] = 'Index lot enquiry'
+                mail_dict['subject'] = 'Collection Index lot enquiry'
 
             # Add the specific email contact to the built in one (data@nhm.ac.uk)
             mail_dict['recipient_email'] += ', ' + collection_contacts[department]
