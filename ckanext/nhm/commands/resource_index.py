@@ -66,7 +66,7 @@ class ResourceIndexCommand(CkanCommand):
         @return:
         """
 
-        print 'Adding btree index'
+        print 'Adding btree indexes'
 
         for field in datastore.get('fields', []):
             # Ignore any special fields (including _id; that's already indexed)
@@ -75,7 +75,7 @@ class ResourceIndexCommand(CkanCommand):
 
             idx = '_'.join([self.options.resource_id, field['id'], 'idx'])
 
-            sql = 'CREATE INDEX "{idx}" ON "{resource_id}" ({field})'.format(
+            sql = 'CREATE INDEX "{idx}" ON "{resource_id}" ("{field}")'.format(
                 idx=idx,
                 resource_id=self.options.resource_id,
                 field=field['id']
