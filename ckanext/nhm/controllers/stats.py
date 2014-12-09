@@ -12,11 +12,12 @@ import ckan.lib.base as base
 from ckanext.nhm.lib.helpers import get_datastore_stats, get_contributor_count
 import ckan.lib.helpers as h
 import ckanext.stats.stats as stats_lib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from ckan.model import TrackingSummary
 from sqlalchemy import and_
 from pylons import config
 from sqlalchemy import func
+from dateutil import rrule
 
 render = base.render
 abort = base.abort
@@ -95,7 +96,28 @@ class StatsController(p.toolkit.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read package %s') % id)
 
-        date_func = func.date_trunc('month', TrackingSummary.tracking_date)
+        # If this is a new dataset, and we only have recent tracking metrics
+        # We want to show stats per day, rather than per month
+
+        # Get the oldest tracking date
+        oldest_date = model.Session.query(
+            TrackingSummary.tracking_date,
+        ).filter(TrackingSummary.package_id == c.pkg_dict['id']).order_by(TrackingSummary.tracking_date).limit(1).scalar()
+
+        # Calc difference between dates
+        delta = date.today() - oldest_date
+
+        # If we have data for more than 31 days, we'll show by month; otherwise segment by day
+        if delta.days > 31:
+            c.date_interval = 'month'
+            label_formatter = '%b %Y'
+            rrule_interval = rrule.MONTHLY
+        else:
+            c.date_interval = 'day'
+            label_formatter = '%d/%m/%y'
+            rrule_interval = rrule.DAILY
+
+        date_func = func.date_trunc(c.date_interval, TrackingSummary.tracking_date)
 
         q = model.Session.query(
             date_func.label('date'),
@@ -106,8 +128,15 @@ class StatsController(p.toolkit.BaseController):
         q = q.order_by(date_func)
         q = q.group_by(date_func)
 
-        stats = q.all()
+        tracking_stats = {}
 
+        # Create a dictionary of tracking stat results
+        for stat in q.all():
+            # Keyed by formatted date
+            formatted_date = stat.date.strftime(label_formatter)
+            tracking_stats[formatted_date] = int(stat.sum)
+
+        # https://github.com/joetsoi/flot-barnumbers
         c.pageviews = []
         c.pageviews_options = {
             'grid': {
@@ -125,29 +154,34 @@ class StatsController(p.toolkit.BaseController):
                 'show': 1,
                 'align': "center",
                 'zero': 1,
-                'fill': 1,
-                'fillColor': '#D7EDFD',
-                'lineWidth': 0,
-                'barWidth': 0.99,
+                'lineWidth': 0.7,
+                'barWidth': 0.9,
                 'showNumbers': 1,
                 'numbers': {
                     'xAlign': 1,
-                    'yAlign': 1
+                    'yAlign': 1,
+                    'top': -15  # BS: Added this. Need to patch flot.barnumbers properly
                 }
             }
         }
 
-        # https://github.com/joetsoi/flot-barnumbers
-        for i, stat in enumerate(stats):
+        for i, dt in enumerate(rrule.rrule(rrule_interval, dtstart=oldest_date, until=date.today())):
 
-            # Add the data
-            c.pageviews.append([i, int(stat.sum)])
+            formatted_date = dt.strftime(label_formatter)
 
-            #  Convert the period name into something a bit nicer: 2014-11 => Nov 2014
-            label = stat.date.strftime('%b %Y')
+            # Do we have a value from the tracking stats?
+            try:
+                count = tracking_stats[formatted_date]
+            except KeyError:
+                # No value - count is zero
+                count = 0
 
-            # label = str(stat.date)
-            c.pageviews_options['xaxis']['ticks'].append([i, label])
+            # Add data
+            c.pageviews.append([i, count])
+
+            # Add date label to ticks
+            c.pageviews_options['xaxis']['ticks'].append([i, formatted_date])
+
 
         # Try and get resource download metrics - these are per resource
         # So need to loop through all resources, looking up download stats
