@@ -104,83 +104,85 @@ class StatsController(p.toolkit.BaseController):
             TrackingSummary.tracking_date,
         ).filter(TrackingSummary.package_id == c.pkg_dict['id']).order_by(TrackingSummary.tracking_date).limit(1).scalar()
 
-        # Calc difference between dates
-        delta = date.today() - oldest_date
+        # If oldest date is none (no stats yet) we don't want to continue
+        if oldest_date:
+            # Calc difference between dates
+            delta = date.today() - oldest_date
 
-        # If we have data for more than 31 days, we'll show by month; otherwise segment by day
-        if delta.days > 31:
-            c.date_interval = 'month'
-            label_formatter = '%b %Y'
-            rrule_interval = rrule.MONTHLY
-        else:
-            c.date_interval = 'day'
-            label_formatter = '%d/%m/%y'
-            rrule_interval = rrule.DAILY
+            # If we have data for more than 31 days, we'll show by month; otherwise segment by da
+            if delta.days > 31:
+                c.date_interval = 'month'
+                label_formatter = '%b %Y'
+                rrule_interval = rrule.MONTHLY
+            else:
+                c.date_interval = 'day'
+                label_formatter = '%d/%m/%y'
+                rrule_interval = rrule.DAILY
 
-        date_func = func.date_trunc(c.date_interval, TrackingSummary.tracking_date)
+            date_func = func.date_trunc(c.date_interval, TrackingSummary.tracking_date)
 
-        q = model.Session.query(
-            date_func.label('date'),
-            func.sum(TrackingSummary.count).label('sum')
-        )
+            q = model.Session.query(
+                date_func.label('date'),
+                func.sum(TrackingSummary.count).label('sum')
+            )
 
-        q = q.filter(and_(TrackingSummary.package_id == c.pkg_dict['id']))
-        q = q.order_by(date_func)
-        q = q.group_by(date_func)
+            q = q.filter(and_(TrackingSummary.package_id == c.pkg_dict['id']))
+            q = q.order_by(date_func)
+            q = q.group_by(date_func)
 
-        tracking_stats = {}
+            tracking_stats = {}
 
-        # Create a dictionary of tracking stat results
-        for stat in q.all():
-            # Keyed by formatted date
-            formatted_date = stat.date.strftime(label_formatter)
-            tracking_stats[formatted_date] = int(stat.sum)
+            # Create a dictionary of tracking stat results
+            for stat in q.all():
+                # Keyed by formatted date
+                formatted_date = stat.date.strftime(label_formatter)
+                tracking_stats[formatted_date] = int(stat.sum)
 
-        # https://github.com/joetsoi/flot-barnumbers
-        c.pageviews = []
-        c.pageviews_options = {
-            'grid': {
-                'borderWidth': {'top': 0, 'right': 0, 'bottom': 1, 'left': 1},
-                'borderColor': "#D4D4D4"
-            },
-            'xaxis': {
-                'ticks': [],
-                'tickLength': 0
-            },
-            'yaxis': {
-                'tickLength': 0
-            },
-            'bars': {
-                'show': 1,
-                'align': "center",
-                'zero': 1,
-                'lineWidth': 0.7,
-                'barWidth': 0.9,
-                'showNumbers': 1,
-                'numbers': {
-                    'xAlign': 1,
-                    'yAlign': 1,
-                    'top': -15  # BS: Added this. Need to patch flot.barnumbers properly
+            # https://github.com/joetsoi/flot-barnumbers
+            c.pageviews = []
+            c.pageviews_options = {
+                'grid': {
+                    'borderWidth': {'top': 0, 'right': 0, 'bottom': 1, 'left': 1},
+                    'borderColor': "#D4D4D4"
+                },
+                'xaxis': {
+                    'ticks': [],
+                    'tickLength': 0
+                },
+                'yaxis': {
+                    'tickLength': 0
+                },
+                'bars': {
+                    'show': 1,
+                    'align': "center",
+                    'zero': 1,
+                    'lineWidth': 0.7,
+                    'barWidth': 0.9,
+                    'showNumbers': 1,
+                    'numbers': {
+                        'xAlign': 1,
+                        'yAlign': 1,
+                        'top': -15  # BS: Added this. Need to patch flot.barnumbers properly
+                    }
                 }
             }
-        }
 
-        for i, dt in enumerate(rrule.rrule(rrule_interval, dtstart=oldest_date, until=date.today())):
+            for i, dt in enumerate(rrule.rrule(rrule_interval, dtstart=oldest_date, until=date.today())):
 
-            formatted_date = dt.strftime(label_formatter)
+                formatted_date = dt.strftime(label_formatter)
 
-            # Do we have a value from the tracking stats?
-            try:
-                count = tracking_stats[formatted_date]
-            except KeyError:
-                # No value - count is zero
-                count = 0
+                # Do we have a value from the tracking stats?
+                try:
+                    count = tracking_stats[formatted_date]
+                except KeyError:
+                    # No value - count is zero
+                    count = 0
 
-            # Add data
-            c.pageviews.append([i, count])
+                # Add data
+                c.pageviews.append([i, count])
 
-            # Add date label to ticks
-            c.pageviews_options['xaxis']['ticks'].append([i, formatted_date])
+                # Add date label to ticks
+                c.pageviews_options['xaxis']['ticks'].append([i, formatted_date])
 
 
         # Try and get resource download metrics - these are per resource
