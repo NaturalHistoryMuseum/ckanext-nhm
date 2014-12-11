@@ -6,7 +6,6 @@ import re
 import os
 
 from beaker.cache import cache_region
-from sqlalchemy import func
 from pylons import config
 from collections import OrderedDict
 
@@ -258,13 +257,12 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
-@cache_region('short_term', 'collection_stats')
+@cache_region('permanent', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by Collection code
     @return:
     """
-
     resource_id = get_specimen_resource_id()
 
     if not resource_id:

@@ -3,6 +3,7 @@ import re
 import ckan.plugins as p
 import ckan.logic as logic
 import ckan.model as model
+from beaker.cache import region_invalidate
 from ckan.common import c, request
 from ckan.lib.helpers import url_for
 from itertools import chain
@@ -10,6 +11,7 @@ import ckan.lib.navl.dictization_functions as dictization_functions
 import ckanext.nhm.logic.action as action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
+import logging
 from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
@@ -20,6 +22,8 @@ get_action = logic.get_action
 unflatten = dictization_functions.unflatten
 
 Invalid = p.toolkit.Invalid
+
+log = logging.getLogger(__name__)
 
 # Contact addresses to route specimen contact request to
 collection_contacts = {
@@ -294,3 +298,21 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             mail_dict['body'] += '\n' + url
 
         return mail_dict
+
+    ## IPackageController
+    def after_update(self, context, pkg_dict):
+        """
+        If this is the specimen resource, clear memcached
+
+        NB: Our version of ckan doesn't have the IResource after_update method
+        But updating a resource calls IPackageController.after_update
+        @param context:
+        @param resource:
+        @return:
+        """
+
+        for resource in pkg_dict.get('resources'):
+            # If this is the specimen resource ID, clear the collection stats
+            if helpers.get_specimen_resource_id() == resource['id']:
+                region_invalidate(helpers.collection_stats, None, 'collection_stats')
+                log.info('Cleared collection stats cache')
