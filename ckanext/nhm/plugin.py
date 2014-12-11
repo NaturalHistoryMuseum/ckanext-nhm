@@ -313,6 +313,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         for resource in pkg_dict.get('resources'):
             # If this is the specimen resource ID, clear the collection stats
-            if helpers.get_specimen_resource_id() == resource['id']:
+            if 'id' in resource and helpers.get_specimen_resource_id() == resource['id']:
                 region_invalidate(helpers.collection_stats, None, 'collection_stats')
                 log.info('Cleared collection stats cache')
