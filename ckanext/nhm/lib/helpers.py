@@ -210,7 +210,7 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
-
+@cache_region('permanent', 'collection_stats')
 def indexlot_count():
 
     resource_id = get_indexlot_resource_id()
@@ -220,7 +220,7 @@ def indexlot_count():
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    sql = 'SELECT COUNT(_id) AS count FROM "{resource_id}"'.format(resource_id=resource_id)
+    sql = 'SELECT COUNT(*) AS count FROM "{resource_id}"'.format(resource_id=resource_id)
 
     try:
         result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
