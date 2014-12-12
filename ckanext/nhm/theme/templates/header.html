@@ -14,15 +14,6 @@
 {% block header_site_search %}
 {% endblock %}
 
-{# Only show the settings link if user isn't LDAP #}
-{% block header_account_settings_link %}
-
-    {% if not h.is_ldap_user() %}
-        {{ super() }}
-    {% endif %}
-
-{% endblock %}
-
 {% block header_wrapper %}
     <header class="masthead">
         <div class="container">
@@ -49,9 +40,70 @@
                 </div>
 
                 <div class="span3">
+
+                    {# Accessibility fix - links need to have text #}
                     {% block header_account_container_content %}
-                        {{ super() }}
+                        {% if c.userobj %}
+                          <div class="account avatar authed" data-module="me" data-me="{{ c.userobj.id }}">
+                            <ul class="unstyled">
+                              {% block header_account_logged %}
+                              {% if c.userobj.sysadmin %}
+                                <li>
+                                  <a href="{{ h.url_for(controller='admin', action='index') }}" title="{{ _('Sysadmin settings') }}">
+                                    <span class="sr-only">Sysadmin settings</span>
+                                    <i class="icon-legal"></i>
+                                  </a>
+                                </li>
+                              {% endif %}
+                              <li>
+                                <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" class="image" title="{{ _('View profile') }}">
+                                  {{ h.accessible_gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22, userobj=c.userobj) }}
+                                  <span class="username">{{ c.userobj.display_name }}</span>
+                                </a>
+                              </li>
+                              {% set new_activities = h.new_activities() %}
+                              <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+                                {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
+                                <a href="{{ h.url_for(controller='user', action='dashboard') }}" title="{{ notifications_tooltip }}">
+                                  <i class="icon-dashboard"></i>
+                                  <span>{{ new_activities }}</span>
+                                </a>
+                              </li>
+                              {% block header_account_settings_link %}
+                                {% if not h.is_ldap_user() %}
+                                <li>
+                                  <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
+                                    <span class="sr-only">Edit settings</span>
+                                    <i class="icon-cog"></i>
+                                  </a>
+                                </li>
+                                {% endif %}
+                              {% endblock %}
+                              {% block header_account_log_out_link %}
+                                <li>
+                                  <a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">
+                                    <span class="sr-only">Log out</span>
+                                    <i class="icon-signout"></i>
+                                  </a>
+                                </li>
+                              {% endblock %}
+                              {% endblock %}
+                            </ul>
+                          </div>
+                        {% else %}
+                          <nav class="account not-authed">
+                            <ul class="unstyled">
+                              {% block header_account_notlogged %}
+                              <li>{% link_for _('Log in'), controller='user', action='login' %}</li>
+                              {% if h.check_access('user_create') %}
+                                <li>{% link_for _('Register'), controller='user', action='register', class_='sub' %}</li>
+                              {% endif %}
+                              {% endblock %}
+                            </ul>
+                          </nav>
+                        {% endif %}
                     {% endblock %}
+
                 </div>
             </div>
 

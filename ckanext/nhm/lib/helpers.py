@@ -13,7 +13,8 @@ import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
-from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, get_allowed_view_types as ckan_get_allowed_view_types
+from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, _VALID_GRAVATAR_DEFAULTS, get_allowed_view_types as ckan_get_allowed_view_types
+from webhelpers.html import literal
 
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
@@ -972,3 +973,25 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
         pass
 
     return ' '.join(text)
+
+def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
+    """
+    Port of ckan helper gravatar
+    Adds title text to the image so it passes accessibility checks
+    @param email_hash:
+    @param size:
+    @param default:
+    @param userobj:
+    @return:
+    """
+    if default is None:
+        default = config.get('ckan.gravatar_default', 'identicon')
+
+    if not default in _VALID_GRAVATAR_DEFAULTS:
+        # treat the default as a url
+        default = urllib.quote(default, safe='')
+
+    return literal('''<img alt="%s" src="//gravatar.com/avatar/%s?s=%d&amp;d=%s"
+        class="gravatar" width="%s" height="%s" />'''
+                   % (userobj.name, email_hash, size, default, size, size)
+                   )
