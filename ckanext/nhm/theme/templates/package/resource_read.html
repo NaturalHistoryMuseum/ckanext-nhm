@@ -58,7 +58,7 @@
         <li>{% link_for _('Manage'), controller='package', action='resource_edit', id=pkg.name, resource_id=res.id, class_='btn', icon='wrench' %}</li>
     {% endif %}
 
-    {% snippet 'package/snippets/resource_link.html', res=res, pkg=pkg %}
+        <li>{% snippet 'package/snippets/resource_link.html', res=res, pkg=pkg %}</li>
 
     {% if 'datastore' in g.plugins and res.datastore_active %}
         <li>{% snippet 'package/snippets/data_api_button.html', resource=res, datastore_root_url=c.datastore_api %}</li>
