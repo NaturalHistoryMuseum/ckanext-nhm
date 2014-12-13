@@ -121,7 +121,7 @@ def resource_filter_get_cookie(resource_id=None):
     """
     try:
         cookie = json.loads(request.cookies[HIDDEN_FIELDS_COOKIE_NAME])
-    except KeyError:
+    except Exception:
         return {}
 
     if resource_id:
