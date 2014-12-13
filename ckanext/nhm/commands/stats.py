@@ -22,6 +22,8 @@ class StatsCommand(CkanCommand):
 
     def command(self):
 
+        print 'Updating stats'
+
         # Update datastore
 
         self._load_config()
@@ -59,4 +61,4 @@ class StatsCommand(CkanCommand):
 
         model.Session.commit()
 
-        log.info('Stats updated')
+        print 'Stats updated'
