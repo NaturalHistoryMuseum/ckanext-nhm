@@ -310,7 +310,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         @return:
         """
 
-        for resource in pkg_dict.get('resources'):
+        for resource in pkg_dict.get('resources', []):
             # If this is the specimen resource ID, clear the collection stats
 
             if 'id' in resource:
