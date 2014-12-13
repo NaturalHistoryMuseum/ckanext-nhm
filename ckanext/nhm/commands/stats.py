@@ -10,6 +10,7 @@ log = logging.getLogger()
 class StatsCommand(CkanCommand):
     """
     Every time this command is run, the datastore_stats table is updated with record counts from the datastore
+    Needs to run from there - rather than on resource update - as datapusher won't have added records to the datastore
 
     paster --plugin=ckanext-nhm stats  -c /etc/ckan/default/development.ini
 
