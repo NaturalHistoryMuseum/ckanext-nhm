@@ -5,7 +5,7 @@ import ckan.model as model
 from ckan.lib.cli import CkanCommand
 from ckanext.nhm.model.stats import DatastoreStats
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 class StatsCommand(CkanCommand):
     """
@@ -22,11 +22,9 @@ class StatsCommand(CkanCommand):
 
     def command(self):
 
-        print 'Updating stats'
-
-        # Update datastore
-
         self._load_config()
+
+        log.info('Updating stats')
 
         # Set up context
         user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
@@ -61,4 +59,4 @@ class StatsCommand(CkanCommand):
 
         model.Session.commit()
 
-        print 'Stats updated'
+        log.info('Stats updated')
