@@ -4,6 +4,7 @@ import json
 import urllib
 import re
 import os
+import urllib
 
 from beaker.cache import cache_region
 from pylons import config
@@ -972,7 +973,9 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     except KeyError:
         pass
 
-    return ' '.join(text)
+    text = ' '.join(text)
+
+    return urllib.quote(text)
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     """

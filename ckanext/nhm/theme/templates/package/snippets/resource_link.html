@@ -1,21 +1,18 @@
 {% if res.url %}
-  <li>
-      {% if res.resource_type in ('listing', 'service') %}
-        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-            <i class="icon-eye-open"></i> {{ _('View') }}
-        </a>
-      {% elif res.resource_type == 'api' %}
-        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-            <i class="icon-key"></i> {{ _('API Endpoint') }}
-        </a>
-      {% elif h.downloadable(res) %}
-        {% snippet 'ckanpackager/snippets/package_resource.html',
-       res=res, pkg=pkg, bt_class="icon-cloud-download", bt_text=_('Download') %}
-      {% else %}
-        <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-            <i class="icon-external-link"></i> {{ _('Go to resource') }}
-        </a>
-      {% endif %}
+  {% if res.resource_type in ('listing', 'service') %}
+    <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
+        <i class="icon-eye-open"></i> {{ _('View') }}
     </a>
-  </li>
+  {% elif res.resource_type == 'api' %}
+    <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
+        <i class="icon-key"></i> {{ _('API Endpoint') }}
+    </a>
+  {% elif h.downloadable(res) %}
+    {% snippet 'ckanpackager/snippets/package_resource.html',
+   res=res, pkg=pkg, bt_class="icon-cloud-download", bt_text=_('Download') %}
+  {% else %}
+    <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
+        <i class="icon-external-link"></i> {{ _('Go to resource') }}
+    </a>
+  {% endif %}
 {% endif %}
