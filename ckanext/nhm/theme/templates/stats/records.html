@@ -7,6 +7,29 @@
 
 {% block stats_content %}
 
+      <section id="stats-total-datasets">
+      <h4>{{ _('Total number of records') }}</h4>
+
+      {% set xaxis = {'mode': 'time', 'timeformat': '%d-%m-%y'} %}
+      {% set yaxis = {'min': 0, 'tickDecimals': 0} %}
+      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
+        <thead>
+          <tr>
+            <th>{{ _("Date") }}</th>
+            <th>{{ _("Records") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in c.num_records %}
+            <tr>
+              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
+              <td>{{ row.count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
     <section id="stats-record-count">
       <h4>{{ _('Records per dataset') }}</h4>
 
@@ -37,31 +60,8 @@
         </tbody>
       </table>
 
-      <section id="stats-total-datasets">
-      <h4>{{ _('Total number of records') }}</h4>
+      </section>
 
-      {% set xaxis = {'mode': 'time', 'timeformat': '%d-%m-%y'} %}
-      {% set yaxis = {'min': 0, 'tickDecimals': 0} %}
-      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
-        <thead>
-          <tr>
-            <th>{{ _("Date") }}</th>
-            <th>{{ _("Records") }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in c.num_records %}
-            <tr>
-              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
-              <td>{{ row.count }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-
-      <p class="info">Record statistics are updated daily - these figures were last updated on {{ h.render_datetime(c.datastore_stats['date']) }} </p>
-
-    </section>
+    <p class="info">Record statistics are updated daily - these figures were last updated on {{ h.render_datetime(c.datastore_stats['date']) }} </p>
 
 {% endblock %}

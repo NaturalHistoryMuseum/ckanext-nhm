@@ -13,7 +13,7 @@ from ckanext.nhm.lib.helpers import get_datastore_stats, get_contributor_count
 import ckan.lib.helpers as h
 import ckanext.stats.stats as stats_lib
 from datetime import datetime, timedelta, date
-from ckan.model import TrackingSummary
+from ckan.model import TrackingSummary, Resource
 from sqlalchemy import and_
 from pylons import config
 from sqlalchemy import func
@@ -45,18 +45,63 @@ class StatsController(p.toolkit.BaseController):
         except NotAuthorized:
             abort(401, _('Not authorized to see this page'))
 
-    def datasets(self):
+    def resources(self):
 
-        rev_stats = stats_lib.RevisionStats()
+        # Get the oldest tracking date
+        oldest_created_date = model.Session.query(
+            Resource.created,
+        ).order_by(Resource.created).limit(1).scalar()
 
-        c.num_packages_by_week = rev_stats.get_num_packages_by_week()
+        # If oldest date is none (no stats yet) we don't want to continue
+        if oldest_created_date:
+            # Calc difference between dates
 
-        # Used in new CKAN templates gives more control to the templates for formatting.
-        c.raw_packages_by_week = []
-        for week_date, num_packages, cumulative_num_packages in c.num_packages_by_week:
-            c.raw_packages_by_week.append({'date': h.date_str_to_datetime(week_date), 'total_packages': cumulative_num_packages})
+            delta = datetime.now() - oldest_created_date
 
-        return p.toolkit.render('stats/datasets.html', {'title': 'Dataset statistics'})
+        # If we have data for more than 31 days, we'll show by month; otherwise segment by da
+        if delta.days > 20:
+            c.date_interval = 'month'
+            label_formatter = '%b %Y'
+        else:
+            c.date_interval = 'day'
+            label_formatter = '%d/%m/%y'
+
+        date_func = func.date_trunc(c.date_interval, Resource.created)
+
+        q = model.Session.query(
+            date_func.label('date'),
+            func.count().label('count')
+        )
+
+        q = q.order_by(date_func)
+        q = q.group_by(date_func)
+
+        c.graph_options = {
+            'series': {
+                'lines': {'show': True},
+                'points': {'show': True}
+            },
+            'xaxis': {
+                'mode': 'time',
+                'ticks': []
+            },
+            'yaxis': {
+                'tickDecimals': 0
+            }
+        }
+
+        c.graph_data = []
+        total = 0
+
+        for i, stat in enumerate(q.all()):
+            total += stat.count
+            c.graph_data.append([i, total])
+
+            formatted_date = stat.date.strftime(label_formatter)
+            c.graph_options['xaxis']['ticks'].append([i, formatted_date])
+
+        return p.toolkit.render('stats/resources.html', {'title': 'Resource statistics'})
+
 
     def contributors(self):
 
