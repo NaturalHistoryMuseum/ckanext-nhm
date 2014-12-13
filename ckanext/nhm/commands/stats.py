@@ -4,8 +4,6 @@ from ckan.plugins import toolkit
 import ckan.model as model
 from ckan.lib.cli import CkanCommand
 from ckanext.nhm.model.stats import DatastoreStats
-from sqlalchemy import desc
-from datetime import datetime
 
 log = logging.getLogger()
 
@@ -13,9 +11,7 @@ class StatsCommand(CkanCommand):
     """
     Every time this command is run, the datastore_stats table is updated with record counts from the datastore
 
-
-    paster stats -c /vagrant/etc/default/development.ini
-    paster stats  -c /etc/ckan/default/development.ini
+    paster --plugin=ckanext-nhm stats  -c /etc/ckan/default/development.ini
 
     """
     summary = __doc__.split('\n')[0]
@@ -28,13 +24,6 @@ class StatsCommand(CkanCommand):
         # Update datastore
 
         self._load_config()
-
-        recent_date = model.Session.query(DatastoreStats.date).order_by(desc(DatastoreStats.date)).limit(1).scalar()
-
-        # If we already have values for this date, do not rerun
-        if recent_date and recent_date.date() == datetime.today().date():
-            print 'Datastore stats already updated today - skipping'
-            return
 
         # Set up context
         user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
@@ -68,3 +57,5 @@ class StatsCommand(CkanCommand):
                 model.Session.add(stats)
 
         model.Session.commit()
+
+        log.info('Stats updated')
