@@ -11,7 +11,7 @@ DEFAULT_DATASET_TYPES = [
     'Library and archives',
     'Public engagement',
     'Research',
-    'Citizen Science'
+    'Citizen science'
 ]
 
 class DatasetTypeCommand(CkanCommand):
@@ -23,8 +23,10 @@ class DatasetTypeCommand(CkanCommand):
         paster dataset-type create-vocabulary -c /vagrant/etc/default/development.ini
         paster dataset-type create-vocabulary -c /etc/ckan/default/development.ini
 
-        paster dataset-type create-type string -c /vagrant/etc/default/development.ini
+        paster --plugin=ckanext-nhm dataset-type create-type 'Citizen Science' -c /etc/ckan/default/development.ini
         paster dataset-type delete-type specimen -c /etc/ckan/default/development.ini
+
+
 
     Where:
         <config> = path to your ckan config file
