@@ -207,13 +207,13 @@ img#beta {
 .masthead .navigation {
   float: right !important;
 }
-.masthead .nav-pills {
+.masthead .navigation .nav-pills {
   margin-top: 24px;
 }
-.masthead .nav-pills li {
+.masthead .navigation .nav-pills li {
   margin: 0 5px;
 }
-.masthead .nav-pills a {
+.masthead .navigation .nav-pills a {
   -o-transition: .5s;
   -ms-transition: .5s;
   -moz-transition: .5s;
@@ -224,17 +224,18 @@ img#beta {
   text-transform: uppercase;
   font-weight: normal;
 }
-.masthead .nav-pills li.active a,
-.masthead .nav-pills a:hover,
-.masthead .nav-pills > .active > a,
-.masthead .nav-pills > .active > a:hover,
-.masthead .nav-pills > .active > a:focus {
+.masthead .navigation .nav-pills li.active a,
+.masthead .navigation .nav-pills a:hover,
+.masthead .navigation .nav-pills > .active > a,
+.masthead .navigation .nav-pills li.active a,
+.masthead .navigation .nav-pills > .active > a:hover,
+.masthead .navigation .nav-pills > .active > a:focus {
   background-color: transparent;
   background: #195D0D;
   background: rgba(0, 0, 0, 0.2) !important;
 }
-.masthead .nav-pills a:focus {
-  background: none!important;
+.masthead .navigation .nav-pills a:focus {
+  background: none !important;
 }
 /* Extended masthead */
 .extended-masthead {

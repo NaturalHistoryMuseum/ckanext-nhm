@@ -231,9 +231,8 @@ img#beta{
 
   .navigation {
     float: right !important;
-  }
 
-  .nav-pills {
+      .nav-pills {
     margin-top: 24px;
   }
 
@@ -253,20 +252,23 @@ img#beta{
     font-weight: normal;
   }
 
-  .nav-pills li.active a,
-  .nav-pills a:hover,
-  .nav-pills > .active > a,
-  .nav-pills > .active > a:hover,
-  .nav-pills > .active > a:focus {
-    background-color: transparent;
-    background: #195D0D;
-    background: rgba(0, 0, 0, 0.2) !important;
-  }
-
-  // Fix for IE9, which gets the focus state stuck
-    .nav-pills a:focus{
-      background:none!important;
+    .nav-pills li.active a,
+    .nav-pills a:hover,
+    .nav-pills > .active > a,
+    .nav-pills li.active a,
+    .nav-pills > .active > a:hover,
+    .nav-pills > .active > a:focus {
+      background-color: transparent;
+      background: #195D0D;
+      background: rgba(0, 0, 0, 0.2) !important;
     }
+
+    // Fix for IE9, which gets the focus state stuck
+    .nav-pills a:focus {
+      background: none !important;
+    }
+
+  }
 
 }
 
