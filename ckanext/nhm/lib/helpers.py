@@ -330,8 +330,7 @@ def api_doc_link():
     @return:
     """
     attr= {'class': 'external', 'target': '_blank'}
-    # TODO: Change to http://docs.nhm.apiary.io/
-    return link_to(_('API Docs'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
+    return link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 
 def get_google_analytics_config():
