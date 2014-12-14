@@ -7,8 +7,6 @@
         {% snippet 'package/snippets/resource_view_full_text_search.html', resource_view=resource_view, resource=resource, package=package, filters=query_params['filters'] %}
     </div>
 
-
-
     <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">
 
         <div class="resource-view-filters-wrapper">
@@ -40,7 +38,7 @@
                     <span class="facet">{{ field }}:</span>
                     {% for value, filter in pills.items() %}
                         <span class="filtered pill">{{ value }}
-                            <a href="{{ h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], filters=filter) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
+                            <a href="{{ h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], filters=filter, q=query_params['q']) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
                         </span>
                     {% endfor %}
                 {% endfor %}
