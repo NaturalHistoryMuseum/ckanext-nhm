@@ -5,3 +5,8 @@
     {{ c.about_formatted }}
   {% endif %}
 {% endblock %}
+
+{% block breadcrumb_content %}
+  {# Remove user from breadcrumb {{ h.build_nav('user_index', _('Users')) }} #}
+  {{ h.build_nav('user_datasets', user.display_name|truncate(35), id=user.name) }}
+{% endblock %}
