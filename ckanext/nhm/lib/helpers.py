@@ -845,7 +845,7 @@ def get_contact_form_category_options():
     Contact form category
     @return:
     """
-    options = ['None', 'Request information', 'Suggest update']
+    options = ['', 'Request information', 'Suggest update']
     return list_to_form_options(options)
 
 

@@ -292,6 +292,11 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 else:
                     url = url_for(controller='package', action='read', id=package_id, qualified=True)
 
+        contact_type = data_dict.get('contact_type', None)
+
+        if contact_type:
+            mail_dict['body'] += '\nContact type: %s\n' % contact_type
+
         # If we have a URL append it to the message body
         if url:
             mail_dict['body'] += '\n' + url
