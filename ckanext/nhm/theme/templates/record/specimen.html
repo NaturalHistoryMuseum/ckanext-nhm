@@ -51,7 +51,7 @@
 
                                     {% elif field == 'collectionCode' %}
                                         {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
-                                    {% elif field in ['scientificName', 'genus', 'specificEpithet'] %}
+                                    {% elif field in ['genus', 'specificEpithet'] %}
                                         <em>{{ c.record_dict[field] }}</em>
                                     {% else %}
                                         {{ c.record_dict[field] }}
