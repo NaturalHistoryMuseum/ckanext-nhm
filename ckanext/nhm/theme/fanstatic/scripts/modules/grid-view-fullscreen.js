@@ -90,9 +90,9 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
           } else {
             height = self._base_height;
           }
-          console.log(height);
           $grid.height(height);
           grid.resizeCanvas();
+          grid.autosizeColumns();
         }, 250);
       }
     }
