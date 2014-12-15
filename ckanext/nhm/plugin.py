@@ -264,7 +264,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 mail_dict['subject'] = 'Collection Index lot enquiry'
 
             # Add the specific email contact to the built in one (data@nhm.ac.uk)
-            mail_dict['recipient_email'] += ', ' + collection_contacts[department]
+            mail_dict['recipient_email'] = collection_contacts[department]
             mail_dict['recipient_name'] = '%s collection manager' % department
 
             url = url_for(named_route, action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
@@ -279,7 +279,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 user_obj = model.User.get(package_dict['creator_user_id'])
 
                 # Update send to with creator username
-                mail_dict['recipient_email'] += ', ' + user_obj.email
+                mail_dict['recipient_email'] = user_obj.email
                 mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
 
                 if resource_id:
@@ -295,6 +295,12 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # If we have a URL append it to the message body
         if url:
             mail_dict['body'] += '\n' + url
+
+        # If this is being directed to someone other than @daat@nhm.ac.uk
+        # Ensure data@nhm.ac.uk is copied in
+
+        if mail_dict['recipient_email'] != 'data@nhm.ac.uk':
+            mail_dict['headers']['cc'] = 'data@nhm.ac.uk'
 
         return mail_dict
 
