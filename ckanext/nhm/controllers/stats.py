@@ -59,7 +59,7 @@ class StatsController(p.toolkit.BaseController):
             delta = datetime.now() - oldest_created_date
 
         # If we have data for more than 31 days, we'll show by month; otherwise segment by da
-        if delta.days > 20:
+        if delta.days > 10:
             c.date_interval = 'month'
             label_formatter = '%b %Y'
         else:
@@ -155,7 +155,7 @@ class StatsController(p.toolkit.BaseController):
             delta = date.today() - oldest_date
 
             # If we have data for more than 31 days, we'll show by month; otherwise segment by da
-            if delta.days > 31:
+            if delta.days > 10:
                 c.date_interval = 'month'
                 label_formatter = '%b %Y'
                 rrule_interval = rrule.MONTHLY
