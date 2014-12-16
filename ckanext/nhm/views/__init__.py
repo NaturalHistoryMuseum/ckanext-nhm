@@ -8,4 +8,4 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 from ckanext.nhm.views.default import DefaultView
 from ckanext.nhm.views.specimen import SpecimenView
 from ckanext.nhm.views.dwc import DarwinCoreView
-# from indexlot import IndexLotController
+from ckanext.nhm.views.indexlot import IndexLotView
