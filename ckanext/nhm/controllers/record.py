@@ -86,16 +86,16 @@ class RecordController(base.BaseController):
         # Sanity check: image field hasn't been set to _id
         if field_names['image'] and field_names['image'] != '_id':
 
-            description = None
+            description = ['<small>&copy; The Trustees of the Natural History Museum, London</small>']
             licence_id = c.resource.get('_image_licence', None)
 
             if licence_id:
                 licence = model.Package.get_license_register()[licence_id]
-                description = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
+                description.insert(0, 'Licence: %s' % link_to(licence.title, licence.url, target='_blank'))
 
             try:
                 # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                c.images = [{'modal_title': c.record_title, 'url': image.strip(), 'description': description} for image in c.record_dict.pop(field_names['image']).split(';') if image.strip()]
+                c.images = [{'modal_title': c.record_title, 'url': image.strip(), 'description': '<br />'.join(description)} for image in c.record_dict.pop(field_names['image']).split(';') if image.strip()]
             except (KeyError, AttributeError):
                 # Skip errors - there are no images
                 pass
