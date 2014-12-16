@@ -50,14 +50,14 @@ def record_get_schema():
 def create_package_schema():
     schema = default_create_package_schema()
     _modify_schema(schema)
-    doi_modify_create_package_schema(schema)
+    # doi_modify_create_package_schema(schema)
     return schema
 
 
 def update_package_schema():
     schema = default_update_package_schema()
     _modify_schema(schema)
-    doi_modify_update_package_schema(schema)
+    # doi_modify_update_package_schema(schema)
     return schema
 
 
