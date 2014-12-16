@@ -93,6 +93,9 @@ a:hover {
 a:hover.no-underline {
   text-decoration: none!important;
 }
+a:focus {
+  text-decoration: none!important;
+}
 .masthead-color-scheme {
   background: #228900;
   color: #ffffff;
