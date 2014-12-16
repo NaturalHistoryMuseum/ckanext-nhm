@@ -28,22 +28,22 @@ Invalid = p.toolkit.Invalid
 log = logging.getLogger(__name__)
 
 # Contact addresses to route specimen contact request to
-collection_contacts = {
-    'Entomology': 'b.scott@nhm.ac.uk',
-    'Botany': 'b.scott@nhm.ac.uk',
-    'Mineralogy': 'b.scott@nhm.ac.uk',
-    'Palaeontology': 'b.scott@nhm.ac.uk',
-    'Zoology': 'b.scott@nhm.ac.uk'
-}
+# collection_contacts = {
+#     'Entomology': 'b.scott@nhm.ac.uk',
+#     'Botany': 'b.scott@nhm.ac.uk',
+#     'Mineralogy': 'b.scott@nhm.ac.uk',
+#     'Palaeontology': 'b.scott@nhm.ac.uk',
+#     'Zoology': 'b.scott@nhm.ac.uk'
+# }
 
 # For live
-# collection_contacts = {
-#     'Entomology': 't.howard@nhm.ac.uk',
-#     'Botany': 't.howard@nhm.ac.uk',
-#     'Mineralogy': 'a.hart@nhm.ac.uk',
-#     'Palaeontology': 'm.munt@nhm.ac.uk',
-#     'Zoology': 'c.valentine@nhm.ac.uk'
-# }
+collection_contacts = {
+    'Entomology': 't.howard@nhm.ac.uk',
+    'Botany': 't.howard@nhm.ac.uk',
+    'Mineralogy': 'a.hart@nhm.ac.uk',
+    'Palaeontology': 'm.munt@nhm.ac.uk',
+    'Zoology': 'c.valentine@nhm.ac.uk'
+}
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
