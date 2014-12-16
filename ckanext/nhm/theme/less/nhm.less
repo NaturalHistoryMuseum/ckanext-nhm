@@ -1323,25 +1323,30 @@ i.mineralogy{
   padding: 2px 0;
 }
 
-//.record-content table tbody tr th{
-//  width: 240px;
-//}
-
 .record-content table tbody tr th a{
   font-weight: normal;
 }
 
-.record-content table thead tr{
-  border-top: 20px solid #fff;
-  border-bottom: 8px solid #fff;
-}
-
 .record-content table thead tr th{
  background: @tableHeaderColor;
- padding: 10px 0 10px 5px;
+ padding: 8px 0 8px 5px;
  font-size: 18px;
- margin: 5px 0 5px 0;
  font-weight: normal;
+ vertical-align: middle;
+}
+
+.record-content table tbody:before {
+    line-height:4px;
+    content:"-";
+    color:white; /* to hide text */
+    display:block;
+}
+
+.record-content table tbody:after {
+    line-height:8px;
+    content:"-";
+    color:white; /* to hide text */
+    display:block;
 }
 
 .toggle-empty-rows{

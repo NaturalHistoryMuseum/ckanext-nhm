@@ -27,9 +27,6 @@ def record_get(context, data_dict):
     if errors:
         raise p.toolkit.ValidationError(errors)
 
-    print data_dict['resource_id']
-    print data_dict['record_id']
-
     # Retrieve datastore record
     search_result = get_action('datastore_search')(context, {'resource_id': data_dict['resource_id'], 'filters': {'_id': data_dict['record_id']}})
     try:
