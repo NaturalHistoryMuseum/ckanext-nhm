@@ -80,7 +80,7 @@
 
      {# If this is a web link, just show it a link #}
 
-    {% if res.url and not res.can_be_previewed %}
+    {% if res.url and not res.can_be_previewed and not res.on_same_domain %}
         <a href="{{ res.url }}" class="external" target="_blank">{{ res.url }}</a>
     {% else %}
         {{ _("There're no views created for this resource yet.") }}
