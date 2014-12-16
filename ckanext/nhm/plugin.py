@@ -4,6 +4,7 @@ import ckan.plugins as p
 import ckan.logic as logic
 import ckan.model as model
 from beaker.cache import region_invalidate
+from beaker.cache import cache_managers
 from ckan.common import c, request
 from ckan.lib.helpers import url_for
 from itertools import chain
@@ -15,6 +16,7 @@ import logging
 from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
+from ckanext.graph.db import run_stats_query
 from collections import OrderedDict
 
 get_action = logic.get_action
@@ -320,15 +322,12 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         @param resource:
         @return:
         """
-
         for resource in pkg_dict.get('resources', []):
             # If this is the specimen resource ID, clear the collection stats
 
             if 'id' in resource:
-
-                if helpers.get_specimen_resource_id() == resource['id']:
-                    region_invalidate(helpers.collection_stats, None, 'collection_stats')
-                    log.info('Cleared specimen stats cache')
-                if helpers.get_indexlot_resource_id() == resource['id']:
-                    region_invalidate(helpers.indexlot_count, None, 'collection_stats')
-                    log.info('Cleared indexlot stats cache')
+                if resource['id'] in [helpers.get_specimen_resource_id(), helpers.get_indexlot_resource_id()]:
+                    # Quick and dirty, delete all caches when indexlot or specimens are updated
+                    # TODO: Move to invalidate_cache - need to investigate why that isn't working
+                    for _cache in cache_managers.values():
+                        _cache.clear()
