@@ -38,11 +38,11 @@ log = logging.getLogger(__name__)
 
 # For live
 collection_contacts = {
-    'Entomology': 't.howard@nhm.ac.uk',
-    'Botany': 't.howard@nhm.ac.uk',
-    'Mineralogy': 'a.hart@nhm.ac.uk',
-    'Palaeontology': 'm.munt@nhm.ac.uk',
-    'Zoology': 'c.valentine@nhm.ac.uk'
+    'Entomology': 'adrian.hine@nhm.ac.uk',
+    'Botany': 'lawrence.brooks@nhm.ac.uk',
+    'Mineralogy': 'd.a.smith@nhm.ac.uk',
+    'Palaeontology': 'd.a.smith@nhm.ac.uk',
+    'Zoology': 't.conyers@nhm.ac.uk'
 }
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
