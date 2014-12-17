@@ -644,6 +644,9 @@ table.package-list th {
   text-align: center;
   vertical-align: middle;
 }
+table.package-list th#package-list-author {
+  width: 90px;
+}
 table.package-list tr td:first-child,
 table.package-list tr th:first-child {
   width: auto;
