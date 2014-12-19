@@ -17,7 +17,11 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
             .attr('title', 'full screen')
             .html('<i class="fa fa-expand"></i>')
             .appendTo(self.controls)
-            .click(self._toggle_fullscreen)
+            .click(self._toggle_fullscreen);
+          self._base_height = $('div.recline-slickgrid').height();
+          $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange', function(){
+            self._on_fs_changed();
+          });
         });
       }
     },
@@ -52,7 +56,6 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
         } else if (document.msExitFullscreen) {
           document.msExitFullscreen();
         }
-        $(body).removeClass('fullscreen');
       } else {
         //FIXME: Handle older browsers
         if (body.requestFullscreen) {
@@ -64,36 +67,46 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
         } else if (body.msRequestFullscreen) {
           body.msRequestFullscreen();
         }
-        $(body).addClass('fullscreen');
       }
-      self._is_full_screen = !self._is_full_screen;
-      self._resize_slickgrid();
       e.stopPropagation();
       return false;
     },
 
     /**
+     * Event triggered when switching in/out of fullscreen
+     */
+    _on_fs_changed: function(){
+      self._is_full_screen = !self._is_full_screen;
+      if (self._is_full_screen){
+        $('body').addClass('fullscreen');
+      } else { 
+        $('body').removeClass('fullscreen');
+      }
+      // Run resize once for browsers that trigger the event when it's ready,
+      // and in a second for browsers that trigger the event before it's ready.
+      self._resize_slickgrid();
+      setTimeout(function(){
+        self._resize_slickgrid();
+      }, 1000);
+    },
+ 
+    /**
      * Resize the grid canvas
      *
-     * This uses a delay timer to ensure that the browser has had time to
-     * switch before we measure available height.
      */
     _resize_slickgrid: function(){
       var $grid = $('div.recline-slickgrid');
       if ($grid.length > 0 && typeof($grid.get(0).grid) !== 'undefined') {
-        setTimeout(function() {
-          var grid = $grid.get(0).grid;
-          var height = 0;
-          if (self._is_full_screen){
-            self._base_height = $grid.height();
-            height = $(document).height() - $('div.controls').height() - 32;
-          } else {
-            height = self._base_height;
-          }
-          $grid.height(height);
-          grid.resizeCanvas();
-          grid.autosizeColumns();
-        }, 250);
+        var grid = $grid.get(0).grid;
+        var height = 0;
+        if (self._is_full_screen){
+          height = $(document).height() - $('div.controls').height() - 32;
+        } else {
+          height = self._base_height;
+        }
+        $grid.height(height);
+        grid.resizeCanvas();
+        grid.autosizeColumns();
       }
     }
   }
