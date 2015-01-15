@@ -974,7 +974,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
 
     text = ' '.join(text)
 
-    return urllib.quote(text)
+    return urllib.quote(text.encode('utf8'))
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     """
