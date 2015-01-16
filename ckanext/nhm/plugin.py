@@ -214,6 +214,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # CKAN's field auto-completion uses full text search on individual fields. This causes
         # problems because of stemming issues, and is quite slow on our data set (even with an
         # appropriate index). We detect this type of queries and replace them with a LIKE query.
+        # We also cancel the count query which is not needed for this query and slows things down.
         if 'q' in data_dict and isinstance(data_dict['q'], dict) and len(data_dict['q']) == 1:
             field_name = data_dict['q'].keys()[0]
             if data_dict['fields'] == field_name and data_dict['q'][field_name].endswith(':*'):
@@ -226,7 +227,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'sort': [escaped_field_name],
                     'where': [(escaped_field_name + '::citext LIKE %s', value)],
                     'select': [escaped_field_name],
-                    'ts_query': ''
+                    'ts_query': '',
+                    'count': False
                 }
         return query_dict
 

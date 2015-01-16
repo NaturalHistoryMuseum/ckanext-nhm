@@ -245,7 +245,8 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
               offset: offset,
               fields: field_name,
               distinct: true,
-              sort: field_name
+              sort: field_name,
+              count: false
             };
 
             if (term !== '') {
@@ -258,7 +259,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
           },
           results: function (data, page) {
             var records = data.result.records,
-                hasMore = (records.length < data.result.total),
+                hasMore = (records.length == queryLimit),
                 results;
 
             results = $.map(records, function (record) {
