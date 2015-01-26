@@ -32,5 +32,6 @@ setup(
             stats=ckanext.nhm.commands.stats:StatsCommand
             resource-index=ckanext.nhm.commands.resource_index:ResourceIndexCommand
             dataset-purge-all=ckanext.nhm.commands.dataset_purge_all:DatasetPurgeAllCommand
+            datastore=ckanext.nhm.commands.datastore:DatastoreCommand
 	""",
 )
