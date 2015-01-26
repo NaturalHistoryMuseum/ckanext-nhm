@@ -240,23 +240,25 @@ class SpecimenView(DefaultView):
             pass
 
 
-        # Pattern for matching key in determination date
-        regex = re.compile('^([a-z ]+)=(.*)', re.IGNORECASE)
-        determinations = []
+        if c.record_dict['determinations']
 
-        for determination in c.record_dict['determinations'].split('\n'):
-            result = regex.match(determination)
-            try:
-                determination_type = 'Filed as' if result.group(1) == 'filedAs' else result.group(1).title()
-                determinations.append([determination_type] + result.group(2).split(';'))
-            except AttributeError:
-                pass
-
-        if determinations:
-            # Transpose list of determinations & fill in missing values so they are all the same length
-            c.record_dict['determinations'] = map(lambda *row: list(row), *determinations)
-        else:
-            c.record_dict['determinations'] = None
+        # # Pattern for matching key in determination date
+        # regex = re.compile('^([a-z ]+)=(.*)', re.IGNORECASE)
+        # determinations = []
+        #
+        # for determination in c.record_dict['determinations'].split('\n'):
+        #     result = regex.match(determination)
+        #     try:
+        #         determination_type = 'Filed as' if result.group(1) == 'filedAs' else result.group(1).title()
+        #         determinations.append([determination_type] + result.group(2).split(';'))
+        #     except AttributeError:
+        #         pass
+        #
+        # if determinations:
+        #     # Transpose list of determinations & fill in missing values so they are all the same length
+        #     c.record_dict['determinations'] = map(lambda *row: list(row), *determinations)
+        # else:
+        #     c.record_dict['determinations'] = None
 
         # We do not want custom filters for determinations
         c.custom_filters['determinations'] = None

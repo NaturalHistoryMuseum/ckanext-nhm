@@ -119,7 +119,8 @@ def get_resource(resource_id):
 
 
 def get_record(resource_id, record_id):
-    return _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
+    record = _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
+    return record.get('data', None)
 
 
 def resource_view_get_ordered_fields(resource_id):

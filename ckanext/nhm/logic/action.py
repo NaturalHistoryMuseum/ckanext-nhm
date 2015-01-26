@@ -29,8 +29,13 @@ def record_get(context, data_dict):
 
     # Retrieve datastore record
     search_result = get_action('datastore_search')(context, {'resource_id': data_dict['resource_id'], 'filters': {'_id': data_dict['record_id']}})
+
     try:
-        record = search_result['records'][0]
+        record = {
+            'data': search_result['records'][0],
+            'fields': search_result['fields'],
+            'resource_id': search_result['resource_id']
+        }
     except IndexError:
         # If we don't have a result, raise not found
         raise NotFound
