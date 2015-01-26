@@ -34,12 +34,12 @@
                                         <table id="determinations">
 
                                             <tr>
-                                                {% for label in c.record_dict['determinations'][0] %}
-                                                    <th class="{{ label|lower }}">{{ label }}</th>
+                                                {% for label in c.record_dict['determination_labels'] %}
+                                                    <th class="{{ label|lower }}">{{ label|capitalize }}</th>
                                                 {% endfor %}
                                             </tr>
 
-                                            {% for determination in c.record_dict['determinations'][1:] %}
+                                            {% for determination in c.record_dict['determinations'] %}
                                                 <tr>
                                                     {% for value in determination %}
                                                         <td> {{ value or '' }}</td>
