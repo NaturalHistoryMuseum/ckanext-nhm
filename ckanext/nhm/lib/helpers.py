@@ -643,12 +643,13 @@ def get_resource_filter_options(resource):
             filters[key] = [value]
         else:
             filters[key].append(value)
+    result = {}
     for o in options:
-        if o in filters and 'true' in filters[o]:
-            options[o]['checked'] = True
-        else:
-            options[o]['checked'] = False
-    return options
+        if options[o].get('hide', False):
+            continue
+        result[o] = options[o]
+        result[o]['checked'] = o in filters and 'true' in filters[o]
+    return result
 
 
 def get_resource_filter_pills(resource):
