@@ -2,10 +2,11 @@
 import logging
 import pylons
 import ckan.logic as logic
-from ckan.plugins import toolkit as tk
+from ckan.plugins import toolkit
 from ckan.lib.cli import CkanCommand
 from ckanext.datastore.db import _get_engine
-from sqlalchemy.exc import ProgrammingError
+import ckan.model as model
+from ckanext.nhm.model.stats import DatastoreStats
 
 log = logging.getLogger()
 
@@ -25,6 +26,12 @@ class DatastoreCommand(CkanCommand):
             Required param: str alias
 
         update-stats - Update datastore stats
+
+        Every time this command is run, the datastore_stats table is updated
+        with record counts from the datastore
+        Needs to run on cron rather than on resource update - as datapusher
+        won't have added records to the datastore
+
         paster datastore update-stats -c /etc/ckan/default/development.ini
 
     """
@@ -46,7 +53,7 @@ class DatastoreCommand(CkanCommand):
         self._load_config()
 
         # Set up context
-        user = tk.get_action('get_site_user')({'ignore_auth': True}, {})
+        user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
         self.context = {'user': user['name']}
 
         # Set up datastore DB engine
@@ -60,8 +67,22 @@ class DatastoreCommand(CkanCommand):
             self.replace()
         elif cmd == 'purge-all':
             self.purge_all()
+        elif cmd == 'update-stats':
+            self.update_stats()
         else:
             print 'Command %s not recognized' % cmd
+
+    def _get_datastore_or_fail(self, resource_id):
+
+        data = {
+            'resource_id': resource_id,
+            'limit': 0
+        }
+
+        try:
+            return toolkit.get_action('datastore_search')({}, data)
+        except logic.NotFound:
+            raise self.BadCommand('Datastore resource %s does not exist' % resource_id)
 
     def replace(self):
         """
@@ -84,28 +105,11 @@ class DatastoreCommand(CkanCommand):
             raise self.BadCommand(msg)
 
         # Load the existing resource to check it exists
-
-        data = {
-            'resource_id': self.options.resource_id,
-            'limit': 0
-        }
-
-        try:
-            logic.get_action('datastore_search')({}, data)
-        except logic.NotFound:
-            raise self.BadCommand('Datastore resource %s to replace does not exist' % self.options.resource_id)
-
+        self._get_datastore_or_fail(self.options.table)
 
         # And check the new table exists
-        data = {
-            'resource_id': self.options.table,
-            'limit': 0
-        }
+        self._get_datastore_or_fail(self.options.resource_id)
 
-        try:
-            logic.get_action('datastore_search')({}, data)
-        except logic.NotFound:
-            raise self.BadCommand('Replacement table %s does not exist' % self.options.table)
 
         response = self.ask('You are about to replace %s with table %s. Are you sure you want to continue?' % (
             self.options.resource_id, self.options.table)
@@ -128,37 +132,78 @@ class DatastoreCommand(CkanCommand):
             connection = self.engine.connect()
             trans = connection.begin()
             try:
-
-
-
-
                 # First rename the existing resource table - we'll keep it as *-bak just in case
-                # connection.execute('ALTER TABLE "{resource_id}" RENAME TO "{resource_id}-bak"'.format(
-                #     resource_id=self.options.resource_id
-                # ))
-                # connection.execute('ALTER TABLE "%s" RENAME TO "%s-bak"')
+                connection.execute('ALTER TABLE "{resource_id}" RENAME TO "{backup_resource_id}"'.format(
+                    resource_id=self.options.resource_id,
+                    backup_resource_id=backup_resource_id
+                ))
+                connection.execute('ALTER TABLE "{table}" RENAME TO "{resource_id}"'.format(
+                    table=self.options.table,
+                    resource_id=self.options.resource_id
+                ))
                 trans.commit()
             except:
                 trans.rollback()
                 raise
-
-
-
-
-        # print self.parser
-        # print type(self.parser)
-        #
-        # print self.parser.get_option('-i')
-        #
-        # resource_id = self.options.resource_id
-        #
-        # assert resource_id != None
-        #
-        # print resource_id
-        # print 'ALIAS'
+            else:
+                print 'SUCCESS: Resource %s replaced' % self.options.resource_id
 
     def purge_all(self):
 
+        response = self.ask(
+            'You are about to remove all datasets and datastore tables. Are you sure you want to continue?'
+        )
 
+        # If user confirms the action, we're going to rename the tables in a single transaction
+        if response:
 
-        print 'PURGE'
+            import ckan.model as model
+
+        #     package_names = toolkit.get_action('package_list')(self.context, {})
+        #
+        #     print '%i packages to purge' % len(package_names)
+        #
+        # for package_name in package_names:
+        # #
+        # #     # Load the package and loop through the resources
+        #     pkg_dict = toolkit.get_action('package_show')(self.context, {'id': package_name})
+        #     for resource in pkg_dict['resources']:
+        #         # Does this have an activate datastore table?
+        #         if resource['datastore_active']:
+        #
+        #             print 'Deleting datastore %s' % resource['id']
+        #             tk.get_action('datastore_delete')(self.context, {'resource_id': resource['id'], 'force': True})
+        #
+        #     # Load the package model and delete
+        #     pkg = model.Package.get(pkg_dict['id'])
+        #
+        #     rev = model.repo.new_revision()
+        #     pkg.purge()
+        #     model.repo.commit_and_remove()
+        #     print '%s purged' % pkg_dict['name']
+
+    def update_stats(self):
+
+        pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {})
+
+        for pkg_dict in pkgs:
+            for resource in pkg_dict['resources']:
+                # Does this have an activate datastore table?
+                if resource['url_type'] == 'datastore':
+
+                    try:
+                        result = toolkit.get_action('datastore_search_sql')(self.context, {
+                            'sql': 'SELECT COUNT(*) FROM "%s"' % resource['id']
+                        })
+                    except logic.ValidationError:
+                        log.critical('Update stats error: resource %s does not exist' % resource['id'])
+                    else:
+                        count = result['records'][0]['count']
+
+                        stats = DatastoreStats(count=count, resource_id=resource['id'])
+
+                        model.Session.add(stats)
+
+        model.Session.commit()
+
+        log.info('Stats updated')
