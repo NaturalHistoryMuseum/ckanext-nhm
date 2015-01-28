@@ -20,8 +20,8 @@ class DatastoreCommand(CkanCommand):
         purge-all - Delete all datasets and datastore tables
         paster datastore purge-all -c /etc/ckan/default/development.ini
 
-        alias - Update datastore aliases
-        paster datastore alias [resource_id] [str alias] -c /etc/ckan/default/development.ini
+        replace - Update datastore aliases
+        paster datastore replace -i [resource_id] -t [table] -c /etc/ckan/default/development.ini
             Required param: ID of the datastore resource to update
             Required param: str alias
 
