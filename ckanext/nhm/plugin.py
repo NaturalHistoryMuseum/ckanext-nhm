@@ -85,6 +85,11 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     controller='ckanext.nhm.controllers.record:RecordController',
                     action='view')
 
+        # Permalink for specimens
+        map.connect('specimen_citation', '/specimen/{uuid}',
+                    controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController',
+                    action='view')
+
         # Add dwc view
         map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
                     controller='ckanext.nhm.controllers.record:RecordController',

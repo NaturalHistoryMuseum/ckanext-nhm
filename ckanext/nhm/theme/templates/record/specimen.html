@@ -34,12 +34,12 @@
                                         <table id="determinations">
 
                                             <tr>
-                                                {% for label in c.record_dict['determinations'][0] %}
-                                                    <th class="{{ label|lower }}">{{ label }}</th>
+                                                {% for label in c.record_dict['determination_labels'] %}
+                                                    <th class="{{ label|lower }}">{{ label|capitalize }}</th>
                                                 {% endfor %}
                                             </tr>
 
-                                            {% for determination in c.record_dict['determinations'][1:] %}
+                                            {% for determination in c.record_dict['determinations'] %}
                                                 <tr>
                                                     {% for value in determination %}
                                                         <td> {{ value or '' }}</td>
@@ -108,6 +108,13 @@
 {% endblock %}
 
 {% block record_additional_information_rows %}
+
+   {% set cite_as = h.url_for(controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
+
+   <tr>
+    <th scope="row">{{ _('Cite as') }}</th>
+    <td>{{ h.link_to(cite_as, cite_as) }}</td>
+  </tr>
 
    <tr>
     <th scope="row">{{ _('Created') }}</th>

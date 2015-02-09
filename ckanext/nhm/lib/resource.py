@@ -51,6 +51,9 @@ def resource_filter_options(resource):
     @return: A dictionary associating each option's name to a dict
             defining:
                 - label: The label to display to users;
+                - hide: Optional. If present and True, the option will not
+                        be presented to users (but the filter will work and
+                        the pill displayed if the filter is applied)
                 - sql: Optional. The SQL WHERE statement to use when this
                        option is checked (as a tuple containing statement
                        and value replacements);
@@ -79,6 +82,11 @@ def resource_filter_options(resource):
             '_exclude_centroid': {
                 'label': 'Exclude centroids',
                 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(table),)
+            },
+            '_exclude_mineralogy': {
+                'label': 'Exclude Mineralogy',
+                'hide': True,
+                'sql': ('"{}"."collectionCode" <> \'MIN\''.format(table),)
             }
         }
     else:
