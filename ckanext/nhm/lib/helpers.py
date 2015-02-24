@@ -9,6 +9,7 @@ import urllib
 from beaker.cache import cache_region
 from pylons import config
 from collections import OrderedDict
+from jinja2.filters import do_truncate
 
 import ckan.model as model
 import ckan.logic as logic
@@ -43,6 +44,9 @@ _check_access = logic.check_access
 enumerate = enumerate
 
 re_dwc_field_label = re.compile('([A-Z]+)')
+
+# Maximum number of characters for the author string
+AUTHOR_MAX_LENGTH = 100
 
 def get_site_statistics():
     stats = dict()
@@ -999,3 +1003,36 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
         class="gravatar" width="%s" height="%s" />'''
                    % (userobj.name, email_hash, size, default, size, size)
                    )
+
+
+def dataset_author_truncate(author_str):
+    """
+
+    For author strings with lots of authors need to shorten for display
+    insert et al as abbreviation tag
+
+    @param author_str: dataset author
+    @return: shortened author str, will full text in abbr tag
+    """
+
+    def _truncate(author_str, separator=None):
+
+        # If we have a separator, split string on it
+        if separator:
+            shortened = ';'.join(author_str.split(separator)[0:4])
+        else:
+            # Otherwise use the jinja truncate function (may split author name)
+            shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
+
+        return literal('%s <abbr title="%s">et al.</abbr>' % (shortened, author_str))
+
+    if len(author_str) > AUTHOR_MAX_LENGTH:
+
+        if ';' in author_str:
+            author_str = _truncate(author_str, ';')
+        elif ',' in author_str:
+            author_str = _truncate(author_str, ',')
+        else:
+            author_str = _truncate(author_str)
+
+    return author_str

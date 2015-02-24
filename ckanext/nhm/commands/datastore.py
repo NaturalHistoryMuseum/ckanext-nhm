@@ -157,30 +157,25 @@ class DatastoreCommand(CkanCommand):
         # If user confirms the action, we're going to rename the tables in a single transaction
         if response:
 
-            import ckan.model as model
+            pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {})
 
-        #     package_names = toolkit.get_action('package_list')(self.context, {})
-        #
-        #     print '%i packages to purge' % len(package_names)
-        #
-        # for package_name in package_names:
-        # #
-        # #     # Load the package and loop through the resources
-        #     pkg_dict = toolkit.get_action('package_show')(self.context, {'id': package_name})
-        #     for resource in pkg_dict['resources']:
-        #         # Does this have an activate datastore table?
-        #         if resource['datastore_active']:
-        #
-        #             print 'Deleting datastore %s' % resource['id']
-        #             tk.get_action('datastore_delete')(self.context, {'resource_id': resource['id'], 'force': True})
-        #
-        #     # Load the package model and delete
-        #     pkg = model.Package.get(pkg_dict['id'])
-        #
-        #     rev = model.repo.new_revision()
-        #     pkg.purge()
-        #     model.repo.commit_and_remove()
-        #     print '%s purged' % pkg_dict['name']
+            for pkg_dict in pkgs:
+                for resource in pkg_dict['resources']:
+
+                    try:
+                        toolkit.get_action('datastore_delete')(self.context, {'resource_id': resource['id'], 'force': True})
+                    except logic.NotFound:
+                        # Ignore missing datastore tables
+                        continue
+
+                # Load the package model and delete
+                pkg = model.Package.get(pkg_dict['id'])
+
+                rev = model.repo.new_revision()
+                pkg.purge()
+                model.repo.commit_and_remove()
+                print '%s purged' % pkg_dict['name']
+
 
     def update_stats(self):
 

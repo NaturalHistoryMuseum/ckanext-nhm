@@ -4,6 +4,7 @@ import ckan.plugins as p
 import ckan.logic as logic
 import ckan.model as model
 from beaker.cache import region_invalidate
+from webhelpers.html import literal
 from beaker.cache import cache_managers
 from ckan.common import c, request
 from ckan.lib.helpers import url_for
@@ -176,6 +177,15 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             data_dict['sort'] = u'promoted asc, metadata_modified desc'
 
         return data_dict
+
+    def before_view(self, pkg_dict):
+        """
+        Shorten author string
+        @param pkg_dict:
+        @return: pkg_dict with author field truncated (with HTML!) if necessary
+        """
+        pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
+        return pkg_dict
 
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
