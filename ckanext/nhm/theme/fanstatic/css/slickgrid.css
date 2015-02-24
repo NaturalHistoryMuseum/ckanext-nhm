@@ -92,3 +92,35 @@ content: "\f066";
 body.fullscreen .controls .recline-pager .pagination {
     width: 50%;
 }
+
+div.recline-slickgrid div.slick-cell div.dqi_majorerrors,
+div.recline-slickgrid div.slick-cell div.dqi_minorerrors,
+div.recline-slickgrid div.slick-cell div.dqi_noerrors {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+div.recline-slickgrid div.slick-cell div.dqi_majorerrors span,
+div.recline-slickgrid div.slick-cell div.dqi_minorerrors span,
+div.recline-slickgrid div.slick-cell div.dqi_noerrors span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 18px;
+}
+
+div.recline-slickgrid div.slick-cell div.dqi_majorerrors span {
+    background: #D00;
+    border: 1px solid #800;
+}
+
+div.recline-slickgrid div.slick-cell div.dqi_minorerrors span {
+    background: #D70;
+    border: 1px solid #840;
+}
+
+div.recline-slickgrid div.slick-cell div.dqi_noerrors span {
+    background: #0D0;
+    border: 1px solid #080;
+}

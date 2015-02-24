@@ -10,6 +10,7 @@ if (baseURL.indexOf('?') > -1){
 }
 
 // Slickgrid formatter for making the _id field into a link
+// and the dqi field into a traffic light!
 var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
 
     if(columnDef.id == "del"){
@@ -24,6 +25,14 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
         // Slickgrid uses preventDefault() preventing the link from working
         // So am using the onclick handler to change location
         return '<a title="View record" target="_parent" href="' + url + '" onclick="window.top.location=this.href">View</a>';
+    }
+
+    if(columnDef.id == 'dqi'){
+      if (value == 'N/A' || value == 'Unknown'){
+        return value;
+      }
+      var dqi_class = 'dqi_' + value.toLowerCase().replace(/[^a-z]/g, '');
+      return '<div title="' + value + '" class="' + dqi_class + '"><span></span></div>';
     }
 
     return value
