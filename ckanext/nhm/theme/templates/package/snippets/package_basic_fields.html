@@ -92,14 +92,14 @@
  {{ form.input('tag_string', id='field-tags', label=_('Keywords'), placeholder=_('eg. taxonomy, biodiversity'), value=data.tag_string, error=errors.tags, classes=['control-full'], attrs=tag_attrs) }}
 
   <div class="control-group">
-    {% set error = errors.dataset_type %}
-    <label class="control-label" for="field-dataset-type"><span title="This field is required" class="control-required">*</span> {{ _("Dataset type") }}</label>
+    {% set error = errors.dataset_category %}
+    <label class="control-label" for="field-dataset-category"><span title="This field is required" class="control-required">*</span> {{ _("Dataset category") }}</label>
     <div class="controls">
 
-      <select id="field-dataset-type" name="dataset_type" data-module="autocomplete">
+      <select id="field-dataset-category" name="dataset_category" data-module="autocomplete">
         <option value="">None</option>
-        {% for dataset_type in h.dataset_types()  %}
-          <option value="{{ dataset_type }}" {% if dataset_type in data.get('dataset_type', []) %}selected="selected"{% endif %}>{{ dataset_type }}</option>
+        {% for category in h.dataset_categories()  %}
+          <option value="{{ category }}" {% if category in data.get('dataset_category', []) %}selected="selected"{% endif %}>{{ category }}</option>
         {% endfor %}
       </select>
 
