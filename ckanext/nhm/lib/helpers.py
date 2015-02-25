@@ -167,7 +167,7 @@ def update_frequency_get_label(value):
             return label
 
 
-def dataset_types():
+def dataset_categories():
     """
     Return list of dataset category terms
     @return: list
