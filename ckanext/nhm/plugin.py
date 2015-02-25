@@ -17,8 +17,8 @@ import logging
 from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
-from ckanext.graph.db import run_stats_query
 from collections import OrderedDict
+from ckanext.doi.interfaces import IDoi
 
 get_action = logic.get_action
 
@@ -61,6 +61,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IPackageController, inherit=True)
     p.implements(IDatastore)
     p.implements(IContact)
+    p.implements(IDoi)
 
     ## IConfigurer
     def update_config(self, config):
@@ -235,6 +236,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             if data_dict['fields'] == field_name and data_dict['q'][field_name].endswith(':*'):
                 escaped_field_name = '"' + field_name.replace('"', '') + '"'
                 value = '%' + data_dict['q'][field_name].replace(':*', '%')
+
                 query_dict = {
                     'distinct': True,
                     'limit': query_dict['limit'],
@@ -245,6 +247,15 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'ts_query': '',
                     'count': False
                 }
+
+        # We want DQI to always be the second column
+
+        i = query_dict['select'].index(u'"dqi"')
+
+        # If we have an index for column named DQI, remove it and insert it at position 1
+        if i:
+           query_dict['select'].insert(1, query_dict['select'].pop(i))
+
         return query_dict
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
@@ -348,3 +359,13 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     # TODO: Move to invalidate_cache - need to investigate why that isn't working
                     for _cache in cache_managers.values():
                         _cache.clear()
+
+    ## IDoi
+    def build_metadata(self, pkg_dict, metadata_dict):
+
+        metadata_dict['resource_type'] = pkg_dict.get('dataset_category', None)
+
+        if isinstance(metadata_dict['resource_type'], list):
+            metadata_dict['resource_type'] = metadata_dict['resource_type'][0]
+
+        return metadata_dict
