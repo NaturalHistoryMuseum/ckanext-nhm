@@ -166,15 +166,15 @@ class DatastoreCommand(CkanCommand):
                         toolkit.get_action('datastore_delete')(self.context, {'resource_id': resource['id'], 'force': True})
                     except logic.NotFound:
                         # Ignore missing datastore tables
-                        continue
 
-                # Load the package model and delete
-                pkg = model.Package.get(pkg_dict['id'])
+                        # Load the package model and delete
+                        pkg = model.Package.get(pkg_dict['id'])
 
-                rev = model.repo.new_revision()
-                pkg.purge()
-                model.repo.commit_and_remove()
-                print '%s purged' % pkg_dict['name']
+                        if pkg:
+                            rev = model.repo.new_revision()
+                            pkg.purge()
+                            model.repo.commit_and_remove()
+                            print '%s purged' % pkg_dict['name']
 
 
     def update_stats(self):
