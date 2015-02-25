@@ -484,30 +484,14 @@ def resource_view_state(resource_view_json, resource_json):
     col_width = 100
     fit_columns = (num_fields * col_width) < viewport_max_width
 
-    resource_view['state'] = {
-        'fitColumns': fit_columns,
-        'gridOptions': {
-            'defaultFormatter': 'NHMFormatter',
-            'enableCellRangeSelection': False,
-            'enableTextSelectionOnCells': False,
-            'enableCellNavigation': False,
-            'enableColumnReorder': False,
-            'defaultColumnWidth': 100
-        },
-        'columnsWidth': [
-            {
-                'column': '_id',
-                'width': 45
-            },
-        ],
-        'columnsTitle': [
-            {
-                'column': '_id',
-                'title': ''  # This is just converted into a link so lets hide the field
-            }
-        ],
-        'columnsToolTip': []
-    }
+    # Initiate the resource view
+    view = resource_view_get_view(resource)
+
+    # And get the state
+    resource_view['state'] = view.get_slickgrid_state()
+
+    # TODO: This can be merged into get_slickgrid_state
+    resource_view['state']['fitColumns'] = fit_columns
 
     for group, fields in resource_view_get_field_groups(resource).items():
 
@@ -532,11 +516,8 @@ def resource_view_state(resource_view_json, resource_json):
                         'title': label
                     }
                 )
-
-    # Do we have custom column widths set in the controller
-    view_cls = resource_view_get_view(resource)
-    if view_cls.grid_column_widths:
-        for column, width in view_cls.grid_column_widths.items():
+    if view.grid_column_widths:
+        for column, width in view.grid_column_widths.items():
             resource_view['state']['columnsWidth'].append(
                 {
                     'column': column,

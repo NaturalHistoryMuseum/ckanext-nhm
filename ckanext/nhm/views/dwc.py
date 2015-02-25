@@ -28,6 +28,7 @@ class DarwinCoreView(DefaultView):
 
     grid_default_columns = [
         '_id',
+        'dqi',
         'scientificName',
         'scientificNameAuthorship',
         'specificEpithet',
@@ -45,6 +46,7 @@ class DarwinCoreView(DefaultView):
     ]
 
     grid_column_widths = {
+        'dqi': 70,
         'catalogNumber': 120,
         'scientificNameAuthorship': 180,
         'scientificName': 160

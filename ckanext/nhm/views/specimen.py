@@ -179,6 +179,7 @@ class SpecimenView(DefaultView):
             ("modified", "Modified"),
             ("created", "Created"),
             ("recordType", "Record type"),
+            ("dqi", "Quality"),
         ])),
     ])
 
@@ -293,3 +294,22 @@ class SpecimenView(DefaultView):
         # We do not want to show the record data in the grid or filters
         del field_groups['Record']
         return field_groups
+
+    def get_slickgrid_state(self):
+
+        # Add the DQI column settings
+        self.state['columnsTitle'].append(
+            {
+                'column': 'dqi',
+                'title': 'Quality'
+            }
+        )
+
+        self.state['columnsToolTip'].append(
+            {
+                'column': 'dqi',
+                'value': 'Data Quality Indicator'
+            }
+        )
+
+        return self.state

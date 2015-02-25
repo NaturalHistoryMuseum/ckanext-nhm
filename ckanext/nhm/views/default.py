@@ -27,6 +27,31 @@ class DefaultView(object):
     # Specific column widths
     grid_column_widths = {}
 
+    # Default state
+    state = {
+        'gridOptions': {
+            'defaultFormatter': 'NHMFormatter',
+            'enableCellRangeSelection': False,
+            'enableTextSelectionOnCells': False,
+            'enableCellNavigation': False,
+            'enableColumnReorder': False,
+            'defaultColumnWidth': 100
+        },
+        'columnsWidth': [
+            {
+                'column': '_id',
+                'width': 45
+            },
+        ],
+        'columnsTitle': [
+            {
+                'column': '_id',
+                'title': ''  # This is just converted into a link so lets hide the field
+            }
+        ],
+        'columnsToolTip': []
+    }
+
     def render_record(self, c):
         """
         Render a record
@@ -43,3 +68,6 @@ class DefaultView(object):
 
     def get_field_groups(self, resource):
         return self.field_groups
+
+    def get_slickgrid_state(self):
+        return self.state
