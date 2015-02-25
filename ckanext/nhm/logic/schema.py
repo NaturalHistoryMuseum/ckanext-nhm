@@ -7,10 +7,6 @@ from ckan.logic.schema import (
     )
 
 from ckanext.nhm.logic.validators import string_max_length
-from ckanext.doi.logic.schema import (
-    _modify_create_package_schema as doi_modify_create_package_schema,
-    _modify_update_package_schema as doi_modify_update_package_schema
-)
 from formencode.validators import OneOf
 
 get_converter = p.toolkit.get_converter
@@ -24,7 +20,7 @@ resource_id_exists = get_validator('resource_id_exists')
 int_validator = get_validator('int_validator')
 boolean_validator = get_validator('boolean_validator')
 
-DATASET_TYPE_VOCABULARY = 'dataset_types'
+DATASET_TYPE_VOCABULARY = 'dataset_category'
 
 UPDATE_FREQUENCIES = [
     ('', 'None'),
@@ -50,14 +46,12 @@ def record_get_schema():
 def create_package_schema():
     schema = default_create_package_schema()
     _modify_schema(schema)
-    doi_modify_create_package_schema(schema)
     return schema
 
 
 def update_package_schema():
     schema = default_update_package_schema()
     _modify_schema(schema)
-    doi_modify_update_package_schema(schema)
     return schema
 
 
@@ -73,7 +67,7 @@ def _modify_schema(schema):
     schema['resources']['name'] = [not_empty, string_max_length(255), unicode]
 
     # Add new fields
-    schema['dataset_type'] = [not_empty, convert_from_tags(DATASET_TYPE_VOCABULARY)]
+    schema[DATASET_TYPE_VOCABULARY] = [not_empty, convert_from_tags(DATASET_TYPE_VOCABULARY)]
     schema['temporal_extent'] = [ignore_missing, unicode, convert_to_extras]
     schema['update_frequency'] = [ignore_missing, OneOf([v[0] for v in UPDATE_FREQUENCIES]), convert_to_extras, unicode]
     schema['promoted'] = [ignore_missing, convert_to_extras, boolean_validator]
@@ -87,7 +81,7 @@ def show_package_schema():
 
     schema = default_show_package_schema()
     schema['tags']['__extras'].append(p.toolkit.get_converter('free_tags_only'))
-    schema['dataset_type'] = [convert_to_tags(DATASET_TYPE_VOCABULARY)]
+    schema[DATASET_TYPE_VOCABULARY] = [convert_to_tags(DATASET_TYPE_VOCABULARY)]
     schema['temporal_extent'] = [convert_from_extras, ignore_missing]
     schema['update_frequency'] = [convert_from_extras, ignore_missing]
     schema['promoted'] = [convert_from_extras, ignore_missing]
