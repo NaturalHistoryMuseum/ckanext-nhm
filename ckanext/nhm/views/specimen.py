@@ -1,15 +1,17 @@
 import logging
 import re
+import json
+import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins as p
-from ckan.common import c
-import json
 from copy import deepcopy
-import ckan.model as model
+from ckan.plugins import toolkit as tk
 from pylons import config
 from collections import OrderedDict
 from ckanext.nhm.views.default import DefaultView
 from ckanext.nhm.views.dwc import DarwinCoreView
+
+ValidationError = logic.ValidationError
 
 log = logging.getLogger(__name__)
 
@@ -194,6 +196,18 @@ class SpecimenView(DefaultView):
 
         log.info('Viewing record %s', occurrence_id)
 
+        # Load the gbif_id (it's a hidden field so we need to manually add it
+        sql = """SELECT _gbif_id FROM "{resource_id}" WHERE "occurrenceID"='{occurrence_id}'""".format(
+            resource_id=c.resource['id'],
+            occurrence_id=occurrence_id
+        )
+
+        try:
+            result = tk.get_action('datastore_search_sql')(context, {'sql': sql})
+            c.record_dict['gbif_id'] = result['records'][0]['_gbif_id']
+        except (ValidationError, IndexError):
+            pass
+
         c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
 
         # Act on a deep copy of field groups, so deleting element will not have any impact
@@ -300,14 +314,14 @@ class SpecimenView(DefaultView):
         self.state['columnsTitle'].append(
             {
                 'column': 'dqi',
-                'title': 'Quality'
+                'title': 'GBIF QI'
             }
         )
 
         self.state['columnsToolTip'].append(
             {
                 'column': 'dqi',
-                'value': 'Data Quality Indicator'
+                'value': 'GBIF Data Quality Indicator'
             }
         )
 
