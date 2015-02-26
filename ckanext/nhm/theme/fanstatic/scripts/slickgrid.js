@@ -28,11 +28,17 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
     }
 
     if(columnDef.id == 'dqi'){
-      if (value == 'N/A' || value == 'Unknown'){
-        return value;
+
+      var dqi_class, dqi_title
+
+      if (value == 'N/A'){
+          dqi_class = 'dqi_na'
+          value = 'Not applicable'
+      }else{
+          dqi_class = 'dqi_' + value.toLowerCase().replace(/[^a-z]/g, '');
       }
-      var dqi_class = 'dqi_' + value.toLowerCase().replace(/[^a-z]/g, '');
-      return '<div title="' + value + '" class="' + dqi_class + '"><span></span></div>';
+
+      return '<div title="' + value + '" class="dqi-traffic-light ' + dqi_class + '"><span></span></div>';
     }
 
     return value

@@ -178,8 +178,7 @@ class SpecimenView(DefaultView):
             ("occurrenceID", "Occurrence ID"),
             ("modified", "Modified"),
             ("created", "Created"),
-            ("recordType", "Record type"),
-            ("dqi", "Quality"),
+            ("recordType", "Record type")
         ])),
     ])
 

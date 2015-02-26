@@ -93,34 +93,39 @@ body.fullscreen .controls .recline-pager .pagination {
     width: 50%;
 }
 
-div.recline-slickgrid div.slick-cell div.dqi_majorerrors,
-div.recline-slickgrid div.slick-cell div.dqi_minorerrors,
-div.recline-slickgrid div.slick-cell div.dqi_noerrors {
+div.recline-slickgrid div.slick-cell div.dqi-traffic-light{
     width: 100%;
     height: 100%;
     text-align: center;
 }
 
-div.recline-slickgrid div.slick-cell div.dqi_majorerrors span,
-div.recline-slickgrid div.slick-cell div.dqi_minorerrors span,
-div.recline-slickgrid div.slick-cell div.dqi_noerrors span {
+div.recline-slickgrid div.slick-cell div.dqi-traffic-light span {
     display: inline-block;
-    width: 18px;
-    height: 18px;
-    border-radius: 18px;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    position: relative;
+    top:1px;
+    border-width: 1px;
+    border-style: solid;
 }
 
 div.recline-slickgrid div.slick-cell div.dqi_majorerrors span {
-    background: #D00;
-    border: 1px solid #800;
+    background: #DF2621;
+    border-color: #A42122;
 }
 
 div.recline-slickgrid div.slick-cell div.dqi_minorerrors span {
-    background: #D70;
-    border: 1px solid #840;
+    background: #FFCF00;
+    border-color: #FEB800;
 }
 
 div.recline-slickgrid div.slick-cell div.dqi_noerrors span {
-    background: #0D0;
-    border: 1px solid #080;
+    background: #9BD500;
+    border-color: #73B100;
+}
+
+div.recline-slickgrid div.slick-cell div.dqi_na span,
+div.recline-slickgrid div.slick-cell div.dqi_unknown span {
+    border-color: #bbb;
 }
