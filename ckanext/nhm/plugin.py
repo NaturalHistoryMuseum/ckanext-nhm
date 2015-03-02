@@ -366,6 +366,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         metadata_dict['resource_type'] = pkg_dict.get('dataset_category', None)
 
         if isinstance(metadata_dict['resource_type'], list):
+
+            print metadata_dict['resource_type']
+
             metadata_dict['resource_type'] = metadata_dict['resource_type'][0]
 
         return metadata_dict
