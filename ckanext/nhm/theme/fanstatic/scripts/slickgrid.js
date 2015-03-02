@@ -29,13 +29,16 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
 
     if(columnDef.id == 'dqi'){
 
-      var dqi_class, dqi_title
+      var dqi_class
 
-      if (value == 'N/A'){
-          dqi_class = 'dqi_na'
+      if(value === null){
+          dqi_class = 'dqi-unknown'
+          value = 'Unknown'
+      }else if (value == 'N/A'){
+          dqi_class = 'dqi-na'
           value = 'Not applicable'
       }else{
-          dqi_class = 'dqi_' + value.toLowerCase().replace(/[^a-z]/g, '');
+          dqi_class = 'dqi-' + value.toLowerCase().replace(/[^a-z]/g, '');
       }
 
       return '<div title="' + value + '" class="dqi-traffic-light ' + dqi_class + '"><span></span></div>';
