@@ -249,14 +249,13 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 }
 
         # We want DQI to always be the second column
-
-        # TODO: Revert back after GBIF data updated
-
-        # i = query_dict['select'].index(u'"dqi"')
-        #
-        # # If we have an index for column named DQI, remove it and insert it at position 1
-        # if i:
-        #    query_dict['select'].insert(1, query_dict['select'].pop(i))
+        try:
+            i = query_dict['select'].index(u'"dqi"')
+        except ValueError:
+            pass
+        else:
+           # If we have an index for column named DQI, remove it and insert it at position 1
+           query_dict['select'].insert(1, query_dict['select'].pop(i))
 
         return query_dict
 
