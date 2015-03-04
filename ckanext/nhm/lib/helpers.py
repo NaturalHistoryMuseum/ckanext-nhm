@@ -580,6 +580,10 @@ def resource_view_get_hidden_fields(resource):
         # Make sure _id is never hidden
         display_fields.append('_id')
 
+        # Make sure dqi is never hidden (if it exists)
+        if 'dqi' in resource_fields:
+            display_fields.append('dqi')
+
         # Make sure all filtered fields are never hidden
         display_fields += filter_dict.keys()
 
