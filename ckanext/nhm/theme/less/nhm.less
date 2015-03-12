@@ -703,6 +703,14 @@ a.btn-danger:hover{
 .pill{
   color: @pillTextColor;
   background-color: @pillColor;
+
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  top: 6px;
+
   a:hover{
     color: @pillHoverColor;
     text-decoration: none;
