@@ -19,6 +19,7 @@ from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
 from ckanext.doi.interfaces import IDoi
+from ckanext.datasolr.interfaces import IDataSolr
 
 get_action = logic.get_action
 
@@ -60,6 +61,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IFacets, inherit=True)
     p.implements(p.IPackageController, inherit=True)
     p.implements(IDatastore)
+    p.implements(IDataSolr)
     p.implements(IContact)
     p.implements(IDoi)
 
@@ -260,6 +262,31 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return query_dict
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
+        return query_dict
+
+    ## IDataSolr
+    def datasolr_validate(self, context, data_dict, field_types):
+        return self.datastore_validate(context, data_dict, field_types)
+
+    def datasolr_search(self, context, data_dict, field_types, query_dict):
+        # Add our custom filters
+        if 'filters' in data_dict:
+            resource_show = p.toolkit.get_action('resource_show')
+            resource = resource_show(context, {'id': data_dict['resource_id']})
+            options = resource_filter_options(resource)
+            for o in options:
+                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
+                    if 'solr' in options[o]:
+                        query_dict['q'][0].append(options[o]['solr'])
+                elif 'solr_false' in options[o]:
+                    query_dict['q'][0].append(options[o]['solr_false'])
+        # We want DQI to always be the second column
+        try:
+            i = query_dict['fields'].index('dqi')
+        except ValueError:
+            pass
+        else:
+            query_dict['fields'].insert(1, query_dict['fields'].pop(i))
         return query_dict
 
     ## IContact
