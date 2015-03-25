@@ -80,12 +80,12 @@ def resource_filter_options(resource):
                  # BS: Changed to look for latitude field,as _geom is only available after a map has been added
                  # As this works for all DwC, we might get datasets without a map
                 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(table),),
-                'solr': ['decimalLatitude:[* TO *]']
+                'solr': 'decimalLatitude:[* TO *]'
             },
             '_exclude_centroid': {
                 'label': 'Exclude centroids',
                 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(table),),
-                'solr': '(centroid:true OR centroid:yes OR centroid:1)'
+                'solr': 'centroid:true'
             },
             '_exclude_mineralogy': {
                 'label': 'Exclude Mineralogy',
