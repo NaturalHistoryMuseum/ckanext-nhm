@@ -85,7 +85,7 @@ def resource_filter_options(resource):
             '_exclude_centroid': {
                 'label': 'Exclude centroids',
                 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(table),),
-                'solr': 'centroid:true'
+                'solr': 'centroid:false'
             },
             '_exclude_mineralogy': {
                 'label': 'Exclude Mineralogy',
