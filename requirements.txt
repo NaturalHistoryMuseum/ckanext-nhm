@@ -19,5 +19,6 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-dataspatial.git#egg=ckanext_dataspatial
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-video.git#egg=ckanext_video
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-gbif.git#egg=ckanext_gbif
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-datasolr.git#egg=ckanext_datasolr
 pytz==2013.9
 python-memcached==1.53
