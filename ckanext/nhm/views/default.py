@@ -46,7 +46,7 @@ class DefaultView(object):
         'columnsTitle': [
             {
                 'column': '_id',
-                'title': ''  # This is just converted into a link so lets hide the field
+                'title': ''  # This is just converted into a link so lets hide the title
             }
         ],
         'columnsToolTip': []
