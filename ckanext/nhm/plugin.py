@@ -220,7 +220,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     query_dict['where'].append(options[o]['sql_false'])
 
         # Enhance the full text search, by adding support for double quoted expressions. We leave the
-        # full text search query intact (so we benefit from the full text index) and add an additonal
+        # full text search query intact (so we benefit from the full text index) and add an additional
         # LIKE statement for each quoted group.
         if 'q' in data_dict and not isinstance(data_dict['q'], dict):
             for match in re.findall('"[^"]+"', data_dict['q']):
@@ -250,15 +250,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'count': False
                 }
 
-        # We want DQI to always be the second column
-        try:
-            i = query_dict['select'].index(u'"dqi"')
-        except ValueError:
-            pass
-        else:
-           # If we have an index for column named DQI, remove it and insert it at position 1
-           query_dict['select'].insert(1, query_dict['select'].pop(i))
-
+        # Make sure _id and DQI are first
+        query_dict['select'] = self._order_fields(query_dict['select'], True)
         return query_dict
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
@@ -280,14 +273,28 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         query_dict['q'][0].append(options[o]['solr'])
                 elif 'solr_false' in options[o]:
                     query_dict['q'][0].append(options[o]['solr_false'])
-        # We want DQI to always be the second column
-        try:
-            i = query_dict['fields'].index('dqi')
-        except ValueError:
-            pass
-        else:
-            query_dict['fields'].insert(1, query_dict['fields'].pop(i))
+        # Make sure _id and DQI are first
+        query_dict['fields'] = self._order_fields(query_dict['fields'])
         return query_dict
+
+    def _order_fields(self, fields, encode=False):
+        """
+        We always want _id first, and DQI second
+        :return:
+        """
+        ordered_fields = ["_id", "dqi"]
+        for position, field in enumerate(ordered_fields):
+            try:
+                # Does this field exist?
+                if encode:
+                    field = u'"%s"' % field
+                i = fields.index(field)
+            except ValueError:
+                pass
+            else:
+                # If we have an index for column named DQI, remove it and insert it at position
+                fields.insert(position, fields.pop(i))
+        return fields
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
