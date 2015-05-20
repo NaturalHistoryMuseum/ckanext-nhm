@@ -13,28 +13,10 @@ Example:
 
       <section class="module module-narrow module-shallow">
 
-        <h2 class="module-heading"><i class="icon-medium icon-eye-open"></i> {{ _('Follow dataset') }}</h2>
+        <h2 class="module-heading"><i class="icon-medium icon-eye-open"></i> {{ _('Update alerts') }}</h2>
 
            <div class="module-content">
-
-                  {% block nums %}
-              <div class="nums">
-                <table class="table table-no-border">
-                    <tr>
-                        <th>{{ _('Followers') }}</th>
-                        <td>{{ h.SI_number_span(h.follow_count('dataset', pkg.id)) }}</td>
-                    </tr>
-                </table>
-              </div>
-            {% endblock %}
-            {% block follow_button %}
-                <div class="follow_button">
-                  {{ h.persistent_follow_button('dataset', pkg.name) }}
-                </div>
-            {% endblock %}
-
-            <p class="text-center"><small>Follow this dataset to receive update notifications.</small></p>
-
+                <p>Follow <a target="_blank" href="https://twitter.com/nhm_data">@NHM_DATA</a> to receive alerts when this dataset is updated.</p>
            </div>
 
       </section>
