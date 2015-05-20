@@ -23,7 +23,7 @@
         </p>
       </div>
       {% if not to_preview %}
-          {# BS: Added q to persitent filters #}
+          {# BS: Added q to persistent filters #}
           {% set query_params = h.get_query_params() %}
           {% set src = h.url(qualified=true, controller='package',
                              action='resource_view', id=package['name'],
@@ -32,7 +32,7 @@
                              **query_params)  %}
 
       {% else %}
-        {# When previewing we neet to stick the whole resource_view as a param as there is no other way to pass to information on to the iframe #}
+        {# When previewing we need to stick the whole resource_view as a param as there is no other way to pass to information on to the iframe #}
         {% set src = h.url(qualified=true, controller='package', action='resource_view', id=package['name'], resource_id=resource['id']) + '?' + h.urlencode({'resource_view': h.dump_json(resource_view)}) %}
       {% endif %}
       {% resource 'ckanext-nhm/iframe-resize' %}
