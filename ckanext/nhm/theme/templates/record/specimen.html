@@ -107,15 +107,13 @@
 
 {% endblock %}
 
+{% block record_additional_information %}
+    {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
+    {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
+    {{ super() }}
+{% endblock %}
+
 {% block record_additional_information_rows %}
-
-   {% set cite_as = h.url_for(controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
-
-   <tr>
-    <th scope="row">{{ _('Cite as') }}</th>
-    <td>{{ h.link_to(cite_as, cite_as) }}</td>
-  </tr>
-
    <tr>
     <th scope="row">{{ _('Created') }}</th>
     <td>{{ h.render_datetime(c.record_dict['created']) }}</td>

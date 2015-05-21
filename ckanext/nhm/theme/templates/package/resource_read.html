@@ -11,6 +11,11 @@
 {% endblock %}
 
 {% block resource_additional_information %}
+
+    {% if pkg.doi %}
+        {% snippet "doi/snippets/resource_citation.html", pkg_dict=pkg, res=res %}
+    {% endif %}
+
     <div class="additional-info">
         {% if res %}
             <section class="module">

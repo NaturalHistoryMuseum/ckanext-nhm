@@ -1,4 +1,3 @@
-/* Headers */
 .no-box-shadow {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -24,13 +23,17 @@
   font-family: 'nhm_ingrid_lightregular';
   src: url('/fonts/nhmingligreg-webfont.eot');
   src: url('/fonts/nhmingligreg-webfont.woff') format('woff');
-  font-style: normal;/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
+  
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 @font-face {
   font-family: 'nhm_ingridregular';
   src: url('/fonts/nhmingreg-webfont.eot');
   src: url('/fonts/nhmingreg-webfont.woff') format('woff');
-  font-style: normal;/* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
+  
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 /* Headers */
 h1,
@@ -187,7 +190,6 @@ img#beta {
   background: #228900;
   color: #ffffff;
   /* Navigation */
-
 }
 .masthead a {
   color: #ffffff;
@@ -290,7 +292,6 @@ img#beta {
   padding: 0;
   margin: 0;
   /* Breadcrumbs */
-
 }
 .toolbar .breadcrumb {
   font-size: 13px;
@@ -744,7 +745,6 @@ table td.filterable {
   min-height: inherit;
   padding: 10px 12px;
   border: none;
-  border: none;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
@@ -1118,7 +1118,6 @@ i.mineralogy {
   content: "-";
   color: white;
   /* to hide text */
-
   display: block;
 }
 .record-content table tbody:after {
@@ -1126,7 +1125,6 @@ i.mineralogy {
   content: "-";
   color: white;
   /* to hide text */
-
   display: block;
 }
 .record-content table tbody table#determinations {
@@ -1342,7 +1340,6 @@ a.toggle-view-filters:after {
 }
 .advanced-filter-field div.advanced-filter-field-value label {
   width: 26px;
-  overflow: hidden;
   position: absolute;
   top: 0;
   right: 0;
@@ -1485,4 +1482,10 @@ div.ckanpackager-form div {
 }
 .ckan-icon-flame {
   display: none!important;
+}
+.citation {
+  margin-bottom: 20px;
+}
+.citation p {
+  margin: 4px 6px;
 }

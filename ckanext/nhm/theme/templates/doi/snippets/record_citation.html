@@ -1,0 +1,13 @@
+{#
+Renders a citation for a resource
+#}
+
+{% extends "doi/snippets/resource_citation.html" %}
+
+{% block citation_link %}
+    Record: {{ h.link_to(citation_url, citation_url) }}
+{% endblock %}
+
+{% block citation_status %}
+    <p>Retrieved: {{ h.render_datetime(h.now(), date_format='%H:%M %d %b %Y') }} (GMT)</p>
+{% endblock %}
