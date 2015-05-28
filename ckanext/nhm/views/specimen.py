@@ -196,17 +196,17 @@ class SpecimenView(DefaultView):
 
         log.info('Viewing record %s', occurrence_id)
 
-        # Load the gbif_id (it's a hidden field so we need to manually add it
-        sql = """SELECT _gbif_id FROM "{resource_id}" WHERE "occurrenceID"='{occurrence_id}'""".format(
-            resource_id=c.resource['id'],
-            occurrence_id=occurrence_id
-        )
-
-        try:
-            result = tk.get_action('datastore_search_sql')(context, {'sql': sql})
-            c.record_dict['gbif_id'] = result['records'][0]['_gbif_id']
-        except (ValidationError, IndexError):
-            pass
+        # # Load the gbif_id (it's a hidden field so we need to manually add it
+        # sql = """SELECT _gbif_id FROM "{resource_id}" WHERE "occurrenceID"='{occurrence_id}'""".format(
+        #     resource_id=c.resource['id'],
+        #     occurrence_id=occurrence_id
+        # )
+        #
+        # try:
+        #     result = tk.get_action('datastore_search_sql')(context, {'sql': sql})
+        #     c.record_dict['gbif_id'] = result['records'][0]['_gbif_id']
+        # except (ValidationError, IndexError):
+        #     pass
 
         c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
 
@@ -271,29 +271,29 @@ class SpecimenView(DefaultView):
 
         related_resources = c.record_dict.get('relatedResourceID')
 
-        if related_resources:
-            related_resources = related_resources.split(';')
-
-            try:
-                related_resources.remove(occurrence_id)
-            except ValueError:
-                pass
-
-            if related_resources:
-                result = get_action('datastore_search')(
-                    context,
-                    {
-                        'resource_id': c.resource['id'],
-                        'filters': {'occurrenceID': related_resources},
-                        'fields': ['_id', 'occurrenceID', 'catalogNumber']
-                    }
-                )
-
-                for record in result['records']:
-                    c.related_records.append({
-                        '_id': record['_id'],
-                        'title': 'Other part: %s' % (record['catalogNumber'] or record['occurrenceID']),
-                    })
+        # if related_resources:
+        #     related_resources = related_resources.split(';')
+        #
+        #     try:
+        #         related_resources.remove(occurrence_id)
+        #     except ValueError:
+        #         pass
+        #
+        #     if related_resources:
+        #         result = get_action('datastore_search')(
+        #             context,
+        #             {
+        #                 'resource_id': c.resource['id'],
+        #                 'filters': {'occurrenceID': related_resources},
+        #                 'fields': ['_id', 'occurrenceID', 'catalogNumber']
+        #             }
+        #         )
+        #
+        #         for record in result['records']:
+        #             c.related_records.append({
+        #                 '_id': record['_id'],
+        #                 'title': 'Other part: %s' % (record['catalogNumber'] or record['occurrenceID']),
+        #             })
 
         for image in c.images:
             # Create a thumbnail image by replacing the max image dimensions we've located from KE EMu with thumbnail 100x100
