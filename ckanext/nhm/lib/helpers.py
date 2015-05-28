@@ -493,11 +493,17 @@ def resource_view_state(resource_view_json, resource_json):
     # TODO: This can be merged into get_slickgrid_state
     resource_view['state']['fitColumns'] = fit_columns
 
+    # ID and DQI always first
+    resource_view['state']['columnsOrder'] = ["_id"]
+
+    if 'dqi' in resource_fields:
+        resource_view['state']['columnsOrder'].append('dqi')
+
     for group, fields in resource_view_get_field_groups(resource).items():
 
         for field, label in fields.items():
 
-            if field in resource_fields:
+            if field in resource_fields and field not in hidden_fields:
 
                 # If we have a group, add a tooltip
                 # Otherwise will use title text
@@ -516,6 +522,9 @@ def resource_view_state(resource_view_json, resource_json):
                         'title': label
                     }
                 )
+                # Add field to the ordered columns
+                resource_view['state']['columnsOrder'].append(field)
+
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
             resource_view['state']['columnsWidth'].append(
