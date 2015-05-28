@@ -86,46 +86,49 @@ class RecordController(base.BaseController):
         # Sanity check: image field hasn't been set to _id
         if field_names['image'] and field_names['image'] != '_id':
 
-            image_field_type = record_field_types[field_names['image']]
+            try:
+                image_field_type = record_field_types[field_names['image']]
+            except KeyError:
+                pass
+            else:
+                default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
+                licence_id = c.resource.get('_image_licence') or 'ODC-BY-1.0'
+                licence = model.Package.get_license_register()[licence_id]
+                default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
-            default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
-            licence_id = c.resource.get('_image_licence') or 'ODC-BY-1.0'
-            licence = model.Package.get_license_register()[licence_id]
-            default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
+                image_field_value = c.record_dict.pop(field_names['image'])
 
-            image_field_value = c.record_dict.pop(field_names['image'])
+                if image_field_value:
 
-            if image_field_value:
+                    if image_field_type == 'json':
 
-                if image_field_type == 'json':
+                        c.images = []
 
-                    c.images = []
+                        try:
+                            images = json.loads(image_field_value)
+                        except ValueError:
+                            pass
+                        else:
 
-                    try:
-                        images = json.loads(image_field_value)
-                    except ValueError:
-                        pass
+                            for image in images:
+                                url = image.get('identifier', None)
+                                if url:
+
+                                    license = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
+
+                                    c.images.append({
+                                        'modal_title': image.get('title', None) or c.record_title,
+                                        'url': url,
+                                        'description': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright)
+                                    })
+
                     else:
-
-                        for image in images:
-                            url = image.get('identifier', None)
-                            if url:
-
-                                license = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
-
-                                c.images.append({
-                                    'modal_title': image.get('title', None) or c.record_title,
-                                    'url': url,
-                                    'description': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright)
-                                })
-
-                else:
-                    try:
-                        # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                        c.images = [{'modal_title': c.record_title, 'url': image.strip(), 'description': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if image.strip()]
-                    except (KeyError, AttributeError):
-                        # Skip errors - there are no images
-                        pass
+                        try:
+                            # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
+                            c.images = [{'modal_title': c.record_title, 'url': image.strip(), 'description': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if image.strip()]
+                        except (KeyError, AttributeError):
+                            # Skip errors - there are no images
+                            pass
 
         if field_names['latitude'] and field_names['longitude']:
             latitude, longitude = c.record_dict.get(field_names['latitude']), c.record_dict.get(field_names['longitude'])
