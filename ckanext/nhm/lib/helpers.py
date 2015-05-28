@@ -499,6 +499,11 @@ def resource_view_state(resource_view_json, resource_json):
     if 'dqi' in resource_fields:
         resource_view['state']['columnsOrder'].append('dqi')
 
+    for field in resource_fields:
+        if field not in hidden_fields and field not in resource_view['state']['columnsOrder']:
+            # Add field to the ordered columns
+            resource_view['state']['columnsOrder'].append(field)
+
     for group, fields in resource_view_get_field_groups(resource).items():
 
         for field, label in fields.items():
@@ -522,8 +527,6 @@ def resource_view_state(resource_view_json, resource_json):
                         'title': label
                     }
                 )
-                # Add field to the ordered columns
-                resource_view['state']['columnsOrder'].append(field)
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
