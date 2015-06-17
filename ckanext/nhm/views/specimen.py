@@ -269,8 +269,8 @@ class SpecimenView(DefaultView):
         # Related resources
         c.related_records = []
 
-        related_resources = c.record_dict.get('relatedResourceID')
-
+        # related_resources = c.record_dict.get('relatedResourceID')
+        #
         # if related_resources:
         #     related_resources = related_resources.split(';')
         #
@@ -296,8 +296,8 @@ class SpecimenView(DefaultView):
         #             })
 
         for image in c.images:
-            # Create a thumbnail image by replacing the max image dimensions we've located from KE EMu with thumbnail 100x100
-            image['thumbnail'] = re.sub("width=[0-9]+&height=[0-9]+", "width=100&height=100", image['url'])
+            # Create a thumbnail image by replacing preview with thumbnail
+            image['thumbnail'] = image['url'].replace('preview', 'thumbnail')
 
         return p.toolkit.render('record/specimen.html')
 
