@@ -192,11 +192,11 @@ class DatastoreCommand(CkanCommand):
                         })
                     except logic.ValidationError:
                         log.critical('Update stats error: resource %s does not exist' % resource['id'])
+                    except logic.NotAuthorized:
+                        log.critical('Not authorized to read resource: %s' % resource['id'])
                     else:
                         count = result['records'][0]['count']
-
                         stats = DatastoreStats(count=count, resource_id=resource['id'])
-
                         model.Session.add(stats)
 
         model.Session.commit()
