@@ -1,8 +1,10 @@
 import os
 import re
+import json
 import ckan.plugins as p
 import ckan.logic as logic
 import ckan.model as model
+import ckan.lib.helpers as h
 from beaker.cache import region_invalidate
 from webhelpers.html import literal
 from beaker.cache import cache_managers
@@ -20,11 +22,11 @@ from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
 from ckanext.doi.interfaces import IDoi
 from ckanext.datasolr.interfaces import IDataSolr
+from ckanext.gallery.plugins.interfaces import IGalleryImage
+
 
 get_action = logic.get_action
-
 unflatten = dictization_functions.unflatten
-
 Invalid = p.toolkit.Invalid
 
 log = logging.getLogger(__name__)
@@ -64,6 +66,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(IDataSolr)
     p.implements(IContact)
     p.implements(IDoi)
+    p.implements(IGalleryImage)
 
     ## IConfigurer
     def update_config(self, config):
@@ -373,10 +376,53 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IDoi
     def build_metadata(self, pkg_dict, metadata_dict):
-
         metadata_dict['resource_type'] = pkg_dict.get('dataset_category', None)
-
         if isinstance(metadata_dict['resource_type'], list) and metadata_dict['resource_type']:
             metadata_dict['resource_type'] = metadata_dict['resource_type'][0]
-
         return metadata_dict
+
+    ## IGalleryImage
+    def image_info(self):
+        """
+        Return info for this plugin
+        If resource type is set, only dataset of that type will be available
+        :return:
+        """
+        return {
+            'title': 'DwC associated media',
+            'resource_type': ['dwc', 'csv'],
+            'field_type': ['json']
+        }
+
+    ## IGalleryImage
+    def get_images(self, raw_images, record, data_dict):
+        images = []
+        try:
+            image_json = json.loads(raw_images)
+        except ValueError:
+            pass
+        else:
+            for i in image_json:
+                title = []
+                for title_field in ['scientificName', 'catalogNumber']:
+                    if record.get(title_field, None):
+                        title.append(record.get(title_field))
+                description = '%s<br />&copy; %s' % (
+                    h.link_to(i['license'], i['license'], target='_blank'),
+                    i['rightsHolder']
+                )
+                images.append({
+                    'url': i['identifier'],
+                    'thumbnail': i['identifier'].replace('preview', 'thumbnail'),
+                    'link': h.url_for(
+                        controller='ckanext.nhm.controllers.record:RecordController',
+                        action='view',
+                        package_name=data_dict['package']['name'],
+                        resource_id=data_dict['resource']['id'],
+                        record_id=record['_id']
+                    ),
+                    'description': description,
+                    'title': literal(''.join(['<span>%s</span>' % t for t in title])),
+                    'modal_title': ' - '.join(title)
+                })
+        return images
