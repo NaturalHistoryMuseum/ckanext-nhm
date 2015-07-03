@@ -481,7 +481,7 @@ def resource_view_state(resource_view_json, resource_json):
     num_fields = len(resource_fields) - len(hidden_fields)
 
     viewport_max_width = 920
-    col_width = 100
+    col_width = 80
     fit_columns = (num_fields * col_width) < viewport_max_width
 
     # Initiate the resource view
