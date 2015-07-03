@@ -35,7 +35,7 @@ class DefaultView(object):
             'enableTextSelectionOnCells': False,
             'enableCellNavigation': False,
             'enableColumnReorder': False,
-            'defaultColumnWidth': 100
+            'defaultColumnWidth': 50
         },
         'columnsWidth': [
             {
