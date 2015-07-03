@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
 import os
 import re
 import json
@@ -209,7 +212,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
-
         # Add our options filters
         if 'filters' in data_dict:
             resource_show = p.toolkit.get_action('resource_show')
@@ -264,6 +266,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def datasolr_search(self, context, data_dict, field_types, query_dict):
         # Add our custom filters
         if 'filters' in data_dict:
+
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
             options = resource_filter_options(resource)
@@ -379,7 +382,46 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         metadata_dict['resource_type'] = pkg_dict.get('dataset_category', None)
         if isinstance(metadata_dict['resource_type'], list) and metadata_dict['resource_type']:
             metadata_dict['resource_type'] = metadata_dict['resource_type'][0]
+        contributors = pkg_dict.get('contributors', '').split('\n')
+        if contributors:
+            metadata_dict['contributors'] = []
+            for contributor in contributors:
+                contributor = contributor.replace('\r', '').encode('unicode-escape')
+                m = re.search(r'(.*?)\s?\((.*)\)', contributor)
+                try:
+                    metadata_dict['contributors'].append(
+                        {
+                            'contributorName': m.group(1),
+                            'affiliation': m.group(2),
+
+                        }
+                    )
+                except AttributeError:
+                    metadata_dict['contributors'].append(
+                        {
+                            'contributorName': contributor
+                        }
+                    )
+        affiliation = pkg_dict.get('affiliation', None)
+        if affiliation:
+            metadata_dict['affiliation'] = affiliation.encode('unicode-escape')
+
         return metadata_dict
+
+    ## IDoi
+    def metadata_to_xml(self, xml_dict, metadata):
+        if 'contributors' in metadata:
+            xml_dict['resource']['contributors'] = {
+                'contributor': [],
+            }
+            for contributor in metadata['contributors']:
+                contributor['@contributorType'] = 'Researcher'
+                xml_dict['resource']['contributors']['contributor'].append(contributor)
+
+        # FIXME - Datacite 3.1 isn't accepting affiliation in the creator field
+        # if 'affiliation' in metadata:
+        #     xml_dict['resource']['creators']['creator'][0]['affiliation'] = metadata['affiliation']
+        return xml_dict
 
     ## IGalleryImage
     def image_info(self):

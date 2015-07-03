@@ -45,7 +45,23 @@
 
             {% set temporal_extent = pkg_dict.get('temporal_extent', None) %}
             {% set update_frequency = pkg_dict.get('update_frequency', None) %}
+            {% set affiliation = pkg_dict.get('affiliation', None) %}
+            {% set contributors = pkg_dict.get('contributors', None) %}
             {% set dataset_category = pkg_dict.dataset_category.pop() if pkg_dict.dataset_category else None %}
+
+            {% if affiliation %}
+                <tr>
+                    <th scope="row" class="dataset-label">{{ _("Affiliation") }}</th>
+                    <td class="dataset-details">{{ affiliation }}</td>
+                </tr>
+            {%  endif %}
+
+            {% if contributors %}
+                <tr>
+                    <th scope="row" class="dataset-label">{{ _("Contributors") }}</th>
+                    <td class="dataset-details">{{ contributors }}</td>
+                </tr>
+            {%  endif %}
 
             {% if temporal_extent %}
                 <tr>
