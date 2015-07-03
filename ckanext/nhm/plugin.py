@@ -369,7 +369,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         """
         for resource in pkg_dict.get('resources', []):
             # If this is the specimen resource ID, clear the collection stats
-
             if 'id' in resource:
                 if resource['id'] in [helpers.get_specimen_resource_id(), helpers.get_indexlot_resource_id()]:
                     # Quick and dirty, delete all caches when indexlot or specimens are updated
@@ -382,8 +381,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         metadata_dict['resource_type'] = pkg_dict.get('dataset_category', None)
         if isinstance(metadata_dict['resource_type'], list) and metadata_dict['resource_type']:
             metadata_dict['resource_type'] = metadata_dict['resource_type'][0]
-        contributors = pkg_dict.get('contributors', '').split('\n')
+        contributors = pkg_dict.get('contributors', None)
         if contributors:
+            contributors = contributors.split('\n')
             metadata_dict['contributors'] = []
             for contributor in contributors:
                 contributor = contributor.replace('\r', '').encode('unicode-escape')
