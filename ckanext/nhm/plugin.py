@@ -449,7 +449,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 for title_field in ['scientificName', 'catalogNumber']:
                     if record.get(title_field, None):
                         title.append(record.get(title_field))
-                description = '%s<br />&copy; %s' % (
+                copyright = '%s<br />&copy; %s' % (
                     h.link_to(i['license'], i['license'], target='_blank'),
                     i['rightsHolder']
                 )
@@ -463,7 +463,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         resource_id=data_dict['resource']['id'],
                         record_id=record['_id']
                     ),
-                    'description': description,
+                    'copyright': copyright,
                     'title': literal(''.join(['<span>%s</span>' % t for t in title])),
                     'modal_title': ' - '.join(title)
                 })
