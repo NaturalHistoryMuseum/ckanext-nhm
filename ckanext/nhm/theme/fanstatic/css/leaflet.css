@@ -1,5 +1,4 @@
 /* Leaflet controls */
-/* Leaflet controls */
 .leaflet-container .leaflet-bar {
   border: none;
   box-shadow: none;
@@ -35,4 +34,8 @@
 }
 .leaflet-container .leaflet-draw-actions {
   left: 40px!important;
+}
+.leaflet-container .leaflet-top,
+.leaflet-container .leaflet-bottom {
+  z-index: 400;
 }
