@@ -113,15 +113,12 @@ class RecordController(base.BaseController):
                             for image in images:
                                 url = image.get('identifier', None)
                                 if url:
-
                                     license = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
-
                                     c.images.append({
                                         'modal_title': image.get('title', None) or c.record_title,
                                         'url': url,
-                                        'description': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright)
+                                        'copyright': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright)
                                     })
-
                     else:
                         try:
                             # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
