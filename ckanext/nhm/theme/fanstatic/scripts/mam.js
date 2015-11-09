@@ -4,7 +4,7 @@
 
 $(function() {
 
-    var endpoint = 'http://127.0.0.1:8000/api/3/action/download_image'
+    var endpoint = '/api/3/action/download_image'
     var tpl = '<form id="mam"><p><small>Please enter your email address, and we will send you the original image.</small></p><input type="hidden" value="{{resource_id}}" name="resource_id"><input type="hidden" name="record_id" value="{{record_id}}"><input type="hidden" name="asset_id" value="{{asset_id}}"><div class="input-append"><input type="email" class="input-large" name="email" value="" required placeholder="Email address" oninvalid="this.setCustomValidity(\'Please enter your email\')" oninput="setCustomValidity(\'\')"><button type="submit" class="btn btn-success"><i class="icon-circle-arrow-right icon-large"></i></button></div></form>'
 
     $("#blueimp-gallery").on( "tooltipopen", function( event, ui ) {

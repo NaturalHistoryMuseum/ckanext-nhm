@@ -101,6 +101,7 @@ def _image_exists_on_record(resource, record, asset_id):
     :param asset_id:
     :return:
     """
+    # FIXME - If no image field use gallery
     image_field = resource.get('_image_field', None)
 
     try:
