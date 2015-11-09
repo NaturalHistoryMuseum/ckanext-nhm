@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os
 
-version = '0.2'
+version = '0.3'
 
 setup(
 	name='ckanext-nhm',
@@ -30,5 +30,9 @@ setup(
             dataset-category=ckanext.nhm.commands.dataset_category:DatasetCategoryCommand
             initdb=ckanext.nhm.commands.initdb:InitDBCommand
             datastore=ckanext.nhm.commands.datastore:DatastoreCommand
+
+
+        [ckan.rdf.profiles]
+            nhm_dcat=ckanext.nhm.dcat.profiles:NHMDCATProfile
 	""",
 )
