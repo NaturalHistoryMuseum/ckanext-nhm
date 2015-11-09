@@ -111,18 +111,20 @@ class RecordController(base.BaseController):
                         else:
 
                             for image in images:
-                                url = image.get('identifier', None)
-                                if url:
+                                href = image.get('identifier', None)
+                                if href:
                                     license = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
                                     c.images.append({
-                                        'modal_title': image.get('title', None) or c.record_title,
-                                        'url': url,
-                                        'copyright': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright)
+                                        'title': image.get('title', None) or c.record_title,
+                                        'href': href,
+                                        'copyright': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright),
+                                        'record_id': record_id,
+                                        'resource_id': resource_id
                                     })
                     else:
                         try:
                             # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                            c.images = [{'modal_title': c.record_title, 'url': image.strip(), 'description': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if image.strip()]
+                            c.images = [{'title': c.record_title, 'href': image.strip(), 'copyright': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if image.strip()]
                         except (KeyError, AttributeError):
                             # Skip errors - there are no images
                             pass

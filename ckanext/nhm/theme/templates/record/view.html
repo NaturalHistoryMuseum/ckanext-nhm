@@ -125,7 +125,7 @@
                 {% block record_images %}
                     {% if c.images %}
                         <h3>Images</h3>
-                        {% snippet 'gallery/snippets/gallery.html', images=c.images %}
+                        {% snippet 'gallery/snippets/gallery.html', images=c.images, resource_id=res.id %}
                     {% endif %}
                 {% endblock %}
 

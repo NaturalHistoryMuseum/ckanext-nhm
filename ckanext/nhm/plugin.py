@@ -15,7 +15,7 @@ from ckan.common import c, request
 from ckan.lib.helpers import url_for
 from itertools import chain
 import ckan.lib.navl.dictization_functions as dictization_functions
-import ckanext.nhm.logic.action as action
+import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 import logging
@@ -128,8 +128,10 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     # IActions
     def get_actions(self):
 
+        # TODO: Add after map - remove dump
         return {
-            'record_get':  action.record_get
+            'record_get':  nhm_action.record_get,
+            'download_image': nhm_action.download_original_image
         }
 
     # ITemplateHelpers
@@ -139,7 +141,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
         for helper in dir(helpers):
-
             #  Exclude private
             if not helper.startswith('_'):
                 func = getattr(helpers, helper)
@@ -147,7 +148,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 #  Ensure it's a function
                 if hasattr(func, '__call__'):
                     h[helper] = func
-
         return h
 
     ## IDatasetForm - CKAN Metadata
@@ -454,7 +454,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     i['rightsHolder']
                 )
                 images.append({
-                    'url': i['identifier'],
+                    'href': i['identifier'],
                     'thumbnail': i['identifier'].replace('preview', 'thumbnail'),
                     'link': h.url_for(
                         controller='ckanext.nhm.controllers.record:RecordController',
@@ -464,7 +464,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         record_id=record['_id']
                     ),
                     'copyright': copyright,
-                    'title': literal(''.join(['<span>%s</span>' % t for t in title])),
-                    'modal_title': ' - '.join(title)
+                    # Description of image in gallery view
+                    'description': literal(''.join(['<span>%s</span>' % t for t in title])),
+                    'title': ' - '.join(title),
+                    'record_id': record['_id']
                 })
         return images

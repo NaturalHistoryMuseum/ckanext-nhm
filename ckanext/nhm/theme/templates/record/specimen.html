@@ -107,13 +107,6 @@
 
 {% endblock %}
 
-{% block record_images %}
-    {% if c.images %}
-        <h3>Images</h3>
-        {% snippet 'gallery/snippets/gallery.html', images=c.images %}
-    {% endif %}
-{% endblock %}
-
 {% block record_additional_information %}
     {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
     {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}

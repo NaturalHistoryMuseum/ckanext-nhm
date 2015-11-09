@@ -5,7 +5,7 @@ Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
 
-import re
+from uuid import UUID
 import ckan.plugins as p
 from ckan.common import _
 
@@ -29,3 +29,22 @@ def string_max_length(max_length):
         return value
 
     return callable
+
+
+def uuid_validator(value, context):
+    '''
+    Checks if a UUID is valid (used for MAM asset IDs)
+
+    :raises: ckan.lib.navl.dictization_functions.Invalid if the string is
+        an invalid UUID
+    '''
+    # FIXME: Not a valid UUID
+    # try:
+    #     UUID(value, version=4)
+    # except ValueError:
+    #     # If it's a value error, then the string
+    #     # is not a valid hex code for a UUID.
+    #     # return False
+    #
+    #     raise Invalid(_('Must be a postive integer'))
+    return value

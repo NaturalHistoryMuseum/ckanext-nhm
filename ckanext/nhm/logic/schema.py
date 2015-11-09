@@ -6,7 +6,7 @@ from ckan.logic.schema import (
     default_show_package_schema
     )
 
-from ckanext.nhm.logic.validators import string_max_length
+from ckanext.nhm.logic.validators import string_max_length, uuid_validator
 from formencode.validators import OneOf
 
 get_converter = p.toolkit.get_converter
@@ -33,13 +33,23 @@ UPDATE_FREQUENCIES = [
     ('never', 'Never'),
 ]
 
+
 def record_get_schema():
 
     schema = {
         'resource_id': [not_missing, unicode, resource_id_exists],
         'record_id': [not_missing, int_validator]
     }
+    return schema
 
+
+def download_original_image_schema():
+    schema = {
+        'resource_id': [not_missing, unicode, resource_id_exists],
+        'record_id': [not_missing, int_validator],
+        'asset_id': [not_missing, uuid_validator],
+        'email': [not_missing, not_empty]
+    }
     return schema
 
 

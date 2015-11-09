@@ -297,7 +297,7 @@ class SpecimenView(DefaultView):
 
         for image in c.images:
             # Create a thumbnail image by replacing preview with thumbnail
-            image['thumbnail'] = image['url'].replace('preview', 'thumbnail')
+            image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
 
         return p.toolkit.render('record/specimen.html')
 
