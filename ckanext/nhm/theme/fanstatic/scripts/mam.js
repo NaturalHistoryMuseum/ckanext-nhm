@@ -2,43 +2,66 @@
  * Created by bens3 on 07/11/15.
  */
 
-$(function() {
+var MAM = {
+    config : {
+        endpoint: '/api/3/action/download_image',
+        formTpl: '<form id="mam"><p><small>Please enter your email address, and we will send you the original image.</small></p><input type="hidden" value="{{resource_id}}" name="resource_id"><input type="hidden" name="record_id" value="{{record_id}}"><input type="hidden" name="asset_id" value="{{asset_id}}"><div class="input-append"><input type="email" class="input-large" name="email" value="" required placeholder="Email address" oninvalid="this.setCustomValidity(\'Please enter your email\')" oninput="setCustomValidity(\'\')"><button type="submit" class="btn btn-success"><i class="icon-circle-arrow-right icon-large"></i></button></div></form>'
+    },
 
-    var endpoint = '/api/3/action/download_image'
-    var tpl = '<form id="mam"><p><small>Please enter your email address, and we will send you the original image.</small></p><input type="hidden" value="{{resource_id}}" name="resource_id"><input type="hidden" name="record_id" value="{{record_id}}"><input type="hidden" name="asset_id" value="{{asset_id}}"><div class="input-append"><input type="email" class="input-large" name="email" value="" required placeholder="Email address" oninvalid="this.setCustomValidity(\'Please enter your email\')" oninput="setCustomValidity(\'\')"><button type="submit" class="btn btn-success"><i class="icon-circle-arrow-right icon-large"></i></button></div></form>'
+    init : function() {
 
-    $("#blueimp-gallery").on( "tooltipopen", function( event, ui ) {
+        $('#download-tooltip').tooltip({
+            position: { of: '#blueimp-gallery a.gallery-control-download', my: 'left+60 center', at: 'left center' },
+            tooltipClass: "download-tooltip"
+        });
+        var $gallery = $('#blueimp-gallery')
+        $gallery.find('a.gallery-control-download').on('click', jQuery.proxy(MAM._hijackDownloadLink));
+        // Hide the tooltip if the gallery is clicked
+        $gallery.on('click', jQuery.proxy(MAM._hideDownloadTooltip));
 
-        var image = $('#download-tooltip').data("image")
+    },
+    _hijackDownloadLink: function(e){
+        // Take over the download link - if it's a MAM one show the tooltip options
+        // Otherwise just propagate to default action
+        var image = $('#blueimp-gallery').data('image')
+        if(image.href.indexOf('nhm.ac.uk/services/media-store/asset') != -1){
+            MAM._showDownloadTooltip(image)
+            e.stopPropagation()
+            return false
+        }
+        return true
+    },
 
-        console.log(image);
+    _showDownloadTooltip: function(image){
+        // Get the HTML image 0 we then know the dimensions
+        $img = $('#blueimp-gallery img[src="' + image.href + '"]')
 
-        // If this is a MAM image, add the MAM download form
-        if(image.href.indexOf('nhm.ac.uk/services/media-store/asset')){
+        $('#download-tooltip').tooltip({open: function( event, ui ) {
+            var ul = $('<ul/>')
+            $('<li><a href="' + image.href + '" download>Download image (' + $img[0].naturalHeight + '&times;' + $img[0].naturalWidth + ')</a></li>').appendTo(ul);
 
-            var form = Mustache.render(tpl, {
-                resource_id: image.resource_id,
-                record_id: image.record_id,
-                asset_id: image.href.replace("http://www.nhm.ac.uk/services/media-store/asset/", "").replace("/contents/preview", "")
-            })
-
-            var li = $('<li/>')
-
-            $('<a>',{
+            $('<li/>').append($('<a>',{
                 text: 'Download original image (hi-res)',
                 title: 'Download original image',
                 href: '#',
                 click: function(e){
                     // If mam form is visible, add the active class to the link
                     // Add here - if we use the toggle callback, there's a pause in display
+                    e.preventDefault();
                     $(e.target).toggleClass('active', $('#mam').not(":visible"))
                     $('#mam').toggle();
-                    e.preventDefault();
                     return false;
-                }
-            }).appendTo(li);
 
-            $('ul', ui.tooltip).append(li).append(form);
+                }
+            })).appendTo(ul);
+
+            var form = Mustache.render(MAM.config.formTpl, {
+                resource_id: image.resource_id,
+                record_id: image.record_id,
+                asset_id: image.href.replace("http://www.nhm.ac.uk/services/media-store/asset/", "").replace("/contents/preview", "")
+            })
+
+            $(ui.tooltip).html(ul.append(form));
 
             // Handle form submission
             $('form', ui.tooltip).submit(function( e ) {
@@ -50,7 +73,7 @@ $(function() {
                 $(this).serializeArray().map(function(x){data[x.name] = x.value;});
                 $.ajax({
                    type: "POST",
-                   url: endpoint,
+                   url: MAM.config.endpoint,
                    data: JSON.stringify(data), // serializes the form's elements.
                    complete: function(){
                        $(this).removeClass('working')
@@ -65,15 +88,14 @@ $(function() {
               e.preventDefault();
             });
 
+            }
+        }).tooltip( "open" )
 
+    },
+    _hideDownloadTooltip: function(e){
+        $('#download-tooltip').tooltip('close');
+    }
+};
 
-        }
-
-
-
-
-
-    } );
-
-});
+$(document).ready(function() { MAM.init(); });
 
