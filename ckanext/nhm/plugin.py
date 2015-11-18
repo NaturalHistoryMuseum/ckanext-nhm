@@ -52,6 +52,9 @@ collection_contacts = {
     'Zoology': 't.conyers@nhm.ac.uk'
 }
 
+# The maximum limit for datastore search
+MAX_LIMIT = 200
+
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
     NHM CKAN modifications
@@ -122,16 +125,16 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         # Dataset metrics
         map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
-
+        # NOTE: /datastore/dump/{resource_id} is prevented by NGINX
         return map
+
 
     # IActions
     def get_actions(self):
-
-        # TODO: Add after map - remove dump
         return {
             'record_get':  nhm_action.record_get,
-            'download_image': nhm_action.download_original_image
+            # TEMP: Disable original image download
+            # 'download_image': nhm_action.download_original_image
         }
 
     # ITemplateHelpers
@@ -234,6 +237,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     '%' + match[1:-1] + '%'
                 ))
 
+        self.enforce_max_limit(query_dict)
+
         # CKAN's field auto-completion uses full text search on individual fields. This causes
         # problems because of stemming issues, and is quite slow on our data set (even with an
         # appropriate index). We detect this type of queries and replace them with a LIKE query.
@@ -276,7 +281,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         query_dict['q'][0].append(options[o]['solr'])
                 elif 'solr_false' in options[o]:
                     query_dict['q'][0].append(options[o]['solr_false'])
+        self.enforce_max_limit(query_dict)
         return query_dict
+
+    @staticmethod
+    def enforce_max_limit(query_dict):
+        limit = query_dict.get('limit', 0)
+        if MAX_LIMIT and limit > MAX_LIMIT:
+            query_dict['limit'] = MAX_LIMIT
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
