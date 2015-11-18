@@ -4,7 +4,7 @@ import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
-from ckan.lib.helpers import link_to
+from ckan.lib.helpers import link_to, url_for
 import logging
 import json
 from ckanext.nhm.lib.helpers import resource_view_get_view
@@ -109,7 +109,6 @@ class RecordController(base.BaseController):
                         except ValueError:
                             pass
                         else:
-
                             for image in images:
                                 href = image.get('identifier', None)
                                 if href:
@@ -119,7 +118,14 @@ class RecordController(base.BaseController):
                                         'href': href,
                                         'copyright': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright),
                                         'record_id': record_id,
-                                        'resource_id': resource_id
+                                        'resource_id': resource_id,
+                                        'link': url_for(
+                                            controller='ckanext.nhm.controllers.record:RecordController',
+                                            action='view',
+                                            package_name=package_name,
+                                            resource_id=resource_id,
+                                            record_id=record_id
+                                        ),
                                     })
                     else:
                         try:
