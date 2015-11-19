@@ -8,16 +8,18 @@
 
     {{ form.input('email', label=_('Your email'), id='field-email', type='email', value=data.email, error=errors.email, classes=['control-medium'], is_required=true) }}
 
-    {# Add contact type #}
-    {{ form.select('contact_type', label=_('Contact type'), options=h.get_contact_form_category_options(), selected=data.contact_type, error=errors.contact_type) }}
-
-    {# Add resource name and ID hidden field#}
+     {# Add resource name and ID hidden field#}
 
     {% set package_id = h.get_request_param('package_id', None) %}
 
     {% if package_id %}
 
         {% set package = h.get_package(package_id) %}
+
+        {# If this is the collections dataset, still add the department select #}
+        {% if package['name'] == 'collection-specimens' %}
+            {{ form.select('department', label=_('Department'), options=h.get_contact_form_department_options(), selected=data.department, error=errors.department) }}
+        {% endif %}
 
         <div class="control-group control-medium">
             <label class="control-label">Dataset</label>
@@ -27,6 +29,12 @@
         </div>
 
         {{ form.hidden('package_id', package_id) }}
+        {{ form.hidden('package_name', package['name']) }}
+
+    {% else %}
+
+       {# Add department selection (for non dataset forms)  #}
+       {{ form.select('department', label=_('Department'), options=h.get_contact_form_department_options(), selected=data.department, error=errors.department) }}
 
     {% endif %}
 

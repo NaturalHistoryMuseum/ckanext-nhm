@@ -20,6 +20,7 @@ import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 import logging
 from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
+from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
 from collections import OrderedDict
@@ -33,24 +34,6 @@ unflatten = dictization_functions.unflatten
 Invalid = p.toolkit.Invalid
 
 log = logging.getLogger(__name__)
-
-# Contact addresses to route specimen contact request to
-# collection_contacts = {
-#     'Entomology': 'b.scott@nhm.ac.uk',
-#     'Botany': 'b.scott@nhm.ac.uk',
-#     'Mineralogy': 'b.scott@nhm.ac.uk',
-#     'Palaeontology': 'b.scott@nhm.ac.uk',
-#     'Zoology': 'b.scott@nhm.ac.uk'
-# }
-
-# For live
-collection_contacts = {
-    'Entomology': 'adrian.hine@nhm.ac.uk',
-    'Botany': 'lawrence.brooks@nhm.ac.uk',
-    'Mineralogy': 'd.a.smith@nhm.ac.uk',
-    'Palaeontology': 'd.a.smith@nhm.ac.uk',
-    'Zoology': 't.conyers@nhm.ac.uk'
-}
 
 # The maximum limit for datastore search
 MAX_LIMIT = 200
@@ -293,11 +276,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
 
-        specimen_resource_id = helpers.get_specimen_resource_id()
-        indexlot_resource_id = helpers.get_indexlot_resource_id()
-
         # Get the submitted data values
         package_id = data_dict.get('package_id', None)
+        package_name = data_dict.get('package_name', None)
         resource_id = data_dict.get('resource_id', None)
         record_id = data_dict.get('record_id', None)
 
@@ -307,65 +288,50 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # Over written by linking to record / resource etc., - see below
         url = None
 
-        # If we have a record ID, this is a contact/form request from a record page
-        if record_id and resource_id in [specimen_resource_id, indexlot_resource_id]:
+        # Has the user selected a department
+        department = data_dict.get('department', None)
 
-            # Load the record to retrieve the collection code
-            record_dict = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
-
-            if resource_id == specimen_resource_id:
-                department = helpers.get_department(record_dict.get('Collection code'))
-                named_route = 'specimen'
-                mail_dict['subject'] = 'Collection specimen enquiry'
+        # If this is an index lot enquiry, send to entom
+        if package_name == 'collection-indexlotss':
+            mail_dict['subject'] = 'Collection Index lot enquiry'
+            mail_dict['recipient_email'] = COLLECTION_CONTACTS['Entomology']
+            mail_dict['recipient_name'] = 'Entomology'
+        elif department:
+            # User has selected the department
+            try:
+                mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
+            except KeyError:
+                # Other/unknown etc., - so don't set recipient email
+                mail_dict['body'] += '\nDepartment: %s\n' % department
             else:
-                department = record_dict.get('Department')
-                named_route = 'indexlot'
-                mail_dict['subject'] = 'Collection Index lot enquiry'
-
-            # Add the specific email contact to the built in one (data@nhm.ac.uk)
-            mail_dict['recipient_email'] = collection_contacts[department]
-            mail_dict['recipient_name'] = '%s collection manager' % department
-
-            url = url_for(named_route, action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
-
-        else:  # Not a specimen or indexlot record
-
+                mail_dict['recipient_name'] = department
+                mail_dict['body'] += '\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  and please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(department)
             # If we have a package ID, load the package
-            if package_id:
+        elif package_id:
+            package_dict = get_action('package_show')(context, {'id': package_id})
+            # Load the user - using model rather user_show API which loads all the users packages etc.,
+            user_obj = model.User.get(package_dict['creator_user_id'])
+            mail_dict['recipient_name'] = user_obj.fullname or user_obj.name
+            # Update send to with creator username
+            mail_dict['recipient_email'] = user_obj.email
+            mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
 
-                package_dict = get_action('package_show')(context, {'id': package_id})
-                # Load the user - using model rather user_show API which loads all the users packages etc.,
-                user_obj = model.User.get(package_dict['creator_user_id'])
-
-                # Update send to with creator username
-                mail_dict['recipient_email'] = user_obj.email
-                mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
-
-                if resource_id:
-
-                    if record_id:
-                        url = url_for('record', action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
-                    else:
-                        url = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
-
+            if resource_id:
+                if record_id:
+                    url = url_for('record', action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
                 else:
-                    url = url_for(controller='package', action='read', id=package_id, qualified=True)
-
-        contact_type = data_dict.get('contact_type', None)
-
-        if contact_type:
-            mail_dict['body'] += '\nContact type: %s\n' % contact_type
-
+                    url = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
+            else:
+                url = url_for(controller='package', action='read', id=package_id, qualified=True)
+            mail_dict['body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - and please forward to data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % package_dict['title'] or package_dict['name']
         # If we have a URL append it to the message body
         if url:
             mail_dict['body'] += '\n' + url
 
         # If this is being directed to someone other than @daat@nhm.ac.uk
         # Ensure data@nhm.ac.uk is copied in
-
         if mail_dict['recipient_email'] != 'data@nhm.ac.uk':
             mail_dict['headers']['cc'] = 'data@nhm.ac.uk'
-
         return mail_dict
 
     ## IPackageController

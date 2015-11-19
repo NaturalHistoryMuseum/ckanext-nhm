@@ -30,6 +30,7 @@ from ckanext.nhm.lib.resource import (
     resource_filter_set_cookie,
     resource_filter_delete_cookie
 )
+from ckanext.nhm.settings import COLLECTION_CONTACTS
 
 log = logging.getLogger(__name__)
 
@@ -843,12 +844,12 @@ def get_contact_form_template_url(params):
     return url
 
 
-def get_contact_form_category_options():
+def get_contact_form_department_options():
     """
     Contact form category
     @return:
     """
-    options = ['', 'Request information', 'Suggest update']
+    options = ['Other / unknown'] + COLLECTION_CONTACTS.keys()
     return list_to_form_options(options)
 
 
