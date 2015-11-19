@@ -292,7 +292,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         department = data_dict.get('department', None)
 
         # If this is an index lot enquiry, send to entom
-        if package_name == 'collection-indexlotss':
+        if package_name == 'collection-indexlots':
             mail_dict['subject'] = 'Collection Index lot enquiry'
             mail_dict['recipient_email'] = COLLECTION_CONTACTS['Entomology']
             mail_dict['recipient_name'] = 'Entomology'
@@ -305,7 +305,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 mail_dict['body'] += '\nDepartment: %s\n' % department
             else:
                 mail_dict['recipient_name'] = department
-                mail_dict['body'] += '\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  and please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(department)
+                mail_dict['body'] += '\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(department)
             # If we have a package ID, load the package
         elif package_id:
             package_dict = get_action('package_show')(context, {'id': package_id})
@@ -323,7 +323,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     url = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
             else:
                 url = url_for(controller='package', action='read', id=package_id, qualified=True)
-            mail_dict['body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - and please forward to data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % package_dict['title'] or package_dict['name']
+            mail_dict['body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % package_dict['title'] or package_dict['name']
         # If we have a URL append it to the message body
         if url:
             mail_dict['body'] += '\n' + url
