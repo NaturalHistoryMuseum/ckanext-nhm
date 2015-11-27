@@ -5,10 +5,10 @@ from ckan.common import _, c
 import ckan.lib.helpers as h
 import ckan.plugins as p
 import logging
-from ckanext.nhm.lib.helpers import get_specimen_resource_id
 from ckan.controllers.home import HomeController
 from ckanext.dcat.utils import CONTENT_TYPES
 from ckanext.dcat.controllers import check_access_header
+from ckanext.nhm.lib.record import get_record_by_uuid
 
 log = logging.getLogger(__name__)
 
@@ -36,35 +36,11 @@ class ObjectController(base.BaseController):
         base.BaseController.__before__(self, action, **env)
         self.context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
 
-    def _get_object(self, uuid):
-
-        # Loop through all resources, and try and find the record
-        # Need to loop as this works for all specimens, indexlots and artefacts
-
-        resource_ids = [get_specimen_resource_id()]
-
-        for resource_id in resource_ids:
-
-            try:
-                # Load the resource via model so we have access to get_package_id
-                resource = model.Resource.get(resource_id)
-                # Retrieve datastore record
-                search_result = get_action('datastore_search')(self.context, {'resource_id': resource_id, 'filters': {'occurrenceID': uuid}})
-                record = search_result['records'][0]
-            except:
-                pass
-            else:
-                return resource, record
-
-
     def redirect(self, uuid):
         """
         Redirect to object associated with UUID
         """
-
-        # FIXME - Need to add in indexlots and artefacts
-
-        resource, record = self._get_object(uuid)
+        record, resource = get_record_by_uuid(uuid)
 
         if record:
 
@@ -72,7 +48,7 @@ class ObjectController(base.BaseController):
 
             package = get_action('package_show')(self.context, {'id': package_id})
 
-            h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=package['name'], resource_id=resource['id'], record_id=record['_id'])
+            h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=package['name'], resource_id=resource.id, record_id=record['_id'])
 
         abort(404, _('Record not found'))
 
@@ -84,11 +60,6 @@ class ObjectController(base.BaseController):
         :return:
         """
 
-        resource, record = self._get_object(uuid)
-
-        if not record:
-            abort(404, _('Record not found'))
-
         if not _format:
             _format = check_access_header()
 
@@ -96,8 +67,7 @@ class ObjectController(base.BaseController):
             return HomeController().index()
 
         data_dict = {
-            'record_id': record['_id'],
-            'resource_id': resource.id,
+            'uuid': uuid,
             'format': _format,
         }
 
@@ -106,4 +76,5 @@ class ObjectController(base.BaseController):
         try:
             return p.toolkit.get_action('object_rdf')(self.context, data_dict)
         except p.toolkit.ValidationError, e:
+            print e
             p.toolkit.abort(409, str(e))

@@ -12,7 +12,7 @@ from ckanext.nhm.dcat.utils import record_uri
 
 class RDFSerializer(DCATSerializer):
 
-    def serialize_record(self, dataset_dict, _format='xml'):
+    def serialize_record(self, record_dict, resource_dict, _format='xml'):
         '''
         Given a CKAN dataset dict, returns an RDF serialization
 
@@ -22,7 +22,7 @@ class RDFSerializer(DCATSerializer):
         Returns a string with the serialized dataset
         '''
 
-        self.graph_from_record(dataset_dict)
+        self.graph_from_record(record_dict, resource_dict)
 
         _format = url_to_rdflib_format(_format)
 
@@ -33,7 +33,7 @@ class RDFSerializer(DCATSerializer):
 
         return output
 
-    def graph_from_record(self, record_dict=None):
+    def graph_from_record(self, record_dict=None, resource_dict=None):
         '''
         Creates a graph for the catalog (CKAN site) using the loaded profiles
 

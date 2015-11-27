@@ -42,11 +42,10 @@ def record_show_schema():
     }
     return schema
 
-def record_rdf_schema():
+def object_rdf_schema():
 
     schema = {
-        'resource_id': [not_missing, unicode, resource_id_exists],
-        'record_id': [not_missing, int_validator],
+        'uuid': [not_missing, unicode],
         'format': [not_missing]
     }
     return schema

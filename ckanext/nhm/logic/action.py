@@ -8,6 +8,7 @@ import ckan.model as model
 from ckan.common import c
 from ckanext.nhm.lib.mam import mam_media_request
 from ckanext.nhm.dcat.processors import RDFSerializer
+from ckanext.nhm.lib.record import get_record_by_uuid
 
 NotFound = logic.NotFound
 ActionError = logic.ActionError
@@ -104,20 +105,19 @@ def object_rdf(context, data_dict):
 
     # Validate the data
     context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    schema = context.get('schema', nhm_schema.record_rdf_schema())
+    schema = context.get('schema', nhm_schema.object_rdf_schema())
     data_dict, errors = _validate(data_dict, schema, context)
-
+    # Raise any validation errors
     if errors:
         raise p.toolkit.ValidationError(errors)
 
-    record_dict = p.toolkit.get_action('record_show')(context, data_dict)
-
-    serializer = RDFSerializer()
-
-    output = serializer.serialize_record(record_dict, _format=data_dict.get('format'))
-
-    return output
-
+    # Get the record
+    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'])
+    if record_dict:
+        serializer = RDFSerializer()
+        output = serializer.serialize_record(record_dict, resource_dict, _format=data_dict.get('format'))
+        return output
+    raise NotFound
 
 def _image_exists_on_record(resource, record, asset_id):
     """
