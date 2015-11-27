@@ -81,11 +81,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                      controller='ckanext.nhm.controllers.record:RecordController',
                      action='view')
 
-        # Permalink for specimens
-        _map.connect('specimen_citation', '/specimen/{uuid}',
-                     controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController',
-                     action='view')
-
         # Add dwc view
         _map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
                      controller='ckanext.nhm.controllers.record:RecordController',
@@ -110,9 +105,18 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         _map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
         # NOTE: /datastore/dump/{resource_id} is prevented by NGINX
 
-        _map.connect('dcat_dataset', '/specimen/{uuid}.{_format}',
-                     controller='ckanext.nhm.controllers:DCATController', action='read_dataset',
+        object_controller = 'ckanext.nhm.controllers.object:ObjectController'
+
+        # FIXME: Specimen old link?
+
+        _map.connect('object_rdf', '/object/{uuid}.{_format}',
+                     controller=object_controller, action='rdf',
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
+
+        # Permalink for specimens - needs to come after the DCAT format dependent
+        _map.connect('object_redirect', '/object/{uuid}',
+                     controller=object_controller,
+                     action='redirect')
 
         return _map
 
@@ -121,6 +125,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def get_actions(self):
         return {
             'record_show':  nhm_action.record_show,
+            'object_rdf': nhm_action.object_rdf
             # TEMP: Disable original image download
             # 'download_image': nhm_action.download_original_image
         }

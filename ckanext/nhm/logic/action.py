@@ -3,10 +3,11 @@ import logging
 import ckan.plugins as p
 import ckan.lib.navl.dictization_functions
 import ckanext.nhm.logic.schema as nhm_schema
-from ckanext.nhm.lib.mam import mam_media_request
 import ckan.logic as logic
 import ckan.model as model
 from ckan.common import c
+from ckanext.nhm.lib.mam import mam_media_request
+from ckanext.nhm.dcat.processors import RDFSerializer
 
 NotFound = logic.NotFound
 ActionError = logic.ActionError
@@ -93,18 +94,29 @@ def download_original_image(context, data_dict):
         return 'Original image request successful'
 
 
-def dcat_record_show(context, data_dict):
+def object_rdf(context, data_dict):
+    """
+    Get record RDF
+    :param context:
+    :param data_dict:
+    :return:
+    """
 
-    p.toolkit.check_access('dcat_dataset_show', context, data_dict)
+    # Validate the data
+    context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+    schema = context.get('schema', nhm_schema.record_rdf_schema())
+    data_dict, errors = _validate(data_dict, schema, context)
 
-    # record_dict = p.toolkit.get_action('record_show')(context, data_dict)
-    #
-    # serializer = RDFSerializer()
-    #
-    # output = serializer.serialize_dataset(dataset_dict,
-    #                                       _format=data_dict.get('format'))
+    if errors:
+        raise p.toolkit.ValidationError(errors)
 
-    # return output
+    record_dict = p.toolkit.get_action('record_show')(context, data_dict)
+
+    serializer = RDFSerializer()
+
+    output = serializer.serialize_record(record_dict, _format=data_dict.get('format'))
+
+    return output
 
 
 def _image_exists_on_record(resource, record, asset_id):

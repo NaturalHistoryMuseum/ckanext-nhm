@@ -42,6 +42,15 @@ def record_show_schema():
     }
     return schema
 
+def record_rdf_schema():
+
+    schema = {
+        'resource_id': [not_missing, unicode, resource_id_exists],
+        'record_id': [not_missing, int_validator],
+        'format': [not_missing]
+    }
+    return schema
+
 
 def download_original_image_schema():
     schema = {

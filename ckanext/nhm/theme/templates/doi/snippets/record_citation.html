@@ -2,8 +2,6 @@
 Renders a citation for a resource
 #}
 
-{% extends "doi/snippets/resource_citation.html" %}
-
 {% block citation_link %}
     Record: {{ h.link_to(citation_url, citation_url) }}
 {% endblock %}
