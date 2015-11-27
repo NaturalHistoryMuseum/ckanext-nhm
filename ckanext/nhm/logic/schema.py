@@ -34,7 +34,7 @@ UPDATE_FREQUENCIES = [
 ]
 
 
-def record_get_schema():
+def record_show_schema():
 
     schema = {
         'resource_id': [not_missing, unicode, resource_id_exists],

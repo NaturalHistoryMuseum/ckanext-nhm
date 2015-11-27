@@ -74,48 +74,53 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         p.toolkit.add_public_directory(config, 'files')
 
     ## IRoutes
-    def before_map(self, map):
+    def before_map(self, _map):
 
         # Add view record
-        map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                    controller='ckanext.nhm.controllers.record:RecordController',
-                    action='view')
+        _map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='view')
 
         # Permalink for specimens
-        map.connect('specimen_citation', '/specimen/{uuid}',
-                    controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController',
-                    action='view')
+        _map.connect('specimen_citation', '/specimen/{uuid}',
+                     controller='ckanext.nhm.controllers.specimen_citation:SpecimenCitationController',
+                     action='view')
 
         # Add dwc view
-        map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
-                    controller='ckanext.nhm.controllers.record:RecordController',
-                    action='dwc')
+        _map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='dwc')
 
         # About pages
-        map.connect('about_citation', '/about/citation', controller='ckanext.nhm.controllers.about:AboutController', action='citation')
-        map.connect('about_download', '/about/download', controller='ckanext.nhm.controllers.about:AboutController', action='download')
-        map.connect('about_licensing', '/about/licensing', controller='ckanext.nhm.controllers.about:AboutController', action='licensing')
-        map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.about:AboutController', action='credits')
+        _map.connect('about_citation', '/about/citation', controller='ckanext.nhm.controllers.about:AboutController', action='citation')
+        _map.connect('about_download', '/about/download', controller='ckanext.nhm.controllers.about:AboutController', action='download')
+        _map.connect('about_licensing', '/about/licensing', controller='ckanext.nhm.controllers.about:AboutController', action='licensing')
+        _map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.about:AboutController', action='credits')
 
         # Legal pages
-        map.connect('legal_privacy', '/privacy', controller='ckanext.nhm.controllers.legal:LegalController', action='privacy')
-        map.connect('legal_terms', '/terms-conditions', controller='ckanext.nhm.controllers.legal:LegalController', action='terms')
+        _map.connect('legal_privacy', '/privacy', controller='ckanext.nhm.controllers.legal:LegalController', action='privacy')
+        _map.connect('legal_terms', '/terms-conditions', controller='ckanext.nhm.controllers.legal:LegalController', action='terms')
 
         # About stats pages
-        map.connect('stats_resources', '/about/statistics/resources', controller='ckanext.nhm.controllers.stats:StatsController', action='resources', ckan_icon='bar-chart')
-        map.connect('stats_contributors', '/about/statistics/contributors', controller='ckanext.nhm.controllers.stats:StatsController', action='contributors', ckan_icon='user')
-        map.connect('stats_records', '/about/statistics/records', controller='ckanext.nhm.controllers.stats:StatsController', action='records', ckan_icon='file-text')
+        _map.connect('stats_resources', '/about/statistics/resources', controller='ckanext.nhm.controllers.stats:StatsController', action='resources', ckan_icon='bar-chart')
+        _map.connect('stats_contributors', '/about/statistics/contributors', controller='ckanext.nhm.controllers.stats:StatsController', action='contributors', ckan_icon='user')
+        _map.connect('stats_records', '/about/statistics/records', controller='ckanext.nhm.controllers.stats:StatsController', action='records', ckan_icon='file-text')
 
         # Dataset metrics
-        map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
+        _map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
         # NOTE: /datastore/dump/{resource_id} is prevented by NGINX
-        return map
+
+        _map.connect('dcat_dataset', '/specimen/{uuid}.{_format}',
+                     controller='ckanext.nhm.controllers:DCATController', action='read_dataset',
+                     requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
+
+        return _map
 
 
     # IActions
     def get_actions(self):
         return {
-            'record_get':  nhm_action.record_get,
+            'record_show':  nhm_action.record_show,
             # TEMP: Disable original image download
             # 'download_image': nhm_action.download_original_image
         }

@@ -16,7 +16,7 @@ _validate = ckan.lib.navl.dictization_functions.validate
 
 log = logging.getLogger(__name__)
 
-def record_get(context, data_dict):
+def record_show(context, data_dict):
 
     """
     Retrieve an individual record
@@ -26,7 +26,7 @@ def record_get(context, data_dict):
     """
     # Validate the data
     context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    schema = context.get('schema', nhm_schema.record_get_schema())
+    schema = context.get('schema', nhm_schema.record_show_schema())
     data_dict, errors = _validate(data_dict, schema, context)
 
     if errors:
@@ -91,6 +91,20 @@ def download_original_image(context, data_dict):
         raise ActionError('Could not request original')
     else:
         return 'Original image request successful'
+
+
+def dcat_record_show(context, data_dict):
+
+    p.toolkit.check_access('dcat_dataset_show', context, data_dict)
+
+    # record_dict = p.toolkit.get_action('record_show')(context, data_dict)
+    #
+    # serializer = RDFSerializer()
+    #
+    # output = serializer.serialize_dataset(dataset_dict,
+    #                                       _format=data_dict.get('format'))
+
+    # return output
 
 
 def _image_exists_on_record(resource, record, asset_id):

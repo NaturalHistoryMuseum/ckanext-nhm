@@ -55,6 +55,8 @@ namespaces = {
 # All metadata licence under CC0
 METADATA_LICENCE = 'http://creativecommons.org/publicdomain/zero/1.0'
 
+# FIXME: dataset ID / name
+
 class NHMDCATProfile(RDFProfile):
     '''
     An RDF profile for the NHM
@@ -251,7 +253,6 @@ class NHMDCATProfile(RDFProfile):
         g.add((nhm_uri, OWL.sameAs, URIRef('https://www.wikidata.org/wiki/Q309388')))
 
         if user:
-            # TODO: Check if this is the NHM user - add add as insitution
             user_uri = URIRef(self.user_uri(creator_user_id))
             g.add((user_uri, RDF.type, VCARD.Person))
             g.add((user_uri, VCARD.fn, Literal(user['fullname'])))
@@ -314,4 +315,8 @@ class NHMDCATProfile(RDFProfile):
             g.add((dataset_uri, DCT.contributor, Literal(contributors)))
 
         self.graph_add_resources(dataset_uri, dataset_dict)
+
+    def graph_from_record(self, dataset_dict, dataset_ref):
+
+        pass
 

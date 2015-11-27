@@ -124,7 +124,7 @@ def get_resource(resource_id):
 
 
 def get_record(resource_id, record_id):
-    record = _get_action('record_get', {'resource_id': resource_id, 'record_id': record_id})
+    record = _get_action('record_show', {'resource_id': resource_id, 'record_id': record_id})
     return record.get('data', None)
 
 

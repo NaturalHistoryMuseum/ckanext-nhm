@@ -49,7 +49,7 @@ class RecordController(base.BaseController):
             # required for nav menu
             c.pkg = self.context['package']
             c.pkg_dict = c.package
-            record = get_action('record_get')(self.context, {'resource_id': resource_id, 'record_id': record_id})
+            record = get_action('record_show')(self.context, {'resource_id': resource_id, 'record_id': record_id})
             c.record_dict = record['data']
             record_field_types = {f['id']: f['type'] for f in record['fields']}
 
