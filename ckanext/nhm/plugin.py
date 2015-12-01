@@ -107,8 +107,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         object_controller = 'ckanext.nhm.controllers.object:ObjectController'
 
-        # FIXME: Specimen old link?
-
         _map.connect('object_rdf', '/object/{uuid}.{_format}',
                      controller=object_controller, action='rdf',
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
@@ -117,6 +115,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         _map.connect('object_redirect', '/object/{uuid}',
                      controller=object_controller,
                      action='redirect')
+
+        # Redirect the old specimen url to the object
+        _map.redirect('/specimen/{url:.*}', '/object/{url}')
 
         return _map
 

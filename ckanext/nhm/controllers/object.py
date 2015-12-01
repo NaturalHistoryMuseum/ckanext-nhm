@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 abort = base.abort
 get_action = logic.get_action
 
+# FIXME - specimen, lot, artefact
 
 class ObjectController(base.BaseController):
     """

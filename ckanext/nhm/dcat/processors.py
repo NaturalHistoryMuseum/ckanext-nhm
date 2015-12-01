@@ -8,7 +8,7 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 from rdflib import URIRef, BNode, Literal
 from ckanext.dcat.processors import RDFSerializer as DCATSerializer
 from ckanext.dcat.utils import catalog_uri, dataset_uri, url_to_rdflib_format
-from ckanext.nhm.dcat.utils import record_uri
+from ckanext.nhm.dcat.utils import object_uri
 
 class RDFSerializer(DCATSerializer):
 
@@ -33,7 +33,7 @@ class RDFSerializer(DCATSerializer):
 
         return output
 
-    def graph_from_record(self, record_dict=None, resource_dict=None):
+    def graph_from_record(self, record_dict=None, resource=None):
         '''
         Creates a graph for the catalog (CKAN site) using the loaded profiles
 
@@ -43,11 +43,11 @@ class RDFSerializer(DCATSerializer):
         Returns the reference to the catalog, which will be an rdflib URIRef.
         '''
 
-        record_ref = URIRef(record_uri())
+        record_ref = URIRef(object_uri(record_dict))
 
         for profile_class in self._profiles:
             profile = profile_class(self.g, self.compatibility_mode)
-            profile.graph_from_record(record_dict, record_ref)
+            profile.graph_from_record(record_dict, resource, record_ref)
 
         return record_ref
 

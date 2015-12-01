@@ -114,6 +114,7 @@ def object_rdf(context, data_dict):
     # Get the record
     record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'])
     if record_dict:
+        record_dict['uuid'] = data_dict['uuid']
         serializer = RDFSerializer()
         output = serializer.serialize_record(record_dict, resource_dict, _format=data_dict.get('format'))
         return output

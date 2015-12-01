@@ -9,9 +9,9 @@
     {% endif %}
 {% endblock %}
 
-{% macro dwc_row(field) %}
+{% macro dwc_row(term, uri=None) %}
     {%- set extra_html = caller() if caller -%}
-    {% set value = c.record_dict[field] %}
+    {% set value = c.record_dict[term] %}
 
     {% if not value %}
         {% set cls = 'empty' %}
@@ -23,10 +23,10 @@
     <tr class="{{ cls }}">
         <th>
 
-            {% if c.uris[field] %}
-                <a href="{{ c.uris[field] }}" target="_blank" title="{{ c.uris[field] }}">{{field}}</a>
+            {% if uri %}
+                <a href="{{ uri }}" target="_blank" title="{{ uri }}">{{term}}</a>
             {% else %}
-                {{field}}
+                {{term}}
             {% endif %}
 
         </th>
@@ -40,7 +40,7 @@
 
     <table class="toggle-empty-rows" data-module="toggle-empty-rows">
 
-    {% for group, fields in c.field_groups.items() %}
+    {% for group, terms in c.dwc_terms.items() %}
 
         <thead>
             <tr>
@@ -50,39 +50,25 @@
 
         <tbody>
 
-            {% for field, label in fields.items() %}
-
-                {% set value = c.record_dict[field] %}
-                {% if not value %}
-                    {% set cls = 'empty' %}
-                    {% set value = '' %}
-                {% else %}
-                    {% set cls = 'not-empty' %}
-                {% endif %}
-
-                <tr class="{{ cls }}">
-                    <th>
-                        <a href="{{ c.uris[field] }}" target="_blank" title="{{ c.uris[field] }}">{{field}}</a>
-                    </th>
-
-                    <td>{{ value }}</td>
-                </tr>
-
+            {% for uri, term in terms.items() %}
+                 {{ dwc_row(term, uri) }}
             {% endfor %}
 
         </tbody>
 
     {% endfor %}
 
-            <thead>
+        <thead>
             <tr>
                 <th colspan="2">Dynamic properties</th>
             </tr>
-            </thead>
+        </thead>
 
-            {% for field in c.dynamic_properties %}
-                {{ dwc_row(field) }}
+        {% for uri, properties in c.dynamic_properties.items() %}
+            {% for property in properties %}
+                {{ dwc_row(property) }}
             {% endfor %}
+        {% endfor %}
 
     </table>
 

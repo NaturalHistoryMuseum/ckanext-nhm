@@ -20,11 +20,7 @@ def get_record_by_uuid(uuid):
     context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
     # FIXME - Need to add in indexlots and artefacts
     resource_ids = [get_specimen_resource_id()]
-
-    print resource_ids
-
     for resource_id in resource_ids:
-
         try:
             # Load the resource via model so we have access to get_package_id
             resource = model.Resource.get(resource_id)

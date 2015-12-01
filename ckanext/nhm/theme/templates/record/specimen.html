@@ -1,5 +1,13 @@
 {% extends "record/view.html" %}
 
+{% block styles %}
+   {{ super() }}
+   <link rel="alternate" type="text/n3" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='n3', qualified=True) }}"/>
+   <link rel="alternate" type="text/ttl" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='ttl', qualified=True) }}"/>
+   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='xml', qualified=True) }}"/>
+   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='rdf', qualified=True) }}"/>
+{% endblock -%}
+
 {% block content_primary_nav %}
 
 {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
