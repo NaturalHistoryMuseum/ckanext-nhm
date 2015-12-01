@@ -156,15 +156,19 @@ class NHMDCATProfile(RDFProfile):
         nhm_uri = self.graph_add_museum()
 
         if user:
-            user_uri = URIRef(self.user_uri(creator_user_id))
-            g.add((user_uri, RDF.type, VCARD.Person))
-            g.add((user_uri, VCARD.fn, Literal(user['fullname'])))
-            g.add((user_uri, VCARD.hasEmail, URIRef(user['email'])))
-            # All users are members of the NHM
-            g.add((user_uri, MADS.hasAffiliation, nhm_uri))
-
-            # This user is the contact point for the dataset
-            g.add((dataset_uri, DCAT.contactPoint, user_uri))
+            full_name = user.get('fullname', None)
+            # If this is the Natural History Museum user (i.e. admin), just add the contactPoint
+            if full_name == 'Natural History Museum':
+                g.add((dataset_uri, DCAT.contactPoint, nhm_uri))
+            else:
+                user_uri = URIRef(self.user_uri(creator_user_id))
+                g.add((user_uri, RDF.type, VCARD.Person))
+                g.add((user_uri, VCARD.fn, Literal(full_name)))
+                g.add((user_uri, VCARD.hasEmail, URIRef(user['email'])))
+                # All users are members of the NHM
+                g.add((user_uri, MADS.hasAffiliation, nhm_uri))
+                # This user is the contact point for the dataset
+                g.add((dataset_uri, DCAT.contactPoint, user_uri))
 
         # Add update frequency
         update_frequency = dataset_dict.get('update_frequency', None)
@@ -227,7 +231,6 @@ class NHMDCATProfile(RDFProfile):
         g.add((nhm_uri, RDF.type, FOAF.Organization))
         # Update the name
         g.set((nhm_uri, FOAF.name, Literal('Natural History Museum')))
-
         # # Add TDWG institution details - http://rs.tdwg.org/ontology/voc/Institution
         g.set((nhm_uri, TDWGI.acronymOrCoden, Literal('NHMUK')))
         g.set((nhm_uri, TDWGI.institutionType, URIRef('http://rs.tdwg.org/ontology/voc/InstitutionType#museum')))
