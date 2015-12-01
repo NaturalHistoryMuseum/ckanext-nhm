@@ -47,8 +47,9 @@ class RDFSerializer(DCATSerializer):
 
         for profile_class in self._profiles:
             profile = profile_class(self.g, self.compatibility_mode)
-            profile.graph_from_record(record_dict, resource, record_ref)
+            try:
+                profile.graph_from_record(record_dict, resource, record_ref)
+            except AttributeError:
+                continue
 
         return record_ref
-
-
