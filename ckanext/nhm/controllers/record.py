@@ -10,7 +10,6 @@ import json
 from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.views import DarwinCoreView
 
-
 log = logging.getLogger(__name__)
 
 render = base.render
@@ -154,7 +153,6 @@ class RecordController(base.BaseController):
         :param record_id:
         :return: html
         """
-
         self._load_data(package_name, resource_id, record_id)
 
         view_cls = resource_view_get_view(c.resource)
