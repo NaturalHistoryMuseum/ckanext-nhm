@@ -112,9 +112,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
 
         # Permalink for specimens - needs to come after the DCAT format dependent
-        _map.connect('object_redirect', '/object/{uuid}',
+        _map.connect('object_view', '/object/{uuid}',
                      controller=object_controller,
-                     action='redirect')
+                     action='view')
 
         # Redirect the old specimen url to the object
         _map.redirect('/specimen/{url:.*}', '/object/{url}')
