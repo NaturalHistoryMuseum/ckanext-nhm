@@ -37,36 +37,36 @@ class ObjectController(base.BaseController):
         base.BaseController.__before__(self, action, **env)
         self.context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
 
-    def redirect(self, uuid):
+    def view(self, uuid):
         """
-        Redirect to object associated with UUID
+        View object
+        If this is basic HTTP request, this will redirect to the record
+        If the request is for RDF (content negotiation) return the rdf
         """
-        record, resource = get_record_by_uuid(uuid)
 
-        if record:
+        # Is the request for a particular format
+        _format = check_access_header()
 
-            package_id = resource.get_package_id()
+        if _format:
+            return self.rdf(uuid, _format)
+        else:
+            # This is a normal HTTP request, so redirect to the object record
+            record, resource = get_record_by_uuid(uuid)
 
-            package = get_action('package_show')(self.context, {'id': package_id})
-
-            h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=package['name'], resource_id=resource.id, record_id=record['_id'])
+            if record:
+                package_id = resource.get_package_id()
+                package = get_action('package_show')(self.context, {'id': package_id})
+                h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=package['name'], resource_id=resource.id, record_id=record['_id'])
 
         abort(404, _('Record not found'))
 
-    def rdf(self, uuid, _format=None):
+    def rdf(self, uuid, _format):
         """
         Return RDF
         :param uuid:
         :param _format:
         :return:
         """
-
-        if not _format:
-            _format = check_access_header()
-
-        if not _format:
-            return HomeController().index()
-
         data_dict = {
             'uuid': uuid,
             'format': _format,
@@ -77,5 +77,4 @@ class ObjectController(base.BaseController):
         try:
             return p.toolkit.get_action('object_rdf')(self.context, data_dict)
         except p.toolkit.ValidationError, e:
-            print e
             p.toolkit.abort(409, str(e))
