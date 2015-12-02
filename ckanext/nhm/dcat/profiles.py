@@ -41,7 +41,7 @@ SDWC = Namespace('http://rs.tdwg.org/dwc/xsd/simpledarwincore#')
 DQV = Namespace('http://www.w3.org/ns/dqv#')
 
 # All metadata licence under CC0
-METADATA_LICENCE = 'http://creativecommons.org/publicdomain/zero/1.0'
+METADATA_LICENCE = 'http://creativecommons.org/publicdomain/zero/1.0/'
 
 class NHMDCATProfile(RDFProfile):
     '''
