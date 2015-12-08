@@ -36,7 +36,7 @@ Invalid = p.toolkit.Invalid
 log = logging.getLogger(__name__)
 
 # The maximum limit for datastore search
-MAX_LIMIT = 200
+MAX_LIMIT = 100
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
@@ -287,14 +287,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         query_dict['q'][0].append(options[o]['solr'])
                 elif 'solr_false' in options[o]:
                     query_dict['q'][0].append(options[o]['solr_false'])
-        self.enforce_max_limit(query_dict)
+        self.enforce_max_limit(query_dict, 'rows')
         return query_dict
 
     @staticmethod
-    def enforce_max_limit(query_dict):
-        limit = query_dict.get('limit', 0)
+    def enforce_max_limit(query_dict, field_name='limit'):
+        limit = query_dict.get(field_name, 0)
         if MAX_LIMIT and limit > MAX_LIMIT:
-            query_dict['limit'] = MAX_LIMIT
+            query_dict[field_name] = MAX_LIMIT
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
