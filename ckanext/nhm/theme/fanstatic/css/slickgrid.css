@@ -110,17 +110,17 @@ div.recline-slickgrid div.slick-cell div.dqi-traffic-light span {
     border-style: solid;
 }
 
-div.recline-slickgrid div.slick-cell div.dqi-majorerrors span {
+div.recline-slickgrid div.slick-cell div.dqi-major-errors span {
     background: #DF2621;
     border-color: #A42122;
 }
 
-div.recline-slickgrid div.slick-cell div.dqi-minorerrors span {
+div.recline-slickgrid div.slick-cell div.dqi-minor-errors span {
     background: #FFCF00;
     border-color: #FEB800;
 }
 
-div.recline-slickgrid div.slick-cell div.dqi-noerrors span {
+div.recline-slickgrid div.slick-cell div.dqi-no-errors span {
     background: #9BD500;
     border-color: #73B100;
 }

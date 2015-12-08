@@ -34,8 +34,11 @@ def record_show(context, data_dict):
     if errors:
         raise p.toolkit.ValidationError(errors)
 
+    resource_id = _get_or_bust(data_dict, 'resource_id')
+    record_id = _get_or_bust(data_dict, 'record_id')
+
     # Retrieve datastore record
-    search_result = get_action('datastore_search')(context, {'resource_id': data_dict['resource_id'], 'filters': {'_id': data_dict['record_id']}})
+    search_result = get_action('datastore_search')(context, {'resource_id': resource_id, 'filters': {'_id': record_id}})
 
     try:
         record = {

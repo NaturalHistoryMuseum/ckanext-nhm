@@ -29,19 +29,33 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
 
     if(columnDef.id == 'dqi'){
 
+        console.log(dataContext);
+
       var dqi_class
 
-      if(value === null){
-          dqi_class = 'dqi-unknown'
-          value = 'Unknown'
-      }else if (value == 'N/A'){
-          dqi_class = 'dqi-na'
-          value = 'Not applicable'
-      }else{
-          dqi_class = 'dqi-' + value.toLowerCase().replace(/[^a-z]/g, '');
-      }
+        if(dataContext['_gbif_id'] === null){
+            dqi_class = 'unknown'
+            value = 'Unknown'
+        }else if(value === null){
+            dqi_class = 'no-errors'
+            value = 'No errors'
+        }else{
+        // Match and major errors
 
-      return '<div title="' + value + '" class="dqi-traffic-light ' + dqi_class + '"><span></span></div>';
+        var major_errors = ['TAXON_MATCH_NONE', 'TYPE_STATUS_INVALID', 'BASIS_OF_RECORD_INVALID']
+        // Loop through all the major errors, and see if they exist in the value
+        for(i=0;i<major_errors.length;i++){
+          if(value.indexOf(major_errors[i])!==-1){
+              dqi_class = 'major-errors'
+              break
+          }
+        }
+        if(!dqi_class){
+          dqi_class = 'minor-errors'
+        }
+        }
+
+      return '<div title="' + value + '" class="dqi-traffic-light dqi-' + dqi_class + '"><span></span></div>';
     }
 
     return value

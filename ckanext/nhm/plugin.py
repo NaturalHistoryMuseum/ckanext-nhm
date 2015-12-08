@@ -119,6 +119,18 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # Redirect the old specimen url to the object
         _map.redirect('/specimen/{url:.*}', '/object/{url}')
 
+        # The DCAT plugin breaks these links if enable content negotiation is enabled
+        # because it maps to /dataset/{_id} without excluding these actions
+        # So we re=add them here to make sure it's working
+        _map.connect('add dataset', '/dataset/new', controller='package', action='new')
+        _map.connect('/dataset/{action}',
+          controller='package',
+          requirements=dict(action='|'.join([
+              'list',
+              'autocomplete',
+              'search'
+          ])))
+
         return _map
 
 
