@@ -175,7 +175,7 @@ class SpecimenView(DefaultView):
             ("partType", "Part type"),
         ])),
         ("Data Quality", OrderedDict([
-            ("gbifIssue", "GBIF Errors"),
+            ("gbifIssue", "GBIF Error"),
         ])),
         ("Record", OrderedDict([
             ("occurrenceID", "Occurrence ID"),
