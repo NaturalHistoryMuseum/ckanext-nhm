@@ -497,8 +497,8 @@ def resource_view_state(resource_view_json, resource_json):
     # ID and DQI always first
     resource_view['state']['columnsOrder'] = ["_id"]
 
-    if 'dqi' in resource_fields:
-        resource_view['state']['columnsOrder'].append('dqi')
+    if 'gbifIssue' in resource_fields:
+        resource_view['state']['columnsOrder'].append('gbifIssue')
 
     for field in resource_fields:
         if field not in hidden_fields and field not in resource_view['state']['columnsOrder']:
@@ -575,9 +575,11 @@ def resource_view_get_hidden_fields(resource):
 
     # Get all display fields explicitly set
     display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
+    display_fields = None
 
     # Load the hidden fields cookie
     hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
+    hidden_fields_cookie = None
 
     # Retrieve the fields for this resource
     resource_fields = resource_get_ordered_fields(resource['id'])
@@ -593,9 +595,9 @@ def resource_view_get_hidden_fields(resource):
         # Make sure _id is never hidden
         display_fields.append('_id')
 
-        # Make sure dqi is never hidden (if it exists)
-        if 'dqi' in resource_fields:
-            display_fields.append('dqi')
+        # Make sure gbifIssue is never hidden (if it exists)
+        if 'gbifIssue' in resource_fields:
+            display_fields.append('gbifIssue')
 
         # Make sure all filtered fields are never hidden
         display_fields += filter_dict.keys()

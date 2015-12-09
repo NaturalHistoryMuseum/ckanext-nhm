@@ -27,13 +27,10 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
         return '<a title="View record" target="_parent" href="' + url + '" onclick="window.top.location=this.href">View</a>';
     }
 
-    if(columnDef.id == 'dqi'){
-
-        console.log(dataContext);
-
+    if(columnDef.id == 'gbifIssue'){
       var dqi_class
 
-        if(dataContext['_gbif_id'] === null){
+        if(dataContext['gbifID'] === null){
             dqi_class = 'unknown'
             value = 'Unknown'
         }else if(value === null){

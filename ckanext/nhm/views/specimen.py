@@ -104,6 +104,7 @@ class SpecimenView(DefaultView):
             ("individualCount", "Individual count"),
             ("sex", "Sex"),
             ("lifeStage", "Life stage"),
+            ("catalogueDescription", "Catalogue description"),
         ])),
         ("Mineralogy", OrderedDict([
             ("dateRegistered", "Date registered"),
@@ -173,8 +174,8 @@ class SpecimenView(DefaultView):
             ("totalVolume", "Total volume"),
             ("partType", "Part type"),
         ])),
-        ("Palaeontology", OrderedDict([
-            ("catalogueDescription", "Catalogue description"),
+        ("Data Quality", OrderedDict([
+            ("gbifIssue", "GBIF Errors"),
         ])),
         ("Record", OrderedDict([
             ("occurrenceID", "Occurrence ID"),
@@ -190,28 +191,19 @@ class SpecimenView(DefaultView):
         Called from record controller, when viewing a record page
         @return: html
         """
-        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
         occurrence_id = c.record_dict.get('occurrenceID')
 
         log.info('Viewing record %s', occurrence_id)
 
-        # # Load the gbif_id (it's a hidden field so we need to manually add it
-        # sql = """SELECT _gbif_id FROM "{resource_id}" WHERE "occurrenceID"='{occurrence_id}'""".format(
-        #     resource_id=c.resource['id'],
-        #     occurrence_id=occurrence_id
-        # )
-        #
-        # try:
-        #     result = tk.get_action('datastore_search_sql')(context, {'sql': sql})
-        #     c.record_dict['gbif_id'] = result['records'][0]['_gbif_id']
-        # except (ValidationError, IndexError):
-        #     pass
-
         c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
 
         # Act on a deep copy of field groups, so deleting element will not have any impact
         c.field_groups = deepcopy(self.field_groups)
+
+        # We show the DQI at the top of the record page - so hide the group from
+        # The actual record view - we need the group though for the filters
+        del c.field_groups['Data Quality']
 
         # Some fields are being merged together - in which case we'll need custom filters
         # This can be set to bool false to not display a filter
@@ -313,14 +305,14 @@ class SpecimenView(DefaultView):
         # Add the DQI column settings
         self.state['columnsTitle'].append(
             {
-                'column': 'dqi',
+                'column': 'gbifIssue',
                 'title': 'GBIF QI'
             }
         )
 
         self.state['columnsToolTip'].append(
             {
-                'column': 'dqi',
+                'column': 'gbifIssue',
                 'value': 'GBIF Data Quality Indicator'
             }
         )
