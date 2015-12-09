@@ -127,8 +127,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
           controller='package',
           requirements=dict(action='|'.join([
               'list',
-              'autocomplete',
-              'search'
+              'autocomplete'
           ])))
 
         return _map
