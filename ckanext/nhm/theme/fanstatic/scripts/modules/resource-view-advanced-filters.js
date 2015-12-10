@@ -20,6 +20,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         hiddenFields = self.options.hiddenFields,
         fieldGroups = self.options.fieldGroups,
         filterOptions = self.options.filterOptions,
+        gbifErrors = self.options.gbifErrors,
         fields = self.options.fields;
 
     var filters = ckan.views.filters.get();
@@ -27,6 +28,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
     var $filtersWrapper = $('<div></div>');
 
     $(this).select2('destroy');
+    var displayAllFieldsLabel
 
     if ($.isEmptyObject(fieldGroups)) {
 
@@ -34,7 +36,7 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         // Add selected class, mirroring the class on selected tab
         $filtersWrapper.addClass('selected')
 
-        var displayAllFieldsLabel = 'Display all fields'
+        displayAllFieldsLabel = 'Display all fields'
 
     }else{
 
@@ -43,17 +45,37 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
         $.each(fieldGroups, function (i, groupFields) {
 
             var groupID = i.replace(/\s+/g, '-').toLowerCase();
-
             $tabs.append($('<li >').append($('<a href="#' + groupID + '">' + i + '</a>').on( "click", { group: i }, _toggleTab)))
+            var $filters
 
-            var $filters = _makeFieldFilters(resourceId, groupFields, filters, hiddenFields)
+            if(groupID=='data-quality' && !jQuery.isEmptyObject(gbifErrors)){
+                // There should just be one field in this group - the one used for issues
+                var field_name = Object.keys(groupFields)[0];
+                var currentFilter = filters[field_name]
+                // Create a label
+                var $label = $('<label for="filters[' + field_name + ']">Data quality errors</label>')
+                $filters = $('<div class="advanced-filter-field advanced-filter-field-dqi" />')
+                // Create a select and option for each of the errors
+                var $select = ($('<select name="filters[' + field_name + ']" />'))
+                $select.append($('<option>', { value : '' }).text(''));
+                $.each(gbifErrors, function(errCode, err) {
+                    var $op = $('<option>', { value : errCode }).text(err.title)
+                    // If selected, make this the default option
+                    if($.inArray(errCode, currentFilter) !== -1){
+                        $op.attr('selected', 'selected')
+                    }
+                    $select.append($op);
+                });
+                $filters.append($label).append($select)
+            }else{
+                $filters = _makeFieldFilters(resourceId, groupFields, filters, hiddenFields)
+            }
             $filtersWrapper.append($('<div name="#' + groupID + '"></div>').append($filters));
-
         })
 
         $filtersWrapper.prepend($tabs);
         $filtersWrapper.liteTabs({width: 900});
-        var displayAllFieldsLabel = 'Display all ' + Object.keys(fieldGroups)[0] + ' fields';
+        displayAllFieldsLabel = 'Display all ' + Object.keys(fieldGroups)[0] + ' fields';
 
     }
 
@@ -323,10 +345,8 @@ this.ckan.module('resource-view-advanced-filters', function (jQuery, _) {
 
      ckan.views.filters.set('_f', display_fields);
 
-     self.el.find('input[name^="filters"]').each(function(){
-
+     self.el.find(':input[name^="filters"]').each(function(){
          var filterName = this.name.match(re_filters)[1]
-
          if ($(this).prop('type') == 'checkbox'){
             if ($(this).prop('checked')){
                 ckan.views.filters.set(filterName, 'true');

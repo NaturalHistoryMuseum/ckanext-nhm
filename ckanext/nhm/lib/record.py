@@ -8,7 +8,7 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 import ckan.model as model
 import ckan.logic as logic
 from ckan.common import c
-from ckanext.nhm.lib.helpers import get_specimen_resource_id
+from ckanext.nhm.dcat.utils import rdf_resources
 
 get_action = logic.get_action
 
@@ -18,9 +18,7 @@ def get_record_by_uuid(uuid):
     # Need to loop as this works for all specimens, indexlots and artefacts
 
     context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    # FIXME - Need to add in indexlots and artefacts
-    resource_ids = [get_specimen_resource_id()]
-    for resource_id in resource_ids:
+    for resource_id in rdf_resources():
         try:
             # Load the resource via model so we have access to get_package_id
             resource = model.Resource.get(resource_id)

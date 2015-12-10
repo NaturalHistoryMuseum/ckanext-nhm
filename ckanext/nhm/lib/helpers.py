@@ -31,6 +31,7 @@ from ckanext.nhm.lib.resource import (
     resource_filter_delete_cookie
 )
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from ckanext.gbif import GBIF_ERRORS
 
 log = logging.getLogger(__name__)
 
@@ -655,6 +656,19 @@ def get_resource_filter_options(resource):
         result[o]['checked'] = o in filters and 'true' in filters[o]
     return result
 
+def get_resource_gbif_errors(resource):
+    """
+    Return GBIF errors applicable for this resource
+    i.e. if this the specimen resource, return the gbif errors dict
+    :param resource:
+    :return:
+    """
+
+    # If this is a
+    if resource.get('id') == get_specimen_resource_id():
+        return GBIF_ERRORS
+    else:
+        return {}
 
 def get_resource_filter_pills(resource):
     """

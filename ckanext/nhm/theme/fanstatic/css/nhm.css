@@ -1503,3 +1503,15 @@ form#mam {
 form#mam input.input-large {
   height: 26px;
 }
+.advanced-filter-field-dqi {
+  width: 500px!important;
+  margin: 10px 0 10px 80px;
+}
+.advanced-filter-field-dqi label {
+  float: left;
+  margin-right: 20px;
+  padding-top: 5px;
+}
+.advanced-filter-field-dqi select {
+  width: 300px;
+}

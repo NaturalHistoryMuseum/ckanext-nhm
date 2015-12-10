@@ -19,6 +19,7 @@
               data-module-hidden-fields="{{ h.dump_json(h.resource_view_get_hidden_fields(resource)) }}"
               data-module-field-groups="{{ h.dump_json(h.resource_view_get_field_groups(resource)) }}"
               data-module-filter-options="{{ h.dump_json(h.get_resource_filter_options(resource)) }}"
+              data-module-gbif-errors="{{ h.dump_json(h.get_resource_gbif_errors(resource)) }}"
               >
             </div>
 
