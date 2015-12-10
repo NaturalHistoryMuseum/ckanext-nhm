@@ -16,6 +16,7 @@ from ckanext.dcat.profiles import RDFProfile
 
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.lib.helpers import get_department
+from ckanext.nhm.dcat.utils import rdf_resources
 
 DC = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -302,6 +303,12 @@ class NHMDCATProfile(RDFProfile):
                     g.add((distribution, DCAT.byteSize,
                            Literal(resource_dict['size'])))
 
+            # Is this a resource with RDF records?
+            # If it is we want to add pagination for harvesting the records
+            # TODO: Add pages resources
+            # if resource_dict.get('id') in rdf_resources():
+            #     print 'RDF'
+
     def graph_from_record(self, record_dict, resource, record_ref):
         """
         RDF for an individual record - currently this is a specimen record
@@ -339,8 +346,8 @@ class NHMDCATProfile(RDFProfile):
         # Create licences metadata for record
         object_uri = URIRef(record_ref + '#object')
 
-        # Add publisher
-        nhm_uri = self.graph_add_museum()
+        # Add publisher - as per BBC we don't need the full org description here
+        nhm_uri = URIRef('http://nhm.ac.uk')
 
         # Add object description - the metadata and license
         g.add((record_ref, RDF.type, FOAF.Document))

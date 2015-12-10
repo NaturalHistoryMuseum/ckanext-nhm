@@ -6,6 +6,7 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 """
 
 from ckanext.dcat.utils import catalog_uri
+from ckanext.nhm.lib.helpers import get_specimen_resource_id
 
 def object_uri(record_dict):
     """
@@ -20,3 +21,12 @@ def object_uri(record_dict):
     uuid = record_dict.get('uuid')
     uri = '{0}/object/{1}'.format(catalog_uri().rstrip('/'), uuid)
     return uri
+
+
+def rdf_resources():
+    """
+    Return list of resource IDs with RDF records
+    :return:
+    """
+    # FIXME - Need to add in indexlots and artefacts
+    return [get_specimen_resource_id()]
