@@ -576,11 +576,9 @@ def resource_view_get_hidden_fields(resource):
 
     # Get all display fields explicitly set
     display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
-    display_fields = None
 
     # Load the hidden fields cookie
     hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
-    hidden_fields_cookie = None
 
     # Retrieve the fields for this resource
     resource_fields = resource_get_ordered_fields(resource['id'])
