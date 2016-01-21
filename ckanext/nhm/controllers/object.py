@@ -134,8 +134,14 @@ class ObjectController(base.BaseController):
         """
 
         resource_id = config.get("ckanext.nhm.abyssline_resource_id")
+
+        print(resource_id)
+
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
         search_result = get_action('datastore_search')(context, {'resource_id': resource_id, 'filters': {'catalogNumber': uuid}})
+
+        print(search_result)
+
         try:
             record = search_result['records'][0]
             h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name='abyssline', resource_id=resource_id, record_id=record['_id'])
