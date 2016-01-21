@@ -142,10 +142,14 @@ class ObjectController(base.BaseController):
 
         print(search_result)
 
-        try:
-            record = search_result['records'][0]
-            h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name='abyssline', resource_id=resource_id, record_id=record['_id'])
-        except:
-            pass
+        print(search_result['records'][0])
+
+        record = search_result['records'][0]
+        h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name='abyssline', resource_id=resource_id, record_id=record['_id'])
+
+        # try:
+        #
+        # except:
+        #     pass
 
         abort(404, _('Record not found'))
