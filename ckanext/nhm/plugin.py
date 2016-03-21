@@ -313,6 +313,15 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # Has the user selected a department
         department = data_dict.get('department', None)
 
+        # Build dictionary of URLs
+        urls = {}
+        if package_id:
+            urls['dataset'] = url_for(controller='package', action='read', id=package_id, qualified=True)
+            if resource_id:
+                urls['resource'] = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
+                if record_id:
+                    urls['record'] = url_for('record', action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
+
         # If this is an index lot enquiry, send to entom
         if package_name == 'collection-indexlots':
             mail_dict['subject'] = 'Collection Index lot enquiry'
@@ -337,18 +346,11 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             # Update send to with creator username
             mail_dict['recipient_email'] = user_obj.email
             mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
-
-            if resource_id:
-                if record_id:
-                    url = url_for('record', action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
-                else:
-                    url = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
-            else:
-                url = url_for(controller='package', action='read', id=package_id, qualified=True)
             mail_dict['body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % package_dict['title'] or package_dict['name']
-        # If we have a URL append it to the message body
-        if url:
-            mail_dict['body'] += '\n' + url
+
+
+        for i, url in urls.items():
+            mail_dict['body'] += '\n%s: %s' % (i.title(), url)
 
         # If this is being directed to someone other than @daat@nhm.ac.uk
         # Ensure data@nhm.ac.uk is copied in
