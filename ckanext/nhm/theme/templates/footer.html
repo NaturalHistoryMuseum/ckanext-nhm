@@ -11,7 +11,7 @@
         </ul>
     </div>
 
-    <div class="span6">
+    <div class="span5">
         <div class="dev-info">
             <p>An open source project by the Natural History Museum's Biodiversity Informatics Group.</p><p>Source code available on <a class="external" target="_blank" href="https://github.com/NaturalHistoryMuseum">Github.</a></p>
             <p>Base tiles by  <a class="external" target="_blank" href="http://www.mapquest.com">MapQuest</a> and &copy; <a class="external" target="_blank" href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors.</p>
@@ -25,8 +25,8 @@
             <li><a href="{{ h.url_for('search') }}">Data</a></li>
             <li><a href="{{ h.url_for('about') }}">About</a>
                 <ul>
-                    <li><a href="{{ h.url_for('about_citation') }}">Citation and attribution</a></li>
-                    <li><a href="{{ h.url_for('about_download') }}">Download and API</a></li>
+                    <li><a href="{{ h.url_for('about_citation') }}">Citation &amp; attribution</a></li>
+                    <li><a href="{{ h.url_for('about_download') }}">Download &amp; API</a></li>
                     <li><a href="{{ h.url_for('stats_resources') }}">Site statistics</a></li>
                     <li><a href="{{ h.url_for('about_credits') }}">Credits</a></li>
                 </ul>
@@ -36,7 +36,7 @@
       </ul>
     </div>
 
-    <div class="span1 no-margin menu-links">
+    <div class="span2 no-margin menu-links">
       <ul class="nav unstyled">
         {% block footer_menu_links %}
             {% if c.userobj %}
@@ -48,7 +48,7 @@
             {% endif %}
             <li><a href="{{ h.url_for('contact_form') }}">Contact</a></li>
             <li class="extra-divide">{{ h.api_doc_link() }}</li>
-            <li class="extra-divide"><a href="{{ h.url_for('legal_privacy') }}">Privacy</a></li>
+            <li class="extra-divide"><a href="{{ h.url_for('legal_privacy') }}">Privacy notice</a></li>
             <li><a href="{{ h.url_for('legal_terms') }}">T&amp;C</a></li>
         {% endblock %}
       </ul>
