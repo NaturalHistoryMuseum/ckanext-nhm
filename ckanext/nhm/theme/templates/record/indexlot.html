@@ -164,7 +164,25 @@
         </tr>
     {% endif %}
 
+    </tbody>
+
     <tbody>
+
+        {% if c.record_dict['IRN'] %}
+            <tr>
+                <th>IRN</th>
+                <td>{{ c.record_dict['IRN'] }}</td>
+            </tr>
+        {% endif %}
+
+        {% if c.record_dict['GUID'] %}
+            <tr>
+                <th>GUID</th>
+                <td>{{ c.record_dict['GUID'] }}</td>
+            </tr>
+        {% endif %}
+
+    </tbody>
 
     {% if material_details %}
 
