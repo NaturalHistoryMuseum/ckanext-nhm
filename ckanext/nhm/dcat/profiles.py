@@ -69,7 +69,7 @@ class NHMDCATProfile(RDFProfile):
         }
         try:
             return 'freq-%s' % freq_codes[frequency]
-        except IndexError:
+        except KeyError:
             return None
 
     @staticmethod
