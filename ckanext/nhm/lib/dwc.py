@@ -10,7 +10,6 @@ import sys
 import os
 from collections import OrderedDict
 
-# FIXME - Cache this
 def dwc_terms(fields):
     """
     Get DwC terms and groups, parsed from tdwg_dwcterms
@@ -37,7 +36,7 @@ def dwc_terms(fields):
                 # will need this later on
                 dynamic_properties_uri = uri
             if name in fields:
-                # We have a filed for this group - so create the group if it doesn't exist
+                # We have a field for this group - so create the group if it doesn't exist
                 # We do this here, so we
                 try:
                     terms[group.get('name')]

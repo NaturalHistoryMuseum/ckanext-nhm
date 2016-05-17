@@ -15,10 +15,8 @@ log = logging.getLogger(__name__)
 abort = base.abort
 get_action = logic.get_action
 
-# FIXME - specimen, lot, artefact
-
 # Temporary fix for the ABYSSLINE dataset
-
+# For these specimen UUIDs, the object redirect should go to the ABYSSLINE dataset
 ABYSSLINE_UUIDS = [
     'bc03fc1a-3613-41a2-b1f1-bf905e0fa6d0',
     'de4bd6ce-07fe-496e-bffc-67a4c6b9782c',
@@ -83,8 +81,6 @@ class ObjectController(base.BaseController):
         If this is basic HTTP request, this will redirect to the record
         If the request is for RDF (content negotiation) return the rdf
         """
-
-        # FIXME: Horrible hack to work with Abyssline dataset
         if uuid in ABYSSLINE_UUIDS:
             self.abyssline_object_redirect(uuid)
 

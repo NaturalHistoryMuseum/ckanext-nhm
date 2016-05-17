@@ -1,7 +1,8 @@
 
+import os
 import rdflib
 import json
-from rdflib.namespace import Namespace, RDF, XSD
+from rdflib.namespace import Namespace, RDF, XSD, RDFS
 from rdflib import URIRef, BNode, Literal
 from rdflib import OWL
 from rdflib.namespace import FOAF, SKOS
@@ -10,6 +11,8 @@ from pylons import request
 
 from ckan.plugins import toolkit
 from ckan.lib.helpers import url_for
+import ckan.lib.base as base
+import ckan.logic as logic
 
 from ckanext.dcat.utils import resource_uri, dataset_uri, catalog_uri
 from ckanext.dcat.profiles import RDFProfile
@@ -17,6 +20,9 @@ from ckanext.dcat.profiles import RDFProfile
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.lib.helpers import get_department
 from ckanext.nhm.dcat.utils import rdf_resources
+
+abort = base.abort
+NotFound = logic.NotFound
 
 DC = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -70,6 +76,15 @@ class NHMDCATProfile(RDFProfile):
     def user_uri(id):
         return '{0}/user/{1}'.format(catalog_uri().rstrip('/'), id)
 
+    def get_context(self):
+        """
+        Set up context
+        :return: context dict
+        """
+        user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
+        context = {'user': user['name']}
+        return context
+
     def graph_from_dataset(self, dataset_dict, dataset_ref):
 
         namespaces = {
@@ -94,9 +109,7 @@ class NHMDCATProfile(RDFProfile):
 
         g = self.g
 
-        # Set up context
-        user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
-        context = {'user': user['name']}
+        context = self.get_context()
 
         # Add some more namespaces
         for prefix, namespace in namespaces.iteritems():
@@ -303,12 +316,6 @@ class NHMDCATProfile(RDFProfile):
                     g.add((distribution, DCAT.byteSize,
                            Literal(resource_dict['size'])))
 
-            # Is this a resource with RDF records?
-            # If it is we want to add pagination for harvesting the records
-            # TODO: Add pages resources
-            # if resource_dict.get('id') in rdf_resources():
-            #     print 'RDF'
-
     def graph_from_record(self, record_dict, resource, record_ref):
         """
         RDF for an individual record - currently this is a specimen record
@@ -320,6 +327,8 @@ class NHMDCATProfile(RDFProfile):
         :param record_ref:
         :return:
         """
+
+        context = self.get_context()
 
         namespaces = {
             'dc': DC,
@@ -340,6 +349,9 @@ class NHMDCATProfile(RDFProfile):
         # Add some more namespaces
         for prefix, namespace in namespaces.iteritems():
             g.bind(prefix, namespace)
+
+        # Get the GBIF record if it exists
+        occurrence_id = record_dict.get('occurrenceID')
 
         package_id = resource.get_package_id()
 
@@ -378,6 +390,22 @@ class NHMDCATProfile(RDFProfile):
                 # Parse into data format, and add as dates
                 _date = parse_date(value)
                 g.add((record_ref, getattr(DWC, term), Literal(_date.isoformat(), datatype=XSD.dateTime)))
+
+        try:
+            gbif_record = toolkit.get_action('gbif_record_show')(context, {
+                'occurrence_id': occurrence_id
+            })
+        except NotFound:
+            gbif_record = {}
+        else:
+            # Assert equivalence with the GBIF record
+            gbif_uri = os.path.join('http://www.gbif.org/occurrence', gbif_record['gbifID'])
+            g.add((object_uri, OWL.sameAs, URIRef(gbif_uri)))
+            # If we have a GBIF country code, add it
+            # Annoyingly, this seems to be the only geographic element on GBIF with URI
+            country_code = gbif_record.get('gbifCountryCode')
+            if country_code:
+                g.add((object_uri, DWC.countryCode, URIRef(os.path.join('http://www.gbif.org/country', country_code))))
 
         # Now, create the specimen object
         # Remove nulls and hidden fields from record_dict
@@ -420,12 +448,28 @@ class NHMDCATProfile(RDFProfile):
         g.add((object_uri, VOID.inDataset, dataset_ref))
 
         dwc_terms_dict = dwc_terms(record_dict.keys())
+
         # Handle dynamic properties separately
         dynamic_properties = dwc_terms_dict.pop('dynamicProperties')
 
         for group, terms in dwc_terms_dict.items():
             for uri, term in terms.items():
-                g.add((object_uri, getattr(DWC, term), Literal(record_dict.get(term))))
+                # Do we have a GBIF key value?
+                # Uppercase first letter of term, and convert to GBIF key format => gbifGenusKey
+                uc_term = term[0].upper() + term[1:]
+                gbif_term_key = 'gbif%sKey' % uc_term
+                gbif_key = gbif_record.get(gbif_term_key)
+
+                # Do we have a GBIF key value? If we do, we can provide a URI to GBIF
+                if gbif_key:
+                    gbif_uri = URIRef(os.path.join('http://www.gbif.org/species', gbif_key))
+                    # Add the GBIF species URI with label
+                    g.add((gbif_uri, RDFS.label, Literal(record_dict.get(term))))
+                    # And associated our specimen object's DWC term with the GBIF URI
+                    g.add((object_uri, getattr(DWC, term), gbif_uri))
+                else:
+                    # We do not have a GBIF key, so no URI: Add the term value as a literal
+                    g.add((object_uri, getattr(DWC, term), Literal(record_dict.get(term))))
 
         g.add((object_uri, DC.identifier, Literal(record_dict.get('uuid'))))
 

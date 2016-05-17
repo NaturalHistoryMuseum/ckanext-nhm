@@ -103,7 +103,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         # Dataset metrics
         _map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
-        # NOTE: /datastore/dump/{resource_id} is prevented by NGINX
+        # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
         object_controller = 'ckanext.nhm.controllers.object:ObjectController'
 
