@@ -327,9 +327,7 @@ class NHMDCATProfile(RDFProfile):
         :param record_ref:
         :return:
         """
-
         context = self.get_context()
-
         namespaces = {
             'dc': DC,
             'dcat': DCAT,
