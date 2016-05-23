@@ -204,7 +204,7 @@ class SpecimenView(DefaultView):
 
         # We show the DQI at the top of the record page - so hide the group from
         # The actual record view - we need the group though for the filters
-        del c.field_groups['Data Quality']
+        del c.field_groups['Data Admin']
 
         # Some fields are being merged together - in which case we'll need custom filters
         # This can be set to bool false to not display a filter
@@ -261,6 +261,7 @@ class SpecimenView(DefaultView):
 
         # Related resources
         c.related_records = []
+
         for image in c.images:
             # Create a thumbnail image by replacing preview with thumbnail
             image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
