@@ -174,8 +174,9 @@ class SpecimenView(DefaultView):
             ("totalVolume", "Total volume"),
             ("partType", "Part type"),
         ])),
-        ("Data Quality", OrderedDict([
+        ("Data Admin", OrderedDict([
             ("gbifIssue", "GBIF Error"),
+            ("project", "Project"),
         ])),
         ("Record", OrderedDict([
             ("occurrenceID", "Occurrence ID"),
@@ -260,33 +261,6 @@ class SpecimenView(DefaultView):
 
         # Related resources
         c.related_records = []
-
-        # related_resources = c.record_dict.get('relatedResourceID')
-        #
-        # if related_resources:
-        #     related_resources = related_resources.split(';')
-        #
-        #     try:
-        #         related_resources.remove(occurrence_id)
-        #     except ValueError:
-        #         pass
-        #
-        #     if related_resources:
-        #         result = get_action('datastore_search')(
-        #             context,
-        #             {
-        #                 'resource_id': c.resource['id'],
-        #                 'filters': {'occurrenceID': related_resources},
-        #                 'fields': ['_id', 'occurrenceID', 'catalogNumber']
-        #             }
-        #         )
-        #
-        #         for record in result['records']:
-        #             c.related_records.append({
-        #                 '_id': record['_id'],
-        #                 'title': 'Other part: %s' % (record['catalogNumber'] or record['occurrenceID']),
-        #             })
-
         for image in c.images:
             # Create a thumbnail image by replacing preview with thumbnail
             image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
