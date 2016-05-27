@@ -30,7 +30,7 @@ setup(
             dataset-category=ckanext.nhm.commands.dataset_category:DatasetCategoryCommand
             initdb=ckanext.nhm.commands.initdb:InitDBCommand
             datastore=ckanext.nhm.commands.datastore:DatastoreCommand
-            resource=ckanext.nhm.commands.resource:ResourceCommand
+            file=ckanext.nhm.commands.file:FileCommand
 
         [ckan.rdf.profiles]
             nhm_dcat=ckanext.nhm.dcat.profiles:NHMDCATProfile
