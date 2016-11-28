@@ -182,22 +182,23 @@ class DatastoreCommand(CkanCommand):
         pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {})
 
         for pkg_dict in pkgs:
-            for resource in pkg_dict['resources']:
-                # Does this have an activate datastore table?
-                if resource['url_type'] == 'datastore':
+            if 'resources' in pkg_dict:
+                for resource in pkg_dict['resources']:
+                    # Does this have an activate datastore table?
+                    if resource['url_type'] in ['datastore', 'upload']:
 
-                    try:
-                        result = toolkit.get_action('datastore_search_sql')(self.context, {
-                            'sql': 'SELECT COUNT(*) FROM "%s"' % resource['id']
-                        })
-                    except logic.ValidationError:
-                        log.critical('Update stats error: resource %s does not exist' % resource['id'])
-                    except logic.NotAuthorized:
-                        log.critical('Not authorized to read resource: %s' % resource['id'])
-                    else:
-                        count = result['records'][0]['count']
-                        stats = DatastoreStats(count=count, resource_id=resource['id'])
-                        model.Session.add(stats)
+                        try:
+                            result = toolkit.get_action('datastore_search_sql')(self.context, {
+                                'sql': 'SELECT COUNT(*) FROM "%s"' % resource['id']
+                            })
+                        except logic.ValidationError:
+                            log.critical('Update stats error: resource %s does not exist' % resource['id'])
+                        except logic.NotAuthorized:
+                            log.critical('Not authorized to read resource: %s' % resource['id'])
+                        else:
+                            count = result['records'][0]['count']
+                            stats = DatastoreStats(count=count, resource_id=resource['id'])
+                            model.Session.add(stats)
 
         model.Session.commit()
 
