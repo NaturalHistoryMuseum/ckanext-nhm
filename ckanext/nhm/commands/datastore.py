@@ -182,9 +182,11 @@ class DatastoreCommand(CkanCommand):
         pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {})
 
         for pkg_dict in pkgs:
+            print(pkg_dict['name'])
             if 'resources' in pkg_dict:
                 for resource in pkg_dict['resources']:
                     # Does this have an activate datastore table?
+                    print(resource['url_type'])
                     if resource['url_type'] in ['datastore', 'upload']:
 
                         try:
