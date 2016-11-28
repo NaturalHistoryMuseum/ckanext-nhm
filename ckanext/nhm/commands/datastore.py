@@ -54,7 +54,7 @@ class DatastoreCommand(CkanCommand):
 
         # Set up context
         user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
-        self.context = {'user': user['name']}
+        self.context = {'user': 'admin'}
 
         # Set up datastore DB engine
         self.engine = _get_engine({
@@ -178,9 +178,7 @@ class DatastoreCommand(CkanCommand):
 
 
     def update_stats(self):
-
         pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {})
-
         for pkg_dict in pkgs:
             print(pkg_dict['name'])
             if 'resources' in pkg_dict:
