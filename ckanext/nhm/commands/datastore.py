@@ -179,10 +179,7 @@ class DatastoreCommand(CkanCommand):
 
     def update_stats(self):
         pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {'limit': 100})
-        counter = 0
         for pkg_dict in pkgs:
-            print(pkg_dict['name'])
-            counter += 1
             if 'resources' in pkg_dict:
                 for resource in pkg_dict['resources']:
                     # Does this have an activate datastore table?
@@ -203,6 +200,4 @@ class DatastoreCommand(CkanCommand):
                             model.Session.add(stats)
 
         model.Session.commit()
-        print(counter)
-
         log.info('Stats updated')
