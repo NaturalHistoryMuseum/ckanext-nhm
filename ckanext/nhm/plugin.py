@@ -36,7 +36,7 @@ Invalid = p.toolkit.Invalid
 log = logging.getLogger(__name__)
 
 # The maximum limit for datastore search
-MAX_LIMIT = 100
+MAX_LIMIT = 5000
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
