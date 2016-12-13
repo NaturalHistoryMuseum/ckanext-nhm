@@ -31,7 +31,7 @@ from ckanext.nhm.lib.resource import (
     resource_filter_delete_cookie
 )
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from ckanext.gbif import GBIF_ERRORS
+from ckanext.gbif.lib.errors import GBIF_ERRORS
 
 log = logging.getLogger(__name__)
 
