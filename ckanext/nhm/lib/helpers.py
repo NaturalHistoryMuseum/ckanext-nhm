@@ -273,37 +273,37 @@ def collection_stats():
     @return:
     """
     resource_id = get_specimen_resource_id()
+    total = 0
+    collections = OrderedDict()    
 
     if not resource_id:
         log.critical('Please configure collection resource ID')
-        return {}
+    else:    
+        context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    context = {'model': model, 'session': model.Session, 'user': c.user}
+        sql = '''SELECT "collectionCode", COUNT(*) AS count
+               FROM "{resource_id}"
+               GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
 
-    sql = '''SELECT "collectionCode", COUNT(*) AS count
-           FROM "{resource_id}"
-           GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
+        total = 0
+        collections = OrderedDict()
 
-    total = 0
-    collections = OrderedDict()
+        try:
+            result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
+        except ValidationError, e:
+            log.critical('Error retrieving collection statistics %s', e)
+        else:
+            for record in result['records']:
+                count = int(record['count'])
+                collections[record['collectionCode']] = count
+                total += count
 
-    try:
-        result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
-    except ValidationError, e:
-        log.critical('Error retrieving collection statistics %s', e)
-    else:
-        for record in result['records']:
-            count = int(record['count'])
-            collections[record['collectionCode']] = count
-            total += count
 
     stats = {
         'total': total,
         'collections': collections
-    }
-
+    }  
     return stats
-
 
 def get_department(collection_code):
     """
