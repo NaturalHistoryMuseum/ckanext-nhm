@@ -275,7 +275,8 @@ def collection_stats():
     resource_id = get_specimen_resource_id()
 
     if not resource_id:
-        log.error('Please configure collection resource ID')
+        log.critical('Please configure collection resource ID')
+        return {}
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
@@ -291,7 +292,6 @@ def collection_stats():
     except ValidationError, e:
         log.critical('Error retrieving collection statistics %s', e)
     else:
-
         for record in result['records']:
             count = int(record['count'])
             collections[record['collectionCode']] = count
