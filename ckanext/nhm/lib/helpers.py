@@ -1,4 +1,3 @@
-
 import logging
 import json
 import urllib
@@ -50,6 +49,7 @@ re_dwc_field_label = re.compile('([A-Z]+)')
 # Maximum number of characters for the author string
 AUTHOR_MAX_LENGTH = 100
 
+
 def get_site_statistics():
     stats = dict()
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
@@ -61,7 +61,6 @@ def get_site_statistics():
 
 
 def get_datastore_stats():
-
     context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
 
     stats = {
@@ -72,7 +71,7 @@ def get_datastore_stats():
 
     resource_counts = model.Session.execute(
         """
-        SELECT r.id, r.name, d.count, d.date, p.id as pkg_id, p.title as pkg_title, p.name as pkg_name
+        SELECT r.id, r.name, d.count, d.date, p.id AS pkg_id, p.title AS pkg_title, p.name AS pkg_name
         FROM resource r
         INNER JOIN datastore_stats d ON r.id = d.resource_id
         INNER JOIN resource_group rg ON r.resource_group_id = rg.id
@@ -96,7 +95,7 @@ def get_datastore_stats():
 
 
 def get_contributor_count():
-    return model.Session.execute("SELECT COUNT(DISTINCT creator_user_id) from package WHERE state='active'").scalar()
+    return model.Session.execute("SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE state='active'").scalar()
 
 
 def _get_action(action, params):
@@ -140,7 +139,6 @@ def resource_view_get_ordered_fields(resource_id):
 
 
 def form_select_datastore_field_options(resource_id=None, allow_empty=False):
-
     # Need to check for resource_id as this form gets loaded on add, nut just edit
     # And on add there will be no resource_id
     if resource_id:
@@ -201,7 +199,6 @@ def url_for_indexlot_view():
 
 
 def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}):
-
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
     try:
@@ -209,6 +206,8 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
     except NotFound:
         return None
     else:
+        if not views:
+            return None
 
         for view in views:
             if view['view_type'] == view_type:
@@ -218,9 +217,9 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
 
         return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
+
 @cache_region('permanent', 'collection_stats')
 def indexlot_count():
-
     resource_id = get_indexlot_resource_id()
 
     if not resource_id:
@@ -274,11 +273,11 @@ def collection_stats():
     """
     resource_id = get_specimen_resource_id()
     total = 0
-    collections = OrderedDict()    
+    collections = OrderedDict()
 
     if not resource_id:
         log.critical('Please configure collection resource ID')
-    else:    
+    else:
         context = {'model': model, 'session': model.Session, 'user': c.user}
 
         sql = '''SELECT "collectionCode", COUNT(*) AS count
@@ -298,12 +297,12 @@ def collection_stats():
                 collections[record['collectionCode']] = count
                 total += count
 
-
     stats = {
         'total': total,
         'collections': collections
-    }  
+    }
     return stats
+
 
 def get_department(collection_code):
     """
@@ -336,7 +335,7 @@ def api_doc_link():
     Link to API documentation
     @return:
     """
-    attr= {'class': 'external', 'target': '_blank'}
+    attr = {'class': 'external', 'target': '_blank'}
     return link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 
@@ -368,13 +367,13 @@ def persistent_follow_button(obj_type, obj_id):
         action = 'am_following_%s' % obj_type
         following = logic.get_action(action)(context, {'id': obj_id})
         return snippet('snippets/follow_button.html',
-                   following=following,
-                   obj_id=obj_id,
-                   obj_type=obj_type)
+                       following=following,
+                       obj_id=obj_id,
+                       obj_type=obj_type)
 
     return snippet('snippets/anon_follow_button.html',
-           obj_id=obj_id,
-           obj_type=obj_type)
+                   obj_id=obj_id,
+                   obj_type=obj_type)
 
 
 def filter_resource_items(key):
@@ -654,6 +653,7 @@ def get_resource_filter_options(resource):
         result[o]['checked'] = o in filters and 'true' in filters[o]
     return result
 
+
 def get_resource_gbif_errors(resource):
     """
     Return GBIF errors applicable for this resource
@@ -667,6 +667,7 @@ def get_resource_gbif_errors(resource):
         return GBIF_ERRORS
     else:
         return {}
+
 
 def get_resource_filter_pills(resource):
     """
@@ -784,6 +785,7 @@ def get_facet_label_function(facet_name, multi=False):
                 if f['name'] == filter_value:
                     return facet_function(f)
             return filter
+
         return filter_facets
     else:
         return facet_function
@@ -883,6 +885,7 @@ def is_sysadmin():
     """
     if c.userobj.sysadmin:
         return True
+
 
 def record_display_field(field_name, value):
     """
@@ -993,6 +996,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     text = ' '.join(text)
 
     return urllib.quote(text.encode('utf8'))
+
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     """
