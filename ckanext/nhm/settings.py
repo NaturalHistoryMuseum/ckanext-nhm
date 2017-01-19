@@ -15,7 +15,7 @@ Few module settings which don't really need to go in ini file
 
 # For live
 COLLECTION_CONTACTS = {
-    'Entomology': 'adrian.hine@nhm.ac.uk',
+    'Entomology': 'c.barclay@nhm.ac.uk',
     'Botany': 'lawrence.brooks@nhm.ac.uk',
     'Mineralogy': 'd.a.smith@nhm.ac.uk',
     'Palaeontology': 'd.a.smith@nhm.ac.uk',
