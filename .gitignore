@@ -16,3 +16,6 @@ Thumbs.db
 # PyCharm #
 ###########
 .idea
+
+build
+dist
