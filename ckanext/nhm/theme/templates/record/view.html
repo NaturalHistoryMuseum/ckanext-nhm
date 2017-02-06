@@ -91,7 +91,13 @@
                                     <tr>
                                         <th>{{ h.field_name_label(field_name) }}:</th>
 
-                                        <td>{{ value }}</td>
+                                        <td>
+                                            {% if h.field_is_link(value) %}
+                                                <a href="{{ value }}" title="{{ value }}" target="_blank">{{ value }}</a>
+                                            {% else %}
+                                                {{ value }}
+                                            {% endif %}
+                                        </td>
 
                                         <td width="50" class="filterable">
                                             {% if field_name in filter_fields %}

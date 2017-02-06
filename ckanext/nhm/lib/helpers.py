@@ -46,6 +46,13 @@ enumerate = enumerate
 
 re_dwc_field_label = re.compile('([A-Z]+)')
 
+re_url_validation = re.compile(
+        r'^(?:http)s?://' # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' # domain...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?' # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
 # Maximum number of characters for the author string
 AUTHOR_MAX_LENGTH = 100
 
@@ -814,6 +821,19 @@ def field_name_label(field_name):
     label = field_name.replace('_', ' ')
     label = label[0].upper() + label[1:]
     return label
+
+
+def field_is_link(value):
+    """
+    Is a field a link (starts with http and is a valid URL)
+    @param value:
+    @return: boolean
+    """
+    try:
+        return value.startswith('http') and re_url_validation.match(value)
+    except Exception:
+        pass
+    return False
 
 
 def get_contact_form_params(pkg=None, res=None, rec=None):
