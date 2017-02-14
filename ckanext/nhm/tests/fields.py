@@ -15,6 +15,7 @@ from ckanext.nhm.controllers.specimen import SpecimenController
 # TODO: Temp, need to look at this http://docs.ckan.org/en/1117-start-new-test-suite/testing-coding-standards.html
 # But in the meantime I just want some quick tests
 
+
 class FieldsTest(unittest.TestCase):
 
     def test_specimen_fields(self):
