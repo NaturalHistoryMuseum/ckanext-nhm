@@ -132,14 +132,12 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return _map
 
-
     # IActions
     def get_actions(self):
         return {
             'record_show':  nhm_action.record_show,
-            'object_rdf': nhm_action.object_rdf
-            # TEMP: Disable original image download
-            # 'download_image': nhm_action.download_original_image
+            'object_rdf': nhm_action.object_rdf,
+            'download_image': nhm_action.download_original_image
         }
 
     # ITemplateHelpers
@@ -425,7 +423,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         #     xml_dict['resource']['creators']['creator'][0]['affiliation'] = metadata['affiliation']
         return xml_dict
 
-    ## IGalleryImage
+    # IGalleryImage
     def image_info(self):
         """
         Return info for this plugin
