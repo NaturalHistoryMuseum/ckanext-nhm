@@ -91,7 +91,8 @@ class RecordController(base.BaseController):
                 pass
             else:
                 default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
-                licence_id = c.resource.get('_image_licence') or 'ODC-BY-1.0'
+                licence_id = c.resource.get('_image_licence') or 'cc-by'
+                print(model.Package.get_license_register().values())
                 licence = model.Package.get_license_register()[licence_id]
                 default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
