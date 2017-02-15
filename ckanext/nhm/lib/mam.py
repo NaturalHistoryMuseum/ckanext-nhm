@@ -8,8 +8,6 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 from pylons import config
 import requests
 
-MAM_MEDIA_ENDPOINT = 'https://web-dm-1.nhm.ac.uk:8443/activiti-rest/service/runtime/process-instances'
-
 
 def mam_media_request(asset_id, email):
     """
@@ -25,6 +23,6 @@ def mam_media_request(asset_id, email):
             {"name": "assets", "value": asset_id}
         ]
     }
-    r = requests.post(MAM_MEDIA_ENDPOINT, json=data, auth=(config.get("ckanext.nhm.mam.username"), config.get("ckanext.nhm.mam.password")), verify=False)
+    r = requests.post(config.get("ckanext.nhm.mam.endpoint"), json=data, auth=(config.get("ckanext.nhm.mam.username"), config.get("ckanext.nhm.mam.password")), verify=False)
     # Raise an exception for an error
     r.raise_for_status()
