@@ -5,8 +5,13 @@ Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
 
-from pylons import config
+import json
 import requests
+import logging
+from pylons import config
+
+
+log = logging.getLogger(__name__)
 
 
 def mam_media_request(asset_id, email):
@@ -16,13 +21,19 @@ def mam_media_request(asset_id, email):
     :param email: email to send to
     :return:
     """
-    data = {
+    payload = {
         "processDefinitionKey": "original-media-request",
         "variables": [
             {"name": "emailAddress", "value": email},
             {"name": "assets", "value": asset_id}
         ]
     }
-    r = requests.post(config.get("ckanext.nhm.mam.endpoint"), json=data, auth=(config.get("ckanext.nhm.mam.username"), config.get("ckanext.nhm.mam.password")), verify=False)
-    # Raise an exception for an error
-    r.raise_for_status()
+    headers = {'content-type': 'application/json'}
+    auth = (config.get("ckanext.nhm.mam.username"), config.get("ckanext.nhm.mam.password"))
+    r = requests.post(config.get("ckanext.nhm.mam.endpoint"), data=json.dumps(payload), auth=auth, verify=False, headers=headers)
+    # Raise an exception and log the error
+    try:
+        r.raise_for_status()
+    except:
+        log.critical('Error requesting MAM image: {0}'.format(r.text))
+        raise
