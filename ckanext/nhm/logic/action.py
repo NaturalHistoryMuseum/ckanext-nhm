@@ -123,6 +123,7 @@ def object_rdf(context, data_dict):
         return output
     raise NotFound
 
+
 def _image_exists_on_record(resource, record, asset_id):
     """
     Check the image belongs to the record
