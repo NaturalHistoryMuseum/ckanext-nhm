@@ -100,7 +100,7 @@ class RecordController(base.BaseController):
 
                 if image_field_value:
 
-                    if image_field_type == 'json':
+                    if image_field_type in ['json', 'jsonb']:
 
                         c.images = []
 
