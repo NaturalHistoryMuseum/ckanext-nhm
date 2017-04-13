@@ -442,6 +442,10 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         try:
             image_json = json.loads(raw_images)
         except ValueError:
+            # Cannot parse field, ignore it
+            pass
+        except TypeError:
+            # Has the wrong image field been selected?
             pass
         else:
             for i in image_json:

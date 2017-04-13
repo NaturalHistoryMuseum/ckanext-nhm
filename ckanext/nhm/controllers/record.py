@@ -100,40 +100,39 @@ class RecordController(base.BaseController):
 
                 if image_field_value:
 
-                    if image_field_type in ['json', 'jsonb']:
+                    c.images = []
 
-                        c.images = []
-
-                        try:
-                            images = json.loads(image_field_value)
-                        except ValueError:
-                            pass
-                        else:
-                            for image in images:
-                                href = image.get('identifier', None)
-                                if href:
-                                    license = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
-                                    c.images.append({
-                                        'title': image.get('title', None) or c.record_title,
-                                        'href': href,
-                                        'copyright': '%s<br />%s' % (license or default_licence, image.get('rightsHolder', None) or default_copyright),
-                                        'record_id': record_id,
-                                        'resource_id': resource_id,
-                                        'link': url_for(
-                                            controller='ckanext.nhm.controllers.record:RecordController',
-                                            action='view',
-                                            package_name=package_name,
-                                            resource_id=resource_id,
-                                            record_id=record_id
-                                        ),
-                                    })
-                    else:
+                    # DOn't test for field type, just try and convert image to json
+                    try:
+                        images = json.loads(image_field_value)
+                    except ValueError:
+                        # String field value
                         try:
                             # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
                             c.images = [{'title': c.record_title, 'href': image.strip(), 'copyright': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if image.strip()]
                         except (KeyError, AttributeError):
                             # Skip errors - there are no images
                             pass
+                    else:
+                        for image in images:
+                            href = image.get('identifier', None)
+                            if href:
+                                license_link = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
+                                c.images.append({
+                                    'title': image.get('title', None) or c.record_title,
+                                    'href': href,
+                                    'copyright': '%s<br />%s' % (license_link or default_licence, image.get('rightsHolder', None) or default_copyright),
+                                    'record_id': record_id,
+                                    'resource_id': resource_id,
+                                    'link': url_for(
+                                        controller='ckanext.nhm.controllers.record:RecordController',
+                                        action='view',
+                                        package_name=package_name,
+                                        resource_id=resource_id,
+                                        record_id=record_id
+                                    ),
+                                })
+
 
         if field_names['latitude'] and field_names['longitude']:
             latitude, longitude = c.record_dict.get(field_names['latitude']), c.record_dict.get(field_names['longitude'])
