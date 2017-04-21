@@ -78,6 +78,8 @@ class SpecimenView(DefaultView):
             ("eventTime", "Event time"),
             ("expedition", "Expedition"),
             ("habitat", "Habitat"),
+            ("vessel", "Vessel"),
+            ("samplingProtocol", "Sampling protocol"),
         ])),
         ("Identification", OrderedDict([
             ("identifiedBy", "Identified by"),
