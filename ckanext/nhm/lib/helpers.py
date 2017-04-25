@@ -551,7 +551,10 @@ def resource_view_state(resource_view_json, resource_json):
     else:
         resource_filter_delete_cookie(resource_view['resource_id'])
 
-    return json.dumps(resource_view)
+    try:
+        return json.dumps(resource_view)
+    except TypeError:
+        return {}
 
 
 def resource_is_dwc(resource):
