@@ -3,7 +3,6 @@ amqp==1.4.0
 anyjson==0.3.3
 billiard==3.3.0.13
 celery==3.1.7
--e git+https://github.com/ckan/ckanext-spatial.git#egg=ckanext-spatial
 -e git+https://github.com/okfn/ckanext-issues.git#egg=ckanext-issues
 -e git+https://github.com/ckan/ckanext-viewhelpers.git#egg=ckanext_viewhelpers
 -e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext_dcat
