@@ -92,9 +92,18 @@ class RecordController(base.BaseController):
             else:
                 default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
                 licence_id = c.resource.get('_image_licence') or 'cc-by'
-                #licence_id = c.resource.get('_image_licence') or 'ODC-BY-1.0'
+                short_licence_id = licence_id[:5].lower()
+                # licence_id = c.resource.get('_image_licence') or 'ODC-BY-1.0'
+                # Set default licence - cc-by
+                licence = model.Package.get_license_register()['cc-by']
+                # Try and overwrite default licence with more specific one
+                for l_id in [licence_id, short_licence_id]:
+                    try:
+                        licence = model.Package.get_license_register()[l_id]
+                        break
+                    except KeyError:
+                        continue
 
-                licence = model.Package.get_license_register()[licence_id]
                 default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
                 image_field_value = c.record_dict.pop(field_names['image'])
