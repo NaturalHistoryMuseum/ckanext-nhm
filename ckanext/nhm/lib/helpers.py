@@ -24,10 +24,10 @@ from ckanext.nhm.lib.resource import (
     resource_get_ordered_fields,
     resource_filter_options,
     parse_request_filters,
-    FIELD_DISPLAY_FILTER,
-    resource_filter_get_cookie,
-    resource_filter_set_cookie,
-    resource_filter_delete_cookie
+    # FIELD_DISPLAY_FILTER,
+    # resource_filter_get_cookie,
+    # resource_filter_set_cookie,
+    # resource_filter_delete_cookie
 )
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.gbif.lib.errors import GBIF_ERRORS
@@ -581,53 +581,53 @@ def resource_view_get_hidden_fields(resource):
     @param filter_dict:
     """
 
-    filter_dict = parse_request_filters()
-
-    # Get all display fields explicitly set
-    display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
-
-    # Load the hidden fields cookie
-    hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
-
-    # Retrieve the fields for this resource
-    resource_fields = resource_get_ordered_fields(resource['id'])
-
-    # If user has set display fields, loop through display fields
-    # And available fields, to build a list of hidden fields
-    if display_fields:
-
-        # Ensure it's a list
-        if not isinstance(display_fields, list):
-            display_fields = [display_fields]
-
-        # Make sure _id is never hidden
-        display_fields.append('_id')
-
-        # Make sure gbifIssue is never hidden (if it exists)
-        if 'gbifIssue' in resource_fields:
-            display_fields.append('gbifIssue')
-
-        # Make sure all filtered fields are never hidden
-        display_fields += filter_dict.keys()
-
-        # Hidden fields are all other resource fields not in the display field array
-        return list(set(resource_fields) - set(display_fields))
-
-    elif hidden_fields_cookie:
-
-        # Make sure that even if we're using the hidden fields cookie
-        # All filtered fields are removed from the hidden field list
-        hidden_fields_cookie = list(set(hidden_fields_cookie) - set(filter_dict.keys()))
-        return hidden_fields_cookie
-
-    else:
-
-        # User has nto customised the grid - so see if we have custom display
-        # fields set in the controller
-        view_cls = resource_view_get_view(resource)
-
-        if view_cls.grid_default_columns:
-            return [f for f in resource_fields if f not in view_cls.grid_default_columns]
+    # filter_dict = parse_request_filters()
+    #
+    # # Get all display fields explicitly set
+    # display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
+    #
+    # # Load the hidden fields cookie
+    # hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
+    #
+    # # Retrieve the fields for this resource
+    # resource_fields = resource_get_ordered_fields(resource['id'])
+    #
+    # # If user has set display fields, loop through display fields
+    # # And available fields, to build a list of hidden fields
+    # if display_fields:
+    #
+    #     # Ensure it's a list
+    #     if not isinstance(display_fields, list):
+    #         display_fields = [display_fields]
+    #
+    #     # Make sure _id is never hidden
+    #     display_fields.append('_id')
+    #
+    #     # Make sure gbifIssue is never hidden (if it exists)
+    #     if 'gbifIssue' in resource_fields:
+    #         display_fields.append('gbifIssue')
+    #
+    #     # Make sure all filtered fields are never hidden
+    #     display_fields += filter_dict.keys()
+    #
+    #     # Hidden fields are all other resource fields not in the display field array
+    #     return list(set(resource_fields) - set(display_fields))
+    #
+    # elif hidden_fields_cookie:
+    #
+    #     # Make sure that even if we're using the hidden fields cookie
+    #     # All filtered fields are removed from the hidden field list
+    #     hidden_fields_cookie = list(set(hidden_fields_cookie) - set(filter_dict.keys()))
+    #     return hidden_fields_cookie
+    #
+    # else:
+    #
+    #     # User has nto customised the grid - so see if we have custom display
+    #     # fields set in the controller
+    #     view_cls = resource_view_get_view(resource)
+    #
+    #     if view_cls.grid_default_columns:
+    #         return [f for f in resource_fields if f not in view_cls.grid_default_columns]
 
     return {}
 
@@ -686,7 +686,6 @@ def get_resource_filter_pills(resource):
     @param resource:
     @return:
     """
-
     filter_dict = parse_request_filters()
 
     def get_pill_filters(exclude_field, exclude_value):
@@ -745,7 +744,7 @@ def get_resource_filter_pills(resource):
                     pills[label] = {value: filters}
 
     # Remove the field group key, if it exists
-    pills.pop(FIELD_DISPLAY_FILTER, None)
+    # pills.pop(FIELD_DISPLAY_FILTER, None)
     return pills
 
 
