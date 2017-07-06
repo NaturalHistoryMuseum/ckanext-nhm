@@ -15,9 +15,13 @@ Few module settings which don't really need to go in ini file
 
 # For live
 COLLECTION_CONTACTS = {
-    'Entomology': 'c.barclay@nhm.ac.uk',
-    'Botany': 'lawrence.brooks@nhm.ac.uk',
-    'Mineralogy': 'd.a.smith@nhm.ac.uk',
-    'Palaeontology': 'd.a.smith@nhm.ac.uk',
-    'Zoology': 't.conyers@nhm.ac.uk'
+    'Data Portal / Other': 'data@nhm.ac.uk',
+    'Algae, Fungi & Plants': 'm.carine@nhm.ac.uk',
+    'Economic & Environmental Earth Sciences': 'g.miller@nhm.ac.uk',
+    'Fossil Invertebrates & Plants': 'm.richter@nhm.ac.uk',
+    'Insects': 'g.broad@nhm.ac.uk',
+    'Invertebrates': 'm.lowe@nhm.ac.uk',
+    'Library & Archives': 'library@nhm.ac.uk',
+    'Mineral & Planetary Sciences': 'm.rumsey@nhm.ac.uk',
+    'Vertebrates': 'simon.loader@nhm.ac.uk',
 }

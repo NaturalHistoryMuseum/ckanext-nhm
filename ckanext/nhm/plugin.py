@@ -323,8 +323,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # If this is an index lot enquiry, send to entom
         if package_name == 'collection-indexlots':
             mail_dict['subject'] = 'Collection Index lot enquiry'
-            mail_dict['recipient_email'] = COLLECTION_CONTACTS['Entomology']
-            mail_dict['recipient_name'] = 'Entomology'
+            mail_dict['recipient_email'] = COLLECTION_CONTACTS['Insects']
+            mail_dict['recipient_name'] = 'Insects'
         elif department:
             # User has selected the department
             try:

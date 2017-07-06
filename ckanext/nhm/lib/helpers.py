@@ -888,8 +888,7 @@ def get_contact_form_department_options():
     Contact form category
     @return:
     """
-    options = ['Other / unknown'] + COLLECTION_CONTACTS.keys()
-    return list_to_form_options(options)
+    return list_to_form_options(COLLECTION_CONTACTS.keys())
 
 
 def downloadable(resource):
