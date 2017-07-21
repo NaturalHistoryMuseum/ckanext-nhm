@@ -10,7 +10,6 @@ class AboutController(p.toolkit.BaseController):
     Controller for displaying about pages
     """
     def citation(self):
-        raise Exception('HEELOO')
         return p.toolkit.render('about/citation.html', {'title': 'Citation and attribution'})
 
     def download(self):
