@@ -1,0 +1,54 @@
+
+{% set filter_pills = h.get_resource_filter_pills(resource) %}
+{% set query_params = h.get_query_params() %}
+
+<div class="row resource-view-filter-form">
+    <div class="span9">
+        {% snippet 'package/snippets/resource_view_full_text_search.html', resource_view=resource_view, resource=resource, package=package, filters=query_params['filters'] %}
+    </div>
+
+    <div class="span3 no-margin {{ 'has-filters' if filter_pills else '' }}" data-module="resource-view-filters-ui">
+
+        <div class="resource-view-filters-wrapper">
+
+            <div
+              class="resource-view-advanced-filters"
+              data-module="resource-view-advanced-filters"
+              data-module-resource-id="{{ resource['id'] }}"
+              data-module-fields="{{ h.dump_json(h.resource_view_get_ordered_fields(resource['id'])) }}"
+              data-module-hidden-fields="{{ h.dump_json(h.resource_view_get_hidden_fields(resource)) }}"
+              data-module-field-groups="{{ h.dump_json(h.resource_view_get_field_groups(resource)) }}"
+              data-module-filter-options="{{ h.dump_json(h.get_resource_filter_options(resource)) }}"
+              data-module-gbif-errors="{{ h.dump_json(h.get_resource_gbif_errors(resource)) }}"
+              >
+            </div>
+
+        </div>
+    </div>
+
+    {% resource 'ckanext-nhm/resource-view-advanced-filters' %}
+
+</div>
+
+{% if filter_pills %}
+
+    <div class="row resource-view-filter-pills">
+        <div class="span12">
+            <p class="filtered-list">
+                {% for field, pills in filter_pills.items() %}
+                    <span class="facet">{{ field }}:</span>
+                    {% for value, filter in pills.items() %}
+                        <span class="filtered pill">{{ value }}
+                            <a href="{{ h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id'], filters=filter, q=query_params['q']) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
+                        </span>
+                    {% endfor %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+
+{% endif %}
+
+
+
+
