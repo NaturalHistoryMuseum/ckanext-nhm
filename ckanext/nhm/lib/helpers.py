@@ -9,6 +9,7 @@ from beaker.cache import cache_region
 from pylons import config
 from collections import OrderedDict
 from jinja2.filters import do_truncate
+from operator import itemgetter
 
 import ckan.model as model
 import ckan.logic as logic
@@ -24,10 +25,10 @@ from ckanext.nhm.lib.resource import (
     resource_get_ordered_fields,
     resource_filter_options,
     parse_request_filters,
-    FIELD_DISPLAY_FILTER,
-    resource_filter_get_cookie,
-    resource_filter_set_cookie,
-    resource_filter_delete_cookie
+    # FIELD_DISPLAY_FILTER,
+    # resource_filter_get_cookie,
+    # resource_filter_set_cookie,
+    # resource_filter_delete_cookie
 )
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.gbif.lib.errors import GBIF_ERRORS
@@ -47,11 +48,11 @@ enumerate = enumerate
 re_dwc_field_label = re.compile('([A-Z]+)')
 
 re_url_validation = re.compile(
-        r'^(?:http)s?://' # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' # domain...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-        r'(?::\d+)?' # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    r'^(?:http)s?://'  # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 # Maximum number of characters for the author string
 AUTHOR_MAX_LENGTH = 100
@@ -478,15 +479,9 @@ def resource_view_state(resource_view_json, resource_json):
     # So to fix, we're going to work out how many columns are in the dataset
     # To decide whether or not to turn on fitColumns
     # Messy, but better than trying to hack around with slickgrid
-
     resource_fields = resource_get_ordered_fields(resource_view['resource_id'])
 
-    # Add hidden fields
-    # The way Slickgrid is implemented, we cannot pass in an array of columns
-    # Instead if display fields is set, we will mark all other columns as hidden
-    hidden_fields = resource_view_get_hidden_fields(resource)
-
-    num_fields = len(resource_fields) - len(hidden_fields)
+    num_fields = len(resource_fields)
 
     viewport_max_width = 920
     col_width = 100
@@ -507,34 +502,19 @@ def resource_view_state(resource_view_json, resource_json):
     if 'gbifIssue' in resource_fields:
         resource_view['state']['columnsOrder'].append('gbifIssue')
 
+    # And add the rest of the fields
     for field in resource_fields:
-        if field not in hidden_fields and field not in resource_view['state']['columnsOrder']:
+        if field not in resource_view['state']['columnsOrder']:
             # Add field to the ordered columns
             resource_view['state']['columnsOrder'].append(field)
 
-    for group, fields in resource_view_get_field_groups(resource).items():
-
-        for field, label in fields.items():
-
-            if field in resource_fields and field not in hidden_fields:
-
-                # If we have a group, add a tooltip
-                # Otherwise will use title text
-                if group:
-                    resource_view['state']['columnsToolTip'].append(
-                        {
-                            'column': field,
-                            'value': '%s: %s' % (group, label)
-                        }
-                    )
-
-                # Add custom titles
-                resource_view['state']['columnsTitle'].append(
-                    {
-                        'column': field,
-                        'title': label
-                    }
-                )
+        # Add easier to read
+        resource_view['state']['columnsTitle'].append(
+            {
+                'column': field,
+                'title': camel_case_to_string(field)
+            }
+        )
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
@@ -545,11 +525,10 @@ def resource_view_state(resource_view_json, resource_json):
                 }
             )
 
-    if hidden_fields:
-        resource_filter_set_cookie(resource_view['resource_id'], hidden_fields)
-        resource_view['state']['hiddenColumns'] = hidden_fields
-    else:
-        resource_filter_delete_cookie(resource_view['resource_id'])
+    if hasattr(view, 'grid_fields'):
+        if '_id' not in view.grid_fields:
+            view.grid_fields.append('_id')
+        resource_view['state']['hiddenColumns'] = [f for f in resource_fields if f not in view.grid_fields]
 
     try:
         return json.dumps(resource_view)
@@ -566,70 +545,9 @@ def resource_is_dwc(resource):
     return bool(resource.get('format').lower() == 'dwc')
 
 
-def resource_view_get_hidden_fields(resource):
-    """
-    Get a list of hidden fields
-    This is called from resource_view_filters.html and helper resource_view_state
-    So the same fields are hidden in the form and Slickgrid
-
-    @param resource id:
-    @return: list of hidden fields
-    """
-
-    """
-    Parse hidden fields from the filter dictionary
-    @param filter_dict:
-    """
-
-    filter_dict = parse_request_filters()
-
-    # Get all display fields explicitly set
-    display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
-
-    # Load the hidden fields cookie
-    hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
-
-    # Retrieve the fields for this resource
-    resource_fields = resource_get_ordered_fields(resource['id'])
-
-    # If user has set display fields, loop through display fields
-    # And available fields, to build a list of hidden fields
-    if display_fields:
-
-        # Ensure it's a list
-        if not isinstance(display_fields, list):
-            display_fields = [display_fields]
-
-        # Make sure _id is never hidden
-        display_fields.append('_id')
-
-        # Make sure gbifIssue is never hidden (if it exists)
-        if 'gbifIssue' in resource_fields:
-            display_fields.append('gbifIssue')
-
-        # Make sure all filtered fields are never hidden
-        display_fields += filter_dict.keys()
-
-        # Hidden fields are all other resource fields not in the display field array
-        return list(set(resource_fields) - set(display_fields))
-
-    elif hidden_fields_cookie:
-
-        # Make sure that even if we're using the hidden fields cookie
-        # All filtered fields are removed from the hidden field list
-        hidden_fields_cookie = list(set(hidden_fields_cookie) - set(filter_dict.keys()))
-        return hidden_fields_cookie
-
-    else:
-
-        # User has nto customised the grid - so see if we have custom display
-        # fields set in the controller
-        view_cls = resource_view_get_view(resource)
-
-        if view_cls.grid_default_columns:
-            return [f for f in resource_fields if f not in view_cls.grid_default_columns]
-
-    return {}
+def camel_case_to_string(camel_case_string):
+    s = ' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
+    return s[0].upper() + s[1:]
 
 
 def get_resource_filter_options(resource):
@@ -745,7 +663,7 @@ def get_resource_filter_pills(resource):
                     pills[label] = {value: filters}
 
     # Remove the field group key, if it exists
-    pills.pop(FIELD_DISPLAY_FILTER, None)
+    # pills.pop(FIELD_DISPLAY_FILTER, None)
     return pills
 
 
@@ -1074,3 +992,47 @@ def dataset_author_truncate(author_str):
             author_str = _truncate(author_str)
 
     return author_str
+
+
+def get_resource_facets(resource):
+    """
+    Return a list of facets for a particular resource
+    @param resource:
+    @return:
+    """
+
+    resource_view = resource_view_get_view(resource)
+
+    # If facets aren't defined in the resource view, then just return
+    if not resource_view.field_facets:
+        return
+
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+    # Build query parameters for the faceted search
+    # We'll use the same query parameters used in the current request
+    # And then add extras to perform a solr faceted query, returning
+    # facets but zero results (limit=0)
+    search_params = get_query_params()
+    search_params['resource_id'] = resource.get('id')
+    search_params['limit'] = 0
+    search_params['facets'] = resource_view.field_facets
+    search = logic.get_action('datastore_search')(context, search_params)
+    facets = []
+    # Parse the facets into a list of dictionary values, similar to that
+    # Built for the dataset search solr facets
+    for facet, facet_items in search['facets']['facet_fields'].items():
+        facet = {
+            'name': facet,
+            'label': facet,
+            'facet_values': []
+        }
+        for value, count in facet_items.items():
+            facet['facet_values'].append({
+                'name': value,
+                'display_name': value,
+                'count': count
+            })
+        facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
+        facets.append(facet)
+
+    return facets

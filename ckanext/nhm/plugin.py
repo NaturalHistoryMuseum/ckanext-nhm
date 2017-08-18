@@ -28,7 +28,6 @@ from ckanext.doi.interfaces import IDoi
 from ckanext.datasolr.interfaces import IDataSolr
 from ckanext.gallery.plugins.interfaces import IGalleryImage
 
-
 get_action = logic.get_action
 unflatten = dictization_functions.unflatten
 Invalid = p.toolkit.Invalid
@@ -37,6 +36,7 @@ log = logging.getLogger(__name__)
 
 # The maximum limit for datastore search
 MAX_LIMIT = 5000
+
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     """
@@ -51,6 +51,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IDatasetForm, inherit=True)
     p.implements(p.IFacets, inherit=True)
     p.implements(p.IPackageController, inherit=True)
+    p.implements(p.IResourceController, inherit=True)
     p.implements(IDatastore)
     p.implements(IDataSolr)
     p.implements(IContact)
@@ -124,18 +125,18 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # So we re=add them here to make sure it's working
         _map.connect('add dataset', '/dataset/new', controller='package', action='new')
         _map.connect('/dataset/{action}',
-          controller='package',
-          requirements=dict(action='|'.join([
-              'list',
-              'autocomplete'
-          ])))
+                     controller='package',
+                     requirements=dict(action='|'.join([
+                         'list',
+                         'autocomplete'
+                     ])))
 
         return _map
 
     # IActions
     def get_actions(self):
         return {
-            'record_show':  nhm_action.record_show,
+            'record_show': nhm_action.record_show,
             'object_rdf': nhm_action.object_rdf,
             'download_image': nhm_action.download_original_image
         }
@@ -334,8 +335,10 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 mail_dict['body'] += '\nDepartment: %s\n' % department
             else:
                 mail_dict['recipient_name'] = department
-                mail_dict['body'] += '\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(department)
-            # If we have a package ID, load the package
+                mail_dict[
+                    'body'] += '\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(
+                    department)
+                # If we have a package ID, load the package
         elif package_id:
             package_dict = get_action('package_show')(context, {'id': package_id})
             # Load the user - using model rather user_show API which loads all the users packages etc.,
@@ -344,8 +347,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             # Update send to with creator username
             mail_dict['recipient_email'] = user_obj.email
             mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
-            mail_dict['body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % package_dict['title'] or package_dict['name']
-
+            mail_dict[
+                'body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % \
+                           package_dict['title'] or package_dict['name']
 
         for i, url in urls.items():
             mail_dict['body'] += '\n%s: %s' % (i.title(), url)
@@ -474,3 +478,5 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'record_id': record['_id']
                 })
         return images
+
+

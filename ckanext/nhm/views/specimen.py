@@ -27,6 +27,11 @@ class SpecimenView(DefaultView):
     grid_default_columns = DarwinCoreView.grid_default_columns
     grid_column_widths = DarwinCoreView.grid_column_widths
 
+    field_facets = [
+        'genus',
+        'family'
+    ]
+
     field_groups = OrderedDict([
         ("Classification", OrderedDict([
             ("scientificName", "Scientific name"),
