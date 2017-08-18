@@ -269,25 +269,25 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
         return query_dict
 
-    # ## IDataSolr
-    # def datasolr_validate(self, context, data_dict, field_types):
-    #     return self.datastore_validate(context, data_dict, field_types)
-    #
-    # def datasolr_search(self, context, data_dict, field_types, query_dict):
-    #     # Add our custom filters
-    #     if 'filters' in data_dict:
-    #
-    #         resource_show = p.toolkit.get_action('resource_show')
-    #         resource = resource_show(context, {'id': data_dict['resource_id']})
-    #         options = resource_filter_options(resource)
-    #         for o in options:
-    #             if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
-    #                 if 'solr' in options[o]:
-    #                     query_dict['q'][0].append(options[o]['solr'])
-    #             elif 'solr_false' in options[o]:
-    #                 query_dict['q'][0].append(options[o]['solr_false'])
-    #     self.enforce_max_limit(query_dict, 'rows')
-    #     return query_dict
+    ## IDataSolr
+    def datasolr_validate(self, context, data_dict, field_types):
+        return self.datastore_validate(context, data_dict, field_types)
+
+    def datasolr_search(self, context, data_dict, field_types, query_dict):
+        # Add our custom filters
+        if 'filters' in data_dict:
+
+            resource_show = p.toolkit.get_action('resource_show')
+            resource = resource_show(context, {'id': data_dict['resource_id']})
+            options = resource_filter_options(resource)
+            for o in options:
+                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
+                    if 'solr' in options[o]:
+                        query_dict['q'][0].append(options[o]['solr'])
+                elif 'solr_false' in options[o]:
+                    query_dict['q'][0].append(options[o]['solr_false'])
+        self.enforce_max_limit(query_dict, 'rows')
+        return query_dict
 
     @staticmethod
     def enforce_max_limit(query_dict, field_name='limit'):
