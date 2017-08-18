@@ -604,7 +604,6 @@ def get_resource_filter_pills(resource):
     @param resource:
     @return:
     """
-
     filter_dict = parse_request_filters()
 
     def get_pill_filters(exclude_field, exclude_value):

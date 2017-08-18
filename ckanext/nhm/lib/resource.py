@@ -13,10 +13,10 @@ from ckan.common import request, response
 NotFound = logic.NotFound
 
 # Filter used for filter groups
-FIELD_DISPLAY_FILTER = '_f'
+# FIELD_DISPLAY_FILTER = '_f'
 
 # Name of the field display cookie for sotring hidden fields
-HIDDEN_FIELDS_COOKIE_NAME = 'hidden_fields'
+# HIDDEN_FIELDS_COOKIE_NAME = 'hidden_fields'
 
 
 def resource_get_ordered_fields(resource_id):
@@ -124,50 +124,50 @@ def parse_request_filters():
     return filter_dict
 
 
-## Hidden field cookie handling
-
-def resource_filter_get_cookie(resource_id=None):
-    """
-    Retrieve the resource filter cookie
-    @param resource_id:
-    @return:
-    """
-    try:
-        cookie = json.loads(request.cookies[HIDDEN_FIELDS_COOKIE_NAME])
-    except Exception:
-        return {}
-
-    if resource_id:
-        return cookie.get(resource_id, None)
-    else:
-        return cookie
-
-
-def resource_filter_set_cookie(resource_id, hidden_fields):
-    """
-    Set the resource filter hidden fields cookie
-    @param resource_id:
-    @param hidden_fields:
-    @return:
-    """
-
-    cookie = resource_filter_get_cookie()
-    cookie[resource_id] = hidden_fields
-
-    response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
-
-
-def resource_filter_delete_cookie(resource_id):
-    """
-    Delete the hidden fields for this resource ID
-    @param resource_id:
-    @return:
-    """
-
-    cookie = resource_filter_get_cookie()
-    # Remove the dictionary item for this resource ID
-    cookie.pop(resource_id, None)
-    # And reset the cookie
-    response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
+# ## Hidden field cookie handling
+#
+# def resource_filter_get_cookie(resource_id=None):
+#     """
+#     Retrieve the resource filter cookie
+#     @param resource_id:
+#     @return:
+#     """
+#     try:
+#         cookie = json.loads(request.cookies[HIDDEN_FIELDS_COOKIE_NAME])
+#     except Exception:
+#         return {}
+#
+#     if resource_id:
+#         return cookie.get(resource_id, None)
+#     else:
+#         return cookie
+#
+#
+# def resource_filter_set_cookie(resource_id, hidden_fields):
+#     """
+#     Set the resource filter hidden fields cookie
+#     @param resource_id:
+#     @param hidden_fields:
+#     @return:
+#     """
+#
+#     cookie = resource_filter_get_cookie()
+#     cookie[resource_id] = hidden_fields
+#
+#     response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
+#
+#
+# def resource_filter_delete_cookie(resource_id):
+#     """
+#     Delete the hidden fields for this resource ID
+#     @param resource_id:
+#     @return:
+#     """
+#
+#     cookie = resource_filter_get_cookie()
+#     # Remove the dictionary item for this resource ID
+#     cookie.pop(resource_id, None)
+#     # And reset the cookie
+#     response.set_cookie(HIDDEN_FIELDS_COOKIE_NAME, json.dumps(cookie))
 
 

@@ -19,7 +19,7 @@ import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 import logging
-from ckanext.nhm.lib.resource import resource_filter_options, FIELD_DISPLAY_FILTER
+from ckanext.nhm.lib.resource import resource_filter_options
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
@@ -210,15 +210,16 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             resource = resource_show(context, {'id': data_dict['resource_id']})
             # Remove both filter options and field groups from filters
             # These will be handled separately
-            options = chain(resource_filter_options(resource).keys(), [FIELD_DISPLAY_FILTER])
-
-            for o in options:
-                if o in data_dict['filters']:
-                    del data_dict['filters'][o]
+            for option in resource_filter_options(resource).keys():
+                if option in data_dict['filters']:
+                    del data_dict['filters'][option]
 
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+
+        query_dict['select'].insert(1, "properties->>'dateCreated' as \"dateCreated\"")
+
         # Add our options filters
         if 'filters' in data_dict:
             resource_show = p.toolkit.get_action('resource_show')
@@ -268,25 +269,25 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
         return query_dict
 
-    ## IDataSolr
-    def datasolr_validate(self, context, data_dict, field_types):
-        return self.datastore_validate(context, data_dict, field_types)
-
-    def datasolr_search(self, context, data_dict, field_types, query_dict):
-        # Add our custom filters
-        if 'filters' in data_dict:
-
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
-            options = resource_filter_options(resource)
-            for o in options:
-                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
-                    if 'solr' in options[o]:
-                        query_dict['q'][0].append(options[o]['solr'])
-                elif 'solr_false' in options[o]:
-                    query_dict['q'][0].append(options[o]['solr_false'])
-        self.enforce_max_limit(query_dict, 'rows')
-        return query_dict
+    # ## IDataSolr
+    # def datasolr_validate(self, context, data_dict, field_types):
+    #     return self.datastore_validate(context, data_dict, field_types)
+    #
+    # def datasolr_search(self, context, data_dict, field_types, query_dict):
+    #     # Add our custom filters
+    #     if 'filters' in data_dict:
+    #
+    #         resource_show = p.toolkit.get_action('resource_show')
+    #         resource = resource_show(context, {'id': data_dict['resource_id']})
+    #         options = resource_filter_options(resource)
+    #         for o in options:
+    #             if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
+    #                 if 'solr' in options[o]:
+    #                     query_dict['q'][0].append(options[o]['solr'])
+    #             elif 'solr_false' in options[o]:
+    #                 query_dict['q'][0].append(options[o]['solr_false'])
+    #     self.enforce_max_limit(query_dict, 'rows')
+    #     return query_dict
 
     @staticmethod
     def enforce_max_limit(query_dict, field_name='limit'):
