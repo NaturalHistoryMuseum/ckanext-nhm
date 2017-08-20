@@ -27,3 +27,36 @@ class IndexLotView(DefaultView):
     def render_record(self, c):
         return p.toolkit.render('record/indexlot.html')
 
+
+# def indexlot_material_details(record_dict):
+#     """
+#     Parse the material details into an array, with first column the header
+#     @param record_dict:
+#     @return:
+#     """
+#
+#     material_details = []
+#
+#     material_detail_fields = [
+#         'Material count',
+#         'Material sex',
+#         'Material stage',
+#         'Material types',
+#         'Material primary type no'
+#     ]
+#
+#     # Create a list of lists, containing field and values
+#     # First row will be field title
+#     for material_detail_field in material_detail_fields:
+#         if record_dict[material_detail_field]:
+#             field_values = record_dict[material_detail_field].split(';')
+#             if field_values:
+#                 label = material_detail_field.replace('Material', '').strip().capitalize()
+#                 material_details.append([label] + field_values)
+#
+#     # Transpose list of values & fill in missing values so they are all the same length
+#     if material_details:
+#         material_details = map(lambda *row: list(row), *material_details)
+#
+#     return material_details
+

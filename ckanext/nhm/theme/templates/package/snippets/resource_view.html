@@ -10,26 +10,51 @@
     {% if not to_preview and h.resource_view_is_filterable(resource_view) %}
       {% if h.is_datasolr_resource(resource['id']) %}
         {% set facets = h.get_resource_facets(resource) %}
+        {% set extras = {
+          'id': package.id,
+          'resource_id': resource.id
+        } %}
       {% endif %}
 
       {% if facets %}
         <div class="span3">
           {% for facet in facets %}
-            <section class="module module-narrow module-shallow">
-            <h2 class="module-heading">
-              <i class="icon-medium icon-filter"></i>
-              {{ facet.name|title }}
-            </h2>
-            <nav>
-              <ul class="unstyled nav nav-simple nav-facet">
-                {% for item in facet.facet_values %}
-                  <li>{{ item }}</li>
-                {% endfor %}
-              </ul>
-            </nav>
-            </section>
-
-
+              <section class="module module-narrow module-shallow">
+              <h2 class="module-heading">
+                <i class="icon-medium icon-filter"></i>
+                {{ facet.label }}
+              </h2>
+              {% if facet.facet_values %}
+                <nav>
+                  <ul class="unstyled nav nav-simple nav-facet">
+                    {% for item in facet.facet_values %}
+                       {% set filter = facet.name + ':' + item.name %}
+                       {% set href = h.remove_url_filter(filter, extras=extras) if facet.active else h.add_url_filter(filter, extras=extras) %}
+                        <li class="nav-item{% if facet.active %} active{% endif %}">
+                            <a href="{{ href }}" title="{{ item.label }}">
+                                <span>{{ item.label|title }} ({{ item.count }})</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                  </ul>
+                </nav>
+                {% if not facet.active %}
+                    <p class="module-footer">
+                        {% if h.get_param_int('_%s_limit' % facet.name) %}
+                          {% if facet.has_more %}
+                            <a href="{{ h.remove_url_param('_%s_limit' % facet.name, replace=0, extras=extras) }}"
+                               class="read-more">Show more <i class="icon-plus-sign"></i></a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ h.remove_url_param('_%s_limit' % facet.name, extras=extras) }}"
+                               class="read-more">Show less <i class="icon-minus-sign"></i></a>
+                        {% endif %}
+                    </p>
+                  {% endif %}
+            {% else %}
+              <p class="module-content empty">{{ _('There are no {facet_type} that match this search').format(facet_type=facet.label) }}</p>
+                {% endif %}
+              </section>
           {% endfor %}
         </div>
 

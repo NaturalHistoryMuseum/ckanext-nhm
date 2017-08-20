@@ -10,7 +10,6 @@ from lxml import etree
 
 import re
 from ckanext.nhm.views.default import DefaultView
-from ckanext.nhm.lib.resource import resource_get_ordered_fields
 from ckanext.nhm.lib.dwc import dwc_terms
 
 log = logging.getLogger(__name__)

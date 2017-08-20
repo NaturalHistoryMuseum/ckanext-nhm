@@ -15,21 +15,27 @@ import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
-from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, _VALID_GRAVATAR_DEFAULTS, get_allowed_view_types as ckan_get_allowed_view_types
+
+# from ckan.lib import helpers as h
+
+from ckan.lib.helpers import (
+    url_for,
+    link_to,
+    snippet,
+    _follow_objects,
+    _VALID_GRAVATAR_DEFAULTS,
+    get_allowed_view_types as ckan_get_allowed_view_types,
+    _create_url_with_params,
+    get_param_int
+)
+
 from webhelpers.html import literal
 
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.views import *
-from ckanext.nhm.lib.resource import (
-    resource_get_ordered_fields,
-    resource_filter_options,
-    parse_request_filters,
-    # FIELD_DISPLAY_FILTER,
-    # resource_filter_get_cookie,
-    # resource_filter_set_cookie,
-    # resource_filter_delete_cookie
-)
+from ckanext.nhm.lib.resource import resource_get_ordered_fields
+from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
+
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 
@@ -136,24 +142,24 @@ def get_record(resource_id, record_id):
     return record.get('data', None)
 
 
-def resource_view_get_ordered_fields(resource_id):
-    """
-    This is a replacement for resource_view_get_fields, but this function
-    handles errors internally, and return the fields in their original order
-    @param resource_id:
-    @return:
-    """
-    return resource_get_ordered_fields(resource_id)
+# def resource_view_get_ordered_fields(resource_id):
+#     """
+#     This is a replacement for resource_view_get_fields, but this function
+#     handles errors internally, and return the fields in their original order
+#     @param resource_id:
+#     @return:
+#     """
+#     return resource_get_ordered_fields(resource_id)
 
 
-def form_select_datastore_field_options(resource_id=None, allow_empty=False):
-    # Need to check for resource_id as this form gets loaded on add, nut just edit
-    # And on add there will be no resource_id
-    if resource_id:
-        datastore_fields = resource_get_ordered_fields(resource_id)
-        return list_to_form_options(datastore_fields, allow_empty)
-
-    return []
+# def form_select_datastore_field_options(resource_id=None, allow_empty=False):
+#     # Need to check for resource_id as this form gets loaded on add, nut just edit
+#     # And on add there will be no resource_id
+#     if resource_id:
+#         datastore_fields = resource_get_ordered_fields(resource_id)
+#         return list_to_form_options(datastore_fields, allow_empty)
+#
+#     return []
 
 
 def form_select_update_frequency_options():
@@ -319,14 +325,14 @@ def get_department(collection_code):
     @return: Full department name - Entomology
     """
     departments = {
-        'BMNH(E)': 'Entomology',
-        'BOT': 'Botany',
-        'MIN': 'Mineralogy',
-        'PAL': 'Palaeontology',
-        'ZOO': 'Zoology',
+        'bmnh(e)': 'Entomology',
+        'bot': 'Botany',
+        'min': 'Mineralogy',
+        'pal': 'Palaeontology',
+        'zoo': 'Zoology',
     }
 
-    return departments[collection_code]
+    return departments[collection_code.lower()]
 
 
 def delimit_number(num):
@@ -424,31 +430,6 @@ def get_query_params():
             params[key] = value
 
     return params
-
-
-def resource_view_get_view(resource):
-    """
-    Retrieve the controller for a resource
-    Try and match on resource ID, or on format
-    So we can provide a custom controller for all format types - e.g. DwC
-    @param resource:
-    @return: controller class
-    """
-
-    subclasses = DefaultView.__subclasses__()
-
-    for cls in subclasses:
-        # Does the resource ID match the record controller
-        if cls.resource_id == resource['id']:
-            return cls()
-
-    # Or do we have a controller for a particular format type (eg. DwC)
-    # Run in separate loop so this is lower specificity
-    for cls in subclasses:
-        if cls.format == resource['format']:
-            return cls()
-
-    return DefaultView()
 
 
 def resource_view_get_field_groups(resource):
@@ -561,7 +542,8 @@ def get_resource_filter_options(resource):
                 - label: The label to display to users;
                 - checked: True if the option is currently applied.
     """
-    options = resource_filter_options(resource)
+    options = resource_view_get_filter_options(resource)
+
     filter_list = toolkit.request.params.get('filters', '').split('|')
     filters = {}
     for filter_def in filter_list:
@@ -574,6 +556,7 @@ def get_resource_filter_options(resource):
         else:
             filters[key].append(value)
     result = {}
+    print(filters)
     for o in options:
         if options[o].get('hide', False):
             continue
@@ -595,75 +578,6 @@ def get_resource_gbif_errors(resource):
         return GBIF_ERRORS
     else:
         return {}
-
-
-def get_resource_filter_pills(resource):
-    """
-    Get filter pills
-    We don't want the field group pills - these are handled separately in get_resource_field_groups
-    @param resource:
-    @return:
-    """
-    filter_dict = parse_request_filters()
-
-    def get_pill_filters(exclude_field, exclude_value):
-        """
-        Build filter, using filters which aren't exclude_field=exclude_value
-        @param exclude_field:
-        @param exclude_value:
-        @return:
-        """
-
-        filters = []
-        for field, values in filter_dict.items():
-            for value in values:
-                if not (field == exclude_field and value == exclude_value):
-                    filters.append('%s:%s' % (field, value))
-
-        return '|'.join(filters)
-
-    pills = {}
-
-    options = resource_filter_options(resource)
-
-    field_labels = {}
-
-    field_groups = resource_view_get_field_groups(resource)
-
-    if field_groups:
-        for fields in field_groups.values():
-            for field_name, label in fields.items():
-                field_labels[field_name] = label
-
-    for field, values in filter_dict.items():
-        for value in values:
-            filters = get_pill_filters(field, value)
-
-            # If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
-            # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
-            if field == '_tmgeom':
-                pills['geometry'] = {'Polygon': filters}
-            elif field in options:
-                label = options[field]['label']
-                try:
-                    pills['Options'][label] = filters
-                except KeyError:
-                    pills['Options'] = {label: filters}
-            else:
-
-                try:
-                    label = field_labels[field]
-                except KeyError:
-                    label = field
-
-                try:
-                    pills[label][value] = filters
-                except KeyError:
-                    pills[label] = {value: filters}
-
-    # Remove the field group key, if it exists
-    # pills.pop(FIELD_DISPLAY_FILTER, None)
-    return pills
 
 
 def get_allowed_view_types(resource, package):
@@ -856,37 +770,7 @@ def group_fields_have_data(record_dict, fields):
             return True
 
 
-def indexlot_material_details(record_dict):
-    """
-    Parse the material details into an array, with first column the header
-    @param record_dict:
-    @return:
-    """
 
-    material_details = []
-
-    material_detail_fields = [
-        'Material count',
-        'Material sex',
-        'Material stage',
-        'Material types',
-        'Material primary type no'
-    ]
-
-    # Create a list of lists, containing field and values
-    # First row will be field title
-    for material_detail_field in material_detail_fields:
-        if record_dict[material_detail_field]:
-            field_values = record_dict[material_detail_field].split(';')
-            if field_values:
-                label = material_detail_field.replace('Material', '').strip().capitalize()
-                material_details.append([label] + field_values)
-
-    # Transpose list of values & fill in missing values so they are all the same length
-    if material_details:
-        material_details = map(lambda *row: list(row), *material_details)
-
-    return material_details
 
 
 def get_image_licence_options():
@@ -999,39 +883,133 @@ def get_resource_facets(resource):
     @param resource:
     @return:
     """
-
+    # Number of facets to display
+    num_facets = 10
     resource_view = resource_view_get_view(resource)
-
     # If facets aren't defined in the resource view, then just return
     if not resource_view.field_facets:
         return
-
     context = {'model': model, 'session': model.Session, 'user': c.user}
     # Build query parameters for the faceted search
     # We'll use the same query parameters used in the current request
     # And then add extras to perform a solr faceted query, returning
     # facets but zero results (limit=0)
-    search_params = get_query_params()
-    search_params['resource_id'] = resource.get('id')
-    search_params['limit'] = 0
-    search_params['facets'] = resource_view.field_facets
+    query_params = get_query_params()
+
+    # Convert filters to a dictionary as this won't happen automatically
+    # as we're retrieving raw get parameters from get_query_params
+    filters = {}
+    if query_params.get('filters'):
+        for f in query_params.get('filters').split('|'):
+            filter_field, filter_value = f.split(':')
+            filters.setdefault(filter_field, []).append(filter_value)
+
+    search_params = dict(
+        resource_id=resource.get('id'),
+        limit=0,
+        facets=resource_view.field_facets,
+        q=query_params.get('q', None),
+        filters=filters,
+        facets_limit=num_facets + 1,  # Get an extra facet, so we can determine if there are more
+    )
+
+    for field_name in resource_view.field_facets:
+        if get_param_int('_%s_limit' % field_name) == 0:
+            search_params.setdefault('facets_field_limit', {})[field_name] = 50
+
     search = logic.get_action('datastore_search')(context, search_params)
     facets = []
-    # Parse the facets into a list of dictionary values, similar to that
-    # Built for the dataset search solr facets
-    for facet, facet_items in search['facets']['facet_fields'].items():
+
+    # Dictionary of field name => formatter function
+    # Pass facet value to a formatter to get a better facet item label
+    facet_label_formatters = {
+        'collectionCode': get_department
+    }
+
+    # Loop through original facets to ensure order is preserved
+    for field_name in resource_view.field_facets:
+        # Parse the facets into a list of dictionary values, similar to that
+        # Built for the dataset search solr facets
+        active_facet = field_name in filters
         facet = {
-            'name': facet,
-            'label': facet,
-            'facet_values': []
+            'name': field_name,
+            'label': camel_case_to_string(field_name),
+            'facet_values': [],
+            'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
+            'active': active_facet
         }
-        for value, count in facet_items.items():
+        for value, count in search['facets']['facet_fields'][field_name].items():
+            label = value
+            try:
+                label = facet_label_formatters[field_name](label)
+            except KeyError:
+                pass
             facet['facet_values'].append({
                 'name': value,
-                'display_name': value,
-                'count': count
+                'label': label,
+                'count': count,
             })
+
         facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
+        # Slice the facet values, so length matches num_facets - need to do this after the key sort
+        if facet['has_more']:
+            facet['facet_values'] = facet['facet_values'][0:num_facets]
         facets.append(facet)
 
     return facets
+
+
+def remove_url_filter(url_filter, extras=None):
+    """
+    The CKAN built in functions remove_url_param / add_url_param cannot handle
+    multiple filters which are concatenated with |, not separate query params
+    This replaces remove_url_param for filters
+    @param filter:
+    @param extras:
+    @return:
+    """
+
+    params = dict(request.params)
+    filters = params.pop("filters", None)
+    if filters:
+        # Remove the filter from the existing filters
+        filters_list = filters.split('|')
+        try:
+            filters_list.remove(url_filter)
+        except ValueError:
+            pass
+        # If we have any filters left, add them back in
+        if filters_list:
+            params['filters'] = '|'.join(filters_list)
+
+    return _create_filter_url(params, extras)
+
+
+def add_url_filter(url_filter, extras=None):
+    """
+    The CKAN built in functions remove_url_param / add_url_param cannot handle
+    multiple filters which are concatenated with |, not separate query params
+    This replaces remove_url_param for filters
+    @param filter:
+    @param extras:
+    @return:
+    """
+
+    params = dict(request.params)
+    if params.get('filters', None):
+        params['filters'] += '|%s' % url_filter
+    else:
+        params['filters'] = url_filter
+
+    return _create_filter_url(params, extras)
+
+
+def _create_filter_url(params, extras=None):
+    """
+    Helper function to create filter URL
+    @param params:
+    @param extras:
+    @return:
+    """
+    params_nopage = [(k, v) for k, v in params.items() if k != 'page']
+    return _create_url_with_params(list(params_nopage), extras=extras)

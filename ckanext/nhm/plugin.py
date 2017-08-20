@@ -19,7 +19,9 @@ import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 import logging
-from ckanext.nhm.lib.resource import resource_filter_options
+
+from ckanext.nhm.lib.helpers import resource_view_get_filter_options
+
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.contact.interfaces import IContact
 from ckanext.datastore.interfaces import IDatastore
@@ -206,25 +208,26 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
         if 'filters' in data_dict:
+            print('---')
+            print(data_dict['filters'])
+            print('---')
+
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
             # Remove both filter options and field groups from filters
             # These will be handled separately
-            for option in resource_filter_options(resource).keys():
+            for option in resource_view_get_filter_options(resource).keys():
                 if option in data_dict['filters']:
                     del data_dict['filters'][option]
 
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
-
-        query_dict['select'].insert(1, "properties->>'dateCreated' as \"dateCreated\"")
-
         # Add our options filters
         if 'filters' in data_dict:
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
-            options = resource_filter_options(resource)
+            options = resource_view_get_filter_options(resource)
             for o in options:
                 if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
                     if 'sql' in options[o]:
@@ -279,7 +282,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
-            options = resource_filter_options(resource)
+            options = resource_view_get_filter_options(resource)
             for o in options:
                 if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
                     if 'solr' in options[o]:
@@ -479,5 +482,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'record_id': record['_id']
                 })
         return images
+
+    def before_show(self, resource_dict):
+        from ckanext.nhm.lib.helpers import get_resource_filter_options
+        get_resource_filter_options(resource_dict)
+        return resource_dict
+
+
+
+
 
 
