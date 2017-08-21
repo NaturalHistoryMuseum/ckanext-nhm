@@ -29,6 +29,7 @@ class SpecimenView(DefaultView):
 
     field_facets = [
         'collectionCode',
+        'typeStatus',
         'family',
         'genus',
         'imageCategory',

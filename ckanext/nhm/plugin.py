@@ -208,10 +208,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
         if 'filters' in data_dict:
-            print('---')
-            print(data_dict['filters'])
-            print('---')
-
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
             # Remove both filter options and field groups from filters
@@ -219,6 +215,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             for option in resource_view_get_filter_options(resource).keys():
                 if option in data_dict['filters']:
                     del data_dict['filters'][option]
+                    # data_dict['filters'].remove(option)
 
         return data_dict
 
@@ -279,6 +276,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def datasolr_search(self, context, data_dict, field_types, query_dict):
         # Add our custom filters
         if 'filters' in data_dict:
+
+            # print(query_dict)
 
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
@@ -484,8 +483,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return images
 
     def before_show(self, resource_dict):
-        from ckanext.nhm.lib.helpers import get_resource_filter_options
-        get_resource_filter_options(resource_dict)
+        from ckanext.nhm.lib.helpers import remove_url_filter
+        extras = {
+            'id': 'collection-specimens',
+            'resource_id': resource_dict['id'],
+            'ver': 3
+        }
+        print('---')
+        print(remove_url_filter('collectionCode', ['min'], extras=extras))
         return resource_dict
 
 

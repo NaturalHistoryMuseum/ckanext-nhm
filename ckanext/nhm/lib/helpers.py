@@ -543,7 +543,6 @@ def get_resource_filter_options(resource):
                 - checked: True if the option is currently applied.
     """
     options = resource_view_get_filter_options(resource)
-
     filter_list = toolkit.request.params.get('filters', '').split('|')
     filters = {}
     for filter_def in filter_list:
@@ -556,7 +555,6 @@ def get_resource_filter_options(resource):
         else:
             filters[key].append(value)
     result = {}
-    print(filters)
     for o in options:
         if options[o].get('hide', False):
             continue
@@ -770,9 +768,6 @@ def group_fields_have_data(record_dict, fields):
             return True
 
 
-
-
-
 def get_image_licence_options():
     """
     Return list of image licences
@@ -959,43 +954,60 @@ def get_resource_facets(resource):
     return facets
 
 
-def remove_url_filter(url_filter, extras=None):
+def remove_url_filter(field, value, extras=None):
     """
     The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
-    @param filter:
+    @param field:
+    @param value:
     @param extras:
     @return:
     """
 
+    # import copy
+    # params = copy.copy(dict(request.params))
+
     params = dict(request.params)
-    filters = params.pop("filters", None)
-    if filters:
-        # Remove the filter from the existing filters
-        filters_list = filters.split('|')
-        try:
-            filters_list.remove(url_filter)
-        except ValueError:
-            pass
-        # If we have any filters left, add them back in
-        if filters_list:
-            params['filters'] = '|'.join(filters_list)
+    try:
+        del params['filters']
+    except KeyError:
+        pass
+    else:
+        filters = parse_request_filters()
+        if field in filters:
+            # Remove the filter value form the current filters
+            value = value if isinstance(value, list) else [value]
+            filters[field] = list(set(filters[field]) - set(value))
+            # If the filters values for the field are empty, remove the whole field
+            if not filters[field]:
+                del filters[field]
+
+        # Combine the filters again
+        filter_parts = []
+        for filter_field, filter_values in filters.items():
+            for filter_value in filter_values:
+                filter_parts.append('%s:%s' % (filter_field, filter_value))
+        # If we have filter parts, add them back to the params dict
+        if filter_parts:
+            params['filters'] = '|'.join(filter_parts)
 
     return _create_filter_url(params, extras)
 
 
-def add_url_filter(url_filter, extras=None):
+def add_url_filter(field, value, extras=None):
     """
     The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
-    @param filter:
+    @param field:
+    @param field:
     @param extras:
     @return:
     """
 
     params = dict(request.params)
+    url_filter = '%s:%s' % (field, value)
     if params.get('filters', None):
         params['filters'] += '|%s' % url_filter
     else:
@@ -1013,3 +1025,53 @@ def _create_filter_url(params, extras=None):
     """
     params_nopage = [(k, v) for k, v in params.items() if k != 'page']
     return _create_url_with_params(list(params_nopage), extras=extras)
+
+
+def parse_request_filters():
+    """
+    Get the filters from the request object
+    @return:
+    """
+    filter_dict = {}
+
+    try:
+        filter_params = request.params.get('filters').split('|')
+    except AttributeError:
+        return {}
+
+    # Remove empty values form the filter_params
+    filter_params = filter(None, filter_params)
+
+    for filter_param in filter_params:
+        field, value = filter_param.split(':', 1)
+        filter_dict.setdefault(field, []).append(value)
+
+    return filter_dict
+
+
+def get_resource_filter_pills(package, resource, resource_view=None):
+    """
+    Get filter pills
+    We don't want the field group pills - these are handled separately in get_resource_field_groups
+    @param resource:
+    @return:
+    """
+
+    filter_dict = parse_request_filters()
+    extras = {
+        'id': 'collection-specimens',
+        'resource_id': resource['id']
+    }
+
+    pills = []
+
+    for filter_field, filter_value in filter_dict.items():
+        # Remove filter from url function
+        href = remove_url_filter(filter_field, value=filter_value, extras=extras)
+        pills.append({
+            'field': filter_field,
+            'value': ' '.join(filter_value),
+            'href': href
+        })
+
+    return pills

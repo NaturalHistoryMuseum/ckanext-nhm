@@ -2,7 +2,7 @@
   <div class="m-top ckanext-datapreview">
 
     {% if not to_preview and h.resource_view_is_filterable(resource_view) %}
-      {% snippet 'package/snippets/resource_view_filters.html', resource_view=resource_view, resource=resource, package=package %}
+      {% snippet 'package/snippets/resource_view_search.html', resource_view=resource_view, resource=resource, package=package %}
     {% endif %}
 
     <div class="row">
@@ -28,8 +28,7 @@
                 <nav>
                   <ul class="unstyled nav nav-simple nav-facet">
                     {% for item in facet.facet_values %}
-                       {% set filter = facet.name + ':' + item.name %}
-                       {% set href = h.remove_url_filter(filter, extras=extras) if facet.active else h.add_url_filter(filter, extras=extras) %}
+                       {% set href = h.remove_url_filter(facet.name, item.name, extras=extras) if facet.active else h.add_url_filter(facet.name, item.name, extras=extras) %}
                         <li class="nav-item{% if facet.active %} active{% endif %}">
                             <a href="{{ href }}" title="{{ item.label }}">
                                 <span>{{ item.label|title }} ({{ item.count }})</span>
