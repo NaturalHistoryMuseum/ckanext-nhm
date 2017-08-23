@@ -5,14 +5,13 @@
 {% set placeholder = _('Enter search text') %}
 {% set q = request.str_GET.get('q') or '' %}
 {% set action = h.url_for(controller='package', action='resource_read', id=package['name'], resource_id=resource['id'], view_id=resource_view['id']) %}
-{% set filter_options = h.get_resource_filter_options(resource) %}
 {% set query_params = h.get_query_params() %}
 {% set filter_pills = h.get_resource_filter_pills(package, resource, resource_view) %}
 
 <div class="row resource-view-filter-form">
     <form class="module-content search-form" method="get">
 
-            <div class="span8">
+            <div class="span9">
                 <div class="search-input control-group">
                   <input type="text" class="search" name="q" autocomplete="off" value="{{ q.decode('utf-8') }}" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
                   <input type="hidden" name="view_id" value="{{ resource_view['id'] }}" />
@@ -25,13 +24,13 @@
                   </button>
                 </div>
              </div>
-            <div class="span4">
-
+            <div class="span3 no-margin">
                 <div
                   class="resource-view-field-filters"
                   data-module="resource-view-field-filters"
                   data-module-resource-id="{{ resource['id'] }}"
                   data-module-fields="{{ h.dump_json(h.resource_view_get_fields(resource)) }}"
+                  data-module-field-groups="{{ h.dump_json(h.resource_view_get_field_groups(resource)) }}"
                 ></div>
 
             </div>
@@ -43,7 +42,7 @@
             <div class="span12">
                 <p class="filtered-list">
                     {% for pill in filter_pills %}
-                        <span class="facet">{{ pill.field }}:</span>
+                        <span class="facet">{{ pill.label }}:</span>
                         <span class="filtered pill">{{ pill.value }}
                             <a href="{{ pill.href }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
                         </span>

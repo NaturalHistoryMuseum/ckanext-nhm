@@ -5,8 +5,6 @@
       {% snippet 'package/snippets/resource_view_search.html', resource_view=resource_view, resource=resource, package=package %}
     {% endif %}
 
-    <div class="row">
-
     {% if not to_preview and h.resource_view_is_filterable(resource_view) %}
       {% if h.is_datasolr_resource(resource['id']) %}
         {% set facets = h.get_resource_facets(resource) %}
@@ -16,10 +14,21 @@
         } %}
       {% endif %}
 
+    <div class="row {% if facets %}ckanext-datapreview-faceted{% endif %}">
+
       {% if facets %}
-        <div class="span3">
+        <div class="span3 resource-view-facets">
+
+            <div
+              class="resource-view-filter-options"
+              data-module="resource-view-filter-options"
+              data-module-resource-id="{{ resource['id'] }}"
+              data-module-filter-options="{{ h.dump_json(h.get_resource_filter_options(resource)) }}"
+              >
+            </div>
+
           {% for facet in facets %}
-              <section class="module module-narrow module-shallow">
+              <section class="module module-narrow module-shallow no-margin">
               <h2 class="module-heading">
                 <i class="icon-medium icon-filter"></i>
                 {{ facet.label }}
@@ -67,3 +76,5 @@
     </div>
   </div>
 </div>
+
+{% resource 'ckanext-nhm/resource-view-filter-options' %}

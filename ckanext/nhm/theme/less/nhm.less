@@ -1487,7 +1487,7 @@ margin-top: 0;
 a.toggle-view-filters{
   display: block;
   text-align: center;
-  margin:10px 20px 0 20px;
+  margin:0 20px 0 20px;
   line-height: 40px;
 }
 
@@ -1499,12 +1499,25 @@ a.toggle-view-filters:hover{
 .resource-view-filters-wrapper{
   position: absolute;
   top: 70px;
-  left: 0;
-  width: 900px;
+  right: 20px;
   background: #EBEBEB;
   padding: 20px;
-  display: none;
   z-index: 999;
+  display: none;
+
+  .select2-container{
+    .select2-choice{
+      height: 28px;
+      top: -1px;
+      line-height: 27px;
+    }
+  }
+
+  select{
+    margin-right: 10px;
+    margin-bottom: 0;
+  }
+
 }
 
 // Active
@@ -1551,6 +1564,53 @@ a.toggle-view-filters:after{
   height: 55px;
   float: left;
 }
+
+
+
+.ckanext-datapreview-faceted{
+  .span9{
+    margin-left: 0;
+    border-left: 1px solid #fff;
+  }
+
+  .resource-view-filter-options{
+    background: @tableBorderColor;
+  }
+
+  .resource-view-facets{
+    border-right: 19px solid @tableBorderColor;
+    ul{
+      li.nav-item{
+        background: @tableBorderColor;
+        border-bottom: 1px solid @listDividerGrey
+      }
+    }
+
+    .module-content {
+      background: @tableBorderColor;
+      color: #444;
+    }
+
+    .module-heading {
+      background: #dddddd;
+    }
+
+    .module-footer{
+      padding: 0;
+      border-top-style: none;
+      background: @tableBorderColor;
+      a{
+        padding: 5px 10px 5px 15px;
+        display: block;
+        border-bottom: 1px solid @listDividerGrey;
+      }
+    }
+
+  }
+
+}
+
+
 
 .liteTabs{
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -1726,15 +1786,17 @@ a.toggle-view-filters:after{
   top: 0;
 }
 
-label.resource-view-filter-option {
+.resource-view-filter-options{
+  label{
     font-weight: normal;
     display: inline-block;
-    margin: 0 15px;
-}
-
-label.resource-view-filter-option input{
-  top: 0;
-  margin-right: 4px;
+    margin: 2px 15px 4px 15px;
+    input{
+      top: 0;
+      margin-right: 4px;
+    }
+  }
+  padding-bottom: 10px;
 }
 
 div.resource-view-filter-pills{
