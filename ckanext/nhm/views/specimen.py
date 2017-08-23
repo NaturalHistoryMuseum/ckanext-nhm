@@ -33,15 +33,11 @@ class SpecimenView(DefaultView):
         'family',
         'genus',
         'imageCategory',
+        'gbifIssue'
     ]
 
     # Additional search filter options
     filter_options = {
-        '_has_type': {
-            'label': 'Has type',
-            'sql': ('"{}"."typeStatus" IS NOT NULL'.format(resource_id),),
-            'solr': "typeStatus:[* TO *]"
-        },
         '_has_image': {
             'label': 'Has image',
             'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
