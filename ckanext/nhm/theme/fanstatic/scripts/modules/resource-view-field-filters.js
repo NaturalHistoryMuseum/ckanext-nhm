@@ -8,24 +8,73 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
     function initialize() {
         self = this;
 
-        var fields = self.options.fields;
-        self.$select = ($('<select name="field" />'));
-        $.each(fields, function (i, field_name) {
-            self.$select.append($('<option>', {value: field_name}).text(field_name));
-        });
-        self.el.append(self.$select);
-        var $input = ($('<input type="text" name="value" />'));
-        self.el.append($input);
+        $('<a title="Filter individual fields" href="#" class="toggle-view-filters">Advanced filters</a>').on('click', toggleFilterDisplay).appendTo(self.el);
 
+        self.$filtersWrapper = $('<div class="resource-view-filters-wrapper" />');
+
+        var fields = self.options.fields,
+            fieldGroups = self.options.fieldGroups;
+        self.$select = ($('<select name="field" />'));
+
+        // If we have field groups, separate the field select into option groups
+        // Otherwise, just provide a long list of fields
+
+        console.log(fields);
+
+        if(fieldGroups){
+            for (var group in fieldGroups) {
+                if (!fieldGroups.hasOwnProperty(group)) continue;
+                var $optGroup = $('<optgroup />', {label: group});
+                $.each(fieldGroups[group], function(fieldName, fieldLabel ) {
+                    if(fields.indexOf(fieldName) !== -1){
+                        $optGroup.append($('<option>', {value: fieldName}).text(fieldLabel));
+                    }else{
+                        console.log(fieldName);
+                    }
+                });
+                self.$select.append($optGroup)
+            }
+        }else{
+            $.each(fields, function (i, fieldName) {
+                self.$select.append($('<option>', {value: fieldName}).text(fieldName));
+            });
+        }
+        self.$filtersWrapper.append(self.$select);
+        var $input = ($('<input type="text" name="value" />'));
+        self.$filtersWrapper.append($input);
+        self.el.append(self.$filtersWrapper);
 
         self.$select.on('change', function () {
             clearDropdown($input);
-            applyDropdown($input, self.$select, '05ff2255-c38a-40c9-b657-4ccb55ab2feb')
+            applyDropdown($input, self.$select, self.options.resourceId);
         });
-        applyDropdown($input, self.$select, '05ff2255-c38a-40c9-b657-4ccb55ab2feb')
+        applyDropdown($input, self.$select, self.options.resourceId);
 
         $input.on('select2-selecting', onSelect);
 
+        // Allow hide on esc / clicking elsewhere on the page
+        $('body').click(function (e) {
+            if ($(e.target).closest('.resource-view-filters-wrapper').length === 0) {
+                hideFilterDisplay()
+            }
+        });
+
+        $(document).keyup(function (e) {
+            // esc
+            if (e.keyCode == 27) {
+                hideFilterDisplay()
+            }
+        });
+
+    }
+
+    function toggleFilterDisplay() {
+        self.el.toggleClass('display-filter');
+        return false;
+    }
+
+    function hideFilterDisplay() {
+        self.el.removeClass('display-filter');
     }
 
     function clearDropdown($input) {
@@ -36,12 +85,13 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
         var filterField = self.$select.val(),
             filterValue = e.val;
         ckan.views.filters.set(filterField, filterValue);
-
     }
 
     function applyDropdown($input, $select, resourceId) {
         var filterName = $select.val(),
             queryLimit = 20;
+
+        var searchParams = ckan.views.filters._searchParams;
 
         $input.select2({
             width: 'resolve',
@@ -66,10 +116,12 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
                         sort: filterName
                     };
 
-                    if (term !== '') {
-                        var q = {};
-                        q[filterName] = term + ':*';
-                        query.q = JSON.stringify(q);
+                    // Filter the lookup based on already applied filters
+                    if (searchParams['q']) {
+                        query.q = searchParams['q'];
+                    }
+                    if(searchParams['filters']){
+                        query.filters = JSON.stringify(searchParams['filters']);
                     }
 
                     return query;
@@ -81,7 +133,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
                         results;
 
                     results = $.map(records, function (record) {
-                        if(record[filterName]){
+                        if (record[filterName]) {
                             return {id: record[filterName], text: String(record[filterName])};
                         }
                     });
@@ -100,7 +152,8 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
         initialize: initialize,
         options: {
             resourceId: null,
-            fields: null
+            fields: null,
+            fieldGroups: null
         }
     };
 });

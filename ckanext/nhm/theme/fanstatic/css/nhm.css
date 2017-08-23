@@ -23,17 +23,15 @@
   font-family: 'nhm_ingrid_lightregular';
   src: url('/fonts/nhmingligreg-webfont.eot');
   src: url('/fonts/nhmingligreg-webfont.woff') format('woff');
-  font-style: normal;
-  
   /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
 }
 @font-face {
   font-family: 'nhm_ingridregular';
   src: url('/fonts/nhmingreg-webfont.eot');
   src: url('/fonts/nhmingreg-webfont.woff') format('woff');
-  font-style: normal;
-  
   /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
 }
 /* Headers */
 h1,
@@ -75,14 +73,14 @@ h1.site-title {
 }
 /****************** Color ******************/
 body {
-  background: #ffffff;
-  color: #444444;
+  background: #fff;
+  color: #444;
 }
 .base-link-color {
   color: #228900;
 }
 .base-link-color:hover {
-  color: #444444;
+  color: #444;
 }
 .base-link-color:hover.no-underline {
   text-decoration: none!important;
@@ -91,7 +89,7 @@ a {
   color: #228900;
 }
 a:hover {
-  color: #444444;
+  color: #444;
 }
 a:hover.no-underline {
   text-decoration: none!important;
@@ -101,27 +99,27 @@ a:focus {
 }
 .masthead-color-scheme {
   background: #228900;
-  color: #ffffff;
+  color: #fff;
 }
 .masthead-color-scheme a {
-  color: #ffffff;
+  color: #fff;
 }
 .masthead-color-scheme a:hover {
-  color: #bbeda9;
+  color: #BBEDA9;
   text-decoration: none!important;
 }
 .footer-color-scheme {
   background: #434343;
-  color: #999999;
+  color: #999;
 }
 .footer-color-scheme a {
-  color: #ffffff;
+  color: #fff;
 }
 .box-color-scheme {
   background: #f6f6f6;
 }
 .default-text-color {
-  color: #444444;
+  color: #444;
 }
 .stats .default-text-color {
   color: #0E4609;
@@ -130,7 +128,7 @@ a:focus {
   color: #228900;
 }
 .default-text-color a:hover {
-  color: #444444;
+  color: #444;
 }
 .default-text-color a:hover.no-underline {
   text-decoration: none!important;
@@ -188,14 +186,14 @@ img#beta {
 .masthead {
   padding: 3px 0;
   background: #228900;
-  color: #ffffff;
+  color: #fff;
   /* Navigation */
 }
 .masthead a {
-  color: #ffffff;
+  color: #fff;
 }
 .masthead a:hover {
-  color: #bbeda9;
+  color: #BBEDA9;
   text-decoration: none!important;
 }
 .masthead a.logo {
@@ -246,13 +244,13 @@ img#beta {
 /* Extended masthead */
 .extended-masthead {
   background: #228900;
-  color: #ffffff;
+  color: #fff;
 }
 .extended-masthead a {
-  color: #ffffff;
+  color: #fff;
 }
 .extended-masthead a:hover {
-  color: #bbeda9;
+  color: #BBEDA9;
   text-decoration: none!important;
 }
 .masthead,
@@ -288,7 +286,7 @@ img#beta {
 }
 /* Toolbar */
 .toolbar {
-  background: #bbeda9;
+  background: #BBEDA9;
   padding: 0;
   margin: 0;
   /* Breadcrumbs */
@@ -392,7 +390,7 @@ button.btn,
 .btn-group > .btn:first-child {
   background: #228900;
   padding: 8px 16px;
-  color: #ffffff;
+  color: #fff;
   font-weight: normal;
   text-shadow: none;
   -webkit-box-shadow: none;
@@ -409,17 +407,17 @@ a.btn:hover,
 button.btn:hover,
 .js .image-upload .btn.hover,
 a.btn.active {
-  background: #015b28;
-  color: #ffffff;
+  background: #015B28;
+  color: #fff;
 }
 .btn-group.open .btn-primary.dropdown-toggle {
-  background-color: #015b28;
+  background-color: #015B28;
 }
 a.btn-danger {
   background: #890022;
 }
 a.btn-danger:hover {
-  background: #6e001b;
+  background: #6E001B;
 }
 .caret {
   border-top-color: #fff;
@@ -454,14 +452,14 @@ a.btn-danger:hover {
 }
 .action-box .module-content {
   background: #228900;
-  color: #ffffff;
+  color: #fff;
   padding-top: 20px;
 }
 .action-box .module-content a {
-  color: #ffffff;
+  color: #fff;
 }
 .action-box .module-content a:hover {
-  color: #bbeda9;
+  color: #BBEDA9;
   text-decoration: none!important;
 }
 .action-box i.large {
@@ -481,12 +479,12 @@ a.btn-danger:hover {
 }
 .site-footer {
   background: #434343;
-  color: #999999;
+  color: #999;
   margin-top: 40px;
   padding: 0 0 30px 0;
 }
 .site-footer a {
-  color: #ffffff;
+  color: #fff;
 }
 .site-footer .no-margin {
   margin: 0;
@@ -538,11 +536,11 @@ a.btn-danger:hover {
   background-color: #f6f6f6;
 }
 .secondary .module-heading {
-  background: #dddddd;
+  background: #ddd;
 }
 .secondary .nav > li > a:hover,
 .secondary .nav > li > a:focus {
-  background-color: #eeeeee;
+  background-color: #eee;
 }
 .secondary .nav-aside,
 .secondary .module-footer {
@@ -579,7 +577,7 @@ a.btn-danger:hover {
 }
 .secondary p small {
   display: block;
-  color: #5b5b5b;
+  color: #5B5B5B;
   font-size: 12px;
   line-height: 15px;
   margin: 15px 0;
@@ -596,7 +594,7 @@ a.btn-danger:hover {
 }
 /* Pills (for applied facets) */
 .pill {
-  color: #ffffff;
+  color: #fff;
   background-color: #656565;
   max-width: 300px;
   white-space: nowrap;
@@ -606,16 +604,16 @@ a.btn-danger:hover {
   top: 6px;
 }
 .pill a:hover {
-  color: #e0e0e0;
+  color: #E0E0E0;
   text-decoration: none;
 }
 a.tag {
-  color: #ffffff;
+  color: #fff;
   background-color: #656565;
 }
 a.tag:hover {
   background-color: #656565;
-  color: #e0e0e0;
+  color: #E0E0E0;
   text-decoration: none;
 }
 /* Override some ckan styling */
@@ -631,7 +629,7 @@ a.tag:hover {
 /* Tables */
 .table th,
 .table td {
-  border-color: #f2f2f2;
+  border-color: #F2F2F2;
 }
 .table-chunky thead th,
 .table-chunky thead td {
@@ -706,7 +704,7 @@ table td.filterable {
 .pagination ul > .active > a,
 .pagination ul > .active > span {
   background-color: #228900;
-  color: #ffffff;
+  color: #fff;
 }
 /* Tabs (and view buttons which look the same as tabs) */
 .page-header {
@@ -752,7 +750,7 @@ table td.filterable {
   overflow: inherit;
 }
 .view-list li.active a {
-  color: #ffffff;
+  color: #fff;
 }
 .view-list li a i.icon {
   float: none;
@@ -798,7 +796,7 @@ table td.filterable {
   text-decoration: none;
 }
 .page-header .nav-tabs li.active a {
-  color: #ffffff;
+  color: #fff;
 }
 a.external:after {
   content: "\f08e";
@@ -979,17 +977,17 @@ i.mineralogy {
   color: #890022;
 }
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .cancel:hover {
-  color: #6e001b;
+  color: #6E001B;
 }
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply {
   color: #228900;
 }
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .apply:hover {
-  color: #015b28;
+  color: #015B28;
 }
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .disabled,
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .disabled:hover {
-  color: #9a9a9a;
+  color: #9A9A9A;
 }
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .cancel:after {
   content: '\f057';
@@ -1022,7 +1020,7 @@ i.mineralogy {
 }
 .resources ul.resource-list li.resource-item {
   border-style: solid none none;
-  border-color: #f2f2f2;
+  border-color: #F2F2F2;
   border-width: 1px;
   min-height: 45px;
 }
@@ -1048,7 +1046,7 @@ i.mineralogy {
 }
 /* Additional info - used on both dataset and resource page */
 .additional-info h3 {
-  background: #f2f2f2;
+  background: #F2F2F2;
   margin: 0 0 10px 0;
   font-size: 16px;
   padding: 5px;
@@ -1107,7 +1105,7 @@ i.mineralogy {
   font-weight: normal;
 }
 .record-content table thead tr th {
-  background: #f2f2f2;
+  background: #F2F2F2;
   padding: 8px 0 8px 5px;
   font-size: 18px;
   font-weight: normal;
@@ -1185,8 +1183,8 @@ ul.view-list.reordering .resource-view-item .handle i {
   display: none;
 }
 #followee-filter ul li.active a {
-  background: #bbeda9;
-  color: #444444;
+  background: #BBEDA9;
+  color: #444;
 }
 /* Contact form */
 .control-group .controls p {
@@ -1217,7 +1215,7 @@ ul.view-list.reordering .resource-view-item .handle i {
 a.toggle-view-filters {
   display: block;
   text-align: center;
-  margin: 10px 20px 0 20px;
+  margin: 0 20px 0 20px;
   line-height: 40px;
 }
 a.toggle-view-filters:hover {
@@ -1227,12 +1225,20 @@ a.toggle-view-filters:hover {
 .resource-view-filters-wrapper {
   position: absolute;
   top: 70px;
-  left: 0;
-  width: 900px;
+  right: 20px;
   background: #EBEBEB;
   padding: 20px;
-  display: none;
   z-index: 999;
+  display: none;
+}
+.resource-view-filters-wrapper .select2-container .select2-choice {
+  height: 28px;
+  top: -1px;
+  line-height: 27px;
+}
+.resource-view-filters-wrapper select {
+  margin-right: 10px;
+  margin-bottom: 0;
 }
 .display-filter .resource-view-filters-wrapper {
   display: block;
@@ -1270,6 +1276,37 @@ a.toggle-view-filters:after {
   width: 290px;
   height: 55px;
   float: left;
+}
+.ckanext-datapreview-faceted .span9 {
+  margin-left: 0;
+  border-left: 1px solid #fff;
+}
+.ckanext-datapreview-faceted .resource-view-filter-options {
+  background: #F2F2F2;
+}
+.ckanext-datapreview-faceted .resource-view-facets {
+  border-right: 19px solid #F2F2F2;
+}
+.ckanext-datapreview-faceted .resource-view-facets ul li.nav-item {
+  background: #F2F2F2;
+  border-bottom: 1px solid #FAFAFA;
+}
+.ckanext-datapreview-faceted .resource-view-facets .module-content {
+  background: #F2F2F2;
+  color: #444;
+}
+.ckanext-datapreview-faceted .resource-view-facets .module-heading {
+  background: #dddddd;
+}
+.ckanext-datapreview-faceted .resource-view-facets .module-footer {
+  padding: 0;
+  border-top-style: none;
+  background: #F2F2F2;
+}
+.ckanext-datapreview-faceted .resource-view-facets .module-footer a {
+  padding: 5px 10px 5px 15px;
+  display: block;
+  border-bottom: 1px solid #FAFAFA;
 }
 .liteTabs {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -1408,12 +1445,15 @@ a.toggle-view-filters:after {
 .resource-view-filter-form .form-actions .toggle-all-fields input {
   top: 0;
 }
-label.resource-view-filter-option {
+.resource-view-filter-options {
+  padding-bottom: 10px;
+}
+.resource-view-filter-options label {
   font-weight: normal;
   display: inline-block;
-  margin: 0 15px;
+  margin: 2px 15px 4px 15px;
 }
-label.resource-view-filter-option input {
+.resource-view-filter-options label input {
   top: 0;
   margin-right: 4px;
 }
