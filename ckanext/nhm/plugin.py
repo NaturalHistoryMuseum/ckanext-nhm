@@ -215,8 +215,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             for option in resource_view_get_filter_options(resource).keys():
                 if option in data_dict['filters']:
                     del data_dict['filters'][option]
-                    # data_dict['filters'].remove(option)
-
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
@@ -276,18 +274,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     def datasolr_search(self, context, data_dict, field_types, query_dict):
         # Add our custom filters
         if 'filters' in data_dict:
-
-            # print(query_dict)
-
             resource_show = p.toolkit.get_action('resource_show')
             resource = resource_show(context, {'id': data_dict['resource_id']})
             options = resource_view_get_filter_options(resource)
             for o in options:
-                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
-                    if 'solr' in options[o]:
-                        query_dict['q'][0].append(options[o]['solr'])
-                elif 'solr_false' in options[o]:
-                    query_dict['q'][0].append(options[o]['solr_false'])
+                if o in data_dict['filters'] and 'true' in data_dict['filters'][o] and 'solr' in options[o]:
+                    # By default filters are added as {filed_name}:*{value}* but some filters
+                    # might require special statements - so add them here
+                    query_dict.setdefault('filter_statements', {})[o] = options[o]['solr']
         self.enforce_max_limit(query_dict, 'rows')
         return query_dict
 
@@ -483,14 +477,15 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return images
 
     def before_show(self, resource_dict):
+        # FIXME: To remove!!!
         from ckanext.nhm.lib.helpers import remove_url_filter
-        extras = {
-            'id': 'collection-specimens',
-            'resource_id': resource_dict['id'],
-            'ver': 3
-        }
-        print('---')
-        print(remove_url_filter('collectionCode', ['min'], extras=extras))
+        # extras = {
+        #     'id': 'collection-specimens',
+        #     'resource_id': resource_dict['id'],
+        #     'ver': 3
+        # }
+        # print('---')
+        # print(remove_url_filter('collectionCode', ['min'], extras=extras))
         return resource_dict
 
 

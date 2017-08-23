@@ -976,9 +976,17 @@ def remove_url_filter(field, value, extras=None):
     else:
         filters = parse_request_filters()
         if field in filters:
+            # Convert all filters to unicode for ease of comparison
+            filters[field] = map(unicode.lower, filters[field])
             # Remove the filter value form the current filters
-            value = value if isinstance(value, list) else [value]
-            filters[field] = list(set(filters[field]) - set(value))
+            value_list = value if isinstance(value, list) else [value]
+            for value_item in value_list:
+                try:
+                    # Try and remove the item from the filters
+                    filters[field].remove(value_item.lower())
+                except ValueError:
+                    continue
+
             # If the filters values for the field are empty, remove the whole field
             if not filters[field]:
                 del filters[field]
@@ -991,7 +999,6 @@ def remove_url_filter(field, value, extras=None):
         # If we have filter parts, add them back to the params dict
         if filter_parts:
             params['filters'] = '|'.join(filter_parts)
-
     return _create_filter_url(params, extras)
 
 
@@ -1054,12 +1061,13 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     Get filter pills
     We don't want the field group pills - these are handled separately in get_resource_field_groups
     @param resource:
+    @param package:
     @return:
     """
 
     filter_dict = parse_request_filters()
     extras = {
-        'id': 'collection-specimens',
+        'id': package['id'],
         'resource_id': resource['id']
     }
 
@@ -1067,8 +1075,9 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     for filter_field, filter_value in filter_dict.items():
         # Remove filter from url function
-        href = remove_url_filter(filter_field, value=filter_value, extras=extras)
+        href = remove_url_filter(filter_field, filter_value, extras=extras)
         pills.append({
+            'label': camel_case_to_string(filter_field),
             'field': filter_field,
             'value': ' '.join(filter_value),
             'href': href
