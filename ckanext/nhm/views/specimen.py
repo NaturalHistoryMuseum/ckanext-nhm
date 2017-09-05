@@ -40,25 +40,25 @@ class SpecimenView(DefaultView):
     filter_options = {
         '_has_image': {
             'label': 'Has image',
-            'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
+            # 'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
             'solr': "associatedMedia:[* TO *]"
         },
         '_has_lat_long': {
             'label': 'Has lat/long',
             # BS: Changed to look for latitude field,as _geom is only available after a map has been added
             # As this works for all DwC, we might get datasets without a map
-            'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
+            # 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
             'solr': 'decimalLatitude:[* TO *]'
         },
         '_exclude_centroid': {
             'label': 'Exclude centroids',
-            'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
+            # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
             'solr': 'centroid:false'
         },
         '_exclude_mineralogy': {
             'label': 'Exclude Mineralogy',
             'hide': True,
-            'sql': ('"{}"."collectionCode" <> \'MIN\''.format(resource_id),),
+            # 'sql': ('"{}"."collectionCode" <> \'MIN\''.format(resource_id),),
             'solr': '-collectionCode:MIN'
         }
     }

@@ -27,6 +27,19 @@ class IndexLotView(DefaultView):
     def render_record(self, c):
         return p.toolkit.render('record/indexlot.html')
 
+    field_facets = [
+        'Family',
+        'taxonRank',
+        'imageCategory'
+    ]
+
+    # Additional search filter options
+    filter_options = {
+        '_has_image': {
+            'label': 'Has image',
+            'solr': "_has_multimedia:true"
+        },
+    }
 
 # def indexlot_material_details(record_dict):
 #     """
