@@ -446,12 +446,11 @@ def resource_view_state(resource_view_json, resource_json):
     resource_view['state']['fitColumns'] = fit_columns
 
     # ID and DQI always first
-    columns_order = {'_id'}
+    columns_order = ['_id']
     if 'gbifIssue' in fields:
-        columns_order.add('gbifIssue')
+        columns_order.append('gbifIssue')
     # Add the rest of the columns to the columns order
-    # Using set so _id & gbif don't get added again
-    columns_order |= set(fields)
+    columns_order += [f for f in fields if f not in columns_order]
     resource_view['state']['columnsOrder'] = list(columns_order)
 
     if view.grid_column_widths:
