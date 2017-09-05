@@ -15,25 +15,12 @@ import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
-
-# from ckan.lib import helpers as h
-
-from ckan.lib.helpers import (
-    url_for,
-    link_to,
-    snippet,
-    _follow_objects,
-    _VALID_GRAVATAR_DEFAULTS,
-    get_allowed_view_types as ckan_get_allowed_view_types,
-    _create_url_with_params,
-    get_param_int
-)
+from ckan.lib import helpers as h
 
 from webhelpers.html import literal
 
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource import resource_get_ordered_fields
 from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
 
 from ckanext.nhm.settings import COLLECTION_CONTACTS
@@ -142,26 +129,6 @@ def get_record(resource_id, record_id):
     return record.get('data', None)
 
 
-# def resource_view_get_ordered_fields(resource_id):
-#     """
-#     This is a replacement for resource_view_get_fields, but this function
-#     handles errors internally, and return the fields in their original order
-#     @param resource_id:
-#     @return:
-#     """
-#     return resource_get_ordered_fields(resource_id)
-
-
-# def form_select_datastore_field_options(resource_id=None, allow_empty=False):
-#     # Need to check for resource_id as this form gets loaded on add, nut just edit
-#     # And on add there will be no resource_id
-#     if resource_id:
-#         datastore_fields = resource_get_ordered_fields(resource_id)
-#         return list_to_form_options(datastore_fields, allow_empty)
-#
-#     return []
-
-
 def form_select_update_frequency_options():
     """
     Get update frequencies as a form list
@@ -229,7 +196,7 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
 
         filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
-        return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
+        return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
 @cache_region('permanent', 'collection_stats')
@@ -350,7 +317,7 @@ def api_doc_link():
     @return:
     """
     attr = {'class': 'external', 'target': '_blank'}
-    return link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
+    return h.link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 
 def get_google_analytics_config():
@@ -374,18 +341,18 @@ def persistent_follow_button(obj_type, obj_id):
 
     '''
     obj_type = obj_type.lower()
-    assert obj_type in _follow_objects
+    assert obj_type in h._follow_objects
 
     if c.user:
         context = {'model': model, 'session': model.Session, 'user': c.user}
         action = 'am_following_%s' % obj_type
         following = logic.get_action(action)(context, {'id': obj_id})
-        return snippet('snippets/follow_button.html',
+        return h.snippet('snippets/follow_button.html',
                        following=following,
                        obj_id=obj_id,
                        obj_type=obj_type)
 
-    return snippet('snippets/anon_follow_button.html',
+    return h.snippet('snippets/anon_follow_button.html',
                    obj_id=obj_id,
                    obj_type=obj_type)
 
@@ -460,9 +427,10 @@ def resource_view_state(resource_view_json, resource_json):
     # So to fix, we're going to work out how many columns are in the dataset
     # To decide whether or not to turn on fitColumns
     # Messy, but better than trying to hack around with slickgrid
-    resource_fields = resource_get_ordered_fields(resource_view['resource_id'])
 
-    num_fields = len(resource_fields)
+    fields = h.resource_view_get_fields(resource)
+
+    num_fields = len(fields)
 
     viewport_max_width = 920
     col_width = 100
@@ -478,24 +446,13 @@ def resource_view_state(resource_view_json, resource_json):
     resource_view['state']['fitColumns'] = fit_columns
 
     # ID and DQI always first
-    resource_view['state']['columnsOrder'] = ["_id"]
-
-    if 'gbifIssue' in resource_fields:
-        resource_view['state']['columnsOrder'].append('gbifIssue')
-
-    # And add the rest of the fields
-    for field in resource_fields:
-        if field not in resource_view['state']['columnsOrder']:
-            # Add field to the ordered columns
-            resource_view['state']['columnsOrder'].append(field)
-
-        # Add easier to read
-        resource_view['state']['columnsTitle'].append(
-            {
-                'column': field,
-                'title': camel_case_to_string(field)
-            }
-        )
+    columns_order = {'_id'}
+    if 'gbifIssue' in fields:
+        columns_order.add('gbifIssue')
+    # Add the rest of the columns to the columns order
+    # Using set so _id & gbif don't get added again
+    columns_order |= set(fields)
+    resource_view['state']['columnsOrder'] = list(columns_order)
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
@@ -505,11 +462,6 @@ def resource_view_state(resource_view_json, resource_json):
                     'width': width
                 }
             )
-
-    if hasattr(view, 'grid_fields'):
-        if '_id' not in view.grid_fields:
-            view.grid_fields.append('_id')
-        resource_view['state']['hiddenColumns'] = [f for f in resource_fields if f not in view.grid_fields]
 
     try:
         return json.dumps(resource_view)
@@ -587,7 +539,7 @@ def get_allowed_view_types(resource, package):
     @return:
     """
 
-    view_types = ckan_get_allowed_view_types(resource, package)
+    view_types = h.get_allowed_view_types(resource, package)
     blacklisted_types = ['image']
 
     filtered_types = []
@@ -829,7 +781,7 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     if default is None:
         default = config.get('ckan.gravatar_default', 'identicon')
 
-    if not default in _VALID_GRAVATAR_DEFAULTS:
+    if not default in h._VALID_GRAVATAR_DEFAULTS:
         # treat the default as a url
         default = urllib.quote(default, safe='')
 
@@ -909,7 +861,7 @@ def get_resource_facets(resource):
     )
 
     for field_name in resource_view.field_facets:
-        if get_param_int('_%s_limit' % field_name) == 0:
+        if h.get_param_int('_%s_limit' % field_name) == 0:
             search_params.setdefault('facets_field_limit', {})[field_name] = 50
 
     search = logic.get_action('datastore_search')(context, search_params)
@@ -1031,7 +983,7 @@ def _create_filter_url(params, extras=None):
     @return:
     """
     params_nopage = [(k, v) for k, v in params.items() if k != 'page']
-    return _create_url_with_params(list(params_nopage), extras=extras)
+    return h._create_url_with_params(list(params_nopage), extras=extras)
 
 
 def parse_request_filters():
