@@ -476,20 +476,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                 })
         return images
 
-    def before_show(self, resource_dict):
-        # FIXME: To remove!!!
-        from ckanext.nhm.lib.helpers import remove_url_filter
-        # extras = {
-        #     'id': 'collection-specimens',
-        #     'resource_id': resource_dict['id'],
-        #     'ver': 3
-        # }
-        # print('---')
-        # print(remove_url_filter('collectionCode', ['min'], extras=extras))
-        return resource_dict
-
-
-
-
-
-
+    # def before_show(self, resource_dict):
+    #     # FIXME: To remove!!! Testing only
+    #     from ckanext.nhm.lib.helpers import remove_url_filter
+    #     # extras = {
+    #     #     'id': 'collection-specimens',
+    #     #     'resource_id': resource_dict['id'],
+    #     #     'ver': 3
+    #     # }
+    #     # print('---')
+    #     # print(remove_url_filter('collectionCode', ['min'], extras=extras))
+    #     return resource_dict
