@@ -14,7 +14,7 @@
         } %}
       {% endif %}
 
-    <div class="row {% if facets %}ckanext-datapreview-faceted{% endif %}">
+    <div class="{% if facets %}row ckanext-datapreview-faceted{% endif %}">
 
       {% if facets %}
         <div class="span3 resource-view-facets">
