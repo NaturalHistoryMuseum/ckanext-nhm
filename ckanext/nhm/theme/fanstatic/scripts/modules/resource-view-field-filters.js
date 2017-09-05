@@ -18,18 +18,13 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
 
         // If we have field groups, separate the field select into option groups
         // Otherwise, just provide a long list of fields
-
-        console.log(fields);
-
-        if(fieldGroups){
+        if(fieldGroups.length){
             for (var group in fieldGroups) {
                 if (!fieldGroups.hasOwnProperty(group)) continue;
                 var $optGroup = $('<optgroup />', {label: group});
                 $.each(fieldGroups[group], function(fieldName, fieldLabel ) {
                     if(fields.indexOf(fieldName) !== -1){
                         $optGroup.append($('<option>', {value: fieldName}).text(fieldLabel));
-                    }else{
-                        console.log(fieldName);
                     }
                 });
                 self.$select.append($optGroup)
