@@ -348,13 +348,13 @@ def persistent_follow_button(obj_type, obj_id):
         action = 'am_following_%s' % obj_type
         following = logic.get_action(action)(context, {'id': obj_id})
         return h.snippet('snippets/follow_button.html',
-                       following=following,
-                       obj_id=obj_id,
-                       obj_type=obj_type)
+                         following=following,
+                         obj_id=obj_id,
+                         obj_type=obj_type)
 
     return h.snippet('snippets/anon_follow_button.html',
-                   obj_id=obj_id,
-                   obj_type=obj_type)
+                     obj_id=obj_id,
+                     obj_type=obj_type)
 
 
 def filter_resource_items(key):
@@ -884,6 +884,7 @@ def get_resource_facets(resource):
             'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
             'active': active_facet
         }
+
         for value, count in search['facets']['facet_fields'][field_name].items():
             label = value
             try:
@@ -897,6 +898,9 @@ def get_resource_facets(resource):
             })
 
         facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
+        # If this is the active facet, only show the highest item
+        if active_facet:
+            facet['facet_values'] = facet['facet_values'][:1]
         # Slice the facet values, so length matches num_facets - need to do this after the key sort
         if facet['has_more']:
             facet['facet_values'] = facet['facet_values'][0:num_facets]
@@ -1035,3 +1039,29 @@ def get_resource_filter_pills(package, resource, resource_view=None):
         })
 
     return pills
+
+
+def resource_view_get_filterable_fields(resource):
+    """
+
+    @return:
+    """
+    if not resource.get('datastore_active'):
+        return []
+
+    data = {
+        'resource_id': resource['id'],
+        'limit': 0
+    }
+    result = logic.get_action('datastore_search')({}, data)
+    fields = []
+    #  Loop through the fields, if this is a solr field, there will be a flag denoting indexed
+    for field in result.get('fields', []):
+        if 'indexed' in field:
+            if field['indexed']:
+                fields.append(field['id'])
+        else:
+            fields.append(field['id'])
+
+    return sorted(fields)
+
