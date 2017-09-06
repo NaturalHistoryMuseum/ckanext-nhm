@@ -30,7 +30,8 @@ class IndexLotView(DefaultView):
     field_facets = [
         'Family',
         'taxonRank',
-        'imageCategory'
+        'imageCategory',
+        'kindOfMaterial'
     ]
 
     # Additional search filter options
