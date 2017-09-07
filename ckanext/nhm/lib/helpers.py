@@ -985,8 +985,8 @@ def _create_filter_url(params, extras=None):
     @param extras:
     @return:
     """
-    params_nopage = [(k, v) for k, v in params.items() if k != 'page']
-    return h._create_url_with_params(list(params_nopage), extras=extras)
+    params_no_page = [(k, v) for k, v in params.items() if k != 'page']
+    return h._create_url_with_params(list(params_no_page), extras=extras)
 
 
 def parse_request_filters():
@@ -1029,6 +1029,9 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     pills = []
 
     for filter_field, filter_value in filter_dict.items():
+        # If the field name stars with an underscore, don't include it in the pills
+        if filter_field.startswith('_'):
+            continue
         # Remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
         pills.append({
