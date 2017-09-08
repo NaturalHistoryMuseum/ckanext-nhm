@@ -1054,17 +1054,11 @@ def resource_view_get_filterable_fields(resource):
 
     data = {
         'resource_id': resource['id'],
-        'limit': 0
+        'limit': 0,
+        # As these are for the filters, only get the indexed fields
+        'indexed_only': True
     }
     result = logic.get_action('datastore_search')({}, data)
-    fields = []
-    #  Loop through the fields, if this is a solr field, there will be a flag denoting indexed
-    for field in result.get('fields', []):
-        if 'indexed' in field:
-            if field['indexed']:
-                fields.append(field['id'])
-        else:
-            fields.append(field['id'])
-
+    fields = [f['id'] for f in result.get('fields', [])]
     return sorted(fields)
 
