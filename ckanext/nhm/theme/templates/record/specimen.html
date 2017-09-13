@@ -35,27 +35,29 @@
                             <tr>
 
                                 <td><strong>{{ label }}:</strong></td>
-                                <td colspan="2">
+                                <td colspan="3">
 
                                     {% if field == 'determinations' %}
+                                        {% if c.record_dict['determinations'] %}
 
-                                        <table id="determinations">
+                                            <table id="determinations" width="100%">
 
-                                            <tr>
-                                                {% for label in c.record_dict['determination_labels'] %}
-                                                    <th class="{{ label|lower }}">{{ label|capitalize }}</th>
-                                                {% endfor %}
-                                            </tr>
-
-                                            {% for determination in c.record_dict['determinations'] %}
                                                 <tr>
-                                                    {% for value in determination %}
-                                                        <td> {{ value or '' }}</td>
+                                                    {% for label in c.record_dict['determination_labels'] %}
+                                                        <th class="{{ label|lower }}">{{ label }}</th>
                                                     {% endfor %}
                                                 </tr>
-                                            {% endfor %}
 
-                                        </table>
+                                                {% for i in range(0, c.record_dict['determinations']['_len']) %}
+                                                    <tr>
+                                                        {% for label in c.record_dict['determination_labels'] %}
+                                                            <td>{% if c.record_dict['determinations'][label][i] %}{{ c.record_dict['determinations'][label][i] }}{% endif %}</td>
+                                                        {% endfor %}
+                                                    </tr>
+                                                {% endfor %}
+
+                                            </table>
+                                        {% endif %}
 
                                     {% elif field == 'collectionCode' %}
                                         {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
@@ -93,23 +95,6 @@
             {% endif %}
 
         {% endfor %}
-
-        {% if c.related_records %}
-
-            <tr><th colspan="3">Related records</th></tr>
-            <tr>
-                <td><strong>Records:</strong></td>
-                <td>
-                    <ul>
-                    {% for record in c.related_records %}
-                        <li>{{ h.link_to(record['title'], h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record['_id'])) }}</li>
-                    {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-
-        {%  endif %}
-
 
     </table>
 

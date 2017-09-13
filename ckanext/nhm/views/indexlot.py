@@ -28,7 +28,7 @@ class IndexLotView(DefaultView):
         return p.toolkit.render('record/indexlot.html')
 
     field_facets = [
-        'Family',
+        'family',
         'taxonRank',
         'imageCategory',
         'kindOfMaterial'

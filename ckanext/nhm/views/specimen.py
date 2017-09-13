@@ -41,7 +41,7 @@ class SpecimenView(DefaultView):
         '_has_image': {
             'label': 'Has image',
             # 'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
-            'solr': "associatedMedia:[* TO *]"
+            'solr': "_has_multimedia:true"
         },
         '_has_lat_long': {
             'label': 'Has lat/long',
@@ -278,31 +278,39 @@ class SpecimenView(DefaultView):
 
         c.field_groups['Collection event']['collectionDate'] = 'Collection date'
 
-        # Some fields need stripping to remove empty string characters
-        try:
-            c.record_dict['maxError'] = c.record_dict['maxError'].strip()
-        except AttributeError:
-            pass
+        # Parse determination names
+        c.record_dict['determinations'] = {}
+        c.record_dict['determination_labels'] = []
 
+        for field in ['determinationNames', 'determinationTypes', 'determinationFiledAs']:
 
-        try:
-            determinations = json.loads(c.record_dict['determinations'])
-        except (ValueError, TypeError):
-            pass
-        else:
-            # Transpose list of determinations & fill in missing values so they are all the same length
-            c.record_dict['determinations'] = map(lambda *row: list(row), *determinations.values())
-            c.record_dict['determination_labels'] = ['filed as' if x == 'filedAs' else x for x in determinations.keys()]
+            label = field.replace('determination', '')
+            # Add a space before capital letters
+            label = re.sub(r"([A-Z])", r" \1", label)
 
-        # We do not want custom filters for determinations
+            c.record_dict['determination_labels'].append(label)
+            value = c.record_dict.get(field, None)
+            try:
+                c.record_dict['determinations'][label] = list(json.loads(value))
+            except(ValueError, TypeError):
+                if value:
+                    c.record_dict['determinations'][label] = [value]
+                else:
+                    c.record_dict['determinations'][label] = []
+
+        c.record_dict['determinations']['_len'] = max([len(l) for l in c.record_dict['determinations'].values()])
+
+        # Set determinations to None if we don't have any values - required by the specimen template
+        # to hide the Identification block
+        if not c.record_dict['determinations']['_len']:
+            c.record_dict['determinations']= None
+
+        # No filters for determinations
         c.custom_filters['determinations'] = None
 
-        # Related resources
-        c.related_records = []
-
-        for image in c.images:
-            # Create a thumbnail image by replacing preview with thumbnail
-            image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
+        # for image in c.images:
+        #     # Create a thumbnail image by replacing preview with thumbnail
+        #     image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
 
         return p.toolkit.render('record/specimen.html')
 
