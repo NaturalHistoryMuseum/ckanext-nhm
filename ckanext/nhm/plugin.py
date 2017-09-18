@@ -207,14 +207,14 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
-            # Remove both filter options and field groups from filters
-            # These will be handled separately
-            for option in resource_view_get_filter_options(resource).keys():
-                if option in data_dict['filters']:
-                    del data_dict['filters'][option]
+        # if 'filters' in data_dict:
+        #     resource_show = p.toolkit.get_action('resource_show')
+        #     resource = resource_show(context, {'id': data_dict['resource_id']})
+        #     # Remove both filter options and field groups from filters
+        #     # These will be handled separately
+        #     for option in resource_view_get_filter_options(resource).keys():
+        #         if option in data_dict['filters']:
+        #             del data_dict['filters'][option]
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):

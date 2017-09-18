@@ -212,10 +212,6 @@ class SpecimenView(DefaultView):
             ("totalVolume", "Total volume"),
             ("partType", "Part type"),
         ])),
-        ("Data Admin", OrderedDict([
-            ("gbifIssue", "GBIF Error"),
-            ("project", "Project"),
-        ])),
         ("Record", OrderedDict([
             ("occurrenceID", "Occurrence ID"),
             ("modified", "Modified"),
@@ -239,10 +235,6 @@ class SpecimenView(DefaultView):
 
         # Act on a deep copy of field groups, so deleting element will not have any impact
         c.field_groups = deepcopy(self.field_groups)
-
-        # We show the DQI at the top of the record page - so hide the group from
-        # The actual record view - we need the group though for the filters
-        del c.field_groups['Data Admin']
 
         # Some fields are being merged together - in which case we'll need custom filters
         # This can be set to bool false to not display a filter
@@ -303,7 +295,7 @@ class SpecimenView(DefaultView):
         # Set determinations to None if we don't have any values - required by the specimen template
         # to hide the Identification block
         if not c.record_dict['determinations']['_len']:
-            c.record_dict['determinations']= None
+            c.record_dict['determinations'] = None
 
         # No filters for determinations
         c.custom_filters['determinations'] = None
@@ -314,28 +306,3 @@ class SpecimenView(DefaultView):
 
         return p.toolkit.render('record/specimen.html')
 
-    def get_field_groups(self, resource):
-        # Modify field groups for grid display
-        field_groups = deepcopy(self.field_groups)
-        # We do not want to show the record data in the grid or filters
-        del field_groups['Record']
-        return field_groups
-
-    def get_slickgrid_state(self):
-
-        # Add the DQI column settings
-        self.state['columnsTitle'].append(
-            {
-                'column': 'gbifIssue',
-                'title': 'GBIF QI'
-            }
-        )
-
-        self.state['columnsToolTip'].append(
-            {
-                'column': 'gbifIssue',
-                'value': 'GBIF Data Quality Indicator'
-            }
-        )
-
-        return self.state

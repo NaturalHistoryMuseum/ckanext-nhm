@@ -56,42 +56,8 @@ def get_site_statistics():
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
     # Get a count of all distinct user IDs
     stats['contributor_count'] = get_contributor_count()
-    datastore_stats = get_datastore_stats()
-    stats['record_count'] = datastore_stats['total']
-    return stats
-
-
-def get_datastore_stats():
-    context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
-
-    stats = {
-        'resources': [],
-        'total': 0,
-        'date': None,
-    }
-
-    resource_counts = model.Session.execute(
-        """
-        SELECT r.id, r.name, d.count, d.date, p.id AS pkg_id, p.title AS pkg_title, p.name AS pkg_name
-        FROM resource r
-        INNER JOIN datastore_stats d ON r.id = d.resource_id
-        INNER JOIN resource_group rg ON r.resource_group_id = rg.id
-        INNER JOIN package p ON rg.package_id = p.id
-        WHERE r.state='active' AND p.state='active' AND date = (SELECT date FROM datastore_stats ORDER BY date DESC LIMIT 1)
-        ORDER BY count DESC
-        """
-    );
-
-    for resource in resource_counts:
-        try:
-            _check_access('resource_show', context, dict(resource))
-        except NotAuthorized:
-            pass
-        else:
-            stats['resources'].append(resource)
-            stats['total'] += int(resource['count'])
-            stats['date'] = resource['date']
-
+    dataset_stats = _get_action('dataset_stats', {})
+    stats['record_count'] = dataset_stats['total']
     return stats
 
 
@@ -199,7 +165,7 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
         return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
-@cache_region('permanent', 'collection_stats')
+# @cache_region('permanent', 'collection_stats')
 def indexlot_count():
     resource_id = get_indexlot_resource_id()
 
@@ -208,21 +174,12 @@ def indexlot_count():
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    sql = 'SELECT COUNT(*) AS count FROM "{resource_id}"'.format(resource_id=resource_id)
-
-    try:
-        result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
-    except ValidationError, e:
-        log.critical('Error retrieving indexlot statistics %s', e)
-    else:
-
-        try:
-            return delimit_number(int(result['records'][0]['count']))
-        except IndexError, e:
-            log.critical('Error retrieving indexlot statistics %s', e)
-
-    # Return 0 as default value
-    return 0
+    search_params = dict(
+        resource_id=resource_id,
+        limit=1,
+    )
+    search = logic.get_action('datastore_search')(context, search_params)
+    return delimit_number(search.get('total', 0))
 
 
 def get_nhm_organisation_id():
@@ -246,7 +203,7 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
-@cache_region('permanent', 'collection_stats')
+# @cache_region('permanent', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by Collection code
@@ -255,28 +212,19 @@ def collection_stats():
     resource_id = get_specimen_resource_id()
     total = 0
     collections = OrderedDict()
+    search_params = dict(
+        resource_id=resource_id,
+        limit=0,
+        facets=['collectionCode'],
+        facets_limit=5,  # Get an extra facet, so we can determine if there are more
+    )
 
-    if not resource_id:
-        log.critical('Please configure collection resource ID')
-    else:
-        context = {'model': model, 'session': model.Session, 'user': c.user}
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+    search = logic.get_action('datastore_search')(context, search_params)
 
-        sql = '''SELECT "collectionCode", COUNT(*) AS count
-               FROM "{resource_id}"
-               GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
-
-        total = 0
-        collections = OrderedDict()
-
-        try:
-            result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
-        except ValidationError, e:
-            log.critical('Error retrieving collection statistics %s', e)
-        else:
-            for record in result['records']:
-                count = int(record['count'])
-                collections[record['collectionCode']] = count
-                total += count
+    for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
+        collections[collection_code] = num
+        total += num
 
     stats = {
         'total': total,
@@ -482,7 +430,7 @@ def camel_case_to_string(camel_case_string):
     return s[0].upper() + s[1:]
 
 
-def get_resource_filter_options(resource):
+def get_resource_filter_options(resource, resource_view):
     """Return the available filter options for the given resource
 
     @type resource: dict
@@ -496,11 +444,18 @@ def get_resource_filter_options(resource):
     options = resource_view_get_filter_options(resource)
     filter_list = toolkit.request.params.get('filters', '').split('|')
     filters = {}
+
+    # If this is a gallery view, hide the has image filter
+    # Only records with images will be displayed anyway
+    if resource_view['view_type'] == 'gallery':
+        options.pop("_has_image", None)
+
     for filter_def in filter_list:
         try:
             (key, value) = filter_def.split(':', 1)
         except ValueError:
             continue
+
         if key not in filters:
             filters[key] = [value]
         else:
@@ -1062,3 +1017,7 @@ def resource_view_get_filterable_fields(resource):
     fields = [f['id'] for f in result.get('fields', [])]
     return sorted(fields)
 
+
+def form_select_datastore_field_options(resource, allow_empty=True):
+    fields = h.resource_view_get_fields(resource)
+    return list_to_form_options(fields, allow_empty)

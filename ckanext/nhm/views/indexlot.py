@@ -4,6 +4,7 @@ import logging
 from ckanext.nhm.views.default import DefaultView
 from pylons import config
 import ckan.plugins as p
+from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
@@ -24,9 +25,6 @@ class IndexLotView(DefaultView):
 
     resource_id = config.get("ckanext.nhm.indexlot_resource_id")
 
-    def render_record(self, c):
-        return p.toolkit.render('record/indexlot.html')
-
     field_facets = [
         'family',
         'taxonRank',
@@ -37,40 +35,49 @@ class IndexLotView(DefaultView):
     # Additional search filter options
     filter_options = {
         '_has_image': {
-            'label': 'Has image',
+            'label': 'Has images',
             'solr': "_has_multimedia:true"
         },
     }
 
-# def indexlot_material_details(record_dict):
-#     """
-#     Parse the material details into an array, with first column the header
-#     @param record_dict:
-#     @return:
-#     """
-#
-#     material_details = []
-#
-#     material_detail_fields = [
-#         'Material count',
-#         'Material sex',
-#         'Material stage',
-#         'Material types',
-#         'Material primary type no'
-#     ]
-#
-#     # Create a list of lists, containing field and values
-#     # First row will be field title
-#     for material_detail_field in material_detail_fields:
-#         if record_dict[material_detail_field]:
-#             field_values = record_dict[material_detail_field].split(';')
-#             if field_values:
-#                 label = material_detail_field.replace('Material', '').strip().capitalize()
-#                 material_details.append([label] + field_values)
-#
-#     # Transpose list of values & fill in missing values so they are all the same length
-#     if material_details:
-#         material_details = map(lambda *row: list(row), *material_details)
-#
-#     return material_details
+    field_groups = OrderedDict([
+        ("Classification", OrderedDict([
+            ("currentScientificName", "Scientific name"),
+            ("scientificNameAuthorship", "Author"),
+            ("kingdom", "Kingdom"),
+            ("phylum", "Phylum"),
+            ("class", "Class"),
+            ("order", "Order"),
+            ("family", "Family"),
+            ("genus", "Genus"),
+            ("subgenus", "Subgenus"),
+            ("specificEpithet", "Species"),
+            ("infraspecificEpithet", "Subspecies"),
+            ("higherClassification", "Higher classification"),
+            ("taxonRank", "Taxon rank"),
+        ])),
+        ("Specimen", OrderedDict([
+            ("type", "Type"),
+            ("media", "Media"),
+            ("british", "British"),
+        ])),
+        ("Material details", OrderedDict([
+            ("material", "Material"),
+            ("kindOfMaterial", "Kind of material"),
+            ("kindOfMedia", "Kind of media"),
+            ("materialCount", "Count"),
+            ("materialSex", "Sex"),
+            ("materialStage", "Stage"),
+            ("materialTypes", "Types"),
+            ("materialPrimaryTypeNumber", "Primary type number"),
+        ])),
+        ("Record", OrderedDict([
+            ("GUID", "GUID"),
+            ("modified", "Modified"),
+            ("created", "Created"),
+        ])),
+    ])
 
+    def render_record(self, c):
+        c.field_groups = self.field_groups
+        return p.toolkit.render('record/collection.html')

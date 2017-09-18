@@ -1,4 +1,3 @@
-
 import os
 import ckan.plugins as p
 from ckan.common import _, g, c
@@ -9,7 +8,7 @@ import logging
 import ckan.model as model
 import ckan.logic as logic
 import ckan.lib.base as base
-from ckanext.nhm.lib.helpers import get_datastore_stats, get_contributor_count
+from ckanext.nhm.lib.helpers import get_contributor_count
 import ckan.lib.helpers as h
 import ckanext.stats.stats as stats_lib
 from datetime import datetime, timedelta, date
@@ -29,6 +28,7 @@ get_action = logic.get_action
 check_access = logic.check_access
 
 log = logging.getLogger(__name__)
+
 
 class StatsController(p.toolkit.BaseController):
     """
@@ -102,11 +102,11 @@ class StatsController(p.toolkit.BaseController):
 
         return p.toolkit.render('stats/resources.html', {'title': 'Resource statistics'})
 
-
     def contributors(self):
 
         # Get number of contributors
-        c.contributors = model.Session.execute("SELECT u.id AS user_id, u.name, u.fullname, COUNT(p.id) as count FROM package p INNER JOIN public.user u ON u.id = p.creator_user_id WHERE u.state='active' and p.state='active' GROUP BY u.id ORDER BY count DESC").fetchall()
+        c.contributors = model.Session.execute(
+            "SELECT u.id AS user_id, u.name, u.fullname, COUNT(p.id) AS count FROM package p INNER JOIN public.user u ON u.id = p.creator_user_id WHERE u.state='active' AND p.state='active' GROUP BY u.id ORDER BY count DESC").fetchall()
 
         contributor_count = get_contributor_count()
 
@@ -119,8 +119,7 @@ class StatsController(p.toolkit.BaseController):
 
     def records(self):
 
-        c.datastore_stats = get_datastore_stats()
-
+        c.datastore_stats = get_action('dataset_stats')(self.context, {})
         c.num_records = [
             {'date': datetime.now() - timedelta(days=7), 'count': 0},
             {'date': datetime.now(), 'count': c.datastore_stats['total']},
@@ -229,7 +228,6 @@ class StatsController(p.toolkit.BaseController):
                 # Add date label to ticks
                 c.pageviews_options['xaxis']['ticks'].append([i, formatted_date])
 
-
         # Try and get resource download metrics - these are per resource
         # So need to loop through all resources, looking up download stats
         # Post to /dataset with secret and resource_id, and receive back:
@@ -249,6 +247,8 @@ class StatsController(p.toolkit.BaseController):
 
         endpoint = os.path.join(config.get("ckanpackager.url"), 'statistics')
 
+        # FIXME: This does not work!!
+
         for resource in c.pkg_dict['resources']:
 
             params = {
@@ -259,7 +259,7 @@ class StatsController(p.toolkit.BaseController):
             try:
                 r = requests.post(endpoint, params)
                 result = r.json()
-            except ValueError:   # includes simplejson.decoder.JSONDecodeError
+            except ValueError:  # includes simplejson.decoder.JSONDecodeError
                 # Unable to retrieve download stats for this resource
                 log.critical('ERROR %s: Unable to retrieve download stats for resource %s', r.status_code, resource['id'])
             except ConnectionError, e:
@@ -276,7 +276,7 @@ class StatsController(p.toolkit.BaseController):
                             'name': resource['name'],
                             'id': resource['id'],
                             'total': total
-                         }
+                        }
                     )
 
                     c.total_downloads += total
