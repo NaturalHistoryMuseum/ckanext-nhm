@@ -44,28 +44,21 @@
         <tbody>
 
           {% for row in c.datastore_stats['resources'] %}
-
-            {% set last_date = row.count.keys()[-1] %}
-
-
-
             <tr>
               <th><a href="{{ h.url_for(controller='package', action='read', id=row.pkg_name ) }}">{{ row.pkg_title }}</a></th>
               <th><a href="{{ h.url_for(controller='package', action='resource_read', id=row.pkg_name, resource_id=row.id ) }}">{{ row.name }}</a></th>
-              <td>{{ h.delimit_number(row.count[last_date]) }}</td>
+              <td>{{ h.delimit_number(row.total) }}</td>
             </tr>
           {% endfor %}
 
           <tr>
-              <td colspan="2">Total</td>
-              <td>{{ h.delimit_number(c.datastore_stats['total']) }}</td>
+              <td colspan="2"><strong>Total</strong></td>
+              <td><strong>{{ h.delimit_number(c.datastore_stats['total']) }}</strong></td>
           </tr>
 
         </tbody>
       </table>
 
       </section>
-
-    <p class="info">Record statistics are updated daily - these figures were last updated on {{ h.render_datetime(c.datastore_stats['date']) }} </p>
 
 {% endblock %}
