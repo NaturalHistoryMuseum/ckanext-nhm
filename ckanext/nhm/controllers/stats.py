@@ -119,7 +119,7 @@ class StatsController(p.toolkit.BaseController):
 
     def records(self):
 
-        c.datastore_stats = get_action('dataset_stats')(self.context, {})
+        c.datastore_stats = get_action('dataset_statistics')(self.context, {})
         c.num_records = [
             {'date': datetime.now() - timedelta(days=7), 'count': 0},
             {'date': datetime.now(), 'count': c.datastore_stats['total']},
