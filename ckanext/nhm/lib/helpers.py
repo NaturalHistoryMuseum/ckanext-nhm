@@ -56,8 +56,8 @@ def get_site_statistics():
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
     # Get a count of all distinct user IDs
     stats['contributor_count'] = get_contributor_count()
-    dataset_stats = _get_action('dataset_stats', {})
-    stats['record_count'] = dataset_stats['total']
+    dataset_statistics = _get_action('dataset_statistics', {})
+    stats['record_count'] = dataset_statistics.get('total', 0)
     return stats
 
 
