@@ -10,6 +10,7 @@ from pylons import config
 from collections import OrderedDict
 from jinja2.filters import do_truncate
 from operator import itemgetter
+from solr import SolrException
 
 import ckan.model as model
 import ckan.logic as logic
@@ -220,11 +221,14 @@ def collection_stats():
     )
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
-    search = logic.get_action('datastore_search')(context, search_params)
-
-    for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
-        collections[collection_code] = num
-        total += num
+    try:
+        search = logic.get_action('datastore_search')(context, search_params)
+    except SolrException:
+        pass
+    else:
+        for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
+            collections[collection_code] = num
+            total += num
 
     stats = {
         'total': total,
