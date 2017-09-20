@@ -19,3 +19,5 @@ Thumbs.db
 
 build
 dist
+
+node_modules

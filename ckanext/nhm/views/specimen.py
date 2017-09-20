@@ -27,6 +27,42 @@ class SpecimenView(DefaultView):
     grid_default_columns = DarwinCoreView.grid_default_columns
     grid_column_widths = DarwinCoreView.grid_column_widths
 
+    field_facets = [
+        'collectionCode',
+        'typeStatus',
+        'family',
+        'genus',
+        'imageCategory',
+        'gbifIssue'
+    ]
+
+    # Additional search filter options
+    filter_options = {
+        '_has_image': {
+            'label': 'Has image',
+            # 'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
+            'solr': "_has_multimedia:true"
+        },
+        '_has_lat_long': {
+            'label': 'Has lat/long',
+            # BS: Changed to look for latitude field,as _geom is only available after a map has been added
+            # As this works for all DwC, we might get datasets without a map
+            # 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
+            'solr': 'decimalLatitude:[* TO *]'
+        },
+        '_exclude_centroid': {
+            'label': 'Exclude centroids',
+            # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
+            'solr': 'centroid:false'
+        },
+        '_exclude_mineralogy': {
+            'label': 'Exclude Mineralogy',
+            'hide': True,
+            # 'sql': ('"{}"."collectionCode" <> \'MIN\''.format(resource_id),),
+            'solr': '-collectionCode:MIN'
+        }
+    }
+
     field_groups = OrderedDict([
         ("Classification", OrderedDict([
             ("scientificName", "Scientific name"),
@@ -176,10 +212,6 @@ class SpecimenView(DefaultView):
             ("totalVolume", "Total volume"),
             ("partType", "Part type"),
         ])),
-        ("Data Admin", OrderedDict([
-            ("gbifIssue", "GBIF Error"),
-            ("project", "Project"),
-        ])),
         ("Record", OrderedDict([
             ("occurrenceID", "Occurrence ID"),
             ("modified", "Modified"),
@@ -203,10 +235,6 @@ class SpecimenView(DefaultView):
 
         # Act on a deep copy of field groups, so deleting element will not have any impact
         c.field_groups = deepcopy(self.field_groups)
-
-        # We show the DQI at the top of the record page - so hide the group from
-        # The actual record view - we need the group though for the filters
-        del c.field_groups['Data Admin']
 
         # Some fields are being merged together - in which case we'll need custom filters
         # This can be set to bool false to not display a filter
@@ -242,56 +270,39 @@ class SpecimenView(DefaultView):
 
         c.field_groups['Collection event']['collectionDate'] = 'Collection date'
 
-        # Some fields need stripping to remove empty string characters
-        try:
-            c.record_dict['maxError'] = c.record_dict['maxError'].strip()
-        except AttributeError:
-            pass
+        # Parse determination names
+        c.record_dict['determinations'] = {}
+        c.record_dict['determination_labels'] = []
 
+        for field in ['determinationNames', 'determinationTypes', 'determinationFiledAs']:
 
-        try:
-            determinations = json.loads(c.record_dict['determinations'])
-        except (ValueError, TypeError):
-            pass
-        else:
-            # Transpose list of determinations & fill in missing values so they are all the same length
-            c.record_dict['determinations'] = map(lambda *row: list(row), *determinations.values())
-            c.record_dict['determination_labels'] = ['filed as' if x == 'filedAs' else x for x in determinations.keys()]
+            label = field.replace('determination', '')
+            # Add a space before capital letters
+            label = re.sub(r"([A-Z])", r" \1", label)
 
-        # We do not want custom filters for determinations
+            c.record_dict['determination_labels'].append(label)
+            value = c.record_dict.get(field, None)
+            try:
+                c.record_dict['determinations'][label] = list(json.loads(value))
+            except(ValueError, TypeError):
+                if value:
+                    c.record_dict['determinations'][label] = [value]
+                else:
+                    c.record_dict['determinations'][label] = []
+
+        c.record_dict['determinations']['_len'] = max([len(l) for l in c.record_dict['determinations'].values()])
+
+        # Set determinations to None if we don't have any values - required by the specimen template
+        # to hide the Identification block
+        if not c.record_dict['determinations']['_len']:
+            c.record_dict['determinations'] = None
+
+        # No filters for determinations
         c.custom_filters['determinations'] = None
 
-        # Related resources
-        c.related_records = []
-
-        for image in c.images:
-            # Create a thumbnail image by replacing preview with thumbnail
-            image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
+        # for image in c.images:
+        #     # Create a thumbnail image by replacing preview with thumbnail
+        #     image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
 
         return p.toolkit.render('record/specimen.html')
 
-    def get_field_groups(self, resource):
-        # Modify field groups for grid display
-        field_groups = deepcopy(self.field_groups)
-        # We do not want to show the record data in the grid or filters
-        del field_groups['Record']
-        return field_groups
-
-    def get_slickgrid_state(self):
-
-        # Add the DQI column settings
-        self.state['columnsTitle'].append(
-            {
-                'column': 'gbifIssue',
-                'title': 'GBIF QI'
-            }
-        )
-
-        self.state['columnsToolTip'].append(
-            {
-                'column': 'gbifIssue',
-                'value': 'GBIF Data Quality Indicator'
-            }
-        )
-
-        return self.state

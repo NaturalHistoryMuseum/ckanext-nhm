@@ -20,9 +20,6 @@ this.ckan.module('social', function ($, _) {
 
         _on_click: function(e){
             e.preventDefault();
-
-            console.log(this.title);
-
             window.open(this.href, this.title, 'width=600,height=400');
             return false;
         }

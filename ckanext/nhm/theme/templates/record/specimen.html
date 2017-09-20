@@ -1,4 +1,4 @@
-{% extends "record/view.html" %}
+{% extends "record/collection.html" %}
 
 {% block styles %}
    {{ super() }}
@@ -15,124 +15,10 @@
 
 {% endblock %}
 
-{% block record_data %}
-
-    <table>
-
-        {% for group, fields in c.field_groups.items() %}
-
-            {% if h.group_fields_have_data(c.record_dict, fields.keys()) %}
-
-                <thead>
-                    <tr><th colspan="4">{{ group }}</th></tr>
-                </thead>
-
-                <tbody>
-                    {% for field, label in fields.items() %}
-
-                        {% if c.record_dict[field] %}
-
-                            <tr>
-
-                                <td><strong>{{ label }}:</strong></td>
-                                <td colspan="2">
-
-                                    {% if field == 'determinations' %}
-
-                                        <table id="determinations">
-
-                                            <tr>
-                                                {% for label in c.record_dict['determination_labels'] %}
-                                                    <th class="{{ label|lower }}">{{ label|capitalize }}</th>
-                                                {% endfor %}
-                                            </tr>
-
-                                            {% for determination in c.record_dict['determinations'] %}
-                                                <tr>
-                                                    {% for value in determination %}
-                                                        <td> {{ value or '' }}</td>
-                                                    {% endfor %}
-                                                </tr>
-                                            {% endfor %}
-
-                                        </table>
-
-                                    {% elif field == 'collectionCode' %}
-                                        {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
-                                    {% elif field in ['genus', 'specificEpithet'] %}
-                                        <em>{{ c.record_dict[field] }}</em>
-                                    {% else %}
-                                        {{ c.record_dict[field] }}
-                                    {% endif %}
-
-                                </td>
-
-                                <td width="50" class="filterable">
-
-                                    {% if field in c.custom_filters %}
-                                        {% set filter = c.custom_filters[field] %}
-                                    {% else %}
-                                        {% set filter = '%s:%s' % (field, c.record_dict[field]) %}
-                                    {% endif %}
-
-                                    {% if filter %}
-
-                                        <a title="View all records where {{ filter }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters=filter) }}">
-                                            <i class="icon-filter"></i>
-                                        </a>
-
-                                    {% endif %}
-                                </td>
-                            </tr>
-
-                        {% endif %}
-
-                    {% endfor %}
-                <tbody>
-
-            {% endif %}
-
-        {% endfor %}
-
-        {% if c.related_records %}
-
-            <tr><th colspan="3">Related records</th></tr>
-            <tr>
-                <td><strong>Records:</strong></td>
-                <td>
-                    <ul>
-                    {% for record in c.related_records %}
-                        <li>{{ h.link_to(record['title'], h.url_for(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=pkg.name, resource_id=res.id, record_id=record['_id'])) }}</li>
-                    {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-
-        {%  endif %}
-
-
-    </table>
-
-{% endblock %}
-
 {% block record_additional_information %}
-    {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.object:ObjectController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
-    {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
+    {% if c.record_dict['occurrenceID']%}
+        {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.object:ObjectController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
+        {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
+    {% endif %}
     {{ super() }}
 {% endblock %}
-
-{% block record_additional_information_rows %}
-   <tr>
-    <th scope="row">{{ _('Created') }}</th>
-    <td>{{ h.render_datetime(c.record_dict['created']) }}</td>
-  </tr>
-   <tr>
-    <th scope="row">{{ _('Last updated') }}</th>
-    <td>{{ h.render_datetime(c.record_dict['modified']) }}</td>
-  </tr>
-
-  {{ super() }}
-
-{% endblock %}
-
-

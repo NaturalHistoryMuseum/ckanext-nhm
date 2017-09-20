@@ -1,0 +1,22 @@
+{
+  "name": "ckanext-nhm",
+  "version": "0.0.1",
+  "description": "Natural History Museum CKAN Plugin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-nhm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NaturalHistoryMuseum/ckanext-nhm/issues"
+  },
+  "homepage": "http://data.nhm.ac.uk",
+  "devDependencies": {
+    "gulp-watch": "^4.3.11"
+  },
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-less": "^3.1.0"
+  }
+}

@@ -28,7 +28,7 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
     }
 
     if(columnDef.id == 'gbifIssue'){
-      var dqi_class
+      var dqi_class;
 
         if(dataContext['gbifID'] === null){
             dqi_class = 'unknown'

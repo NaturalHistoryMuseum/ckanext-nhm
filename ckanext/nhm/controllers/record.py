@@ -63,6 +63,7 @@ class RecordController(base.BaseController):
             'latitude': None,
             'longitude': None
         }
+
         # Get lat/long fields
         # Loop through all the views - if we have a tiled map view with lat/lon fields
         # We'll use those fields to add the map
@@ -110,7 +111,7 @@ class RecordController(base.BaseController):
 
                 default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
-                image_field_value = c.record_dict.pop(field_names['image'])
+                image_field_value = c.record_dict.pop(field_names['image'], None)
 
                 if image_field_value:
 
@@ -123,7 +124,8 @@ class RecordController(base.BaseController):
                         # String field value
                         try:
                             # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                            c.images = [{'title': c.record_title, 'href': image.strip(), 'copyright': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if image.strip()]
+                            c.images = [{'title': c.record_title, 'href': image.strip(), 'copyright': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if
+                                        image.strip()]
                         except (KeyError, AttributeError):
                             # Skip errors - there are no images
                             pass
@@ -147,7 +149,6 @@ class RecordController(base.BaseController):
                                     ),
                                 })
 
-
         if field_names['latitude'] and field_names['longitude']:
             latitude, longitude = c.record_dict.get(field_names['latitude']), c.record_dict.get(field_names['longitude'])
 
@@ -157,15 +158,13 @@ class RecordController(base.BaseController):
                     'coordinates': [longitude, latitude]
                 })
 
-
     def view(self, package_name, resource_id, record_id):
-
         """
         View an individual record
-        :param id:
-        :param resource_id:
-        :param record_id:
-        :return: html
+        @param package_name:
+        @param resource_id:
+        @param record_id:
+        @return:
         """
         self._load_data(package_name, resource_id, record_id)
 

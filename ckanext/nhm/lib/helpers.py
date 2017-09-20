@@ -9,26 +9,21 @@ from beaker.cache import cache_region
 from pylons import config
 from collections import OrderedDict
 from jinja2.filters import do_truncate
+from operator import itemgetter
+from solr import SolrException
 
 import ckan.model as model
 import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
-from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, _VALID_GRAVATAR_DEFAULTS, get_allowed_view_types as ckan_get_allowed_view_types
+from ckan.lib import helpers as h
+
 from webhelpers.html import literal
 
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.views import *
-from ckanext.nhm.lib.resource import (
-    resource_get_ordered_fields,
-    resource_filter_options,
-    parse_request_filters,
-    FIELD_DISPLAY_FILTER,
-    resource_filter_get_cookie,
-    resource_filter_set_cookie,
-    resource_filter_delete_cookie
-)
+from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
+
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 
@@ -47,11 +42,11 @@ enumerate = enumerate
 re_dwc_field_label = re.compile('([A-Z]+)')
 
 re_url_validation = re.compile(
-        r'^(?:http)s?://' # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' # domain...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-        r'(?::\d+)?' # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    r'^(?:http)s?://'  # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 # Maximum number of characters for the author string
 AUTHOR_MAX_LENGTH = 100
@@ -62,42 +57,8 @@ def get_site_statistics():
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
     # Get a count of all distinct user IDs
     stats['contributor_count'] = get_contributor_count()
-    datastore_stats = get_datastore_stats()
-    stats['record_count'] = datastore_stats['total']
-    return stats
-
-
-def get_datastore_stats():
-    context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
-
-    stats = {
-        'resources': [],
-        'total': 0,
-        'date': None,
-    }
-
-    resource_counts = model.Session.execute(
-        """
-        SELECT r.id, r.name, d.count, d.date, p.id AS pkg_id, p.title AS pkg_title, p.name AS pkg_name
-        FROM resource r
-        INNER JOIN datastore_stats d ON r.id = d.resource_id
-        INNER JOIN resource_group rg ON r.resource_group_id = rg.id
-        INNER JOIN package p ON rg.package_id = p.id
-        WHERE r.state='active' AND p.state='active' AND date = (SELECT date FROM datastore_stats ORDER BY date DESC LIMIT 1)
-        ORDER BY count DESC
-        """
-    );
-
-    for resource in resource_counts:
-        try:
-            _check_access('resource_show', context, dict(resource))
-        except NotAuthorized:
-            pass
-        else:
-            stats['resources'].append(resource)
-            stats['total'] += int(resource['count'])
-            stats['date'] = resource['date']
-
+    dataset_statistics = _get_action('dataset_statistics', {})
+    stats['record_count'] = dataset_statistics.get('total', 0)
     return stats
 
 
@@ -133,26 +94,6 @@ def get_resource(resource_id):
 def get_record(resource_id, record_id):
     record = _get_action('record_show', {'resource_id': resource_id, 'record_id': record_id})
     return record.get('data', None)
-
-
-def resource_view_get_ordered_fields(resource_id):
-    """
-    This is a replacement for resource_view_get_fields, but this function
-    handles errors internally, and return the fields in their original order
-    @param resource_id:
-    @return:
-    """
-    return resource_get_ordered_fields(resource_id)
-
-
-def form_select_datastore_field_options(resource_id=None, allow_empty=False):
-    # Need to check for resource_id as this form gets loaded on add, nut just edit
-    # And on add there will be no resource_id
-    if resource_id:
-        datastore_fields = resource_get_ordered_fields(resource_id)
-        return list_to_form_options(datastore_fields, allow_empty)
-
-    return []
 
 
 def form_select_update_frequency_options():
@@ -222,10 +163,10 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
 
         filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
-        return url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
+        return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
-@cache_region('permanent', 'collection_stats')
+# @cache_region('permanent', 'collection_stats')
 def indexlot_count():
     resource_id = get_indexlot_resource_id()
 
@@ -234,21 +175,12 @@ def indexlot_count():
 
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
-    sql = 'SELECT COUNT(*) AS count FROM "{resource_id}"'.format(resource_id=resource_id)
-
-    try:
-        result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
-    except ValidationError, e:
-        log.critical('Error retrieving indexlot statistics %s', e)
-    else:
-
-        try:
-            return delimit_number(int(result['records'][0]['count']))
-        except IndexError, e:
-            log.critical('Error retrieving indexlot statistics %s', e)
-
-    # Return 0 as default value
-    return 0
+    search_params = dict(
+        resource_id=resource_id,
+        limit=1,
+    )
+    search = logic.get_action('datastore_search')(context, search_params)
+    return delimit_number(search.get('total', 0))
 
 
 def get_nhm_organisation_id():
@@ -272,7 +204,7 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
-@cache_region('permanent', 'collection_stats')
+# @cache_region('permanent', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by Collection code
@@ -281,28 +213,22 @@ def collection_stats():
     resource_id = get_specimen_resource_id()
     total = 0
     collections = OrderedDict()
+    search_params = dict(
+        resource_id=resource_id,
+        limit=0,
+        facets=['collectionCode'],
+        facets_limit=5,  # Get an extra facet, so we can determine if there are more
+    )
 
-    if not resource_id:
-        log.critical('Please configure collection resource ID')
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+    try:
+        search = logic.get_action('datastore_search')(context, search_params)
+    except SolrException:
+        pass
     else:
-        context = {'model': model, 'session': model.Session, 'user': c.user}
-
-        sql = '''SELECT "collectionCode", COUNT(*) AS count
-               FROM "{resource_id}"
-               GROUP BY "collectionCode" ORDER BY count DESC'''.format(resource_id=resource_id)
-
-        total = 0
-        collections = OrderedDict()
-
-        try:
-            result = toolkit.get_action('datastore_search_sql')(context, {'sql': sql})
-        except ValidationError, e:
-            log.critical('Error retrieving collection statistics %s', e)
-        else:
-            for record in result['records']:
-                count = int(record['count'])
-                collections[record['collectionCode']] = count
-                total += count
+        for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
+            collections[collection_code] = num
+            total += num
 
     stats = {
         'total': total,
@@ -318,14 +244,14 @@ def get_department(collection_code):
     @return: Full department name - Entomology
     """
     departments = {
-        'BMNH(E)': 'Entomology',
-        'BOT': 'Botany',
-        'MIN': 'Mineralogy',
-        'PAL': 'Palaeontology',
-        'ZOO': 'Zoology',
+        'bmnh(e)': 'Entomology',
+        'bot': 'Botany',
+        'min': 'Mineralogy',
+        'pal': 'Palaeontology',
+        'zoo': 'Zoology',
     }
 
-    return departments[collection_code]
+    return departments[collection_code.lower()]
 
 
 def delimit_number(num):
@@ -343,7 +269,7 @@ def api_doc_link():
     @return:
     """
     attr = {'class': 'external', 'target': '_blank'}
-    return link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
+    return h.link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 
 def get_google_analytics_config():
@@ -367,20 +293,20 @@ def persistent_follow_button(obj_type, obj_id):
 
     '''
     obj_type = obj_type.lower()
-    assert obj_type in _follow_objects
+    assert obj_type in h._follow_objects
 
     if c.user:
         context = {'model': model, 'session': model.Session, 'user': c.user}
         action = 'am_following_%s' % obj_type
         following = logic.get_action(action)(context, {'id': obj_id})
-        return snippet('snippets/follow_button.html',
-                       following=following,
-                       obj_id=obj_id,
-                       obj_type=obj_type)
+        return h.snippet('snippets/follow_button.html',
+                         following=following,
+                         obj_id=obj_id,
+                         obj_type=obj_type)
 
-    return snippet('snippets/anon_follow_button.html',
-                   obj_id=obj_id,
-                   obj_type=obj_type)
+    return h.snippet('snippets/anon_follow_button.html',
+                     obj_id=obj_id,
+                     obj_type=obj_type)
 
 
 def filter_resource_items(key):
@@ -425,31 +351,6 @@ def get_query_params():
     return params
 
 
-def resource_view_get_view(resource):
-    """
-    Retrieve the controller for a resource
-    Try and match on resource ID, or on format
-    So we can provide a custom controller for all format types - e.g. DwC
-    @param resource:
-    @return: controller class
-    """
-
-    subclasses = DefaultView.__subclasses__()
-
-    for cls in subclasses:
-        # Does the resource ID match the record controller
-        if cls.resource_id == resource['id']:
-            return cls()
-
-    # Or do we have a controller for a particular format type (eg. DwC)
-    # Run in separate loop so this is lower specificity
-    for cls in subclasses:
-        if cls.format == resource['format']:
-            return cls()
-
-    return DefaultView()
-
-
 def resource_view_get_field_groups(resource):
     """
     Return dictionary of field groups
@@ -479,14 +380,9 @@ def resource_view_state(resource_view_json, resource_json):
     # To decide whether or not to turn on fitColumns
     # Messy, but better than trying to hack around with slickgrid
 
-    resource_fields = resource_get_ordered_fields(resource_view['resource_id'])
+    fields = h.resource_view_get_fields(resource)
 
-    # Add hidden fields
-    # The way Slickgrid is implemented, we cannot pass in an array of columns
-    # Instead if display fields is set, we will mark all other columns as hidden
-    hidden_fields = resource_view_get_hidden_fields(resource)
-
-    num_fields = len(resource_fields) - len(hidden_fields)
+    num_fields = len(fields)
 
     viewport_max_width = 920
     col_width = 100
@@ -502,39 +398,12 @@ def resource_view_state(resource_view_json, resource_json):
     resource_view['state']['fitColumns'] = fit_columns
 
     # ID and DQI always first
-    resource_view['state']['columnsOrder'] = ["_id"]
-
-    if 'gbifIssue' in resource_fields:
-        resource_view['state']['columnsOrder'].append('gbifIssue')
-
-    for field in resource_fields:
-        if field not in hidden_fields and field not in resource_view['state']['columnsOrder']:
-            # Add field to the ordered columns
-            resource_view['state']['columnsOrder'].append(field)
-
-    for group, fields in resource_view_get_field_groups(resource).items():
-
-        for field, label in fields.items():
-
-            if field in resource_fields and field not in hidden_fields:
-
-                # If we have a group, add a tooltip
-                # Otherwise will use title text
-                if group:
-                    resource_view['state']['columnsToolTip'].append(
-                        {
-                            'column': field,
-                            'value': '%s: %s' % (group, label)
-                        }
-                    )
-
-                # Add custom titles
-                resource_view['state']['columnsTitle'].append(
-                    {
-                        'column': field,
-                        'title': label
-                    }
-                )
+    columns_order = ['_id']
+    if 'gbifIssue' in fields:
+        columns_order.append('gbifIssue')
+    # Add the rest of the columns to the columns order
+    columns_order += [f for f in fields if f not in columns_order]
+    resource_view['state']['columnsOrder'] = list(columns_order)
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
@@ -544,12 +413,6 @@ def resource_view_state(resource_view_json, resource_json):
                     'width': width
                 }
             )
-
-    if hidden_fields:
-        resource_filter_set_cookie(resource_view['resource_id'], hidden_fields)
-        resource_view['state']['hiddenColumns'] = hidden_fields
-    else:
-        resource_filter_delete_cookie(resource_view['resource_id'])
 
     try:
         return json.dumps(resource_view)
@@ -566,73 +429,12 @@ def resource_is_dwc(resource):
     return bool(resource.get('format').lower() == 'dwc')
 
 
-def resource_view_get_hidden_fields(resource):
-    """
-    Get a list of hidden fields
-    This is called from resource_view_filters.html and helper resource_view_state
-    So the same fields are hidden in the form and Slickgrid
-
-    @param resource id:
-    @return: list of hidden fields
-    """
-
-    """
-    Parse hidden fields from the filter dictionary
-    @param filter_dict:
-    """
-
-    filter_dict = parse_request_filters()
-
-    # Get all display fields explicitly set
-    display_fields = filter_dict.pop(FIELD_DISPLAY_FILTER, [])
-
-    # Load the hidden fields cookie
-    hidden_fields_cookie = resource_filter_get_cookie(resource['id'])
-
-    # Retrieve the fields for this resource
-    resource_fields = resource_get_ordered_fields(resource['id'])
-
-    # If user has set display fields, loop through display fields
-    # And available fields, to build a list of hidden fields
-    if display_fields:
-
-        # Ensure it's a list
-        if not isinstance(display_fields, list):
-            display_fields = [display_fields]
-
-        # Make sure _id is never hidden
-        display_fields.append('_id')
-
-        # Make sure gbifIssue is never hidden (if it exists)
-        if 'gbifIssue' in resource_fields:
-            display_fields.append('gbifIssue')
-
-        # Make sure all filtered fields are never hidden
-        display_fields += filter_dict.keys()
-
-        # Hidden fields are all other resource fields not in the display field array
-        return list(set(resource_fields) - set(display_fields))
-
-    elif hidden_fields_cookie:
-
-        # Make sure that even if we're using the hidden fields cookie
-        # All filtered fields are removed from the hidden field list
-        hidden_fields_cookie = list(set(hidden_fields_cookie) - set(filter_dict.keys()))
-        return hidden_fields_cookie
-
-    else:
-
-        # User has nto customised the grid - so see if we have custom display
-        # fields set in the controller
-        view_cls = resource_view_get_view(resource)
-
-        if view_cls.grid_default_columns:
-            return [f for f in resource_fields if f not in view_cls.grid_default_columns]
-
-    return {}
+def camel_case_to_string(camel_case_string):
+    s = ' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
+    return s[0].upper() + s[1:]
 
 
-def get_resource_filter_options(resource):
+def get_resource_filter_options(resource, resource_view):
     """Return the available filter options for the given resource
 
     @type resource: dict
@@ -643,14 +445,21 @@ def get_resource_filter_options(resource):
                 - label: The label to display to users;
                 - checked: True if the option is currently applied.
     """
-    options = resource_filter_options(resource)
+    options = resource_view_get_filter_options(resource)
     filter_list = toolkit.request.params.get('filters', '').split('|')
     filters = {}
+
+    # If this is a gallery view, hide the has image filter
+    # Only records with images will be displayed anyway
+    if resource_view['view_type'] == 'gallery':
+        options.pop("_has_image", None)
+
     for filter_def in filter_list:
         try:
             (key, value) = filter_def.split(':', 1)
         except ValueError:
             continue
+
         if key not in filters:
             filters[key] = [value]
         else:
@@ -679,76 +488,6 @@ def get_resource_gbif_errors(resource):
         return {}
 
 
-def get_resource_filter_pills(resource):
-    """
-    Get filter pills
-    We don't want the field group pills - these are handled separately in get_resource_field_groups
-    @param resource:
-    @return:
-    """
-
-    filter_dict = parse_request_filters()
-
-    def get_pill_filters(exclude_field, exclude_value):
-        """
-        Build filter, using filters which aren't exclude_field=exclude_value
-        @param exclude_field:
-        @param exclude_value:
-        @return:
-        """
-
-        filters = []
-        for field, values in filter_dict.items():
-            for value in values:
-                if not (field == exclude_field and value == exclude_value):
-                    filters.append('%s:%s' % (field, value))
-
-        return '|'.join(filters)
-
-    pills = {}
-
-    options = resource_filter_options(resource)
-
-    field_labels = {}
-
-    field_groups = resource_view_get_field_groups(resource)
-
-    if field_groups:
-        for fields in field_groups.values():
-            for field_name, label in fields.items():
-                field_labels[field_name] = label
-
-    for field, values in filter_dict.items():
-        for value in values:
-            filters = get_pill_filters(field, value)
-
-            # If this is the _tmgeom field, we don't want to output the whole value as it's in the format:
-            # POLYGON ((-100.45898437499999 41.902277040963696, -100.45898437499999 47.54687159892238, -92.6806640625 47.54687159892238, -92.6806640625 41.902277040963696, -100.45898437499999 41.902277040963696))
-            if field == '_tmgeom':
-                pills['geometry'] = {'Polygon': filters}
-            elif field in options:
-                label = options[field]['label']
-                try:
-                    pills['Options'][label] = filters
-                except KeyError:
-                    pills['Options'] = {label: filters}
-            else:
-
-                try:
-                    label = field_labels[field]
-                except KeyError:
-                    label = field
-
-                try:
-                    pills[label][value] = filters
-                except KeyError:
-                    pills[label] = {value: filters}
-
-    # Remove the field group key, if it exists
-    pills.pop(FIELD_DISPLAY_FILTER, None)
-    return pills
-
-
 def get_allowed_view_types(resource, package):
     """
     Overwrite ckan.lib.helpers.get_allowed_view_types
@@ -758,7 +497,7 @@ def get_allowed_view_types(resource, package):
     @return:
     """
 
-    view_types = ckan_get_allowed_view_types(resource, package)
+    view_types = h.get_allowed_view_types(resource, package)
     blacklisted_types = ['image']
 
     filtered_types = []
@@ -939,39 +678,6 @@ def group_fields_have_data(record_dict, fields):
             return True
 
 
-def indexlot_material_details(record_dict):
-    """
-    Parse the material details into an array, with first column the header
-    @param record_dict:
-    @return:
-    """
-
-    material_details = []
-
-    material_detail_fields = [
-        'Material count',
-        'Material sex',
-        'Material stage',
-        'Material types',
-        'Material primary type no'
-    ]
-
-    # Create a list of lists, containing field and values
-    # First row will be field title
-    for material_detail_field in material_detail_fields:
-        if record_dict[material_detail_field]:
-            field_values = record_dict[material_detail_field].split(';')
-            if field_values:
-                label = material_detail_field.replace('Material', '').strip().capitalize()
-                material_details.append([label] + field_values)
-
-    # Transpose list of values & fill in missing values so they are all the same length
-    if material_details:
-        material_details = map(lambda *row: list(row), *material_details)
-
-    return material_details
-
-
 def get_image_licence_options():
     """
     Return list of image licences
@@ -1033,7 +739,7 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     if default is None:
         default = config.get('ckan.gravatar_default', 'identicon')
 
-    if not default in _VALID_GRAVATAR_DEFAULTS:
+    if not default in h._VALID_GRAVATAR_DEFAULTS:
         # treat the default as a url
         default = urllib.quote(default, safe='')
 
@@ -1074,3 +780,248 @@ def dataset_author_truncate(author_str):
             author_str = _truncate(author_str)
 
     return author_str
+
+
+def get_resource_facets(resource):
+    """
+    Return a list of facets for a particular resource
+    @param resource:
+    @return:
+    """
+    # Number of facets to display
+    num_facets = 10
+    resource_view = resource_view_get_view(resource)
+    # If facets aren't defined in the resource view, then just return
+    if not resource_view.field_facets:
+        return
+    context = {'model': model, 'session': model.Session, 'user': c.user}
+    # Build query parameters for the faceted search
+    # We'll use the same query parameters used in the current request
+    # And then add extras to perform a solr faceted query, returning
+    # facets but zero results (limit=0)
+    query_params = get_query_params()
+
+    # Convert filters to a dictionary as this won't happen automatically
+    # as we're retrieving raw get parameters from get_query_params
+    filters = {}
+    if query_params.get('filters'):
+        for f in query_params.get('filters').split('|'):
+            filter_field, filter_value = f.split(':')
+            filters.setdefault(filter_field, []).append(filter_value)
+
+    search_params = dict(
+        resource_id=resource.get('id'),
+        limit=0,
+        facets=resource_view.field_facets,
+        q=query_params.get('q', None),
+        filters=filters,
+        facets_limit=num_facets + 1,  # Get an extra facet, so we can determine if there are more
+    )
+
+    for field_name in resource_view.field_facets:
+        if h.get_param_int('_%s_limit' % field_name) == 0:
+            search_params.setdefault('facets_field_limit', {})[field_name] = 50
+
+    search = logic.get_action('datastore_search')(context, search_params)
+    facets = []
+
+    # Dictionary of field name => formatter function
+    # Pass facet value to a formatter to get a better facet item label
+    facet_label_formatters = {
+        'collectionCode': get_department
+    }
+
+    # Loop through original facets to ensure order is preserved
+    for field_name in resource_view.field_facets:
+        # Parse the facets into a list of dictionary values, similar to that
+        # Built for the dataset search solr facets
+        active_facet = field_name in filters
+        facet = {
+            'name': field_name,
+            'label': camel_case_to_string(field_name),
+            'facet_values': [],
+            'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
+            'active': active_facet
+        }
+
+        for value, count in search['facets']['facet_fields'][field_name].items():
+            label = value
+            try:
+                label = facet_label_formatters[field_name](label)
+            except KeyError:
+                pass
+            facet['facet_values'].append({
+                'name': value,
+                'label': label,
+                'count': count,
+            })
+
+        facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
+        # If this is the active facet, only show the highest item
+        if active_facet:
+            facet['facet_values'] = facet['facet_values'][:1]
+        # Slice the facet values, so length matches num_facets - need to do this after the key sort
+        if facet['has_more']:
+            facet['facet_values'] = facet['facet_values'][0:num_facets]
+        facets.append(facet)
+
+    return facets
+
+
+def remove_url_filter(field, value, extras=None):
+    """
+    The CKAN built in functions remove_url_param / add_url_param cannot handle
+    multiple filters which are concatenated with |, not separate query params
+    This replaces remove_url_param for filters
+    @param field:
+    @param value:
+    @param extras:
+    @return:
+    """
+
+    # import copy
+    # params = copy.copy(dict(request.params))
+
+    params = dict(request.params)
+    try:
+        del params['filters']
+    except KeyError:
+        pass
+    else:
+        filters = parse_request_filters()
+        if field in filters:
+            # Convert all filters to unicode for ease of comparison
+            filters[field] = map(unicode.lower, filters[field])
+            # Remove the filter value form the current filters
+            value_list = value if isinstance(value, list) else [value]
+            for value_item in value_list:
+                try:
+                    # Try and remove the item from the filters
+                    filters[field].remove(value_item.lower())
+                except ValueError:
+                    continue
+
+            # If the filters values for the field are empty, remove the whole field
+            if not filters[field]:
+                del filters[field]
+
+        # Combine the filters again
+        filter_parts = []
+        for filter_field, filter_values in filters.items():
+            for filter_value in filter_values:
+                filter_parts.append('%s:%s' % (filter_field, filter_value))
+        # If we have filter parts, add them back to the params dict
+        if filter_parts:
+            params['filters'] = '|'.join(filter_parts)
+    return _create_filter_url(params, extras)
+
+
+def add_url_filter(field, value, extras=None):
+    """
+    The CKAN built in functions remove_url_param / add_url_param cannot handle
+    multiple filters which are concatenated with |, not separate query params
+    This replaces remove_url_param for filters
+    @param field:
+    @param field:
+    @param extras:
+    @return:
+    """
+
+    params = dict(request.params)
+    url_filter = '%s:%s' % (field, value)
+    if params.get('filters', None):
+        params['filters'] += '|%s' % url_filter
+    else:
+        params['filters'] = url_filter
+
+    return _create_filter_url(params, extras)
+
+
+def _create_filter_url(params, extras=None):
+    """
+    Helper function to create filter URL
+    @param params:
+    @param extras:
+    @return:
+    """
+    params_no_page = [(k, v) for k, v in params.items() if k != 'page']
+    return h._create_url_with_params(list(params_no_page), extras=extras)
+
+
+def parse_request_filters():
+    """
+    Get the filters from the request object
+    @return:
+    """
+    filter_dict = {}
+
+    try:
+        filter_params = request.params.get('filters').split('|')
+    except AttributeError:
+        return {}
+
+    # Remove empty values form the filter_params
+    filter_params = filter(None, filter_params)
+
+    for filter_param in filter_params:
+        field, value = filter_param.split(':', 1)
+        filter_dict.setdefault(field, []).append(value)
+
+    return filter_dict
+
+
+def get_resource_filter_pills(package, resource, resource_view=None):
+    """
+    Get filter pills
+    We don't want the field group pills - these are handled separately in get_resource_field_groups
+    @param resource:
+    @param package:
+    @return:
+    """
+
+    filter_dict = parse_request_filters()
+    extras = {
+        'id': package['id'],
+        'resource_id': resource['id']
+    }
+
+    pills = []
+
+    for filter_field, filter_value in filter_dict.items():
+        # If the field name stars with an underscore, don't include it in the pills
+        if filter_field.startswith('_'):
+            continue
+        # Remove filter from url function
+        href = remove_url_filter(filter_field, filter_value, extras=extras)
+        pills.append({
+            'label': camel_case_to_string(filter_field),
+            'field': filter_field,
+            'value': ' '.join(filter_value),
+            'href': href
+        })
+
+    return pills
+
+
+def resource_view_get_filterable_fields(resource):
+    """
+
+    @return:
+    """
+    if not resource.get('datastore_active'):
+        return []
+
+    data = {
+        'resource_id': resource['id'],
+        'limit': 0,
+        # As these are for the filters, only get the indexed fields
+        'indexed_only': True
+    }
+    result = logic.get_action('datastore_search')({}, data)
+    fields = [f['id'] for f in result.get('fields', [])]
+    return sorted(fields)
+
+
+def form_select_datastore_field_options(resource, allow_empty=True):
+    fields = h.resource_view_get_fields(resource)
+    return list_to_form_options(fields, allow_empty)

@@ -6,7 +6,6 @@ from ckan.plugins import toolkit
 from ckan.lib.cli import CkanCommand
 from ckanext.datastore.db import _get_engine
 import ckan.model as model
-from ckanext.nhm.model.stats import DatastoreStats
 
 log = logging.getLogger()
 
@@ -24,15 +23,6 @@ class DatastoreCommand(CkanCommand):
         paster datastore replace -i [resource_id] -t [table] -c /etc/ckan/default/development.ini
             Required param: ID of the datastore resource to update
             Required param: str alias
-
-        update-stats - Update datastore stats
-
-        Every time this command is run, the datastore_stats table is updated
-        with record counts from the datastore
-        Needs to run on cron rather than on resource update - as datapusher
-        won't have added records to the datastore
-
-        paster datastore update-stats -c /etc/ckan/default/development.ini
 
     """
     summary = __doc__.split('\n')[0]
@@ -67,8 +57,6 @@ class DatastoreCommand(CkanCommand):
             self.replace()
         elif cmd == 'purge-all':
             self.purge_all()
-        elif cmd == 'update-stats':
-            self.update_stats()
         else:
             print 'Command %s not recognized' % cmd
 
@@ -175,30 +163,3 @@ class DatastoreCommand(CkanCommand):
                             pkg.purge()
                             model.repo.commit_and_remove()
                             print '%s purged' % pkg_dict['name']
-
-
-    def update_stats(self):
-        pkgs = toolkit.get_action('current_package_list_with_resources')(self.context, {'limit': 100})
-        for pkg_dict in pkgs:
-            if pkg_dict['private']:
-                continue
-            if 'resources' in pkg_dict:
-                for resource in pkg_dict['resources']:
-                    # Does this have an activate datastore table?
-                    if resource['url_type'] in ['datastore', 'upload']:
-
-                        try:
-                            result = toolkit.get_action('datastore_search_sql')(self.context, {
-                                'sql': 'SELECT COUNT(*) FROM "%s"' % resource['id']
-                            })
-                        except logic.ValidationError:
-                            log.critical('Update stats error: resource %s does not exist' % resource['id'])
-                        except logic.NotAuthorized:
-                            log.critical('Not authorized to read resource: %s' % resource['id'])
-                        else:
-                            count = result['records'][0]['count']
-                            stats = DatastoreStats(count=count, resource_id=resource['id'])
-                            model.Session.add(stats)
-
-        model.Session.commit()
-        log.info('Stats updated')

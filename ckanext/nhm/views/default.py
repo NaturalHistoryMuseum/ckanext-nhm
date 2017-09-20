@@ -20,6 +20,9 @@ class DefaultView(object):
     format = None
 
     field_groups = {}
+    field_facets = []
+
+    filter_options = {}
 
     # Default columns to show in grid
     grid_default_columns = []

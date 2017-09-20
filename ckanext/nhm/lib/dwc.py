@@ -10,6 +10,7 @@ import sys
 import os
 from collections import OrderedDict
 
+
 def dwc_terms(fields):
     """
     Get DwC terms and groups, parsed from tdwg_dwcterms

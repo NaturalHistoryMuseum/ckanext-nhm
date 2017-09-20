@@ -4,6 +4,7 @@
     {% with items = items or h.get_facet_items_dict(name) %}
         {% if items %}
             <nav>
+
                 <ul class="{{ nav_class or 'unstyled nav nav-simple nav-facet' }}">
                     {% for item in items %}
                         {% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}

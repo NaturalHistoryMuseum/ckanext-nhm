@@ -1,0 +1,11 @@
+{% ckan_extends %}
+
+{% block page %}
+  {{ super() }}
+  <div data-module="list"
+       data-module-resource = "{{ h.dump_json(resource_json) }}"
+       data-module-resource-view = "{{ h.dump_json(resource_view_json) }}"
+  >
+  </div>
+  {% resource 'ckanext-list/main' %}
+{% endblock %}

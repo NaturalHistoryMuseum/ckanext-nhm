@@ -1,0 +1,102 @@
+{% extends "record/view.html" %}
+
+{% block record_data %}
+
+    <table>
+
+        {% for group, fields in c.field_groups.items() %}
+
+            {% if h.group_fields_have_data(c.record_dict, fields.keys()) %}
+
+                <thead>
+                    <tr><th colspan="4">{{ group }}</th></tr>
+                </thead>
+
+                <tbody>
+                    {% for field, label in fields.items() %}
+
+                        {% if c.record_dict[field] %}
+
+                            <tr>
+
+                                <td><strong>{{ label }}:</strong></td>
+                                <td colspan="3">
+
+                                    {% if field == 'determinations' %}
+                                        {% if c.record_dict['determinations'] %}
+
+                                            <table id="determinations" width="100%">
+
+                                                <tr>
+                                                    {% for label in c.record_dict['determination_labels'] %}
+                                                        <th class="{{ label|lower }}">{{ label }}</th>
+                                                    {% endfor %}
+                                                </tr>
+
+                                                {% for i in range(0, c.record_dict['determinations']['_len']) %}
+                                                    <tr>
+                                                        {% for label in c.record_dict['determination_labels'] %}
+                                                            <td>{% if c.record_dict['determinations'][label][i] %}{{ c.record_dict['determinations'][label][i] }}{% endif %}</td>
+                                                        {% endfor %}
+                                                    </tr>
+                                                {% endfor %}
+
+                                            </table>
+                                        {% endif %}
+
+                                    {% elif field == 'collectionCode' %}
+                                        {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
+                                    {% elif field in ['genus', 'specificEpithet'] %}
+                                        <em>{{ c.record_dict[field] }}</em>
+                                    {% else %}
+                                        {{ c.record_dict[field] }}
+                                    {% endif %}
+
+                                </td>
+
+                                <td width="50" class="filterable">
+
+                                    {% if field in c.custom_filters %}
+                                        {% set filter = c.custom_filters[field] %}
+                                    {% else %}
+                                        {% set filter = '%s:%s' % (field, c.record_dict[field]) %}
+                                    {% endif %}
+
+                                    {% if filter %}
+
+                                        <a title="View all records where {{ filter }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters=filter) }}">
+                                            <i class="icon-filter"></i>
+                                        </a>
+
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        {% endif %}
+
+                    {% endfor %}
+                <tbody>
+
+            {% endif %}
+
+        {% endfor %}
+
+    </table>
+
+{% endblock %}
+
+{% block record_additional_information_rows %}
+   <tr>
+    <th scope="row">{{ _('Created') }}</th>
+    <td>{{ h.render_datetime(c.record_dict['created']) }}</td>
+  </tr>
+   <tr>
+    <th scope="row">{{ _('Last updated') }}</th>
+    <td>{{ h.render_datetime(c.record_dict['modified']) }}</td>
+  </tr>
+
+  {{ super() }}
+
+{% endblock %}
+
+
