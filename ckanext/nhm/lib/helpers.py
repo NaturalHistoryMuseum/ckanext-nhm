@@ -166,7 +166,7 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
         return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
-# @cache_region('permanent', 'collection_stats')
+@cache_region('permanent', 'collection_stats')
 def indexlot_count():
     resource_id = get_indexlot_resource_id()
 
@@ -204,7 +204,7 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
-# @cache_region('permanent', 'collection_stats')
+@cache_region('permanent', 'collection_stats')
 def collection_stats():
     """
     Get collection stats, grouped by Collection code
