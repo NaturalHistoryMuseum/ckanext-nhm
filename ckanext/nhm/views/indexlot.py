@@ -27,6 +27,7 @@ class IndexLotView(DefaultView):
 
     field_facets = [
         'family',
+        'type',
         'taxonRank',
         'imageCategory',
         'kindOfMaterial'
