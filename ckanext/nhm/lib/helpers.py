@@ -452,8 +452,8 @@ def get_resource_filter_options(resource, resource_view):
 
     # If this is a gallery view, hide the has image filter
     # Only records with images will be displayed anyway
-    if resource_view['view_type'] == 'gallery':
-        options.pop("_has_image", None)
+    # if resource_view['view_type'] == 'gallery':
+    #     options.pop("_has_image", None)
 
     for filter_def in filter_list:
         try:
