@@ -229,6 +229,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                         query_dict['where'].append(options[o]['sql'])
                 elif 'sql_false' in options[o]:
                     query_dict['where'].append(options[o]['sql_false'])
+            # Remove _f from search
+            if query_dict['filters']:
+                query_dict['filters'].pop("_f", None)
 
         # Enhance the full text search, by adding support for double quoted expressions. We leave the
         # full text search query intact (so we benefit from the full text index) and add an additional
