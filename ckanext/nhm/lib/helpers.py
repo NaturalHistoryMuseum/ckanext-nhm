@@ -52,6 +52,7 @@ re_url_validation = re.compile(
 AUTHOR_MAX_LENGTH = 100
 
 
+@cache_region('permanent', 'collection_stats')
 def get_site_statistics():
     stats = dict()
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
