@@ -23,6 +23,7 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-datasolr.git#egg=ckanext_datasolr
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-statistics.git#egg=ckanext_statistics
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-list.git#egg=ckanext_list
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-solr-heatmap.git#egg=ckanext_solr_heatmap
 pytz==2013.9
 python-memcached==1.53
 lxml==3.4.4
