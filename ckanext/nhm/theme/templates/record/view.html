@@ -84,8 +84,6 @@
 
                     {% block record_data %}
 
-                        {{ filterable_fields }}
-
                         <table>
                             {% for field_name, value in c.field_data.items() %}
                                 {% if h.record_display_field(field_name, value) %}
