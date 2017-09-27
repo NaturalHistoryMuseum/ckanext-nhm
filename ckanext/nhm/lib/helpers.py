@@ -127,7 +127,7 @@ def dataset_categories():
         return []
 
 
-def url_for_collection_view(view_type='recline_grid_view', filters={}):
+def url_for_collection_view(view_type=None, filters={}):
     """
     Return URL to link through to specimen dataset view, with optional search params
     @param view_type: grid to link to - grid or map
@@ -147,7 +147,15 @@ def url_for_indexlot_view():
     return url_for_resource_view(resource_id)
 
 
-def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}):
+def url_for_resource_view(resource_id, view_type=None, filters={}):
+    """
+    Get URL to link to resource view
+    If no view type is specified, the first view will be used
+    @param resource_id:
+    @param view_type:
+    @param filters:
+    @return:
+    """
     context = {'model': model, 'session': model.Session, 'user': c.user}
 
     try:
@@ -158,9 +166,12 @@ def url_for_resource_view(resource_id, view_type='recline_grid_view', filters={}
         if not views:
             return None
 
-        for view in views:
-            if view['view_type'] == view_type:
-                break
+        if not view_type:
+            view = views[0]
+        else:
+            for view in views:
+                if view['view_type'] == view_type:
+                    break
 
         filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
@@ -1009,6 +1020,9 @@ def resource_view_get_filterable_fields(resource):
 
     @return:
     """
+
+    filterable_field_types = ['int', 'text']
+
     if not resource.get('datastore_active'):
         return []
 
@@ -1019,7 +1033,7 @@ def resource_view_get_filterable_fields(resource):
         'indexed_only': True
     }
     result = logic.get_action('datastore_search')({}, data)
-    fields = [f['id'] for f in result.get('fields', [])]
+    fields = [f['id'] for f in result.get('fields', []) if f['type'] in filterable_field_types]
     return sorted(fields)
 
 
