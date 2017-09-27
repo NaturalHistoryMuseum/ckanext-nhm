@@ -50,11 +50,11 @@ class SpecimenView(DefaultView):
             # 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
             'solr': 'decimalLatitude:[* TO *]'
         },
-        '_exclude_centroid': {
-            'label': 'Exclude centroids',
-            # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
-            'solr': 'centroid:false'
-        },
+        # '_exclude_centroid': {
+        #     'label': 'Exclude centroids',
+        #     # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
+        #     'solr': 'centroid:false'
+        # },
         '_exclude_mineralogy': {
             'label': 'Exclude Mineralogy',
             'hide': True,
@@ -299,10 +299,6 @@ class SpecimenView(DefaultView):
 
         # No filters for determinations
         c.custom_filters['determinations'] = None
-
-        # for image in c.images:
-        #     # Create a thumbnail image by replacing preview with thumbnail
-        #     image['thumbnail'] = image['href'].replace('preview', 'thumbnail')
 
         return p.toolkit.render('record/specimen.html')
 
