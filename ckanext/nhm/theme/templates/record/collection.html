@@ -62,7 +62,7 @@
                                         {% set filter = '%s:%s' % (field, c.record_dict[field]) %}
                                     {% endif %}
 
-                                    {% if filter %}
+                                    {% if filter and field in filterable_fields %}
 
                                         <a title="View all records where {{ filter }}" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters=filter) }}">
                                             <i class="icon-filter"></i>

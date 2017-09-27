@@ -3,7 +3,7 @@
 {% set rec = c.record_dict %}
 {% set res = c.resource %}
 {% set pkg = c.pkg_dict or pkg_dict %}
-{% set filter_fields = h.resource_view_get_fields(res) %}
+{% set filterable_fields = h.resource_view_get_filterable_fields(res) %}
 
 {% block head_extras -%}
     {{ super() }}
@@ -84,6 +84,8 @@
 
                     {% block record_data %}
 
+                        {{ filterable_fields }}
+
                         <table>
                             {% for field_name, value in c.field_data.items() %}
                                 {% if h.record_display_field(field_name, value) %}
@@ -100,7 +102,7 @@
                                         </td>
 
                                         <td width="50" class="filterable">
-                                            {% if field_name in filter_fields %}
+                                            {% if field_name in filterable_fields %}
                                                 <a title="View all records where {{ field_name }}={{ value }}"
                                                    href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
                                                     <i class="icon-filter"></i>
