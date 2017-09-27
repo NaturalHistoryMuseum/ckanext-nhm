@@ -1021,7 +1021,7 @@ def resource_view_get_filterable_fields(resource):
     @return:
     """
 
-    filterable_field_types = ['int', 'text']
+    filterable_field_types = ['int', 'text', 'numeric']
 
     if not resource.get('datastore_active'):
         return []
@@ -1032,7 +1032,9 @@ def resource_view_get_filterable_fields(resource):
         # As these are for the filters, only get the indexed fields
         'indexed_only': True
     }
+
     result = logic.get_action('datastore_search')({}, data)
+
     fields = [f['id'] for f in result.get('fields', []) if f['type'] in filterable_field_types]
     return sorted(fields)
 
