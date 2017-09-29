@@ -299,6 +299,7 @@ class SpecimenView(DefaultView):
 
         # No filters for determinations
         c.custom_filters['determinations'] = None
+        c.custom_filters['otherCatalogNumbers'] = None
 
         return p.toolkit.render('record/specimen.html')
 
