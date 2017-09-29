@@ -20,7 +20,11 @@ import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 import logging
 
-from ckanext.nhm.lib.helpers import resource_view_get_filter_options
+from ckanext.nhm.lib.helpers import (
+    resource_view_get_filter_options,
+    # NOTE: Need to import a function with a cached decorator so clear caches works
+    get_site_statistics,
+)
 
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.contact.interfaces import IContact
@@ -378,8 +382,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             # If this is the specimen resource ID, clear the collection stats
             if 'id' in resource:
                 if resource['id'] in [helpers.get_specimen_resource_id(), helpers.get_indexlot_resource_id()]:
+                    log.info('Clearing caches')
                     # Quick and dirty, delete all caches when indexlot or specimens are updated
-                    # TODO: Move to invalidate_cache - need to investigate why that isn't working
                     for _cache in cache_managers.values():
                         _cache.clear()
 
@@ -481,15 +485,3 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'record_id': record['_id']
                 })
         return images
-
-    # def before_show(self, resource_dict):
-    #     # FIXME: To remove!!! Testing only
-    #     from ckanext.nhm.lib.helpers import remove_url_filter
-    #     # extras = {
-    #     #     'id': 'collection-specimens',
-    #     #     'resource_id': resource_dict['id'],
-    #     #     'ver': 3
-    #     # }
-    #     # print('---')
-    #     # print(remove_url_filter('collectionCode', ['min'], extras=extras))
-    #     return resource_dict
