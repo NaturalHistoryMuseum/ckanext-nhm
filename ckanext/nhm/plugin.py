@@ -204,8 +204,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         """
         Shorten author string
         @param pkg_dict:
-        @return: pkg_dict with author field truncated (with HTML!) if necessary
+        @return: pkg_dict with full list of authors renamed to all_authors, and author field truncated (with HTML!) if necessary
         """
+        pkg_dict['all_authors'] = pkg_dict['author']
         pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
         return pkg_dict
 

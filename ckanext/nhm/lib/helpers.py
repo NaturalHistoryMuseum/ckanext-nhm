@@ -780,7 +780,7 @@ def dataset_author_truncate(author_str):
             # Otherwise use the jinja truncate function (may split author name)
             shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
 
-        return literal('%s <abbr title="%s">et al.</abbr>' % (shortened, author_str))
+        return literal('{0} <abbr title="{1}">et al.</abbr>'.format(shortened, author_str))
 
     if len(author_str) > AUTHOR_MAX_LENGTH:
 
