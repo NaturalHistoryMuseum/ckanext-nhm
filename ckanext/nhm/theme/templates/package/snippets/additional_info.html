@@ -9,9 +9,10 @@
         {% endif %}
 
         {% if pkg_dict.author %}
+          {% resource 'ckanext-nhm/expand-authors' %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Author(s)") }}</th>
-            <td class="dataset-details" property="dc:creator">{{ pkg_dict.author }}</td>
+            <td class="dataset-details" property="dc:creator" data-module="expand-authors">{{ pkg_dict.author }}</td>
           </tr>
         {% endif %}
 
