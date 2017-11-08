@@ -818,7 +818,7 @@ def get_resource_facets(resource):
     filters = {}
     if query_params.get('filters'):
         for f in query_params.get('filters').split('|'):
-            filter_field, filter_value = f.split(':')
+            filter_field, filter_value = f.split(':', 1)
             filters.setdefault(filter_field, []).append(filter_value)
 
     search_params = dict(

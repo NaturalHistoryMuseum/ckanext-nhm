@@ -370,6 +370,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IPackageController
     def after_update(self, context, pkg_dict):
+
         """
         If this is the specimen resource, clear memcached
 
@@ -420,8 +421,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         return metadata_dict
 
-    ## IDoi
-    def metadata_to_xml(self, xml_dict, metadata):
+    @staticmethod
+    def metadata_to_xml(xml_dict, metadata):
         if 'contributors' in metadata:
             xml_dict['resource']['contributors'] = {
                 'contributor': [],
@@ -441,6 +442,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         Return info for this plugin
         If resource type is set, only dataset of that type will be available
         :return:
+        @rtype: object
         """
         return {
             'title': 'DwC associated media',
