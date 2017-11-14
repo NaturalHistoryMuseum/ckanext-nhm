@@ -33,6 +33,7 @@ from collections import OrderedDict
 from ckanext.doi.interfaces import IDoi
 from ckanext.datasolr.interfaces import IDataSolr
 from ckanext.gallery.plugins.interfaces import IGalleryImage
+from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 
 get_action = logic.get_action
 unflatten = dictization_functions.unflatten
@@ -388,6 +389,9 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     # Quick and dirty, delete all caches when indexlot or specimens are updated
                     for _cache in cache_managers.values():
                         _cache.clear()
+
+        # Clear the NGINX proxy cache
+        cache_clear_nginx_proxy()
 
     ## IDoi
     def build_metadata(self, pkg_dict, metadata_dict):
