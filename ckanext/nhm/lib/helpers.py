@@ -782,7 +782,7 @@ def dataset_author_truncate(author_str):
 
         return literal('{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened, author_str))
 
-    if len(author_str) > AUTHOR_MAX_LENGTH:
+    if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
         if ';' in author_str:
             author_str = _truncate(author_str, ';')

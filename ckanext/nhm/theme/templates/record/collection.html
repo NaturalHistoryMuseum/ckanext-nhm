@@ -1,5 +1,4 @@
 {% extends "record/view.html" %}
-
 {% block record_data %}
 
     <table>
@@ -46,10 +45,8 @@
 
                                     {% elif field == 'collectionCode' %}
                                         {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
-                                    {% elif field in ['genus', 'specificEpithet'] %}
-                                        <em>{{ c.record_dict[field] }}</em>
                                     {% else %}
-                                        {{ c.record_dict[field] }}
+                                        {% taxonomy field, c.record_dict['collectionCode'], c.record_dict %}{{ c.record_dict[field] }}{% endtaxonomy %}
                                     {% endif %}
 
                                 </td>

@@ -8,6 +8,7 @@ from ckan.lib.helpers import link_to, url_for
 import logging
 import json
 from ckanext.nhm.lib.helpers import resource_view_get_view
+from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
 from ckanext.nhm.views import DarwinCoreView
 
 log = logging.getLogger(__name__)
@@ -169,6 +170,10 @@ class RecordController(base.BaseController):
         self._load_data(package_name, resource_id, record_id)
 
         view_cls = resource_view_get_view(c.resource)
+
+        # Load the taxonomy formatter
+        c.pylons.app_globals.jinja_env.add_extension(
+            TaxonomyFormatExtension)
 
         return view_cls.render_record(c)
 
