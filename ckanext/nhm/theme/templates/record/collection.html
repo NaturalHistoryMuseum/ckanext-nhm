@@ -35,7 +35,11 @@
                                                 {% for i in range(0, c.record_dict['determinations']['_len']) %}
                                                     <tr>
                                                         {% for label in c.record_dict['determination_labels'] %}
-                                                            <td>{% if c.record_dict['determinations'][label][i] %}{{ c.record_dict['determinations'][label][i] }}{% endif %}</td>
+                                                            <td>{% if c.record_dict['determinations'][label][i] %}
+                                                                {% taxonomy 'determinations', c.record_dict['collectionCode'], c.record_dict %}
+                                                                    {{ c.record_dict['determinations'][label][i] }}
+                                                                {% endtaxonomy %}
+                                                                {% endif %}</td>
                                                         {% endfor %}
                                                     </tr>
                                                 {% endfor %}
@@ -46,7 +50,9 @@
                                     {% elif field == 'collectionCode' %}
                                         {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
                                     {% else %}
-                                        {% taxonomy field, c.record_dict['collectionCode'], c.record_dict %}{{ c.record_dict[field] }}{% endtaxonomy %}
+                                        {% taxonomy field, c.record_dict['collectionCode'], c.record_dict %}
+                                            {{ c.record_dict[field] }}
+                                        {% endtaxonomy %}
                                     {% endif %}
 
                                 </td>
