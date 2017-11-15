@@ -42,10 +42,17 @@
             <div class="span12">
                 <p class="filtered-list">
                     {% for pill in filter_pills %}
-                        <span class="facet">{{ pill.label }}:</span>
-                        <span class="filtered pill">{{ pill.value }}
+                <div class="filter">
+                    <div class="facet">{{ pill.label }}:</div>
+                    <div class="filtered pill">
+                        <div class="pill-txt">{{ pill.value }}</div>
+                        <div class="pill-remove">
                             <a href="{{ pill.href }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
-                        </span>
+                        </div>
+                    </div>
+                </div>
+
+
                     {% endfor %}
                 </p>
             </div>

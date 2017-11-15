@@ -51,29 +51,36 @@
   {% endblock %}
 
   {% block search_facets %}
-    {% if facets %}
-      <p class="filter-list">
-        {% for field in facets.fields %}
-          {% set search_facets_items = facets.search.get(field)['items'] %}
-          {% set label_function = h.get_facet_label_function(field, multi=True) %}
-          <span class="facet">{{ facets.titles.get(field) }}:</span>
-          {% for value in facets.fields[field] %}
-            <span class="filtered pill">
-              {%- if facets.translated_fields and facets.translated_fields.has_key((field,value)) -%}
-                {{ facets.translated_fields[(field,value)] }}
-              {%- else -%}
-                {% if label_function %}
-                  {{ label_function(search_facets_items, value) }}
-                {% else %}
-                  {{ h.list_dict_filter(search_facets_items, 'name', 'display_name', value) }}
-                {% endif %}
-              {%- endif %}
-              <a href="{{ facets.remove_field(field, value) }}" class="remove" title="{{ _('Remove') }}"><i class="icon-remove"></i></a>
-            </span>
-          {% endfor %}
-        {% endfor %}
-      </p>
-    {% endif %}
+  {% if facets %}
+  <p class="filter-list">
+    {% for field in facets.fields %}
+    {% set search_facets_items = facets.search.get(field)['items'] %}
+    {% set label_function = h.get_facet_label_function(field, multi=True) %}
+  <div class="filter">
+    <div class="facet">{{ facets.titles.get(field) }}:</div>
+    {% for value in facets.fields[field] %}
+    <div class="filtered pill">
+
+      <div class="pill-txt">{%- if facets.translated_fields and facets.translated_fields.has_key((field,value)) -%}
+        {{ facets.translated_fields[(field,value)] }}
+        {%- else -%}
+        {% if label_function %}
+        {{ label_function(search_facets_items, value) }}
+        {% else %}
+        {{ h.list_dict_filter(search_facets_items, 'name', 'display_name', value) }}
+        {% endif %}
+        {%- endif %}
+      </div>
+      <div class="pill-remove">
+        <a href="{{ facets.remove_field(field, value) }}" class="remove" title="{{ _('Remove') }}"><i
+                class="icon-remove"></i></a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+  </p>
+  {% endif %}
   {% endblock %}
 
 </form>
