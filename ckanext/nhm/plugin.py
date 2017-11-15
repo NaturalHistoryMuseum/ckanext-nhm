@@ -19,6 +19,7 @@ import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
 import ckanext.nhm.lib.helpers as helpers
 import logging
+from jinja2 import Environment
 
 from ckanext.nhm.lib.helpers import (
     resource_view_get_filter_options,
@@ -67,7 +68,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IConfigurer
     def update_config(self, config):
-
         # Add template directory - we manually add to extra_template_paths
         # rather than using add_template_directory to ensure it is always used
         # to override templates
