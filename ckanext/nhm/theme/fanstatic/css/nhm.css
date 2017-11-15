@@ -596,16 +596,27 @@ a.btn-danger:hover {
 .pill {
   color: #fff;
   background-color: #656565;
-  max-width: 300px;
+  position: relative;
+  top: 6px;
+}
+.pill .pill-txt {
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  position: relative;
-  top: 6px;
+  float: left;
+}
+.pill .pill-remove {
+  float: right;
+  margin-left: 5px;
 }
 .pill a:hover {
   color: #E0E0E0;
   text-decoration: none;
+}
+.facet,
+.filter {
+  display: inline;
 }
 a.tag {
   color: #fff;
