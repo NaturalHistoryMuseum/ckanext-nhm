@@ -111,7 +111,7 @@ class TaxonomyFormatExtension(Extension):
             self.common_strings['italics'].format: ['specificEpithet', 'genus',
                                                     'subgenus'],
             unicode.lower: ['specificEpithet', 'infraspecificEpithet']}
-        parsed_fields = ['scientificName', 'infraspecificEpithet', 'determinations']
+        parsed_fields = ['scientificName', 'infraspecificEpithet', 'determinations Names']
         return formatted_fields, parsed_fields
 
     @property
@@ -142,7 +142,7 @@ class TaxonomyFormatExtension(Extension):
             self.common_strings['italics'].format: ['specificEpithet', 'genus',
                                                     'subgenus'],
             unicode.lower: ['specificEpithet', 'infraspecificEpithet']}
-        parsed_fields = ['scientificName', 'infraspecificEpithet', 'determinations']
+        parsed_fields = ['scientificName', 'infraspecificEpithet', 'determinations Names']
         return formatted_fields, parsed_fields
 
     @property

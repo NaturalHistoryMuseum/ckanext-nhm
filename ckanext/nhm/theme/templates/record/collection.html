@@ -36,7 +36,7 @@
                                                     <tr>
                                                         {% for label in c.record_dict['determination_labels'] %}
                                                             <td>{% if c.record_dict['determinations'][label][i] %}
-                                                                {% taxonomy 'determinations', c.record_dict['collectionCode'], c.record_dict %}
+                                                                {% taxonomy 'determinations' + label, c.record_dict['collectionCode'], c.record_dict %}
                                                                     {{ c.record_dict['determinations'][label][i] }}
                                                                 {% endtaxonomy %}
                                                                 {% endif %}</td>
