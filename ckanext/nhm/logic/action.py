@@ -18,8 +18,8 @@ _validate = ckan.lib.navl.dictization_functions.validate
 
 log = logging.getLogger(__name__)
 
-def record_show(context, data_dict):
 
+def record_show(context, data_dict):
     """
     Retrieve an individual record
     @param context:
@@ -27,7 +27,8 @@ def record_show(context, data_dict):
     @return:
     """
     # Validate the data
-    context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+    # FIXME: Does this break anything? We're overwriting the context passed into the action??
+    # context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
     schema = context.get('schema', nhm_schema.record_show_schema())
     data_dict, errors = _validate(data_dict, schema, context)
 
@@ -54,7 +55,6 @@ def record_show(context, data_dict):
 
 
 def download_original_image(context, data_dict):
-
     """
     Request an original image from the MAM
     Before sending request, performs a number of checks
@@ -140,7 +140,7 @@ def _image_exists_on_record(resource, record, asset_id):
     except ValueError:
         pass
     else:
-    # Check the asset ID belongs to the record
+        # Check the asset ID belongs to the record
         for image in images:
             url = image.get('identifier', None)
             if asset_id in url:
