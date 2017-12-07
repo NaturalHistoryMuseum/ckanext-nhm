@@ -32,7 +32,9 @@ curl -X PURGE http://data-nlb-stg-1.nhm.ac.uk
 
 Memory intensive function calls are cached with memcached. 
 
+```bash
 echo 'flush_all' | nc localhost 11211
+```
 
 #### Clearing Cache
 
