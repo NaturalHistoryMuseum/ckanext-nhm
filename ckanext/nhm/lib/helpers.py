@@ -781,7 +781,7 @@ def dataset_author_truncate(author_str):
             shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
 
         try:
-            return literal('{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened, author_str))
+            return literal(u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened, author_str))
         except UnicodeEncodeError:
             return author_str
 
