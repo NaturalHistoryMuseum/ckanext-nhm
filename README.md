@@ -5,7 +5,38 @@ CKAN extension for data.nhm.ac.uk
 
 paster datastore update-stats -c /etc/ckan/default/development.ini
 
+
+
+Caching
+=======
+
+#### NGINX
+
+Datastore API searches are cached by the NGINX proxy.  
+
+To clear the NGINX cache, issue a PURGE HTTP request:
+
+Production: 
+
+```bash
+curl -X PURGE data.nhm.ac.uk
+```
+
+Staging: 
+
+```bash
+curl -X PURGE http://data-nlb-stg-1.nhm.ac.uk
+```
+
+#### Memcached
+
+Memory intensive function calls are cached with memcached. 
+
 echo 'flush_all' | nc localhost 11211
+
+#### Clearing Cache
+
+Caches are cleared on dataset updates see plugin.py:IPackageController
 
 
 Requirements
