@@ -839,7 +839,7 @@ def get_resource_facets(resource):
 
     # Dictionary of field name => formatter function
     # Pass facet value to a formatter to get a better facet item label
-    facet_label_formatters = {
+    facet_field_label_formatters = {
         'collectionCode': get_department
     }
 
@@ -859,7 +859,7 @@ def get_resource_facets(resource):
         for value, count in search['facets']['facet_fields'][field_name].items():
             label = value
             try:
-                label = facet_label_formatters[field_name](label)
+                label = facet_field_label_formatters[field_name](label)
             except KeyError:
                 pass
             facet['facet_values'].append({
