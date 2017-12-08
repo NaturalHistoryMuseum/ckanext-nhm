@@ -7,7 +7,7 @@ import urllib
 
 from beaker.cache import cache_region
 from pylons import config
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from jinja2.filters import do_truncate
 from operator import itemgetter
 from solr import SolrException
@@ -837,6 +837,13 @@ def get_resource_facets(resource):
     search = logic.get_action('datastore_search')(context, search_params)
     facets = []
 
+    # dictionary of facet name => formatter function with camel_case_to_string defined as the default formatting
+    # function and then any overrides for specific edge cases
+    facet_label_formatters = defaultdict(lambda: camel_case_to_string, **{
+        # specific lambda for GBIF to ensure it's capitalised correctly
+        'gbifIssue': lambda _: 'GBIF Issue'
+    })
+
     # Dictionary of field name => formatter function
     # Pass facet value to a formatter to get a better facet item label
     facet_field_label_formatters = {
@@ -850,7 +857,7 @@ def get_resource_facets(resource):
         active_facet = field_name in filters
         facet = {
             'name': field_name,
-            'label': camel_case_to_string(field_name),
+            'label': facet_label_formatters[field_name](field_name),
             'facet_values': [],
             'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
             'active': active_facet
