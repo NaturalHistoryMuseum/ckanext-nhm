@@ -189,7 +189,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         # Add author facet as the first item
         facets_dict = OrderedDict([('author', 'Authors')] + facets_dict.items())
-        facets_dict['creator_user_id'] = 'User'
+        facets_dict['creator_user_id'] = 'Users'
 
         return facets_dict
 
