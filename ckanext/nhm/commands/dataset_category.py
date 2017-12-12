@@ -3,15 +3,16 @@ import logging
 from ckan.plugins import toolkit
 from ckan.lib.cli import CkanCommand
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
+import re
 
 # Dataset type to be automatically added to the vocabulary
 DEFAULT_DATASET_CATEGORIES = [
     'Collections',
     'Corporate',
-    'Library and archives',
-    'Public engagement',
+    'Library and Archives',
+    'Public Engagement',
     'Research',
-    'Citizen science'
+    'Citizen Science'
 ]
 
 class DatasetCategoryCommand(CkanCommand):
@@ -71,8 +72,31 @@ class DatasetCategoryCommand(CkanCommand):
 
         try:
             data = {'id': DATASET_TYPE_VOCABULARY}
-            toolkit.get_action('vocabulary_show')(self.context, data)
-            print("Dataset category vocabulary already exists, skipping.")
+            vocab = toolkit.get_action('vocabulary_show')(self.context, data)
+            missing_categories = [c for c in DEFAULT_DATASET_CATEGORIES if c not in [v['name'] for v in vocab['tags']]]
+            updates = 0
+            for c in missing_categories:
+                matches = [v for v in vocab['tags'] if re.match('(?i)' + c, v['name'])]
+                if len(matches) == 0:
+                    print("Adding tag '{0}'.".format(c))
+                    self._add_tag(vocab['id'], c)
+                else:
+                    matches = matches[0]
+                    try:
+                        ix = vocab['tags'].index(matches)
+                        matches['name'] = c
+                        matches['display_name'] = c
+                        vocab['tags'][ix] = matches
+                        updates += 1
+                        print(
+                        "Updating tag '{0}' to '{1}'.".format(matches['name'],
+                                                              c))
+                    except IndexError:
+                        pass
+            if updates > 0:
+                self._update_vocabulary(vocab)
+            if len(missing_categories) == 0:
+                print("Dataset category vocabulary already exists and is up to date, skipping.")
 
         except toolkit.ObjectNotFound:
 
@@ -128,3 +152,7 @@ class DatasetCategoryCommand(CkanCommand):
         print "Adding tag {0} to vocab '{1}'".format(tag, DATASET_TYPE_VOCABULARY)
         data = {'name': tag, 'vocabulary_id': vocabulary_id}
         toolkit.get_action('tag_create')(self.context, data)
+
+    def _update_vocabulary(self, data):
+        print "Updating vocab '{0}'".format(DATASET_TYPE_VOCABULARY)
+        toolkit.get_action('vocabulary_update')(self.context, data)
