@@ -37,7 +37,7 @@ class DarwinCoreView(DefaultView):
         'class',
         'locality',
         'country',
-        'viceCountry',
+        'viceCounty',
         'recordedBy',
         'typeStatus',
         'catalogNumber',

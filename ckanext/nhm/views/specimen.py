@@ -85,7 +85,7 @@ class SpecimenView(DefaultView):
             ("stateProvince", "State province"),
             ("mine", "Mine"),
             ("miningDistrict", "Mining district"),
-            ("viceCountry", "Vice country"),
+            ("viceCounty", "Vice County"),
             ("country", "Country"),
             ("continent", "Continent"),
             ("island", "Island"),
@@ -195,8 +195,8 @@ class SpecimenView(DefaultView):
             # "Registered weight unit",  # Merged into Registered weight
         ])),
         ("Botany", OrderedDict([
-            ("exsiccati", "Exsiccati"),
-            ("exsiccatiNumber", "Exsiccati number"),
+            ("exsiccata", "Exsiccata"),
+            ("exsiccataNumber", "Exsiccata number"),
             ("plantDescription", "Plant description"),
             ("cultivated", "Cultivated"),
         ])),
