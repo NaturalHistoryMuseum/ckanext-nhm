@@ -111,9 +111,11 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
                         sort: filterName
                     };
 
-                    // Filter the lookup based on already applied filters
-                    if (searchParams['q']) {
-                        query.q = searchParams['q'];
+                    // filter based on the entered term
+                    if (term) {
+                        var q = {};
+                        q[filterName] = term + ":*";
+                        query.q = JSON.stringify(q);
                     }
                     if(searchParams['filters']){
                         query.filters = JSON.stringify(searchParams['filters']);
