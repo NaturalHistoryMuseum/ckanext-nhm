@@ -1049,3 +1049,37 @@ def resource_view_get_filterable_fields(resource):
 def form_select_datastore_field_options(resource, allow_empty=True):
     fields = h.resource_view_get_fields(resource)
     return list_to_form_options(fields, allow_empty)
+
+
+def get_last_resource_update_for_package(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime across all resources in this
+    package. If there is no update time found then 'unknown' is returned. If
+    there is datetime found then it is rendered using the standard ckan helper.
+    :param pkg_dict:        the package dict
+    :param date_format:     date format for the return datetime
+    :return: 'unknown' or a rendered datetime as a string
+    '''
+
+    def get_resource_last_update(resource):
+        '''
+        Given a resource dict, return the most recent update time available from
+        it, or None if there is no update time.
+        :param resource:    the resource dict
+        :return: a datetime or None
+        '''
+        # a list of fields on the resource that should contain update dates
+        fields = [u'last_modified', u'revision_timestamp', u'Created']
+        # find the available update dates on the resource, filter and sort them
+        update_dates = sorted(filter(None, [h._datestamp_to_datetime(resource[field]) for field in fields]))
+        # return the last non-None value, or None
+        return update_dates[-1] if update_dates else None
+
+    # find the latest update date for each resource using the above function and
+    # then find the latest of these
+    dates = sorted(filter(None, [get_resource_last_update(r) for r in pkg_dict[u'resources']]))
+    # the list is ordered in ascending fashion, so return the last element
+    if dates:
+        return h.render_datetime(dates[-1], date_format=date_format)
+    # otherwise there is no update so we return 'unknown'
+    return _('unknown')
