@@ -64,8 +64,9 @@ class ResourceLatestModificationDateTest(unittest.TestCase):
         return {'resources': resources if resources else []}
 
     @staticmethod
-    def resource(last_modified=None, revision_timestamp=None, created=None):
+    def resource(name, last_modified=None, revision_timestamp=None, created=None):
         return {
+            'name': name,
             'last_modified': last_modified,
             'revision_timestamp': revision_timestamp,
             'Created': created
@@ -84,31 +85,35 @@ class ResourceLatestModificationDateTest(unittest.TestCase):
         If the package has one resource, it's latest modification datetime
         should be returned
         '''
+        name = 'r1'
         time = datetime.now()
-        package = self.package([self.resource(last_modified=time)])
+        package = self.package([self.resource(name, last_modified=time)])
         latest = get_last_resource_update_for_package(package, self.date_format)
-        self.assertEqual(time.strftime(self.date_format), latest)
+        self.assertTrue(latest.startswith(time.strftime(self.date_format)))
+        self.assertTrue(name in latest)
 
     def test_package_with_multiple_resources(self):
         '''
         If the package has more than one resource, then the newest update
         datetime from those resources should be returned
         '''
+        name = 'r1'
         time = datetime.now()
         package = self.package([
-            self.resource(last_modified=time - timedelta(hours=1)),
-            self.resource(revision_timestamp=time),
-            self.resource(created=time - timedelta(hours=5))
+            self.resource('r1', last_modified=time - timedelta(hours=1)),
+            self.resource(name, revision_timestamp=time),
+            self.resource('r3', created=time - timedelta(hours=5))
         ])
         latest = get_last_resource_update_for_package(package, self.date_format)
-        self.assertEqual(time.strftime(self.date_format), latest)
+        self.assertTrue(latest.startswith(time.strftime(self.date_format)))
+        self.assertTrue(name in latest)
 
     def test_resource_with_no_dates(self):
         '''
         If the package has a resource, but the resource has no update datetimes
         then 'unknown' should be returned
         '''
-        package = self.package([self.resource()])
+        package = self.package([self.resource('r1')])
         latest = get_last_resource_update_for_package(package)
         self.assertEqual('unknown', latest)
 
@@ -117,13 +122,15 @@ class ResourceLatestModificationDateTest(unittest.TestCase):
         If the package has a resource and the resource has update datetimes,
         then the latest one should be returned
         '''
+        name = 'r1'
         time = datetime.now()
         package = self.package([
-            self.resource(last_modified=time - timedelta(hours=1),
+            self.resource(name, last_modified=time - timedelta(hours=1),
                           revision_timestamp=time,
                           created=time - timedelta(hours=5))])
         latest = get_last_resource_update_for_package(package, self.date_format)
-        self.assertEqual(time.strftime(self.date_format), latest)
+        self.assertTrue(latest.startswith(time.strftime(self.date_format)))
+        self.assertTrue(name in latest)
 
 
 if __name__ == '__main__':

@@ -1058,7 +1058,8 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
     there is datetime found then it is rendered using the standard ckan helper.
     :param pkg_dict:        the package dict
     :param date_format:     date format for the return datetime
-    :return: 'unknown' or a rendered datetime as a string
+    :return: 'unknown' or a string containing the rendered datetime and the
+    resource name
     '''
 
     def get_resource_last_update(resource):
@@ -1070,16 +1071,18 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
         '''
         # a list of fields on the resource that should contain update dates
         fields = [u'last_modified', u'revision_timestamp', u'Created']
-        # find the available update dates on the resource, filter and sort them
-        update_dates = sorted(filter(None, [h._datestamp_to_datetime(resource[field]) for field in fields]))
-        # return the last non-None value, or None
-        return update_dates[-1] if update_dates else None
+        # find the available update dates on the resource and filter out Nones
+        update_dates = filter(None, [h._datestamp_to_datetime(resource[field]) for field in fields])
+        # return the latest non-None value, or None
+        return max(update_dates) if update_dates else None
 
     # find the latest update date for each resource using the above function and
-    # then find the latest of these
-    dates = sorted(filter(None, [get_resource_last_update(r) for r in pkg_dict[u'resources']]))
-    # the list is ordered in ascending fashion, so return the last element
-    if dates:
-        return h.render_datetime(dates[-1], date_format=date_format)
-    # otherwise there is no update so we return 'unknown'
+    # then filter out the ones that don't have an update date available
+    dates_and_names = filter(lambda x: x[0],
+                             [(get_resource_last_update(r), r['name']) for r in pkg_dict[u'resources']])
+    if dates_and_names:
+        # find the most recent date and name combo
+        date, name = max(dates_and_names, key=lambda x: x[0])
+        return '{} ({})'.format(h.render_datetime(date, date_format=date_format), name)
+    # there is no available update so we return 'unknown'
     return _('unknown')
