@@ -1,0 +1,17 @@
+diff --git a/ckanext/reclineview/theme/public/widget.recordcount.js b/ckanext/reclineview/theme/public/widget.recordcount.js
+index b47caca..cc8e8bf 100644
+--- a/ckanext/reclineview/theme/public/widget.recordcount.js
++++ b/ckanext/reclineview/theme/public/widget.recordcount.js
+@@ -20,7 +20,11 @@ my.RecordCount = Backbone.View.extend({
+ 
+   render: function() {
+     var tmplData = this.model.toTemplateJSON();
+-    tmplData.recordCount = tmplData.recordCount || 'Unknown number of';
++    if (isNaN(tmplData.recordCount)) {
++      tmplData.recordCount = 'Unknown number of';
++    } else {
++      tmplData.recordCount = tmplData.recordCount.toLocaleString();
++    }
+     var templated = Mustache.render(this.template, tmplData);
+     this.$el.html(templated);
+   }
