@@ -1049,3 +1049,40 @@ def resource_view_get_filterable_fields(resource):
 def form_select_datastore_field_options(resource, allow_empty=True):
     fields = h.resource_view_get_fields(resource)
     return list_to_form_options(fields, allow_empty)
+
+
+def get_last_resource_update_for_package(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime across all resources in this
+    package. If there is no update time found then 'unknown' is returned. If
+    there is datetime found then it is rendered using the standard ckan helper.
+    :param pkg_dict:        the package dict
+    :param date_format:     date format for the return datetime
+    :return: 'unknown' or a string containing the rendered datetime and the
+    resource name
+    '''
+
+    def get_resource_last_update(resource):
+        '''
+        Given a resource dict, return the most recent update time available from
+        it, or None if there is no update time.
+        :param resource:    the resource dict
+        :return: a datetime or None
+        '''
+        # a list of fields on the resource that should contain update dates
+        fields = [u'last_modified', u'revision_timestamp', u'Created']
+        # find the available update dates on the resource and filter out Nones
+        update_dates = filter(None, [h._datestamp_to_datetime(resource[field]) for field in fields])
+        # return the latest non-None value, or None
+        return max(update_dates) if update_dates else None
+
+    # find the latest update date for each resource using the above function and
+    # then filter out the ones that don't have an update date available
+    dates_and_names = filter(lambda x: x[0],
+                             [(get_resource_last_update(r), r['name']) for r in pkg_dict[u'resources']])
+    if dates_and_names:
+        # find the most recent date and name combo
+        date, name = max(dates_and_names, key=lambda x: x[0])
+        return '{} ({})'.format(h.render_datetime(date, date_format=date_format), name)
+    # there is no available update so we return 'unknown'
+    return _('unknown')

@@ -90,6 +90,10 @@
                 <td>{{ h.render_datetime(pkg_dict.last_modified) or h.render_datetime(pkg_dict.revision_timestamp) or h.render_datetime(pkg_dict.created) or _('unknown') }}</td>
                 </tr>
             <tr>
+                <th scope="row">{{ _('Last resource update') }}</th>
+                <td>{{ h.get_last_resource_update_for_package(pkg_dict) }}</td>
+                </tr>
+            <tr>
                 <th scope="row">{{ _('Created') }}</th>
                 <td>{{ h.render_datetime(pkg_dict.metadata_created) or _('unknown') }}</td>
                 </tr>
