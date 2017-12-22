@@ -67,14 +67,15 @@ class TaxonomyFormatExtension(Extension):
             '(?i)min': self._min, }
 
         # get collection-specific rules
-        for rgx, p in collections.items():
-            if re.match(rgx, collection_code):
-                collection_formatted_fields, collection_parsed_fields = p
-                self.format_to_fields = self._merge(global_formatted_fields,
-                                                    collection_formatted_fields)
-                self.parsed_fields = global_parsed_fields + \
-                                     collection_parsed_fields
-                break
+        if collection_code:
+            for rgx, p in collections.items():
+                if re.match(rgx, collection_code):
+                    collection_formatted_fields, collection_parsed_fields = p
+                    self.format_to_fields = self._merge(global_formatted_fields,
+                                                        collection_formatted_fields)
+                    self.parsed_fields = global_parsed_fields + \
+                                         collection_parsed_fields
+                    break
 
         self.field_to_formats = {
             f: [k for k, v in self.format_to_fields.items() if f in v] for f in
