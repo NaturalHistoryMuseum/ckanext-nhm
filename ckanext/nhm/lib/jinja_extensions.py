@@ -259,10 +259,10 @@ class AuthorParserStage(BaseParserStage):
         '''
         full_author = record_dict['scientificNameAuthorship']
         author_strings = [full_author] + [p.strip() for p in set(
-                re.findall('\(([\w\s]+)\)', full_author) + re.findall(
-                        '([\w.\s]+)', full_author))]
+                re.findall(u'\(([\w\s]+)\)', full_author) + re.findall(
+                        u'([\w.\s]+)', full_author))]
         for a in author_strings:
-            matches = re.search('\s\(?{0}\)?(\s|$)'.format(re.escape(a)), body)
+            matches = re.search(u'\s\(?{0}\)?(\s|$)'.format(re.escape(a)), body)
             return matches.start() if matches else None
 
 
