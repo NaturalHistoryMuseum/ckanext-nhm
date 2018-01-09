@@ -729,7 +729,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     text.append('on the @NHM_London Data Portal')
 
     try:
-        text.append('DOI: %s' % os.path.join('http://dx.doi.org', pkg_dict['doi']))
+        text.append('DOI: %s' % os.path.join('https://doi.org', pkg_dict['doi']))
     except KeyError:
         pass
 
