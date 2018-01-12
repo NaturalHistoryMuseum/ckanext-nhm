@@ -31,10 +31,6 @@
                 <th scope="row">{{ _('Query') }}</th>
                 <td><code>{{ datastore_root_url }}/datastore_search</code></td>
               </tr>
-              <tr>
-                <th scope="row">{{ _('Query (via SQL)') }}</th>
-                <td><code>{{ datastore_root_url }}/datastore_search_sql</code></td>
-              </tr>
 
             </tbody>
           </table>
@@ -57,12 +53,6 @@
           <p>
           <code><a href="{{ datastore_root_url }}/datastore_search?resource_id={{resource_id}}&q=jones"
               target="_blank">{{ datastore_root_url }}/datastore_search?resource_id={{resource_id}}&q=jones</a></code>
-          </p>
-
-          <strong>{{ _('Query example (via SQL statement)') }}</strong>
-          <p>
-          <code><a href="{{sql_example_url}}"
-              target="_blank">{{sql_example_url}}</a></code>
           </p>
 
         </div>

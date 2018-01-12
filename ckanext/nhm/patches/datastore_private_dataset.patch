@@ -1,0 +1,29 @@
+diff --git a/ckanext/datastore/db.py b/ckanext/datastore/db.py
+index 44db853..a7d3430 100644
+--- a/ckanext/datastore/db.py
++++ b/ckanext/datastore/db.py
+@@ -1254,9 +1254,8 @@ def _change_privilege(context, data_dict, what):
+     ''' We need a transaction for this code to work '''
+     read_only_user = _get_read_only_user(data_dict)
+     if what == 'REVOKE':
+-        sql = u'REVOKE SELECT ON TABLE "{0}" FROM "{1}"'.format(
+-            data_dict['resource_id'],
+-            read_only_user)
++        # don't run the revokes to avoid making private datasets unsable
++        return
+     elif what == 'GRANT':
+         sql = u'GRANT SELECT ON TABLE "{0}" TO "{1}"'.format(
+             data_dict['resource_id'],
+diff --git a/ckanext/datastore/logic/auth.py b/ckanext/datastore/logic/auth.py
+index 73d78e0..b7e5c12 100644
+--- a/ckanext/datastore/logic/auth.py
++++ b/ckanext/datastore/logic/auth.py
+@@ -45,7 +45,7 @@ def datastore_search(context, data_dict):
+ 
+ @p.toolkit.auth_allow_anonymous_access
+ def datastore_search_sql(context, data_dict):
+-    return {'success': True}
++    return {'success': False}
+ 
+ 
+ def datastore_change_permissions(context, data_dict):
