@@ -1,5 +1,4 @@
-
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
 #
 # This file is part of ckanext-nhm
@@ -8,15 +7,16 @@
 from ckanext.dcat.utils import catalog_uri
 from ckanext.nhm.lib.helpers import get_specimen_resource_id
 
+
 def object_uri(record_dict):
-    '''Returns an URI for an object
+    '''Returns an URI for an object.
     
     This will be used to uniquely reference the dataset on the RDF
     serializations.
-    
-    Returns a string with the dataset URI.
 
-    :param record_dict: 
+    :param record_dict: the object
+
+    :returns: a string with the dataset URI
 
     '''
 
@@ -28,8 +28,7 @@ def object_uri(record_dict):
 def rdf_resources():
     '''
 
-
-    :returns: :return:
+    :returns: the specimen resource ID as a list
 
     '''
     # FIXME - Need to add in indexlots and artefacts

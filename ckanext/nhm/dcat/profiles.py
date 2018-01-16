@@ -1,34 +1,22 @@
-
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
+import json
+
 import os
 import rdflib
-import json
-from rdflib.namespace import Namespace, RDF, XSD, RDFS
-from rdflib import URIRef, BNode, Literal
-from rdflib import OWL
-from rdflib.namespace import FOAF, SKOS
-from dateutil.parser import parse as parse_date
-from pylons import request
-
-from ckan.plugins import toolkit
-from ckan.lib.helpers import url_for
-import ckan.lib.base as base
-import ckan.logic as logic
-
-from ckanext.dcat.utils import resource_uri, dataset_uri, catalog_uri
 from ckanext.dcat.profiles import RDFProfile
-
+from ckanext.dcat.utils import catalog_uri, dataset_uri, resource_uri
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.lib.helpers import get_department
-from ckanext.nhm.dcat.utils import rdf_resources
+from dateutil.parser import parse as parse_date
+from rdflib import BNode, Literal, OWL, URIRef
+from rdflib.namespace import FOAF, Namespace, RDF, RDFS, SKOS, XSD
 
-abort = base.abort
-NotFound = logic.NotFound
+from ckan.plugins import toolkit
 
 DC = Namespace(u'http://purl.org/dc/terms/')
 DCAT = Namespace(u'http://www.w3.org/ns/dcat#')
@@ -53,19 +41,22 @@ DQV = Namespace(u'http://www.w3.org/ns/dqv#')
 
 METADATA_LICENCE = u'http://creativecommons.org/publicdomain/zero/1.0/'
 
+
 class NHMDCATProfile(RDFProfile):
     '''An RDF profile for the NHM
     
     http://www.w3.org/2011/gld/wiki/Data_Catalog_Vocabulary/Recipes
     http://rdf-vocabulary.ddialliance.org/discovery.html
 
-
     '''
 
     def _get_update_frequency_code(self, frequency):
-        '''
+        '''Get a standardised representation of an update frequency
+        based on a text description.
 
-        :param frequency: 
+        :param frequency: the text description, e.g. 'daily' or 'annually'
+
+        :returns: a frequency code string if the description was valid; None if not
 
         '''
         freq_codes = {
@@ -74,7 +65,7 @@ class NHMDCATProfile(RDFProfile):
             u'monthly': u'M',
             u'quarterly': u'Q',
             u'annual': u'A',
-        }
+            }
         try:
             return u'freq-%s' % freq_codes[frequency]
         except KeyError:
@@ -82,17 +73,19 @@ class NHMDCATProfile(RDFProfile):
 
     @staticmethod
     def user_uri(id):
-        '''
+        '''Get a URI for a given user.
 
-        :param id: 
+        :param id: the user's ID
+
+        :returns: a URI string
 
         '''
         return u'{0}/user/{1}'.format(catalog_uri().rstrip('/'), id)
 
     def get_context(self):
-        '''Set up context
-        :return: context dict
+        '''Set up context.
 
+        :return: context dict
 
         '''
         user = toolkit.get_action(u'get_site_user')({u'ignore_auth': True}, {})
@@ -125,7 +118,7 @@ class NHMDCATProfile(RDFProfile):
             u'void': VOID,
             u'cc': CC,
             u'org': ORG
-        }
+            }
 
         g = self.g
 
@@ -135,11 +128,13 @@ class NHMDCATProfile(RDFProfile):
         for prefix, namespace in namespaces.iteritems():
             g.bind(prefix, namespace)
 
-        # Add #dataset to the dataset URI to denote the conceptual object - the actual dataset
+        # Add #dataset to the dataset URI to denote the conceptual object - the
+        # actual dataset
         # Without #dataset is the metadata - and that needs CC0 for BBC res
         dataset_uri = URIRef(dataset_ref + u'#dataset')
 
-        # Add dataset description (NB: This isn't the dataset - this is the dataset metadata)
+        # Add dataset description (NB: This isn't the dataset - this is the
+        # dataset metadata)
         dataset_metadata_uri = URIRef(dataset_ref)
         g.add((dataset_metadata_uri, RDF.type, VOID.DatasetDescription))
         g.add((dataset_metadata_uri, CC.license, URIRef(METADATA_LICENCE)))
@@ -147,18 +142,16 @@ class NHMDCATProfile(RDFProfile):
         g.add((dataset_metadata_uri, FOAF.primaryTopic, dataset_uri))
         # If it is possible to access the RDF via dataset name, not uuid
         # In which case add a sameAs for the dataset name uri
-        if dataset_dict[u'name'] in request.environ.get(u'CKAN_CURRENT_URL'):
-            alt_dataset_uri = u'{0}/dataset/{1}'.format(catalog_uri().rstrip('/'), dataset_dict[u'name'])
+        if dataset_dict[u'name'] in toolkit.request.environ.get(u'CKAN_CURRENT_URL'):
+            alt_dataset_uri = u'{0}/dataset/{1}'.format(catalog_uri().rstrip('/'),
+                                                        dataset_dict[u'name'])
             # Add a sameAs link
             g.add((dataset_metadata_uri, OWL.sameAs, URIRef(alt_dataset_uri)))
         # And now we can describe the dataset itself
         g.add((dataset_uri, RDF.type, DCAT.Dataset))
 
         # Basic fields
-        items = [
-            (u'title', DC.title, None),
-            (u'url', DCAT.landingPage, None),
-        ]
+        items = [(u'title', DC.title, None), (u'url', DCAT.landingPage, None), ]
         self._add_triples_from_dict(dataset_dict, dataset_uri, items)
 
         if dataset_dict.get(u'notes', None):
@@ -174,24 +167,23 @@ class NHMDCATProfile(RDFProfile):
             g.add((dataset_uri, DCAT.keyword, Literal(tag[u'name'])))
 
         # Dates
-        items = [
-            (u'issued', DC.issued, [u'metadata_created']),
-            (u'modified', DC.modified, [u'metadata_modified']),
-        ]
+        items = [(u'issued', DC.issued, [u'metadata_created']),
+                 (u'modified', DC.modified, [u'metadata_modified']), ]
         self._add_date_triples_from_dict(dataset_dict, dataset_uri, items)
 
         # We don't have maintainers - whoever added it to the portal is the maintainer
         creator_user_id = dataset_dict[u'creator_user_id']
         user = toolkit.get_action(u'user_show')(context, {
             u'id': creator_user_id,
-        })
+            })
 
         # Add publisher
         nhm_uri = self.graph_add_museum()
 
         if user:
             full_name = user.get(u'fullname', None)
-            # If this is the Natural History Museum user (i.e. admin), just add the contactPoint
+            # If this is the Natural History Museum user (i.e. admin), just add
+            # the contactPoint
             if full_name == u'Natural History Museum':
                 g.add((dataset_uri, DCAT.contactPoint, nhm_uri))
             else:
@@ -241,7 +233,8 @@ class NHMDCATProfile(RDFProfile):
                 author_details = BNode()
                 g.add((author_details, VCARD.fn, Literal(author)))
                 if dataset_dict.get(u'author_email', None):
-                    g.add((author_details, VCARD.hasEmail, Literal(dataset_dict[u'author_email'])))
+                    g.add((author_details, VCARD.hasEmail,
+                           Literal(dataset_dict[u'author_email'])))
                 g.add((author_details, RDF.type, VCARD.Person))
                 g.add((dataset_uri, DC.creator, author_details))
                 affiliation = dataset_dict.get(u'affiliation', None)
@@ -249,7 +242,8 @@ class NHMDCATProfile(RDFProfile):
                     if affiliation == u'Natural History Museum':
                         g.add((author_details, MADS.hasAffiliation, nhm_uri))
                     else:
-                        g.add((author_details, MADS.hasAffiliation, Literal(affiliation)))
+                        g.add((
+                            author_details, MADS.hasAffiliation, Literal(affiliation)))
 
         contributors = dataset_dict.get(u'contributors', None)
         if contributors:
@@ -258,7 +252,7 @@ class NHMDCATProfile(RDFProfile):
         self.graph_add_resources(dataset_uri, dataset_dict)
 
     def graph_add_museum(self):
-        ''' '''
+        '''Add the museum details.'''
 
         g = self.g
         nhm_uri = URIRef(u'http://nhm.ac.uk')
@@ -266,22 +260,23 @@ class NHMDCATProfile(RDFProfile):
         g.add((nhm_uri, RDF.type, FOAF.Organization))
         # Update the name
         g.set((nhm_uri, FOAF.name, Literal(u'Natural History Museum')))
-        # # Add TDWG institution details - http://rs.tdwg.org/ontology/voc/Institution
+        # Add TDWG institution details - http://rs.tdwg.org/ontology/voc/Institution
         g.set((nhm_uri, TDWGI.acronymOrCoden, Literal(u'NHMUK')))
-        g.set((nhm_uri, TDWGI.institutionType, URIRef(u'http://rs.tdwg.org/ontology/voc/InstitutionType#museum')))
+        g.set((nhm_uri, TDWGI.institutionType,
+               URIRef(u'http://rs.tdwg.org/ontology/voc/InstitutionType#museum')))
         # Add AIISO institution
         g.add((nhm_uri, RDF.type, AIISO.Institution))
         # Add same as link
-        g.add((nhm_uri, OWL.sameAs, URIRef(u'http://dbpedia.org/resource/Natural_history_museum')))
+        g.add((nhm_uri, OWL.sameAs,
+               URIRef(u'http://dbpedia.org/resource/Natural_history_museum')))
         g.add((nhm_uri, OWL.sameAs, URIRef(u'https://www.wikidata.org/wiki/Q309388')))
         return nhm_uri
 
-
     def graph_add_resources(self, dataset_uri, dataset_dict):
-        '''
+        '''Add resources to the graph.
 
-        :param dataset_uri: 
-        :param dataset_dict: 
+        :param dataset_uri: the URI of the dataset
+        :param dataset_dict: the data
 
         '''
 
@@ -300,20 +295,15 @@ class NHMDCATProfile(RDFProfile):
             g.add((distribution, RDF.type, DCAT.Distribution))
 
             #  Simple values
-            items = [
-                (u'name', DC.title, None),
-                (u'description', DC.description, None),
-                (u'status', ADMS.status, None),
-                (u'rights', DC.rights, None),
-                (u'license', DC.license, None),
-            ]
+            items = [(u'name', DC.title, None), (u'description', DC.description, None),
+                     (u'status', ADMS.status, None), (u'rights', DC.rights, None),
+                     (u'license', DC.license, None), ]
 
             self._add_triples_from_dict(resource_dict, distribution, items)
 
             # Format
             if '/' in resource_dict.get(u'format', u''):
-                g.add((distribution, DCAT.mediaType,
-                       Literal(resource_dict[u'format'])))
+                g.add((distribution, DCAT.mediaType, Literal(resource_dict[u'format'])))
             else:
                 if resource_dict.get(u'format'):
                     g.add((distribution, DC[u'format'],
@@ -326,10 +316,7 @@ class NHMDCATProfile(RDFProfile):
             g.set((distribution, DCAT.accessURL, distribution))
 
             # Dates
-            items = [
-                (u'issued', DC.issued, None),
-                (u'modified', DC.modified, None),
-            ]
+            items = [(u'issued', DC.issued, None), (u'modified', DC.modified, None), ]
 
             self._add_date_triples_from_dict(resource_dict, distribution, items)
 
@@ -337,19 +324,18 @@ class NHMDCATProfile(RDFProfile):
             if resource_dict.get(u'size'):
                 try:
                     g.add((distribution, DCAT.byteSize,
-                           Literal(float(resource_dict[u'size']),
-                                   datatype=XSD.decimal)))
+                           Literal(float(resource_dict[u'size']), datatype=XSD.decimal)))
                 except (ValueError, TypeError):
-                    g.add((distribution, DCAT.byteSize,
-                           Literal(resource_dict[u'size'])))
+                    g.add((distribution, DCAT.byteSize, Literal(resource_dict[u'size'])))
 
     def graph_from_record(self, record_dict, resource, record_ref):
         '''RDF for an individual record - currently this is a specimen record
         
-        Similar approach to: curl -L -H "Accept: application/rdf+ttl" http://data.rbge.org.uk/herb/E00321910
+        Similar approach to: curl -L -H "Accept: application/rdf+ttl"
+        http://data.rbge.org.uk/herb/E00321910
 
-        :param record_dict: param resource:
-        :param record_ref: return:
+        :param record_dict:
+        :param record_ref:
         :param resource: 
 
         '''
@@ -366,7 +352,7 @@ class NHMDCATProfile(RDFProfile):
             u'aiiso': AIISO,
             u'tdwgi': TDWGI,
             u'owl': OWL
-        }
+            }
 
         g = self.g
 
@@ -391,11 +377,14 @@ class NHMDCATProfile(RDFProfile):
         # This metadata describes #dataset
         g.add((record_ref, FOAF.primaryTopic, object_uri))
         # Add the de-referenced link to record
-        record_link = url_for(u'record', action=u'view', package_name=package_id, resource_id=resource.id, record_id=record_dict[u'_id'], qualified=True)
+        record_link = toolkit.url_for(u'record', action=u'view', package_name=package_id,
+                                      resource_id=resource.id,
+                                      record_id=record_dict[u'_id'], qualified=True)
         g.add((record_ref, DC.hasVersion, URIRef(record_link)))
         # Add institution properties
         g.add((record_ref, FOAF.organization, nhm_uri))
-        g.add((record_ref, AIISO.Department, Literal(get_department(record_dict[u'collectionCode']))))
+        g.add((record_ref, AIISO.Department,
+               Literal(get_department(record_dict[u'collectionCode']))))
 
         try:
             sub_dept = record_dict.pop(u'subDepartment')
@@ -413,23 +402,26 @@ class NHMDCATProfile(RDFProfile):
             else:
                 # Parse into data format, and add as dates
                 _date = parse_date(value)
-                g.add((record_ref, getattr(DWC, term), Literal(_date.isoformat(), datatype=XSD.dateTime)))
+                g.add((record_ref, getattr(DWC, term),
+                       Literal(_date.isoformat(), datatype=XSD.dateTime)))
 
         try:
             gbif_record = toolkit.get_action(u'gbif_record_show')(context, {
                 u'occurrence_id': occurrence_id
-            })
-        except NotFound:
+                })
+        except toolkit.ObjectNotFound:
             gbif_record = {}
         else:
             # Assert equivalence with the GBIF record
-            gbif_uri = os.path.join(u'http://www.gbif.org/occurrence', gbif_record[u'gbifID'])
+            gbif_uri = os.path.join(u'http://www.gbif.org/occurrence',
+                                    gbif_record[u'gbifID'])
             g.add((object_uri, OWL.sameAs, URIRef(gbif_uri)))
             # If we have a GBIF country code, add it
             # Annoyingly, this seems to be the only geographic element on GBIF with URI
             country_code = gbif_record.get(u'gbifCountryCode')
             if country_code:
-                g.add((object_uri, DWC.countryCode, URIRef(os.path.join(u'http://www.gbif.org/country', country_code))))
+                g.add((object_uri, DWC.countryCode, URIRef(
+                        os.path.join(u'http://www.gbif.org/country', country_code))))
 
         # Now, create the specimen object
         # Remove nulls and hidden fields from record_dict
@@ -479,21 +471,25 @@ class NHMDCATProfile(RDFProfile):
         for group, terms in dwc_terms_dict.items():
             for uri, term in terms.items():
                 # Do we have a GBIF key value?
-                # Uppercase first letter of term, and convert to GBIF key format => gbifGenusKey
+                # Uppercase first letter of term and convert to
+                # GBIF key format => gbifGenusKey
                 uc_term = term[0].upper() + term[1:]
                 gbif_term_key = u'gbif%sKey' % uc_term
                 gbif_key = gbif_record.get(gbif_term_key)
 
                 # Do we have a GBIF key value? If we do, we can provide a URI to GBIF
                 if gbif_key:
-                    gbif_uri = URIRef(os.path.join(u'http://www.gbif.org/species', gbif_key))
+                    gbif_uri = URIRef(
+                            os.path.join(u'http://www.gbif.org/species', gbif_key))
                     # Add the GBIF species URI with label
                     g.add((gbif_uri, RDFS.label, Literal(record_dict.get(term))))
                     # And associated our specimen object's DWC term with the GBIF URI
                     g.add((object_uri, getattr(DWC, term), gbif_uri))
                 else:
-                    # We do not have a GBIF key, so no URI: Add the term value as a literal
-                    g.add((object_uri, getattr(DWC, term), Literal(record_dict.get(term))))
+                    # We do not have a GBIF key, so no URI: Add the term value
+                    # as a literal
+                    g.add((object_uri, getattr(DWC, term),
+                           Literal(record_dict.get(term))))
 
         g.add((object_uri, DC.identifier, Literal(record_dict.get(u'uuid'))))
 
@@ -502,14 +498,5 @@ class NHMDCATProfile(RDFProfile):
             for property in properties:
                 dynamic_properties_dict[property] = record_dict.get(property)
         if dynamic_properties_dict:
-            g.add((object_uri, DWC.dynamicProperties, Literal(json.dumps(dynamic_properties_dict))))
-
-        # try:
-        #     dqi = record_dict.pop('dqi')
-        # except KeyError:
-        #     pass
-        # else:
-        #     pass
-        #     # TODO: Add DQV. Currently there are none in use
-        #     # if dqi != 'Unknown':
-        #     #     n = BNode()
+            g.add((object_uri, DWC.dynamicProperties,
+                   Literal(json.dumps(dynamic_properties_dict))))

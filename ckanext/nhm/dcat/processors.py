@@ -1,29 +1,27 @@
-
 #!/usr/bin/env python
 # encoding: utf-8
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from rdflib import URIRef, BNode, Literal
 from ckanext.dcat.processors import RDFSerializer as DCATSerializer
-from ckanext.dcat.utils import catalog_uri, dataset_uri, url_to_rdflib_format
+from ckanext.dcat.utils import url_to_rdflib_format
 from ckanext.nhm.dcat.utils import object_uri
+from rdflib import URIRef
+
 
 class RDFSerializer(DCATSerializer):
-    ''' '''
+    '''Transforms records into RDF formats.'''
 
     def serialize_record(self, record_dict, resource_dict, _format=u'xml'):
-        '''Given a CKAN dataset dict, returns an RDF serialization
-        
-        The serialization format can be defined using the `_format` parameter.
-        It must be one of the ones supported by RDFLib, defaults to `xml`.
-        
-        Returns a string with the serialized dataset
+        '''Given a CKAN dataset dict, returns an RDF serialization.
 
-        :param record_dict: 
-        :param resource_dict: 
-        :param _format:  (Default value = u'xml')
+        :param record_dict: the record data
+        :param resource_dict: the resource data
+        :param _format: the serialisation format to use;
+            must be supported by RDFLib (optional, default: u'xml')
+
+        :returns: a string with the serialized dataset
 
         '''
 
@@ -39,15 +37,15 @@ class RDFSerializer(DCATSerializer):
         return output
 
     def graph_from_record(self, record_dict=None, resource=None):
-        '''Creates a graph for the catalog (CKAN site) using the loaded profiles
+        '''Creates a graph for the catalog (CKAN site) using the loaded profiles.
         
         The class RDFLib graph (accessible via `serializer.g`) will be updated
         by the loaded profiles.
-        
-        Returns the reference to the catalog, which will be an rdflib URIRef.
 
-        :param record_dict:  (Default value = None)
-        :param resource:  (Default value = None)
+        :param record_dict: the record data (optional, default: None)
+        :param resource: the resource data (optional, default: None)
+
+        :returns: the reference to the catalog, which will be an rdflib URIRef
 
         '''
 
