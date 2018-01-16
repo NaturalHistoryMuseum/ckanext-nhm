@@ -1,17 +1,19 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
-import ckan.plugins as p
-from ckan.common import _, g, c
-import ckan.lib.helpers as h
-from ckanext.stats import stats as stats_lib
+from ckan.plugins import toolkit
 
 
-class LegalController(p.toolkit.BaseController):
-    """
-    Controller for displaying about pages
-    """
+class LegalController(toolkit.BaseController):
+    '''Controller for displaying legal pages'''
 
     def privacy(self):
-        return p.toolkit.render('legal/privacy.html', {'title': 'Privacy notice'})
+        '''Render the privacy notice page.'''
+        return toolkit.render(u'legal/privacy.html', {u'title': u'Privacy notice'})
 
     def terms(self):
-        return p.toolkit.render('legal/terms.html', {'title': 'Terms and conditions'})
+        '''Render the terms and conditions page.'''
+        return toolkit.render(u'legal/terms.html', {u'title': u'Terms and conditions'})

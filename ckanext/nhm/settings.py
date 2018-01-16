@@ -1,27 +1,19 @@
+
 #!/usr/bin/env python
 # encoding: utf-8
-"""
-Few module settings which don't really need to go in ini file
-"""
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
-# Contact addresses to route specimen contact request to
-# COLLECTION_CONTACTS = {
-#     'Entomology': 'b.scott@nhm.ac.uk',
-#     'Botany': 'b.scott@nhm.ac.uk',
-#     'Mineralogy': 'b.scott@nhm.ac.uk',
-#     'Palaeontology': 'b.scott@nhm.ac.uk',
-#     'Zoology': 'b.scott@nhm.ac.uk'
-# }
 
-# For live
 COLLECTION_CONTACTS = {
-    'Data Portal / Other': 'data@nhm.ac.uk',
-    'Algae, Fungi & Plants': 'm.carine@nhm.ac.uk',
-    'Economic & Environmental Earth Sciences': 'g.miller@nhm.ac.uk',
-    'Fossil Invertebrates & Plants': 'm.richter@nhm.ac.uk',
-    'Insects': 'g.broad@nhm.ac.uk',
-    'Invertebrates': 'm.lowe@nhm.ac.uk',
-    'Library & Archives': 'library@nhm.ac.uk',
-    'Mineral & Planetary Sciences': 'm.rumsey@nhm.ac.uk',
-    'Vertebrates': 'simon.loader@nhm.ac.uk',
+    u'Data Portal / Other': u'data@nhm.ac.uk',
+    u'Algae, Fungi & Plants': u'm.carine@nhm.ac.uk',
+    u'Economic & Environmental Earth Sciences': u'g.miller@nhm.ac.uk',
+    u'Fossil Invertebrates & Plants': u'm.richter@nhm.ac.uk',
+    u'Insects': u'g.broad@nhm.ac.uk',
+    u'Invertebrates': u'm.lowe@nhm.ac.uk',
+    u'Library & Archives': u'library@nhm.ac.uk',
+    u'Mineral & Planetary Sciences': u'm.rumsey@nhm.ac.uk',
+    u'Vertebrates': u'simon.loader@nhm.ac.uk',
 }

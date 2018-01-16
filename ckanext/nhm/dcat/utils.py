@@ -1,32 +1,36 @@
+
 #!/usr/bin/env python
 # encoding: utf-8
-"""
-Created by 'bens3' on 2013-06-21.
-Copyright (c) 2013 'bens3'. All rights reserved.
-"""
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
 from ckanext.dcat.utils import catalog_uri
 from ckanext.nhm.lib.helpers import get_specimen_resource_id
 
 def object_uri(record_dict):
-    """
-    Returns an URI for an object
-
+    '''Returns an URI for an object
+    
     This will be used to uniquely reference the dataset on the RDF
     serializations.
-
+    
     Returns a string with the dataset URI.
-    """
 
-    uuid = record_dict.get('uuid')
-    uri = '{0}/object/{1}'.format(catalog_uri().rstrip('/'), uuid)
+    :param record_dict: 
+
+    '''
+
+    uuid = record_dict.get(u'uuid')
+    uri = u'{0}/object/{1}'.format(catalog_uri().rstrip('/'), uuid)
     return uri
 
 
 def rdf_resources():
-    """
-    Return list of resource IDs with RDF records
-    :return:
-    """
+    '''
+
+
+    :returns: :return:
+
+    '''
     # FIXME - Need to add in indexlots and artefacts
     return [get_specimen_resource_id()]

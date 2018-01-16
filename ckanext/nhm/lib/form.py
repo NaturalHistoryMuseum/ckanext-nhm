@@ -1,23 +1,24 @@
+
 #!/usr/bin/env python
 # encoding: utf-8
-"""
-Created by 'bens3' on 2013-06-21.
-Copyright (c) 2013 'bens3'. All rights reserved.
-"""
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
 
-def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
-    """
-    Format a list of values into a list of dict suitable for use in forms: [{value: x, name: y}]
-    @param values: list or list of tuples [(value, name)]
-    @param allow_empty: If true, will add none option
-    @param allow_empty_name: Label for none value
-    @return:
-    """
+def list_to_form_options(values, allow_empty=False, allow_empty_text=u'None'):
+    '''Format a list of values into a list of dict suitable for use in forms: [{value: x, name: y}]
+
+    :param values: list or list of tuples [(value, name)]
+    :param allow_empty: If true, will add none option (Default value = False)
+    :param allow_empty_name: Label for none value
+    :param allow_empty_text:  (Default value = u'None')
+
+    '''
     options = []
 
     if allow_empty:
-        options.append({'value': None, 'text': allow_empty_text or None})
+        options.append({u'value': None, u'text': allow_empty_text or None})
 
     for value in values:
 
@@ -28,6 +29,6 @@ def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
             name = value[1]
             value = value[0]
 
-        options.append({'value': value, 'text': name})
+        options.append({u'value': value, u'text': name})
 
     return options

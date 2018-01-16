@@ -1,25 +1,32 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
-import ckan.plugins as p
-from ckan.common import _, g, c
-import ckan.lib.helpers as h
-from ckanext.stats import stats as stats_lib
+from ckan.plugins import toolkit
 
 
-class AboutController(p.toolkit.BaseController):
-    """
-    Controller for displaying about pages
-    """
+class AboutController(toolkit.BaseController):
+    '''Controller for displaying "about" pages.'''
+
     def citation(self):
-        return p.toolkit.render('about/citation.html', {'title': 'Citation and attribution'})
+        '''Render the "about" page for citations and attributions.'''
+        return toolkit.render(u'about/citation.html',
+                              {u'title': u'Citation and attribution'})
 
     def download(self):
-        return p.toolkit.render('about/download.html', {'title': 'Download and API'})
+        '''Render the "about" page for downloads and the API.'''
+        return toolkit.render(u'about/download.html', {u'title': u'Download and API'})
 
     def credits(self):
-        return p.toolkit.render('about/credits.html', {'title': 'Credits'})
+        '''Render the "about" page for credits.'''
+        return toolkit.render(u'about/credits.html', {u'title': u'Credits'})
 
     def privacy(self):
-        return p.toolkit.render('about/privacy.html', {'title': 'Privacy'})
+        '''Render the "about" page for privacy.'''
+        return toolkit.render(u'about/privacy.html', {u'title': u'Privacy'})
 
     def terms(self):
-        return p.toolkit.render('about/terms.html', {'title': 'Terms and conditions'})
+        '''Render the "about" page for terms and conditions.'''
+        return toolkit.render(u'about/terms.html', {u'title': u'Terms and conditions'})

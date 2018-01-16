@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
 import ckan.logic as logic
 import ckan.lib.base as base
 import logging
@@ -19,66 +25,69 @@ get_action = logic.get_action
 
 
 class IndexLotView(DefaultView):
-    """
-    Controller for displaying a specimen record
-    """
+    '''Controller for displaying a specimen record'''
 
-    resource_id = config.get("ckanext.nhm.indexlot_resource_id")
+    resource_id = config.get(u'ckanext.nhm.indexlot_resource_id')
 
     field_facets = [
-        'family',
-        'type',
-        'taxonRank',
-        'imageCategory',
-        'kindOfMaterial'
+        u'family',
+        u'type',
+        u'taxonRank',
+        u'imageCategory',
+        u'kindOfMaterial'
     ]
 
     # Additional search filter options
     filter_options = {
-        '_has_image': {
-            'label': 'Has images',
-            'solr': "_has_multimedia:true"
+        u'_has_image': {
+            u'label': u'Has images',
+            u'solr': u'_has_multimedia:true'
         },
     }
 
     field_groups = OrderedDict([
-        ("Classification", OrderedDict([
-            ("currentScientificName", "Scientific name"),
-            ("scientificNameAuthorship", "Author"),
-            ("kingdom", "Kingdom"),
-            ("phylum", "Phylum"),
-            ("class", "Class"),
-            ("order", "Order"),
-            ("family", "Family"),
-            ("genus", "Genus"),
-            ("subgenus", "Subgenus"),
-            ("specificEpithet", "Species"),
-            ("infraspecificEpithet", "Subspecies"),
-            ("higherClassification", "Higher classification"),
-            ("taxonRank", "Taxon rank"),
+        (u'Classification', OrderedDict([
+            (u'currentScientificName', u'Scientific name'),
+            (u'scientificNameAuthorship', u'Author'),
+            (u'kingdom', u'Kingdom'),
+            (u'phylum', u'Phylum'),
+            (u'class', u'Class'),
+            (u'order', u'Order'),
+            (u'family', u'Family'),
+            (u'genus', u'Genus'),
+            (u'subgenus', u'Subgenus'),
+            (u'specificEpithet', u'Species'),
+            (u'infraspecificEpithet', u'Subspecies'),
+            (u'higherClassification', u'Higher classification'),
+            (u'taxonRank', u'Taxon rank'),
         ])),
-        ("Specimen", OrderedDict([
-            ("type", "Type"),
-            ("media", "Media"),
-            ("british", "British"),
+        (u'Specimen', OrderedDict([
+            (u'type', u'Type'),
+            (u'media', u'Media'),
+            (u'british', u'British'),
         ])),
-        ("Material details", OrderedDict([
-            ("material", "Material"),
-            ("kindOfMaterial", "Kind of material"),
-            ("kindOfMedia", "Kind of media"),
-            ("materialCount", "Count"),
-            ("materialSex", "Sex"),
-            ("materialStage", "Stage"),
-            ("materialTypes", "Types"),
-            ("materialPrimaryTypeNumber", "Primary type number"),
+        (u'Material details', OrderedDict([
+            (u'material', u'Material'),
+            (u'kindOfMaterial', u'Kind of material'),
+            (u'kindOfMedia', u'Kind of media'),
+            (u'materialCount', u'Count'),
+            (u'materialSex', u'Sex'),
+            (u'materialStage', u'Stage'),
+            (u'materialTypes', u'Types'),
+            (u'materialPrimaryTypeNumber', u'Primary type number'),
         ])),
-        ("Record", OrderedDict([
-            ("GUID", "GUID"),
-            ("modified", "Modified"),
-            ("created", "Created"),
+        (u'Record', OrderedDict([
+            (u'GUID', u'GUID'),
+            (u'modified', u'Modified'),
+            (u'created', u'Created'),
         ])),
     ])
 
     def render_record(self, c):
+        '''
+
+        :param c: 
+
+        '''
         c.field_groups = self.field_groups
-        return p.toolkit.render('record/collection.html')
+        return p.toolkit.render(u'record/collection.html')

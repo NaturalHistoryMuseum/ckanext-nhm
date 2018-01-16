@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
 import logging
 import json
 import urllib
@@ -36,10 +42,9 @@ ValidationError = logic.ValidationError
 get_action = logic.get_action
 _check_access = logic.check_access
 
-# Make enumerate available to templates
 enumerate = enumerate
 
-re_dwc_field_label = re.compile('([A-Z]+)')
+re_dwc_field_label = re.compile(u'([A-Z]+)')
 
 re_url_validation = re.compile(
     r'^(?:http)s?://'  # http:// or https://
@@ -48,33 +53,34 @@ re_url_validation = re.compile(
     r'(?::\d+)?'  # optional port
     r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-# Maximum number of characters for the author string
 AUTHOR_MAX_LENGTH = 100
 
 
-@cache_region('permanent', 'collection_stats')
+@cache_region(u'permanent', u'collection_stats')
 def get_site_statistics():
+    ''' '''
     stats = dict()
-    stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
+    stats[u'dataset_count'] = logic.get_action(u'package_search')({}, {u'rows': 1})[u'count']
     # Get a count of all distinct user IDs
-    stats['contributor_count'] = get_contributor_count()
-    dataset_statistics = _get_action('dataset_statistics', {})
-    stats['record_count'] = dataset_statistics.get('total', 0)
+    stats[u'contributor_count'] = get_contributor_count()
+    dataset_statistics = _get_action(u'dataset_statistics', {})
+    stats[u'record_count'] = dataset_statistics.get(u'total', 0)
     return stats
 
 
 def get_contributor_count():
-    return model.Session.execute("SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE state='active'").scalar()
+    ''' '''
+    return model.Session.execute(u"SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE state='active'").scalar()
 
 
 def _get_action(action, params):
-    """
-    Call basic get_action from template
-    @param action:
-    @param params:
-    @return:
-    """
-    context = {'ignore_auth': True, 'for_view': True}
+    '''Call basic get_action from template
+
+    :param action: param params:
+    :param params: 
+
+    '''
+    context = {u'ignore_auth': True, u'for_view': True}
 
     try:
         return get_action(action)(context, params)
@@ -85,82 +91,101 @@ def _get_action(action, params):
 
 
 def get_package(package_id):
-    return _get_action('package_show', {'id': package_id})
+    '''
+
+    :param package_id: 
+
+    '''
+    return _get_action(u'package_show', {u'id': package_id})
 
 
 def get_resource(resource_id):
-    return _get_action('resource_show', {'id': resource_id})
+    '''
+
+    :param resource_id: 
+
+    '''
+    return _get_action(u'resource_show', {u'id': resource_id})
 
 
 def get_record(resource_id, record_id):
-    record = _get_action('record_show', {'resource_id': resource_id, 'record_id': record_id})
-    return record.get('data', None)
+    '''
+
+    :param resource_id: 
+    :param record_id: 
+
+    '''
+    record = _get_action(u'record_show', {u'resource_id': resource_id, u'record_id': record_id})
+    return record.get(u'data', None)
 
 
 def form_select_update_frequency_options():
-    """
-    Get update frequencies as a form list
-    @return:
-    """
+    '''Get update frequencies as a form list'''
     return list_to_form_options(UPDATE_FREQUENCIES)
 
 
 def update_frequency_get_label(value):
-    """
-    Get the label for this update frequency
-    @param value:
-    @return:
-    """
+    '''Get the label for this update frequency
+
+    :param value: return:
+
+    '''
     for v, label in UPDATE_FREQUENCIES:
         if v == value:
             return label
 
 
 def dataset_categories():
-    """
-    Return list of dataset category terms
-    @return: list
-    """
+    '''Return list of dataset category terms
+
+
+    :returns: list
+
+    '''
     try:
-        return toolkit.get_action('tag_list')(data_dict={'vocabulary_id': DATASET_TYPE_VOCABULARY})
-    except toolkit.ObjectNotFound:
+        return toolkit.get_action(u'tag_list')(data_dict={u'vocabulary_id': DATASET_TYPE_VOCABULARY})
+except toolkit.ObjectNotFound:
         return []
 
 
 def url_for_collection_view(view_type=None, filters={}):
-    """
-    Return URL to link through to specimen dataset view, with optional search params
-    @param view_type: grid to link to - grid or map
-    @param kwargs: search filter params
-    @return: url
-    """
+    '''Return URL to link through to specimen dataset view, with optional search params
+
+    :param view_type: grid to link to - grid or map (Default value = None)
+    :param kwargs: search filter params
+    :param filters:  (Default value = {})
+    :returns: url
+
+    '''
     resource_id = get_specimen_resource_id()
     return url_for_resource_view(resource_id, view_type, filters)
 
 
 def url_for_indexlot_view():
-    """
-    Return URL to link through to index lot resource view
-    @return: url
-    """
+    '''Return URL to link through to index lot resource view
+
+
+    :returns: url
+
+    '''
     resource_id = get_indexlot_resource_id()
     return url_for_resource_view(resource_id)
 
 
 def url_for_resource_view(resource_id, view_type=None, filters={}):
-    """
-    Get URL to link to resource view
+    '''Get URL to link to resource view
     If no view type is specified, the first view will be used
-    @param resource_id:
-    @param view_type:
-    @param filters:
-    @return:
-    """
-    context = {'model': model, 'session': model.Session, 'user': c.user}
+
+    :param resource_id: param view_type:
+    :param filters: return: (Default value = {})
+    :param view_type:  (Default value = None)
+
+    '''
+    context = {u'model': model, u'session': model.Session, u'user': c.user}
 
     try:
-        views = toolkit.get_action('resource_view_list')(context, {'id': resource_id})
-    except NotFound:
+        views = toolkit.get_action(u'resource_view_list')(context, {u'id': resource_id})
+except NotFound:
         return None
     else:
         if not views:
@@ -170,137 +195,141 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
             view = views[0]
         else:
             for view in views:
-                if view['view_type'] == view_type:
+                if view[u'view_type'] == view_type:
                     break
 
-        filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
+        filters = u'|'.join([u'%s:%s' % (k, v) for k, v in filters.items()])
 
-        return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
+        return h.url_for(controller=u'package', action=u'resource_read', id=view[u'package_id'], resource_id=view[u'resource_id'], view_id=view[u'id'], filters=filters)
 
 
-@cache_region('permanent', 'collection_stats')
+@cache_region(u'permanent', u'collection_stats')
 def indexlot_count():
+    ''' '''
     resource_id = get_indexlot_resource_id()
 
     if not resource_id:
-        log.error('Please configure index lot resource ID')
+        log.error(u'Please configure index lot resource ID')
 
-    context = {'model': model, 'session': model.Session, 'user': c.user}
+    context = {u'model': model, u'session': model.Session, u'user': c.user}
 
     search_params = dict(
         resource_id=resource_id,
         limit=1,
     )
-    search = logic.get_action('datastore_search')(context, search_params)
-    return delimit_number(search.get('total', 0))
+    search = logic.get_action(u'datastore_search')(context, search_params)
+    return delimit_number(search.get(u'total', 0))
 
 
 def get_nhm_organisation_id():
-    """
-    @return:  ID for the NHM organisation
-    """
-    return config.get("ldap.organization.id")
+    '''
+
+
+    :returns: ID for the NHM organisation
+
+    '''
+    return config.get(u'ldap.organization.id')
 
 
 def get_specimen_resource_id():
-    """
-    @return:  ID for the specimen resource
-    """
-    return config.get("ckanext.nhm.specimen_resource_id")
+    '''
+
+
+    :returns: ID for the specimen resource
+
+    '''
+    return config.get(u'ckanext.nhm.specimen_resource_id')
 
 
 def get_indexlot_resource_id():
-    """
-    @return:  ID for indexlot resource
-    """
-    return config.get("ckanext.nhm.indexlot_resource_id")
+    '''
 
 
-@cache_region('permanent', 'collection_stats')
+    :returns: ID for indexlot resource
+
+    '''
+    return config.get(u'ckanext.nhm.indexlot_resource_id')
+
+
+@cache_region(u'permanent', u'collection_stats')
 def collection_stats():
-    """
-    Get collection stats, grouped by Collection code
-    @return:
-    """
+    '''Get collection stats, grouped by Collection code'''
     resource_id = get_specimen_resource_id()
     total = 0
     collections = OrderedDict()
     search_params = dict(
         resource_id=resource_id,
         limit=0,
-        facets=['collectionCode'],
+        facets=[u'collectionCode'],
         facets_limit=5,  # Get an extra facet, so we can determine if there are more
     )
 
-    context = {'model': model, 'session': model.Session, 'user': c.user}
+    context = {u'model': model, u'session': model.Session, u'user': c.user}
     try:
-        search = logic.get_action('datastore_search')(context, search_params)
+        search = logic.get_action(u'datastore_search')(context, search_params)
     except SolrException:
         pass
     else:
-        for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
+        for collection_code, num in search[u'facets'][u'facet_fields'][u'collectionCode'].items():
             collections[collection_code] = num
             total += num
 
     stats = {
-        'total': total,
-        'collections': collections
+        u'total': total,
+        u'collections': collections
     }
     return stats
 
 
 def get_department(collection_code):
-    """
-    Return a department name for collection code
-    @param collection_code: BOT, PAL etc.,
-    @return: Full department name - Entomology
-    """
+    '''Return a department name for collection code
+
+    :param collection_code: BOT, PAL etc.,
+    :returns: Full department name - Entomology
+
+    '''
     departments = {
-        'bmnh(e)': 'Entomology',
-        'bot': 'Botany',
-        'min': 'Mineralogy',
-        'pal': 'Palaeontology',
-        'zoo': 'Zoology',
+        u'bmnh(e)': u'Entomology',
+        u'bot': u'Botany',
+        u'min': u'Mineralogy',
+        u'pal': u'Palaeontology',
+        u'zoo': u'Zoology',
     }
 
     return departments[collection_code.lower()]
 
 
 def delimit_number(num):
-    """
-    Separate long number into thousands 1000000 => 1,000,000
-    @param num:
-    @return:
-    """
-    return "{:,}".format(num)
+    '''Separate long number into thousands 1000000 => 1,000,000
+
+    :param num: return:
+
+    '''
+    return u'{:,}'.format(num)
 
 
 def api_doc_link():
-    """
-    Link to API documentation
-    @return:
-    """
-    attr = {'class': 'external', 'target': '_blank'}
-    return h.link_to(_('API guide'), 'http://docs.ckan.org/en/latest/api/index.html', **attr)
+    '''Link to API documentation'''
+    attr = {u'class': u'external', u'target': u'_blank'}
+    return h.link_to(_(u'API guide'), u'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 
 def get_google_analytics_config():
-    """
-    Get Google Analytic configuration
-    @return:
-    """
+    '''Get Google Analytic configuration'''
 
     return {
-        'id': config.get("googleanalytics.id"),
-        'domain': config.get("googleanalytics.domain", "auto")
+        u'id': config.get(u'googleanalytics.id'),
+        u'domain': config.get(u'googleanalytics.domain', u'auto')
     }
 
 
 def persistent_follow_button(obj_type, obj_id):
-    '''Return a follow button for the given object type and id.
+    '''
 
-    Replaces ckan.lib.follow_button which returns an empty string for anonymous users
-
+    :param obj_type: 
+    :param obj_id: 
+    :returns: Replaces ckan.lib.follow_button which returns an empty string for anonymous users
+    
     For anon users this function outputs a follow button which links through to the login page
 
     '''
@@ -308,54 +337,54 @@ def persistent_follow_button(obj_type, obj_id):
     assert obj_type in h._follow_objects
 
     if c.user:
-        context = {'model': model, 'session': model.Session, 'user': c.user}
-        action = 'am_following_%s' % obj_type
-        following = logic.get_action(action)(context, {'id': obj_id})
-        return h.snippet('snippets/follow_button.html',
+        context = {u'model': model, u'session': model.Session, u'user': c.user}
+        action = u'am_following_%s' % obj_type
+        following = logic.get_action(action)(context, {u'id': obj_id})
+        return h.snippet(u'snippets/follow_button.html',
                          following=following,
                          obj_id=obj_id,
                          obj_type=obj_type)
 
-    return h.snippet('snippets/anon_follow_button.html',
+    return h.snippet(u'snippets/anon_follow_button.html',
                      obj_id=obj_id,
                      obj_type=obj_type)
 
 
 def filter_resource_items(key):
-    """
-    Filter resource items - if key is in blacklist, return false
-    @param key:
-    @return: boolean
-    """
+    '''Filter resource items - if key is in blacklist, return false
 
-    blacklist = ['image field', 'title field', 'datastore active', 'has views', 'on same domain', 'resource group id', 'revision id', 'url type']
+    :param key: return: boolean
+    :returns: boolean
+
+    '''
+
+    blacklist = [u'image field', u'title field', u'datastore active', u'has views', u'on same domain', u'resource group id', u'revision id', u'url type']
 
     return key.strip() not in blacklist
 
 
 def get_map_styles():
-    """
-    New map config overriding the marker point img
-    @return:
-    """
+    '''New map config overriding the marker point img'''
     return {
-        'point': {
-            'iconUrl': '/images/leaflet/marker.png',
-            'iconSize': [20, 34],
-            'iconAnchor': [12, 30]
+        u'point': {
+            u'iconUrl': '/images/leaflet/marker.png',
+            u'iconSize': [20, 34],
+            u'iconAnchor': [12, 30]
         }
     }
 
 
 def get_query_params():
-    """
-    Helper function to build a dict of query params
+    '''Helper function to build a dict of query params
     To be used in urls for persistent filters
-    @return: dict
-    """
+
+
+    :returns: dict
+
+    '''
     params = dict()
 
-    for key in ['q', 'filters']:
+    for key in [u'q', u'filters']:
         value = request.params.get(key)
         if value:
             params[key] = value
@@ -364,12 +393,12 @@ def get_query_params():
 
 
 def resource_view_get_field_groups(resource):
-    """
-    Return dictionary of field groups
+    '''Return dictionary of field groups
 
-    @param resource: resource dict
-    @return: OrderedDict of fields
-    """
+    :param resource: resource dict
+    :returns: OrderedDict of fields
+
+    '''
     view_cls = resource_view_get_view(resource)
 
     return view_cls.get_field_groups(resource)
@@ -377,11 +406,12 @@ def resource_view_get_field_groups(resource):
 
 # Resource view and filters
 def resource_view_state(resource_view_json, resource_json):
-    """
-    Alter the recline view resource, adding in state info
-    @param resource_view_json:
-    @return:
-    """
+    '''Alter the recline view resource, adding in state info
+
+    :param resource_view_json: return:
+    :param resource_json: 
+
+    '''
     resource_view = json.loads(resource_view_json)
     resource = json.loads(resource_json)
 
@@ -404,61 +434,66 @@ def resource_view_state(resource_view_json, resource_json):
     view = resource_view_get_view(resource)
 
     # And get the state
-    resource_view['state'] = view.get_slickgrid_state()
+    resource_view[u'state'] = view.get_slickgrid_state()
 
     # TODO: This can be merged into get_slickgrid_state
-    resource_view['state']['fitColumns'] = fit_columns
+    resource_view[u'state'][u'fitColumns'] = fit_columns
 
     # ID and DQI always first
-    columns_order = ['_id']
-    if 'gbifIssue' in fields:
-        columns_order.append('gbifIssue')
+    columns_order = [u'_id']
+    if u'gbifIssue' in fields:
+        columns_order.append(u'gbifIssue')
     # Add the rest of the columns to the columns order
     columns_order += [f for f in fields if f not in columns_order]
-    resource_view['state']['columnsOrder'] = list(columns_order)
+    resource_view[u'state'][u'columnsOrder'] = list(columns_order)
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
-            resource_view['state']['columnsWidth'].append(
+            resource_view[u'state'][u'columnsWidth'].append(
                 {
-                    'column': column,
-                    'width': width
+                    u'column': column,
+                    u'width': width
                 }
             )
 
     try:
         return json.dumps(resource_view)
-    except TypeError:
+except TypeError:
         return {}
 
 
 def resource_is_dwc(resource):
-    """
-    Is the resource format DwC?
-    @param resource:
-    @return:
-    """
-    return bool(resource.get('format').lower() == 'dwc')
+    '''Is the resource format DwC?
+
+    :param resource: return:
+
+    '''
+    return bool(resource.get(u'format').lower() == u'dwc')
 
 
 def camel_case_to_string(camel_case_string):
-    s = ' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
+    '''
+
+    :param camel_case_string: 
+
+    '''
+    s = u' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
     return s[0].upper() + s[1:]
 
 
 def get_resource_filter_options(resource, resource_view):
-    """Return the available filter options for the given resource
+    '''Return the available filter options for the given resource
 
-    @type resource: dict
-    @param resource: Dictionary representing a resource
-    @rtype: dict
-    @return: A dictionary associating each option's name to a dict
+    :param resource: Dictionary representing a resource
+    :param resource_view: 
+    :returns: A dictionary associating each option's name to a dict
             defining:
                 - label: The label to display to users;
                 - checked: True if the option is currently applied.
-    """
+
+    '''
     options = resource_view_get_filter_options(resource)
-    filter_list = toolkit.request.params.get('filters', '').split('|')
+    filter_list = toolkit.request.params.get(u'filters', u'').split(u'|')
     filters = {}
 
     # If this is a gallery view, hide the has image filter
@@ -468,7 +503,7 @@ def get_resource_filter_options(resource, resource_view):
 
     for filter_def in filter_list:
         try:
-            (key, value) = filter_def.split(':', 1)
+            (key, value) = filter_def.split(u':', 1)
         except ValueError:
             continue
 
@@ -478,39 +513,39 @@ def get_resource_filter_options(resource, resource_view):
             filters[key].append(value)
     result = {}
     for o in options:
-        if options[o].get('hide', False):
+        if options[o].get(u'hide', False):
             continue
         result[o] = options[o]
-        result[o]['checked'] = o in filters and 'true' in filters[o]
+        result[o][u'checked'] = o in filters and u'true' in filters[o]
     return result
 
 
 def get_resource_gbif_errors(resource):
-    """
-    Return GBIF errors applicable for this resource
+    '''Return GBIF errors applicable for this resource
     i.e. if this the specimen resource, return the gbif errors dict
-    :param resource:
-    :return:
-    """
+
+    :param resource: return:
+
+    '''
 
     # If this is a
-    if resource.get('id') == get_specimen_resource_id():
+    if resource.get(u'id') == get_specimen_resource_id():
         return GBIF_ERRORS
     else:
         return {}
 
 
 def get_allowed_view_types(resource, package):
-    """
-    Overwrite ckan.lib.helpers.get_allowed_view_types
+    '''Overwrite ckan.lib.helpers.get_allowed_view_types
     We want to edit some of the options - remove Image and change Tiled Map to Map
-    @param resource:
-    @param package:
-    @return:
-    """
+
+    :param resource: param package:
+    :param package: 
+
+    '''
 
     view_types = h.get_allowed_view_types(resource, package)
-    blacklisted_types = ['image']
+    blacklisted_types = [u'image']
 
     filtered_types = []
 
@@ -520,8 +555,8 @@ def get_allowed_view_types(resource, package):
             continue
 
         # Rename Tiled map => map
-        if view_type[1] == 'Tiled map':
-            view_type = (view_type[0], 'Map', view_type[2])
+        if view_type[1] == u'Tiled map':
+            view_type = (view_type[0], u'Map', view_type[2])
 
         filtered_types.append(view_type)
 
@@ -529,21 +564,28 @@ def get_allowed_view_types(resource, package):
 
 
 def get_facet_label_function(facet_name, multi=False):
-    """For a given facet, return the function used to fetch the facet's items labels
+    '''For a given facet, return the function used to fetch the facet's items labels
 
-    @param facet_name: Facet name
-    @param multi: If True, the function returned should take a list of facets and a filter value to find the matching
-                  facet on the name field
-    @return: A function or None
-    """
+    :param facet_name: Facet name
+    :param multi: If True, the function returned should take a list of facets and a filter value to find the matching
+                  facet on the name field (Default value = False)
+    :returns: A function or None
+
+    '''
     facet_function = None
-    if facet_name == 'creator_user_id':
+    if facet_name == u'creator_user_id':
         facet_function = get_creator_id_facet_label
 
     if facet_function and multi:
         def filter_facets(facet, filter_value):
+            '''
+
+            :param facet: 
+            :param filter_value: 
+
+            '''
             for f in facet:
-                if f['name'] == filter_value:
+                if f[u'name'] == filter_value:
                     return facet_function(f)
             return filter
 
@@ -553,121 +595,119 @@ def get_facet_label_function(facet_name, multi=False):
 
 
 def get_creator_id_facet_label(facet):
-    """Return display name for the creator_id facet
+    '''Return display name for the creator_id facet
 
-    @param facet: A dictionary representing a single value for the facet
-    @return: A string to use for display name
-    """
+    :param facet: A dictionary representing a single value for the facet
+    :returns: A string to use for display name
+
+    '''
     try:
-        user = model.User.get(facet['name'])
+        user = model.User.get(facet[u'name'])
         display_name = user.display_name
     except (NotFound, AttributeError) as e:
-        display_name = facet['display_name']
+        display_name = facet[u'display_name']
     return display_name
 
 
 def field_name_label(field_name):
-    """
-    Convert a field name into a label - replacing _s and upper casing first character
-    @param field:
-    @return: str label
-    """
-    label = field_name.replace('_', ' ')
+    '''Convert a field name into a label - replacing _s and upper casing first character
+
+    :param field: return: str label
+    :param field_name: 
+    :returns: str label
+
+    '''
+    label = field_name.replace(u'_', u' ')
     label = label[0].upper() + label[1:]
     return label
 
 
 def field_is_link(value):
-    """
-    Is a field a link (starts with http and is a valid URL)
-    @param value:
-    @return: boolean
-    """
+    '''Is a field a link (starts with http and is a valid URL)
+
+    :param value: return: boolean
+    :returns: boolean
+
+    '''
     try:
-        return value.startswith('http') and re_url_validation.match(value)
+        return value.startswith(u'http') and re_url_validation.match(value)
     except Exception:
         pass
     return False
 
 
 def get_contact_form_params(pkg=None, res=None, rec=None):
-    """
-    Get a list of IDS
+    '''Get a list of IDS
 
-    @param pkg:
-    @param res:
-    @param rec:
-    @return:
-    """
+    :param pkg: param res: (Default value = None)
+    :param rec: return: (Default value = None)
+    :param res:  (Default value = None)
+
+    '''
 
     params = {}
 
     if pkg:
-        params['package_id'] = pkg.get('id')
+        params[u'package_id'] = pkg.get(u'id')
 
     if res:
-        params['resource_id'] = res.get('id')
+        params[u'resource_id'] = res.get(u'id')
 
     if rec:
-        params['record_id'] = rec.get('_id')
+        params[u'record_id'] = rec.get(u'_id')
 
     return params
 
 
 def get_contact_form_template_url(params):
-    """
-    Build a URL suitable for linking to the contact form snippet
-
+    '''Build a URL suitable for linking to the contact form snippet
+    
     For example: /api/1/util/snippet/contact_form.html?resource_id=123&record_id456
-
+    
     Can be parsed output from get_contact_form_params
 
-    @param params:
-    @return:
-    """
+    :param params: return:
+
+    '''
 
     url = '/api/1/util/snippet/contact_form.html'
 
     if params:
-        url += '?%s' % urllib.urlencode(params)
+        url += u'?%s' % urllib.urlencode(params)
 
     return url
 
 
 def get_contact_form_department_options():
-    """
-    Contact form category
-    @return:
-    """
+    '''Contact form category'''
     return list_to_form_options(COLLECTION_CONTACTS.keys())
 
 
 def downloadable(resource):
-    """
-    Is a resource downloadable
-    @param resource:
-    @return: bool
-    """
-    return bool(resource['format'])
+    '''Is a resource downloadable
+
+    :param resource: return: bool
+    :returns: bool
+
+    '''
+    return bool(resource[u'format'])
 
 
 def is_sysadmin():
-    """
-    Is user a sysadmin user
-    @return:
-    """
+    '''Is user a sysadmin user'''
     if c.userobj.sysadmin:
         return True
 
 
 def record_display_field(field_name, value):
-    """
-    Decide whether to display a field
+    '''Decide whether to display a field
     Evaluates whether a field has value
-    @param field_name:
-    @param value:
-    @return: bool - true to display field; false not to
-    """
+
+    :param field_name: param value:
+    :param value: 
+    :returns: bool - true to display field; false not to
+
+    '''
 
     # If this is a string, strip it before evaluating
     if isinstance(value, basestring):
@@ -677,13 +717,14 @@ def record_display_field(field_name, value):
 
 
 def group_fields_have_data(record_dict, fields):
-    """
-    Are any of the fields in the group populated
+    '''Are any of the fields in the group populated
     Return true if they are; false if not
-    @param record_dict: record data
-    @param fields: fields to test
-    @return: bool
-    """
+
+    :param record_dict: record data
+    :param fields: fields to test
+    :returns: bool
+
+    '''
 
     for field in fields:
         if record_dict.get(field, None):
@@ -691,103 +732,110 @@ def group_fields_have_data(record_dict, fields):
 
 
 def get_image_licence_options():
-    """
-    Return list of image licences
+    '''Return list of image licences
     Currently this is the same list as dataset licences
-    @return:
-    """
 
-    licenses = [('', '')] + model.Package.get_license_options()
+
+    '''
+
+    licenses = [(u'', u'')] + model.Package.get_license_options()
 
     # Format licences as form options list of dicts
-    return [{'value': value, 'text': text} for text, value in licenses]
+    return [{u'value': value, u'text': text} for text, value in licenses]
 
 
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
-    """
-    Generate social share text for a package
-    @param pkg_dict:
-    @return:
-    """
+    '''Generate social share text for a package
+
+    :param pkg_dict: return: (Default value = None)
+    :param res_dict:  (Default value = None)
+    :param rec_dict:  (Default value = None)
+
+    '''
 
     text = list()
 
     if rec_dict:
 
         try:
-            title = rec_dict.get(res_dict['_title_field'], None) or 'Record %s' % rec_dict['_id']
+            title = rec_dict.get(res_dict[u'_title_field'], None) or u'Record %s' % rec_dict[u'_id']
         except KeyError:
-            title = 'Record %s' % rec_dict['_id']
+            title = u'Record %s' % rec_dict[u'_id']
 
         text.append(title)
 
     elif res_dict:
-        text.append('%s' % (res_dict['name']))
+        text.append(u'%s' % (res_dict[u'name']))
     elif pkg_dict:
-        text.append('%s' % (pkg_dict['title'] or pkg_dict['name']))
+        text.append(u'%s' % (pkg_dict[u'title'] or pkg_dict[u'name']))
 
-    text.append('on the @NHM_London Data Portal')
+    text.append(u'on the @NHM_London Data Portal')
 
     try:
-        text.append('DOI: %s' % os.path.join('http://dx.doi.org', pkg_dict['doi']))
+        text.append(u'DOI: %s' % os.path.join(u'http://dx.doi.org', pkg_dict[u'doi']))
     except KeyError:
         pass
 
-    text = ' '.join(text)
+    text = u' '.join(text)
 
-    return urllib.quote(text.encode('utf8'))
+    return urllib.quote(text.encode(u'utf8'))
 
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
-    """
-    Port of ckan helper gravatar
+    '''Port of ckan helper gravatar
     Adds title text to the image so it passes accessibility checks
-    @param email_hash:
-    @param size:
-    @param default:
-    @param userobj:
-    @return:
-    """
+
+    :param email_hash: param size:
+    :param default: param userobj: (Default value = None)
+    :param size:  (Default value = 100)
+    :param userobj:  (Default value = None)
+
+    '''
     if default is None:
-        default = config.get('ckan.gravatar_default', 'identicon')
+        default = config.get(u'ckan.gravatar_default', u'identicon')
 
     if not default in h._VALID_GRAVATAR_DEFAULTS:
         # treat the default as a url
-        default = urllib.quote(default, safe='')
+        default = urllib.quote(default, safe=u'')
 
-    return literal('''<img alt="%s" src="//gravatar.com/avatar/%s?s=%d&amp;d=%s"
+    return literal(u'''<img alt="%s" src="//gravatar.com/avatar/%s?s=%d&amp;d=%s"
         class="gravatar" width="%s" height="%s" />'''
                    % (userobj.name, email_hash, size, default, size, size)
                    )
 
 
 def dataset_author_truncate(author_str):
-    """
-
-    For author strings with lots of authors need to shorten for display
+    '''For author strings with lots of authors need to shorten for display
     insert et al as abbreviation tag
 
-    @param author_str: dataset author
-    @return: shortened author str, will full text in abbr tag
-    """
+    :param author_str: dataset author
+    :returns: shortened author str, will full text in abbr tag
+
+    '''
 
     def _truncate(author_str, separator=None):
+        '''
+
+        :param author_str: 
+        :param separator:  (Default value = None)
+
+        '''
 
         # If we have a separator, split string on it
         if separator:
-            shortened = ';'.join(author_str.split(separator)[0:4])
+            shortened = u';'.join(author_str.split(separator)[0:4])
         else:
             # Otherwise use the jinja truncate function (may split author name)
-            shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
+            shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end=u'')
 
         return literal(u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened, author_str))
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
-        if ';' in author_str:
-            author_str = _truncate(author_str, ';')
-        elif ',' in author_str:
-            author_str = _truncate(author_str, ',')
+        if u';' in author_str:
+            author_str = _truncate(author_str, u';')
+        elif u',' in author_str:
+            author_str = _truncate(author_str, u',')
         else:
             author_str = _truncate(author_str)
 
@@ -795,18 +843,18 @@ def dataset_author_truncate(author_str):
 
 
 def get_resource_facets(resource):
-    """
-    Return a list of facets for a particular resource
-    @param resource:
-    @return:
-    """
+    '''Return a list of facets for a particular resource
+
+    :param resource: return:
+
+    '''
     # Number of facets to display
     num_facets = 10
     resource_view = resource_view_get_view(resource)
     # If facets aren't defined in the resource view, then just return
     if not resource_view.field_facets:
         return
-    context = {'model': model, 'session': model.Session, 'user': c.user}
+    context = {u'model': model, u'session': model.Session, u'user': c.user}
     # Build query parameters for the faceted search
     # We'll use the same query parameters used in the current request
     # And then add extras to perform a solr faceted query, returning
@@ -816,38 +864,38 @@ def get_resource_facets(resource):
     # Convert filters to a dictionary as this won't happen automatically
     # as we're retrieving raw get parameters from get_query_params
     filters = {}
-    if query_params.get('filters'):
-        for f in query_params.get('filters').split('|'):
-            filter_field, filter_value = f.split(':', 1)
+    if query_params.get(u'filters'):
+        for f in query_params.get(u'filters').split(u'|'):
+            filter_field, filter_value = f.split(u':', 1)
             filters.setdefault(filter_field, []).append(filter_value)
 
     search_params = dict(
-        resource_id=resource.get('id'),
+        resource_id=resource.get(u'id'),
         limit=0,
         facets=resource_view.field_facets,
-        q=query_params.get('q', None),
+        q=query_params.get(u'q', None),
         filters=filters,
         facets_limit=num_facets + 1,  # Get an extra facet, so we can determine if there are more
     )
 
     for field_name in resource_view.field_facets:
-        if h.get_param_int('_%s_limit' % field_name) == 0:
-            search_params.setdefault('facets_field_limit', {})[field_name] = 50
+        if h.get_param_int(u'_%s_limit' % field_name) == 0:
+            search_params.setdefault(u'facets_field_limit', {})[field_name] = 50
 
-    search = logic.get_action('datastore_search')(context, search_params)
+    search = logic.get_action(u'datastore_search')(context, search_params)
     facets = []
 
     # dictionary of facet name => formatter function with camel_case_to_string defined as the default formatting
     # function and then any overrides for specific edge cases
     facet_label_formatters = defaultdict(lambda: camel_case_to_string, **{
         # specific lambda for GBIF to ensure it's capitalised correctly
-        'gbifIssue': lambda _: 'GBIF Issue'
+        u'gbifIssue': lambda _: u'GBIF Issue'
     })
 
     # Dictionary of field name => formatter function
     # Pass facet value to a formatter to get a better facet item label
     facet_field_label_formatters = {
-        'collectionCode': get_department
+        u'collectionCode': get_department
     }
 
     # Loop through original facets to ensure order is preserved
@@ -856,54 +904,54 @@ def get_resource_facets(resource):
         # Built for the dataset search solr facets
         active_facet = field_name in filters
         facet = {
-            'name': field_name,
-            'label': facet_label_formatters[field_name](field_name),
-            'facet_values': [],
-            'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
-            'active': active_facet
+            u'name': field_name,
+            u'label': facet_label_formatters[field_name](field_name),
+            u'facet_values': [],
+            u'has_more': len(search[u'facets'][u'facet_fields'][field_name]) > num_facets and field_name not in search_params.get(u'facets_field_limit', {}),
+            u'active': active_facet
         }
 
-        for value, count in search['facets']['facet_fields'][field_name].items():
+        for value, count in search[u'facets'][u'facet_fields'][field_name].items():
             label = value
             try:
                 label = facet_field_label_formatters[field_name](label)
             except KeyError:
                 pass
-            facet['facet_values'].append({
-                'name': value,
-                'label': label,
-                'count': count,
+            facet[u'facet_values'].append({
+                u'name': value,
+                u'label': label,
+                u'count': count,
             })
 
-        facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
+        facet[u'facet_values'] = sorted(facet[u'facet_values'], key=itemgetter(u'count'), reverse=True)
         # If this is the active facet, only show the highest item
         if active_facet:
-            facet['facet_values'] = facet['facet_values'][:1]
+            facet[u'facet_values'] = facet[u'facet_values'][:1]
         # Slice the facet values, so length matches num_facets - need to do this after the key sort
-        if facet['has_more']:
-            facet['facet_values'] = facet['facet_values'][0:num_facets]
+        if facet[u'has_more']:
+            facet[u'facet_values'] = facet[u'facet_values'][0:num_facets]
         facets.append(facet)
 
     return facets
 
 
 def remove_url_filter(field, value, extras=None):
-    """
-    The CKAN built in functions remove_url_param / add_url_param cannot handle
+    '''The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
-    @param field:
-    @param value:
-    @param extras:
-    @return:
-    """
+
+    :param field: param value:
+    :param extras: return: (Default value = None)
+    :param value: 
+
+    '''
 
     # import copy
     # params = copy.copy(dict(request.params))
 
     params = dict(request.params)
     try:
-        del params['filters']
+        del params[u'filters']
     except KeyError:
         pass
     else:
@@ -928,54 +976,51 @@ def remove_url_filter(field, value, extras=None):
         filter_parts = []
         for filter_field, filter_values in filters.items():
             for filter_value in filter_values:
-                filter_parts.append('%s:%s' % (filter_field, filter_value))
+                filter_parts.append(u'%s:%s' % (filter_field, filter_value))
         # If we have filter parts, add them back to the params dict
         if filter_parts:
-            params['filters'] = '|'.join(filter_parts)
+            params[u'filters'] = u'|'.join(filter_parts)
     return _create_filter_url(params, extras)
 
 
 def add_url_filter(field, value, extras=None):
-    """
-    The CKAN built in functions remove_url_param / add_url_param cannot handle
+    '''The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
-    @param field:
-    @param field:
-    @param extras:
-    @return:
-    """
+
+    :param field: param field:
+    :param extras: return: (Default value = None)
+    :param value: 
+
+    '''
 
     params = dict(request.params)
-    url_filter = '%s:%s' % (field, value)
-    if params.get('filters', None):
-        params['filters'] += '|%s' % url_filter
+    url_filter = u'%s:%s' % (field, value)
+    if params.get(u'filters', None):
+        params[u'filters'] += u'|%s' % url_filter
     else:
-        params['filters'] = url_filter
+        params[u'filters'] = url_filter
 
     return _create_filter_url(params, extras)
 
 
 def _create_filter_url(params, extras=None):
-    """
-    Helper function to create filter URL
-    @param params:
-    @param extras:
-    @return:
-    """
-    params_no_page = [(k, v) for k, v in params.items() if k != 'page']
+    '''Helper function to create filter URL
+
+    :param params: param extras:
+    :param extras:  (Default value = None)
+
+    '''
+    params_no_page = [(k, v) for k, v in params.items() if k != u'page']
     return h._create_url_with_params(list(params_no_page), extras=extras)
 
 
 def parse_request_filters():
-    """
-    Get the filters from the request object
-    @return:
-    """
+    '''Get the filters from the request object'''
     filter_dict = {}
 
     try:
-        filter_params = request.params.get('filters').split('|')
+        filter_params = request.params.get(u'filters').split(u'|')
     except AttributeError:
         return {}
 
@@ -983,69 +1028,77 @@ def parse_request_filters():
     filter_params = filter(None, filter_params)
 
     for filter_param in filter_params:
-        field, value = filter_param.split(':', 1)
+        field, value = filter_param.split(u':', 1)
         filter_dict.setdefault(field, []).append(value)
 
     return filter_dict
 
 
 def get_resource_filter_pills(package, resource, resource_view=None):
-    """
-    Get filter pills
+    '''Get filter pills
     We don't want the field group pills - these are handled separately in get_resource_field_groups
-    @param resource:
-    @param package:
-    @return:
-    """
+
+    :param resource: param package:
+    :param package: 
+    :param resource_view:  (Default value = None)
+
+    '''
 
     filter_dict = parse_request_filters()
     extras = {
-        'id': package['id'],
-        'resource_id': resource['id']
+        u'id': package[u'id'],
+        u'resource_id': resource[u'id']
     }
 
     pills = []
 
     for filter_field, filter_value in filter_dict.items():
         # If the field name stars with an underscore, don't include it in the pills
-        if filter_field.startswith('_'):
+        if filter_field.startswith(u'_'):
             continue
         # Remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
         pills.append({
-            'label': camel_case_to_string(filter_field),
-            'field': filter_field,
-            'value': ' '.join(filter_value),
-            'href': href
+            u'label': camel_case_to_string(filter_field),
+            u'field': filter_field,
+            u'value': u' '.join(filter_value),
+            u'href': href
         })
 
     return pills
 
 
 def resource_view_get_filterable_fields(resource):
-    """
+    '''
 
-    @return:
-    """
+    :param resource: 
 
-    filterable_field_types = ['int', 'text', 'numeric']
+    '''
 
-    if not resource.get('datastore_active'):
+    filterable_field_types = [u'int', u'text', u'numeric']
+
+    if not resource.get(u'datastore_active'):
         return []
 
     data = {
-        'resource_id': resource['id'],
-        'limit': 0,
+        u'resource_id': resource[u'id'],
+        u'limit': 0,
         # As these are for the filters, only get the indexed fields
-        'indexed_only': True
+        u'indexed_only': True
     }
 
-    result = logic.get_action('datastore_search')({}, data)
+    result = logic.get_action(u'datastore_search')({}, data)
 
-    fields = [f['id'] for f in result.get('fields', []) if f['type'] in filterable_field_types]
+    fields = [f[u'id'] for f in result.get(u'fields', []) if f[u'type'] in filterable_field_types]
     return sorted(fields)
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
+    '''
+
+    :param resource: 
+    :param allow_empty:  (Default value = True)
+
+    '''
     fields = h.resource_view_get_fields(resource)
     return list_to_form_options(fields, allow_empty)

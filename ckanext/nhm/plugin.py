@@ -1,5 +1,9 @@
+
 #!/usr/bin/env python
 # encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
 import os
 import re
@@ -42,16 +46,16 @@ Invalid = p.toolkit.Invalid
 
 log = logging.getLogger(__name__)
 
-# The maximum limit for datastore search
 MAX_LIMIT = 5000
 
 
 class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
-    """
-    NHM CKAN modifications
+    '''NHM CKAN modifications
         View individual records in a dataset
         Set up NHM (CKAN) model
-    """
+
+
+    '''
     p.implements(p.IRoutes, inherit=True)
     p.implements(p.IActions, inherit=True)
     p.implements(p.ITemplateHelpers, inherit=True)
@@ -68,61 +72,71 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IConfigurer
     def update_config(self, config):
+        '''
+
+        :param config: 
+
+        '''
         # Add template directory - we manually add to extra_template_paths
         # rather than using add_template_directory to ensure it is always used
         # to override templates
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        template_dir = os.path.join(root_dir, 'ckanext', 'nhm', 'theme', 'templates')
-        config['extra_template_paths'] = ','.join([template_dir, config.get('extra_template_paths', '')])
+        template_dir = os.path.join(root_dir, u'ckanext', u'nhm', u'theme', u'templates')
+        config[u'extra_template_paths'] = u','.join([template_dir, config.get(u'extra_template_paths', u'')])
 
-        p.toolkit.add_public_directory(config, 'theme/public')
-        p.toolkit.add_resource('theme/fanstatic', 'ckanext-nhm')
+        p.toolkit.add_public_directory(config, u'theme/public')
+        p.toolkit.add_resource(u'theme/fanstatic', u'ckanext-nhm')
 
         # Add another public directory for dataset files - this will hopefully be temporary, until DAMS
-        p.toolkit.add_public_directory(config, 'files')
+        p.toolkit.add_public_directory(config, u'files')
 
     ## IRoutes
     def before_map(self, _map):
+        '''
+
+        :param _map: 
+
+        '''
 
         # Add view record
-        _map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                     controller='ckanext.nhm.controllers.record:RecordController',
-                     action='view')
+        _map.connect(u'record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
+                     controller=u'ckanext.nhm.controllers.record:RecordController',
+                     action=u'view')
 
         # Add dwc view
-        _map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
-                     controller='ckanext.nhm.controllers.record:RecordController',
-                     action='dwc')
+        _map.connect(u'dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
+                     controller=u'ckanext.nhm.controllers.record:RecordController',
+                     action=u'dwc')
 
         # About pages
-        _map.connect('about_citation', '/about/citation', controller='ckanext.nhm.controllers.about:AboutController', action='citation')
-        _map.connect('about_download', '/about/download', controller='ckanext.nhm.controllers.about:AboutController', action='download')
-        _map.connect('about_licensing', '/about/licensing', controller='ckanext.nhm.controllers.about:AboutController', action='licensing')
-        _map.connect('about_credits', '/about/credits', controller='ckanext.nhm.controllers.about:AboutController', action='credits')
+        _map.connect(u'about_citation', '/about/citation', controller=u'ckanext.nhm.controllers.about:AboutController', action=u'citation')
+        _map.connect(u'about_download', '/about/download', controller=u'ckanext.nhm.controllers.about:AboutController', action=u'download')
+        _map.connect(u'about_licensing', '/about/licensing', controller=u'ckanext.nhm.controllers.about:AboutController', action=u'licensing')
+        _map.connect(u'about_credits', '/about/credits', controller=u'ckanext.nhm.controllers.about:AboutController', action=u'credits')
 
         # Legal pages
-        _map.connect('legal_privacy', '/privacy', controller='ckanext.nhm.controllers.legal:LegalController', action='privacy')
-        _map.connect('legal_terms', '/terms-conditions', controller='ckanext.nhm.controllers.legal:LegalController', action='terms')
+        _map.connect(u'legal_privacy', '/privacy', controller=u'ckanext.nhm.controllers.legal:LegalController', action=u'privacy')
+        _map.connect(u'legal_terms', '/terms-conditions', controller=u'ckanext.nhm.controllers.legal:LegalController', action=u'terms')
 
         # About stats pages
-        _map.connect('stats_resources', '/about/statistics/resources', controller='ckanext.nhm.controllers.stats:StatsController', action='resources', ckan_icon='bar-chart')
-        _map.connect('stats_contributors', '/about/statistics/contributors', controller='ckanext.nhm.controllers.stats:StatsController', action='contributors', ckan_icon='user')
-        _map.connect('stats_records', '/about/statistics/records', controller='ckanext.nhm.controllers.stats:StatsController', action='records', ckan_icon='file-text')
+        _map.connect(u'stats_resources', '/about/statistics/resources', controller=u'ckanext.nhm.controllers.stats:StatsController', action=u'resources', ckan_icon=u'bar-chart')
+        _map.connect(u'stats_contributors', '/about/statistics/contributors', controller=u'ckanext.nhm.controllers.stats:StatsController', action=u'contributors', ckan_icon=u'user')
+        _map.connect(u'stats_records', '/about/statistics/records', controller=u'ckanext.nhm.controllers.stats:StatsController', action=u'records', ckan_icon=u'file-text')
 
         # Dataset metrics
-        _map.connect('dataset_metrics', '/dataset/metrics/{id}', controller='ckanext.nhm.controllers.stats:StatsController', action='dataset_metrics', ckan_icon='bar-chart')
+        _map.connect(u'dataset_metrics', '/dataset/metrics/{id}', controller=u'ckanext.nhm.controllers.stats:StatsController', action=u'dataset_metrics', ckan_icon=u'bar-chart')
         # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
-        object_controller = 'ckanext.nhm.controllers.object:ObjectController'
+        object_controller = u'ckanext.nhm.controllers.object:ObjectController'
 
-        _map.connect('object_rdf', '/object/{uuid}.{_format}',
-                     controller=object_controller, action='rdf',
-                     requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
+        _map.connect(u'object_rdf', '/object/{uuid}.{_format}',
+                     controller=object_controller, action=u'rdf',
+                     requirements={u'_format': u'xml|rdf|n3|ttl|jsonld'})
 
         # Permalink for specimens - needs to come after the DCAT format dependent
-        _map.connect('object_view', '/object/{uuid}',
+        _map.connect(u'object_view', '/object/{uuid}',
                      controller=object_controller,
-                     action='view')
+                     action=u'view')
 
         # Redirect the old specimen url to the object
         _map.redirect('/specimen/{url:.*}', '/object/{url}')
@@ -130,126 +144,160 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # The DCAT plugin breaks these links if enable content negotiation is enabled
         # because it maps to /dataset/{_id} without excluding these actions
         # So we re=add them here to make sure it's working
-        _map.connect('add dataset', '/dataset/new', controller='package', action='new')
+        _map.connect(u'add dataset', '/dataset/new', controller=u'package', action=u'new')
         _map.connect('/dataset/{action}',
-                     controller='package',
-                     requirements=dict(action='|'.join([
-                         'list',
-                         'autocomplete'
+                     controller=u'package',
+                     requirements=dict(action=u'|'.join([
+                         u'list',
+                         u'autocomplete'
                      ])))
 
         return _map
 
     # IActions
     def get_actions(self):
+        ''' '''
         return {
-            'record_show': nhm_action.record_show,
-            'object_rdf': nhm_action.object_rdf,
-            'download_image': nhm_action.download_original_image
+            u'record_show': nhm_action.record_show,
+            u'object_rdf': nhm_action.object_rdf,
+            u'download_image': nhm_action.download_original_image
         }
 
     # ITemplateHelpers
     def get_helpers(self):
+        ''' '''
 
         h = {}
 
         #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
         for helper in dir(helpers):
             #  Exclude private
-            if not helper.startswith('_'):
+            if not helper.startswith(u'_'):
                 func = getattr(helpers, helper)
 
                 #  Ensure it's a function
-                if hasattr(func, '__call__'):
+                if hasattr(func, u'__call__'):
                     h[helper] = func
         return h
 
     ## IDatasetForm - CKAN Metadata
     def package_types(self):
+        ''' '''
         return []
 
     def is_fallback(self):
+        ''' '''
         return True
 
     def create_package_schema(self):
+        ''' '''
         return nhm_schema.create_package_schema()
 
     def update_package_schema(self):
+        ''' '''
         return nhm_schema.update_package_schema()
 
     def show_package_schema(self):
+        ''' '''
         return nhm_schema.show_package_schema()
 
     ## IFacets
     def dataset_facets(self, facets_dict, package_type):
+        '''
+
+        :param facets_dict: 
+        :param package_type: 
+
+        '''
 
         # Remove organisations and groups
-        del facets_dict['organization']
-        del facets_dict['groups']
+        del facets_dict[u'organization']
+        del facets_dict[u'groups']
 
         # Add author facet as the first item
-        facets_dict = OrderedDict([('author', 'Authors')] + facets_dict.items())
-        facets_dict['creator_user_id'] = 'Users'
+        facets_dict = OrderedDict([(u'author', u'Authors')] + facets_dict.items())
+        facets_dict[u'creator_user_id'] = u'Users'
 
         return facets_dict
 
     ## IPackageController
     def before_search(self, data_dict):
+        '''
+
+        :param data_dict: 
+
+        '''
         # If there's no sort criteria specified, default to promoted and last modified
-        if not data_dict.get('sort', None):
-            data_dict['sort'] = u'promoted asc, metadata_modified desc'
+        if not data_dict.get(u'sort', None):
+            data_dict[u'sort'] = u'promoted asc, metadata_modified desc'
 
         return data_dict
 
     def before_view(self, pkg_dict):
-        """
-        Shorten author string
-        @param pkg_dict:
-        @return: pkg_dict with full list of authors renamed to all_authors, and author field truncated (with HTML!) if necessary
-        """
-        pkg_dict['all_authors'] = pkg_dict['author']
-        pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
+        '''Shorten author string
+
+        :param pkg_dict: return: pkg_dict with full list of authors renamed to all_authors, and author field truncated (with HTML!) if necessary
+        :returns: pkg_dict with full list of authors renamed to all_authors, and author field truncated (with HTML!) if necessary
+
+        '''
+        pkg_dict[u'all_authors'] = pkg_dict[u'author']
+        pkg_dict[u'author'] = helpers.dataset_author_truncate(pkg_dict[u'author'])
         return pkg_dict
 
     ## IDataStore
     def datastore_validate(self, context, data_dict, all_field_ids):
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param all_field_ids: 
+
+        '''
+        if u'filters' in data_dict:
+            resource_show = p.toolkit.get_action(u'resource_show')
+            resource = resource_show(context, {u'id': data_dict[u'resource_id']})
             # Remove both filter options and field groups from filters
             # These will be handled separately
             for option in resource_view_get_filter_options(resource).keys():
-                if option in data_dict['filters']:
-                    del data_dict['filters'][option]
+                if option in data_dict[u'filters']:
+                    del data_dict[u'filters'][option]
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param all_field_ids: 
+        :param query_dict: 
+
+        '''
         # Add our options filters
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
+        if u'filters' in data_dict:
+            resource_show = p.toolkit.get_action(u'resource_show')
+            resource = resource_show(context, {u'id': data_dict[u'resource_id']})
             options = resource_view_get_filter_options(resource)
             for o in options:
-                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
-                    if 'sql' in options[o]:
-                        query_dict['where'].append(options[o]['sql'])
-                elif 'sql_false' in options[o]:
-                    query_dict['where'].append(options[o]['sql_false'])
+                if o in data_dict[u'filters'] and u'true' in data_dict[u'filters'][o]:
+                    if u'sql' in options[o]:
+                        query_dict[u'where'].append(options[o][u'sql'])
+                elif u'sql_false' in options[o]:
+                    query_dict[u'where'].append(options[o][u'sql_false'])
 
         # Remove old field selection _f from search
         try:
-            query_dict['filters'].pop("_f", None)
+            query_dict[u'filters'].pop(u'_f', None)
         except KeyError:
             pass
 
         # Enhance the full text search, by adding support for double quoted expressions. We leave the
         # full text search query intact (so we benefit from the full text index) and add an additional
         # LIKE statement for each quoted group.
-        if 'q' in data_dict and not isinstance(data_dict['q'], dict):
-            for match in re.findall('"[^"]+"', data_dict['q']):
-                query_dict['where'].append((
-                    '"{}"::text LIKE %s'.format(resource['id']),
-                    '%' + match[1:-1] + '%'
+        if u'q' in data_dict and not isinstance(data_dict[u'q'], dict):
+            for match in re.findall(u'"[^"]+"', data_dict[u'q']):
+                query_dict[u'where'].append((
+                    u'"{}"::text LIKE %s'.format(resource[u'id']),
+                    u'%' + match[1:-1] + u'%'
                 ))
 
         self.enforce_max_limit(query_dict)
@@ -258,134 +306,169 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         # problems because of stemming issues, and is quite slow on our data set (even with an
         # appropriate index). We detect this type of queries and replace them with a LIKE query.
         # We also cancel the count query which is not needed for this query and slows things down.
-        if 'q' in data_dict and isinstance(data_dict['q'], dict) and len(data_dict['q']) == 1:
-            field_name = data_dict['q'].keys()[0]
-            if data_dict['fields'] == field_name and data_dict['q'][field_name].endswith(':*'):
-                escaped_field_name = '"' + field_name.replace('"', '') + '"'
-                value = '%' + data_dict['q'][field_name].replace(':*', '%')
+        if u'q' in data_dict and isinstance(data_dict[u'q'], dict) and len(data_dict[u'q']) == 1:
+            field_name = data_dict[u'q'].keys()[0]
+            if data_dict[u'fields'] == field_name and data_dict[u'q'][field_name].endswith(u':*'):
+                escaped_field_name = u'"' + field_name.replace(u'"', u'') + u'"'
+                value = u'%' + data_dict[u'q'][field_name].replace(u':*', u'%')
 
                 query_dict = {
-                    'distinct': True,
-                    'limit': query_dict['limit'],
-                    'offset': query_dict['offset'],
-                    'sort': [escaped_field_name],
-                    'where': [(escaped_field_name + '::citext LIKE %s', value)],
-                    'select': [escaped_field_name],
-                    'ts_query': '',
-                    'count': False
+                    u'distinct': True,
+                    u'limit': query_dict[u'limit'],
+                    u'offset': query_dict[u'offset'],
+                    u'sort': [escaped_field_name],
+                    u'where': [(escaped_field_name + u'::citext LIKE %s', value)],
+                    u'select': [escaped_field_name],
+                    u'ts_query': u'',
+                    u'count': False
                 }
         return query_dict
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param all_field_ids: 
+        :param query_dict: 
+
+        '''
         return query_dict
 
     ## IDataSolr
     def datasolr_validate(self, context, data_dict, field_types):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param field_types: 
+
+        '''
         return self.datastore_validate(context, data_dict, field_types)
 
     def datasolr_search(self, context, data_dict, field_types, query_dict):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param field_types: 
+        :param query_dict: 
+
+        '''
         # Add our custom filters
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
+        if u'filters' in data_dict:
+            resource_show = p.toolkit.get_action(u'resource_show')
+            resource = resource_show(context, {u'id': data_dict[u'resource_id']})
             options = resource_view_get_filter_options(resource)
             for o in options:
-                if o in data_dict['filters'] and 'true' in data_dict['filters'][o] and 'solr' in options[o]:
+                if o in data_dict[u'filters'] and u'true' in data_dict[u'filters'][o] and u'solr' in options[o]:
                     # By default filters are added as {filed_name}:*{value}* but some filters
                     # might require special statements - so add them here
-                    query_dict.setdefault('filter_statements', {})[o] = options[o]['solr']
-        self.enforce_max_limit(query_dict, 'rows')
+                    query_dict.setdefault(u'filter_statements', {})[o] = options[o][u'solr']
+        self.enforce_max_limit(query_dict, u'rows')
         return query_dict
 
     @staticmethod
-    def enforce_max_limit(query_dict, field_name='limit'):
+    def enforce_max_limit(query_dict, field_name=u'limit'):
+        '''
+
+        :param query_dict: 
+        :param field_name:  (Default value = u'limit')
+
+        '''
         limit = query_dict.get(field_name, 0)
         if MAX_LIMIT and limit > MAX_LIMIT:
             query_dict[field_name] = MAX_LIMIT
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
+        '''
+
+        :param mail_dict: 
+        :param data_dict: 
+
+        '''
 
         # Get the submitted data values
-        package_id = data_dict.get('package_id', None)
-        package_name = data_dict.get('package_name', None)
-        resource_id = data_dict.get('resource_id', None)
-        record_id = data_dict.get('record_id', None)
+        package_id = data_dict.get(u'package_id', None)
+        package_name = data_dict.get(u'package_name', None)
+        resource_id = data_dict.get(u'resource_id', None)
+        record_id = data_dict.get(u'record_id', None)
 
-        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
+        context = {u'model': model, u'session': model.Session, u'user': c.user or c.author}
 
         # URL to provide as link to contact email body
         # Over written by linking to record / resource etc., - see below
         url = None
 
         # Has the user selected a department
-        department = data_dict.get('department', None)
+        department = data_dict.get(u'department', None)
 
         # Build dictionary of URLs
         urls = {}
         if package_id:
-            urls['dataset'] = url_for(controller='package', action='read', id=package_id, qualified=True)
+            urls[u'dataset'] = url_for(controller=u'package', action=u'read', id=package_id, qualified=True)
             if resource_id:
-                urls['resource'] = url_for(controller='package', action='resource_read', id=package_id, resource_id=resource_id, qualified=True)
+                urls[u'resource'] = url_for(controller=u'package', action=u'resource_read', id=package_id, resource_id=resource_id, qualified=True)
                 if record_id:
-                    urls['record'] = url_for('record', action='view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
+                    urls[u'record'] = url_for(u'record', action=u'view', package_name=package_id, resource_id=resource_id, record_id=record_id, qualified=True)
 
         # If this is an index lot enquiry, send to entom
-        if package_name == 'collection-indexlots':
-            mail_dict['subject'] = 'Collection Index lot enquiry'
-            mail_dict['recipient_email'] = COLLECTION_CONTACTS['Insects']
-            mail_dict['recipient_name'] = 'Insects'
+        if package_name == u'collection-indexlots':
+            mail_dict[u'subject'] = u'Collection Index lot enquiry'
+            mail_dict[u'recipient_email'] = COLLECTION_CONTACTS[u'Insects']
+            mail_dict[u'recipient_name'] = u'Insects'
         elif department:
             # User has selected the department
             try:
-                mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
+                mail_dict[u'recipient_email'] = COLLECTION_CONTACTS[department]
             except KeyError:
                 # Other/unknown etc., - so don't set recipient email
-                mail_dict['body'] += '\nDepartment: %s\n' % department
+                mail_dict[u'body'] += u'\nDepartment: %s\n' % department
             else:
-                mail_dict['recipient_name'] = department
+                mail_dict[u'recipient_name'] = department
                 mail_dict[
-                    'body'] += '\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(
+                    u'body'] += u'\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(
                     department)
                 # If we have a package ID, load the package
         elif package_id:
-            package_dict = get_action('package_show')(context, {'id': package_id})
+            package_dict = get_action(u'package_show')(context, {u'id': package_id})
             # Load the user - using model rather user_show API which loads all the users packages etc.,
-            user_obj = model.User.get(package_dict['creator_user_id'])
-            mail_dict['recipient_name'] = user_obj.fullname or user_obj.name
+            user_obj = model.User.get(package_dict[u'creator_user_id'])
+            mail_dict[u'recipient_name'] = user_obj.fullname or user_obj.name
             # Update send to with creator username
-            mail_dict['recipient_email'] = user_obj.email
-            mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict['title']
+            mail_dict[u'recipient_email'] = user_obj.email
+            mail_dict[u'subject'] = u'Message regarding dataset: %s' % package_dict[u'title']
             mail_dict[
-                'body'] += '\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % \
-                           package_dict['title'] or package_dict['name']
+                u'body'] += u'\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % \
+                           package_dict[u'title'] or package_dict[u'name']
 
         for i, url in urls.items():
-            mail_dict['body'] += '\n%s: %s' % (i.title(), url)
+            mail_dict[u'body'] += u'\n%s: %s' % (i.title(), url)
 
         # If this is being directed to someone other than @daat@nhm.ac.uk
         # Ensure data@nhm.ac.uk is copied in
-        if mail_dict['recipient_email'] != 'data@nhm.ac.uk':
-            mail_dict['headers']['cc'] = 'data@nhm.ac.uk'
+        if mail_dict[u'recipient_email'] != u'data@nhm.ac.uk':
+            mail_dict[u'headers'][u'cc'] = u'data@nhm.ac.uk'
         return mail_dict
 
     ## IPackageController
     def after_update(self, context, pkg_dict):
 
-        """
-        If this is the specimen resource, clear memcached
-
+        '''If this is the specimen resource, clear memcached
+        
         NB: Our version of ckan doesn't have the IResource after_update method
         But updating a resource calls IPackageController.after_update
-        @param context:
-        @param resource:
-        @return:
-        """
-        for resource in pkg_dict.get('resources', []):
+
+        :param context: param resource:
+        :param pkg_dict: 
+
+        '''
+        for resource in pkg_dict.get(u'resources', []):
             # If this is the specimen resource ID, clear the collection stats
-            if 'id' in resource:
-                if resource['id'] in [helpers.get_specimen_resource_id(), helpers.get_indexlot_resource_id()]:
-                    log.info('Clearing caches')
+            if u'id' in resource:
+                if resource[u'id'] in [helpers.get_specimen_resource_id(), helpers.get_indexlot_resource_id()]:
+                    log.info(u'Clearing caches')
                     # Quick and dirty, delete all caches when indexlot or specimens are updated
                     for _cache in cache_managers.values():
                         _cache.clear()
@@ -395,45 +478,57 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IDoi
     def build_metadata(self, pkg_dict, metadata_dict):
-        metadata_dict['resource_type'] = pkg_dict.get('dataset_category', None)
-        if isinstance(metadata_dict['resource_type'], list) and metadata_dict['resource_type']:
-            metadata_dict['resource_type'] = metadata_dict['resource_type'][0]
-        contributors = pkg_dict.get('contributors', None)
+        '''
+
+        :param pkg_dict: 
+        :param metadata_dict: 
+
+        '''
+        metadata_dict[u'resource_type'] = pkg_dict.get(u'dataset_category', None)
+        if isinstance(metadata_dict[u'resource_type'], list) and metadata_dict[u'resource_type']:
+            metadata_dict[u'resource_type'] = metadata_dict[u'resource_type'][0]
+        contributors = pkg_dict.get(u'contributors', None)
         if contributors:
-            contributors = contributors.split('\n')
-            metadata_dict['contributors'] = []
+            contributors = contributors.split(u'\n')
+            metadata_dict[u'contributors'] = []
             for contributor in contributors:
-                contributor = contributor.replace('\r', '').encode('unicode-escape')
+                contributor = contributor.replace(u'\r', u'').encode(u'unicode-escape')
                 m = re.search(r'(.*?)\s?\((.*)\)', contributor)
                 try:
-                    metadata_dict['contributors'].append(
+                    metadata_dict[u'contributors'].append(
                         {
-                            'contributorName': m.group(1),
-                            'affiliation': m.group(2),
+                            u'contributorName': m.group(1),
+                            u'affiliation': m.group(2),
 
                         }
                     )
                 except AttributeError:
-                    metadata_dict['contributors'].append(
+                    metadata_dict[u'contributors'].append(
                         {
-                            'contributorName': contributor
+                            u'contributorName': contributor
                         }
                     )
-        affiliation = pkg_dict.get('affiliation', None)
+        affiliation = pkg_dict.get(u'affiliation', None)
         if affiliation:
-            metadata_dict['affiliation'] = affiliation.encode('unicode-escape')
+            metadata_dict[u'affiliation'] = affiliation.encode(u'unicode-escape')
 
         return metadata_dict
 
     @staticmethod
     def metadata_to_xml(xml_dict, metadata):
-        if 'contributors' in metadata:
-            xml_dict['resource']['contributors'] = {
-                'contributor': [],
+        '''
+
+        :param xml_dict: 
+        :param metadata: 
+
+        '''
+        if u'contributors' in metadata:
+            xml_dict[u'resource'][u'contributors'] = {
+                u'contributor': [],
             }
-            for contributor in metadata['contributors']:
-                contributor['@contributorType'] = 'Researcher'
-                xml_dict['resource']['contributors']['contributor'].append(contributor)
+            for contributor in metadata[u'contributors']:
+                contributor[u'@contributorType'] = u'Researcher'
+                xml_dict[u'resource'][u'contributors'][u'contributor'].append(contributor)
 
         # FIXME - Datacite 3.1 isn't accepting affiliation in the creator field
         # if 'affiliation' in metadata:
@@ -442,20 +537,27 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     # IGalleryImage
     def image_info(self):
-        """
-        Return info for this plugin
+        '''Return info for this plugin
         If resource type is set, only dataset of that type will be available
         :return:
-        @rtype: object
-        """
+
+
+        '''
         return {
-            'title': 'DwC associated media',
-            'resource_type': ['dwc', 'csv'],
-            'field_type': ['json']
+            u'title': u'DwC associated media',
+            u'resource_type': [u'dwc', u'csv'],
+            u'field_type': [u'json']
         }
 
     ## IGalleryImage
     def get_images(self, raw_images, record, data_dict):
+        '''
+
+        :param raw_images: 
+        :param record: 
+        :param data_dict: 
+
+        '''
         images = []
         try:
             image_json = json.loads(raw_images)
@@ -468,27 +570,27 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         else:
             for i in image_json:
                 title = []
-                for title_field in ['scientificName', 'catalogNumber']:
+                for title_field in [u'scientificName', u'catalogNumber']:
                     if record.get(title_field, None):
                         title.append(record.get(title_field))
-                copyright = '%s<br />&copy; %s' % (
-                    h.link_to(i['license'], i['license'], target='_blank'),
-                    i['rightsHolder']
+                copyright = u'%s<br />&copy; %s' % (
+                    h.link_to(i[u'license'], i[u'license'], target=u'_blank'),
+                    i[u'rightsHolder']
                 )
                 images.append({
-                    'href': i['identifier'],
-                    'thumbnail': i['identifier'].replace('preview', 'thumbnail'),
-                    'link': h.url_for(
-                        controller='ckanext.nhm.controllers.record:RecordController',
-                        action='view',
-                        package_name=data_dict['package']['name'],
-                        resource_id=data_dict['resource']['id'],
-                        record_id=record['_id']
+                    u'href': i[u'identifier'],
+                    u'thumbnail': i[u'identifier'].replace(u'preview', u'thumbnail'),
+                    u'link': h.url_for(
+                        controller=u'ckanext.nhm.controllers.record:RecordController',
+                        action=u'view',
+                        package_name=data_dict[u'package'][u'name'],
+                        resource_id=data_dict[u'resource'][u'id'],
+                        record_id=record[u'_id']
                     ),
-                    'copyright': copyright,
+                    u'copyright': copyright,
                     # Description of image in gallery view
-                    'description': literal(''.join(['<span>%s</span>' % t for t in title])),
-                    'title': ' - '.join(title),
-                    'record_id': record['_id']
+                    u'description': literal(u''.join([u'<span>%s</span>' % t for t in title])),
+                    u'title': u' - '.join(title),
+                    u'record_id': record[u'_id']
                 })
         return images

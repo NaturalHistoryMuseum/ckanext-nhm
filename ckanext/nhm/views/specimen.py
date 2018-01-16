@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
 import logging
 import re
 import json
@@ -19,219 +25,219 @@ get_action = logic.get_action
 
 
 class SpecimenView(DefaultView):
-    """
-    Controller for displaying a specimen record
-    """
-    resource_id = config.get("ckanext.nhm.specimen_resource_id")
+    '''Controller for displaying a specimen record'''
+    resource_id = config.get(u'ckanext.nhm.specimen_resource_id')
 
     grid_default_columns = DarwinCoreView.grid_default_columns
     grid_column_widths = DarwinCoreView.grid_column_widths
 
     field_facets = [
-        'collectionCode',
-        'typeStatus',
-        'family',
-        'genus',
-        'imageCategory',
-        'gbifIssue'
+        u'collectionCode',
+        u'typeStatus',
+        u'family',
+        u'genus',
+        u'imageCategory',
+        u'gbifIssue'
     ]
 
     # Additional search filter options
     filter_options = {
-        '_has_image': {
-            'label': 'Has image',
+        u'_has_image': {
+            u'label': u'Has image',
             # 'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
-            'solr': "_has_multimedia:true"
+            u'solr': u'_has_multimedia:true'
         },
-        '_has_lat_long': {
-            'label': 'Has lat/long',
+        u'_has_lat_long': {
+            u'label': u'Has lat/long',
             # BS: Changed to look for latitude field,as _geom is only available after a map has been added
             # As this works for all DwC, we might get datasets without a map
             # 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
-            'solr': 'decimalLatitude:[* TO *]'
+            u'solr': u'decimalLatitude:[* TO *]'
         },
         # '_exclude_centroid': {
         #     'label': 'Exclude centroids',
         #     # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
         #     'solr': 'centroid:false'
         # },
-        '_exclude_mineralogy': {
-            'label': 'Exclude Mineralogy',
-            'hide': True,
+        u'_exclude_mineralogy': {
+            u'label': u'Exclude Mineralogy',
+            u'hide': True,
             # 'sql': ('"{}"."collectionCode" <> \'MIN\''.format(resource_id),),
-            'solr': '-collectionCode:MIN'
+            u'solr': u'-collectionCode:MIN'
         }
     }
 
     field_groups = OrderedDict([
-        ("Classification", OrderedDict([
-            ("scientificName", "Scientific name"),
-            ("scientificNameAuthorship", "Author"),
-            ("kingdom", "Kingdom"),
-            ("phylum", "Phylum"),
-            ("class", "Class"),
-            ("order", "Order"),
-            ("family", "Family"),
-            ("genus", "Genus"),
-            ("subgenus", "Subgenus"),
-            ("specificEpithet", "Species"),
-            ("infraspecificEpithet", "Subspecies"),
-            ("higherClassification", "Higher classification"),
-            ("taxonRank", "Taxon rank"),
+        (u'Classification', OrderedDict([
+            (u'scientificName', u'Scientific name'),
+            (u'scientificNameAuthorship', u'Author'),
+            (u'kingdom', u'Kingdom'),
+            (u'phylum', u'Phylum'),
+            (u'class', u'Class'),
+            (u'order', u'Order'),
+            (u'family', u'Family'),
+            (u'genus', u'Genus'),
+            (u'subgenus', u'Subgenus'),
+            (u'specificEpithet', u'Species'),
+            (u'infraspecificEpithet', u'Subspecies'),
+            (u'higherClassification', u'Higher classification'),
+            (u'taxonRank', u'Taxon rank'),
         ])),
-        ("Location", OrderedDict([
-            ("labelLocality", "Label locality"),
-            ("locality", "Locality"),
-            ("stateProvince", "State province"),
-            ("mine", "Mine"),
-            ("miningDistrict", "Mining district"),
-            ("viceCounty", "Vice County"),
-            ("country", "Country"),
-            ("continent", "Continent"),
-            ("island", "Island"),
-            ("islandGroup", "Island group"),
-            ("waterBody", "Water body"),
-            ("higherGeography", "Higher geography"),
-            ("decimalLatitude", "Decimal latitude"),
-            ("decimalLongitude", "Decimal longitude"),
-            ("verbatimLatitude", "Verbatim latitude"),
-            ("verbatimLongitude", "Verbatim longitude"),
-            ("centroid", "Centroid"),
-            ("maxError", "Max error"),
-            ("geodeticDatum", "Geodetic datum"),
-            ("georeferenceProtocol", "Georeference protocol"),
-            ("minimumElevationInMeters", "Minimum elevation(m)"),
-            ("maximumElevationInMeters", "Maximum elevation(m)"),
-            ("minimumDepthInMeters", "Minimum depth(m)"),
-            ("maximumDepthInMeters", "Maximum depth(m)"),
+        (u'Location', OrderedDict([
+            (u'labelLocality', u'Label locality'),
+            (u'locality', u'Locality'),
+            (u'stateProvince', u'State province'),
+            (u'mine', u'Mine'),
+            (u'miningDistrict', u'Mining district'),
+            (u'viceCounty', u'Vice County'),
+            (u'country', u'Country'),
+            (u'continent', u'Continent'),
+            (u'island', u'Island'),
+            (u'islandGroup', u'Island group'),
+            (u'waterBody', u'Water body'),
+            (u'higherGeography', u'Higher geography'),
+            (u'decimalLatitude', u'Decimal latitude'),
+            (u'decimalLongitude', u'Decimal longitude'),
+            (u'verbatimLatitude', u'Verbatim latitude'),
+            (u'verbatimLongitude', u'Verbatim longitude'),
+            (u'centroid', u'Centroid'),
+            (u'maxError', u'Max error'),
+            (u'geodeticDatum', u'Geodetic datum'),
+            (u'georeferenceProtocol', u'Georeference protocol'),
+            (u'minimumElevationInMeters', u'Minimum elevation(m)'),
+            (u'maximumElevationInMeters', u'Maximum elevation(m)'),
+            (u'minimumDepthInMeters', u'Minimum depth(m)'),
+            (u'maximumDepthInMeters', u'Maximum depth(m)'),
         ])),
-        ("Collection event", OrderedDict([
-            ("recordedBy", "Recorded by"),
-            ("recordNumber", "Record number"),
-            ("year", "Year"),
-            ("month", "Month"),
-            ("day", "Day"),
-            ("eventTime", "Event time"),
-            ("expedition", "Expedition"),
-            ("habitat", "Habitat"),
-            ("vessel", "Vessel"),
-            ("samplingProtocol", "Sampling protocol"),
+        (u'Collection event', OrderedDict([
+            (u'recordedBy', u'Recorded by'),
+            (u'recordNumber', u'Record number'),
+            (u'year', u'Year'),
+            (u'month', u'Month'),
+            (u'day', u'Day'),
+            (u'eventTime', u'Event time'),
+            (u'expedition', u'Expedition'),
+            (u'habitat', u'Habitat'),
+            (u'vessel', u'Vessel'),
+            (u'samplingProtocol', u'Sampling protocol'),
         ])),
-        ("Identification", OrderedDict([
-            ("identifiedBy", "Identified by"),
-            ("dateIdentified", "Date identified"),
-            ("identificationQualifier", "Identification qualifier"),
-            ("typeStatus", "Type status"),
-            ("determinations", "Determinations"),
+        (u'Identification', OrderedDict([
+            (u'identifiedBy', u'Identified by'),
+            (u'dateIdentified', u'Date identified'),
+            (u'identificationQualifier', u'Identification qualifier'),
+            (u'typeStatus', u'Type status'),
+            (u'determinations', u'Determinations'),
         ])),
-        ("Specimen", OrderedDict([
-            ("catalogNumber", "Catalogue number"),
-            ("collectionCode", "Collection code"),
-            ("subDepartment", "Sub department"),
-            ("otherCatalogNumbers", "Other catalog numbers"),
-            ("registrationCode", "Registration code"),
-            ("kindOfObject", "Kind of object"),
-            ("preparations", "Preparations"),
-            ("preparationType", "Preparation type"),
-            ("preservative", "Preservative"),
-            ("collectionKind", "Collection kind"),
-            ("collectionName", "Collection name"),
-            ("donorName", "Donor name"),
-            ("kindOfCollection", "Kind of collection"),
-            ("observedWeight", "Observed weight"),
-            ("individualCount", "Individual count"),
-            ("sex", "Sex"),
-            ("lifeStage", "Life stage"),
-            ("catalogueDescription", "Catalogue description"),
+        (u'Specimen', OrderedDict([
+            (u'catalogNumber', u'Catalogue number'),
+            (u'collectionCode', u'Collection code'),
+            (u'subDepartment', u'Sub department'),
+            (u'otherCatalogNumbers', u'Other catalog numbers'),
+            (u'registrationCode', u'Registration code'),
+            (u'kindOfObject', u'Kind of object'),
+            (u'preparations', u'Preparations'),
+            (u'preparationType', u'Preparation type'),
+            (u'preservative', u'Preservative'),
+            (u'collectionKind', u'Collection kind'),
+            (u'collectionName', u'Collection name'),
+            (u'donorName', u'Donor name'),
+            (u'kindOfCollection', u'Kind of collection'),
+            (u'observedWeight', u'Observed weight'),
+            (u'individualCount', u'Individual count'),
+            (u'sex', u'Sex'),
+            (u'lifeStage', u'Life stage'),
+            (u'catalogueDescription', u'Catalogue description'),
         ])),
-        ("Mineralogy", OrderedDict([
-            ("dateRegistered", "Date registered"),
-            ("occurrence", "Occurrence"),
-            ("commodity", "Commodity"),
-            ("depositType", "Deposit type"),
-            ("texture", "Texture"),
-            ("identificationAsRegistered", "Identification as registered"),
-            ("identificationDescription", "Identification description"),
-            ("identificationVariety", "Identification variety"),
-            ("identificationOther", "Identification other"),
-            ("hostRock", "Host rock"),
-            ("age", "Age"),
-            ("ageType", "Age type"),
-            ("geologyRegion", "Geology region"),
-            ("mineralComplex", "Mineral complex"),
-            ("tectonicProvince", "Tectonic province"),
-            ("registeredWeight", "Registered weight"),
+        (u'Mineralogy', OrderedDict([
+            (u'dateRegistered', u'Date registered'),
+            (u'occurrence', u'Occurrence'),
+            (u'commodity', u'Commodity'),
+            (u'depositType', u'Deposit type'),
+            (u'texture', u'Texture'),
+            (u'identificationAsRegistered', u'Identification as registered'),
+            (u'identificationDescription', u'Identification description'),
+            (u'identificationVariety', u'Identification variety'),
+            (u'identificationOther', u'Identification other'),
+            (u'hostRock', u'Host rock'),
+            (u'age', u'Age'),
+            (u'ageType', u'Age type'),
+            (u'geologyRegion', u'Geology region'),
+            (u'mineralComplex', u'Mineral complex'),
+            (u'tectonicProvince', u'Tectonic province'),
+            (u'registeredWeight', u'Registered weight'),
         ])),
-        ("Stratigraphy", OrderedDict([
-            ("earliestEonOrLowestEonothem", "Earliest eon/lowest eonothem"),
-            ("latestEonOrHighestEonothem", "Latest eon/highest eonothem"),
-            ("earliestEraOrLowestErathem", "Earliest era/lowest erathem"),
-            ("latestEraOrHighestErathem", "Latest era/highest erathem"),
-            ("earliestPeriodOrLowestSystem", "Earliest period/lowest system"),
-            ("latestPeriodOrHighestSystem", "Latest period/highest system"),
-            ("earliestEpochOrLowestSeries", "Earliest epoch/lowest series"),
-            ("latestEpochOrHighestSeries", "Latest epoch/highest series"),
-            ("earliestAgeOrLowestStage", "Earliest age/lowest stage"),
-            ("latestAgeOrHighestStage", "Latest age/highest stage"),
-            ("lowestBiostratigraphicZone", "Lowest biostratigraphic zone"),
-            ("highestBiostratigraphicZone", "Highest biostratigraphic zone"),
-            ("group", "Group"),
-            ("formation", "Formation"),
-            ("member", "Member"),
-            ("bed", "Bed"),
-            ("chronostratigraphy", "Chronostratigraphy"),
-            ("lithostratigraphy", "Lithostratigraphy"),
+        (u'Stratigraphy', OrderedDict([
+            (u'earliestEonOrLowestEonothem', u'Earliest eon/lowest eonothem'),
+            (u'latestEonOrHighestEonothem', u'Latest eon/highest eonothem'),
+            (u'earliestEraOrLowestErathem', u'Earliest era/lowest erathem'),
+            (u'latestEraOrHighestErathem', u'Latest era/highest erathem'),
+            (u'earliestPeriodOrLowestSystem', u'Earliest period/lowest system'),
+            (u'latestPeriodOrHighestSystem', u'Latest period/highest system'),
+            (u'earliestEpochOrLowestSeries', u'Earliest epoch/lowest series'),
+            (u'latestEpochOrHighestSeries', u'Latest epoch/highest series'),
+            (u'earliestAgeOrLowestStage', u'Earliest age/lowest stage'),
+            (u'latestAgeOrHighestStage', u'Latest age/highest stage'),
+            (u'lowestBiostratigraphicZone', u'Lowest biostratigraphic zone'),
+            (u'highestBiostratigraphicZone', u'Highest biostratigraphic zone'),
+            (u'group', u'Group'),
+            (u'formation', u'Formation'),
+            (u'member', u'Member'),
+            (u'bed', u'Bed'),
+            (u'chronostratigraphy', u'Chronostratigraphy'),
+            (u'lithostratigraphy', u'Lithostratigraphy'),
         ])),
-        ("Meteorites", OrderedDict([
-            ("meteoriteType", "Meteorite type"),
-            ("meteoriteGroup", "Meteorite group"),
-            ("chondriteAchondrite", "Chondrite Achondrite"),
-            ("meteoriteClass", "Meteorite class"),
-            ("petrologyType", "Petrology type"),
-            ("petrologySubtype", "Petrology subtype"),
-            ("recovery", "Recovery"),
-            ("recoveryDate", "Recovery date"),
-            ("recoveryWeight", "Recovery weight"),
+        (u'Meteorites', OrderedDict([
+            (u'meteoriteType', u'Meteorite type'),
+            (u'meteoriteGroup', u'Meteorite group'),
+            (u'chondriteAchondrite', u'Chondrite Achondrite'),
+            (u'meteoriteClass', u'Meteorite class'),
+            (u'petrologyType', u'Petrology type'),
+            (u'petrologySubtype', u'Petrology subtype'),
+            (u'recovery', u'Recovery'),
+            (u'recoveryDate', u'Recovery date'),
+            (u'recoveryWeight', u'Recovery weight'),
             # "Registered weight unit",  # Merged into Registered weight
         ])),
-        ("Botany", OrderedDict([
-            ("exsiccata", "Exsiccata"),
-            ("exsiccataNumber", "Exsiccata number"),
-            ("plantDescription", "Plant description"),
-            ("cultivated", "Cultivated"),
+        (u'Botany', OrderedDict([
+            (u'exsiccata', u'Exsiccata'),
+            (u'exsiccataNumber', u'Exsiccata number'),
+            (u'plantDescription', u'Plant description'),
+            (u'cultivated', u'Cultivated'),
         ])),
-        ("Zoology", OrderedDict([
-            ("populationCode", "Population code"),
-            ("nestShape", "Nest shape"),
-            ("nestSite", "Nest site"),
-            ("clutchSize", "Clutch size"),
-            ("setMark", "Set mark"),
-            ("barcode", "Barcode"),
-            ("extractionMethod", "Extraction method"),
-            ("resuspendedIn", "Resuspended in"),
-            ("totalVolume", "Total volume"),
-            ("partType", "Part type"),
+        (u'Zoology', OrderedDict([
+            (u'populationCode', u'Population code'),
+            (u'nestShape', u'Nest shape'),
+            (u'nestSite', u'Nest site'),
+            (u'clutchSize', u'Clutch size'),
+            (u'setMark', u'Set mark'),
+            (u'barcode', u'Barcode'),
+            (u'extractionMethod', u'Extraction method'),
+            (u'resuspendedIn', u'Resuspended in'),
+            (u'totalVolume', u'Total volume'),
+            (u'partType', u'Part type'),
         ])),
-        ("Record", OrderedDict([
-            ("occurrenceID", "Occurrence ID"),
-            ("modified", "Modified"),
-            ("created", "Created"),
-            ("recordType", "Record type")
+        (u'Record', OrderedDict([
+            (u'occurrenceID', u'Occurrence ID'),
+            (u'modified', u'Modified'),
+            (u'created', u'Created'),
+            (u'recordType', u'Record type')
         ])),
     ])
 
     def render_record(self, c):
-        """
-        Render a record
+        '''Render a record
         Called from record controller, when viewing a record page
-        @return: html
-        """
 
-        occurrence_id = c.record_dict.get('occurrenceID')
+        :param c: 
+        :returns: html
 
-        log.info('Viewing record %s', occurrence_id)
+        '''
 
-        c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
+        occurrence_id = c.record_dict.get(u'occurrenceID')
+
+        log.info(u'Viewing record %s', occurrence_id)
+
+        c.record_title = c.record_dict.get(u'catalogNumber', None) or occurrence_id
 
         # Act on a deep copy of field groups, so deleting element will not have any impact
         c.field_groups = deepcopy(self.field_groups)
@@ -240,65 +246,65 @@ class SpecimenView(DefaultView):
         # This can be set to bool false to not display a filter
         c.custom_filters = {}
 
-        if c.record_dict.get('registeredWeight', None) and c.record_dict.get('registeredWeightUnit', None):
+        if c.record_dict.get(u'registeredWeight', None) and c.record_dict.get(u'registeredWeightUnit', None):
             # Create custom filter which acts on both weight and units
-            c.custom_filters['registeredWeight'] = 'registeredWeight:%s|registeredWeightUnit:%s' % (c.record_dict['registeredWeight'], c.record_dict['registeredWeightUnit'])
+            c.custom_filters[u'registeredWeight'] = u'registeredWeight:%s|registeredWeightUnit:%s' % (c.record_dict[u'registeredWeight'], c.record_dict[u'registeredWeightUnit'])
             # Merge unit into the field
-            c.record_dict['registeredWeight'] += ' %s' % c.record_dict['registeredWeightUnit']
+            c.record_dict[u'registeredWeight'] += u' %s' % c.record_dict[u'registeredWeightUnit']
 
         collection_date = []
         collection_date_filter = []
 
         # Merge day, month, year into one collection date field
-        for k in ('day', 'month', 'year'):
+        for k in (u'day', u'month', u'year'):
             # Delete the exists field
             try:
-                del c.field_groups['Collection event'][k]
+                del c.field_groups[u'Collection event'][k]
             except KeyError:
                 pass
 
             # Add to collection date field
             if c.record_dict.get(k, None):
                 collection_date.append(c.record_dict.get(k))
-                collection_date_filter.append('%s:%s' % (k, c.record_dict.get(k)))
+                collection_date_filter.append(u'%s:%s' % (k, c.record_dict.get(k)))
 
         # Join the date for the record view
-        c.record_dict['collectionDate'] = ' / '.join(collection_date)
+        c.record_dict[u'collectionDate'] = u' / '.join(collection_date)
 
         # Create a custom filter, so collection date filters on day, month and year
-        c.custom_filters['collectionDate'] = '|'.join(collection_date_filter)
+        c.custom_filters[u'collectionDate'] = u'|'.join(collection_date_filter)
 
-        c.field_groups['Collection event']['collectionDate'] = 'Collection date'
+        c.field_groups[u'Collection event'][u'collectionDate'] = u'Collection date'
 
         # Parse determination names
-        c.record_dict['determinations'] = {}
-        c.record_dict['determination_labels'] = []
+        c.record_dict[u'determinations'] = {}
+        c.record_dict[u'determination_labels'] = []
 
-        for field in ['determinationNames', 'determinationTypes', 'determinationFiledAs']:
+        for field in [u'determinationNames', u'determinationTypes', u'determinationFiledAs']:
 
-            label = field.replace('determination', '')
+            label = field.replace(u'determination', u'')
             # Add a space before capital letters
-            label = re.sub(r"([A-Z])", r" \1", label)
+            label = re.sub('([A-Z])"', ' \1"', label)
 
-            c.record_dict['determination_labels'].append(label)
+            c.record_dict[u'determination_labels'].append(label)
             value = c.record_dict.get(field, None)
             try:
-                c.record_dict['determinations'][label] = list(json.loads(value))
+                c.record_dict[u'determinations'][label] = list(json.loads(value))
             except(ValueError, TypeError):
                 if value:
-                    c.record_dict['determinations'][label] = [value]
+                    c.record_dict[u'determinations'][label] = [value]
                 else:
-                    c.record_dict['determinations'][label] = []
+                    c.record_dict[u'determinations'][label] = []
 
-        c.record_dict['determinations']['_len'] = max([len(l) for l in c.record_dict['determinations'].values()])
+        c.record_dict[u'determinations'][u'_len'] = max([len(l) for l in c.record_dict[u'determinations'].values()])
 
         # Set determinations to None if we don't have any values - required by the specimen template
         # to hide the Identification block
-        if not c.record_dict['determinations']['_len']:
-            c.record_dict['determinations'] = None
+        if not c.record_dict[u'determinations'][u'_len']:
+            c.record_dict[u'determinations'] = None
 
         # No filters for determinations
-        c.custom_filters['determinations'] = None
+        c.custom_filters[u'determinations'] = None
 
-        return p.toolkit.render('record/specimen.html')
+        return p.toolkit.render(u'record/specimen.html')
 
