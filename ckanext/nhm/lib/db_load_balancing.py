@@ -4,26 +4,26 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import re
-import json
 import functools
+import json
 import logging
 import urllib2
+from ConfigParser import SafeConfigParser
+
 import psycopg2
+import re
 import sqlalchemy
-from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
-from sqlalchemy.pool import QueuePool
-from sqlalchemy.exc import SQLAlchemyError, DBAPIError, DisconnectionError
 from sqlalchemy import event
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
-
+from sqlalchemy.exc import DBAPIError, DisconnectionError
+from sqlalchemy.pool import QueuePool
 
 _original_create_engine = None
 _last_host = u''
 config = {
     u'db_load_balancing.plusmoin_url': u'http://localhost:9815/status.json',
     u'ckan.datastore.read_url': u''
-}
+    }
 
 
 def db_load_balancing_init(config_file):
@@ -56,9 +56,10 @@ def db_load_balancing_init(config_file):
         cp = SafeConfigParser(defaults=config)
         cp.read(config_file)
         config = {
-            u'db_load_balancing.plusmoin_url': cp.get(u'app:main', u'db_load_balancing.plusmoin_url'),
+            u'db_load_balancing.plusmoin_url': cp.get(u'app:main',
+                                                      u'db_load_balancing.plusmoin_url'),
             u'ckan.datastore.read_url': cp.get(u'app:main', u'ckan.datastore.read_url')
-        }
+            }
 
 
 def _create_engine(*args, **kargs):
@@ -67,6 +68,7 @@ def _create_engine(*args, **kargs):
     Note that this does not do anything we cannot do by configuring SQLAlchemy.
     The only reason for monkey patching is that CKAN does not allow us to
     configure SQLALchemy properly.
+    # TODO: check if this is still the case
     
     This will:
     - Set a custom pool size, timeout, recycle and overflow;
@@ -84,7 +86,7 @@ def _create_engine(*args, **kargs):
     a chance to join back into the pool reasonably quickly.
 
     :param *args: 
-    :param **kargs: 
+    :param **kargs:
 
     '''
     global _original_create_engine
@@ -94,17 +96,9 @@ def _create_engine(*args, **kargs):
     conn_info = _parse_conn_info(url)
     dialect = PGDialect_psycopg2(dbapi=psycopg2)
     if url == config[u'ckan.datastore.read_url']:
-        creator = functools.partial(
-            _read_only_connect,
-            dialect,
-            conn_info
-        )
+        creator = functools.partial(_read_only_connect, dialect, conn_info)
     else:
-        creator = functools.partial(
-            _read_write_connect,
-            dialect,
-            conn_info
-        )
+        creator = functools.partial(_read_write_connect, dialect, conn_info)
     kargs = dict(kargs.items() + {
         u'poolclass': QueuePool,
         u'pool_size': 6,
@@ -112,7 +106,7 @@ def _create_engine(*args, **kargs):
         u'pool_recycle': 300,
         u'max_overflow': 10,
         u'creator': creator
-    }.items())
+        }.items())
 
     return _original_create_engine(*args, **kargs)
 
@@ -160,49 +154,48 @@ def _read_write_connect(dialect, connection_info):
     Every time a new connection is created, we query plusmoin for the current
     master and return a connection to that host.
 
-    :param dialect: The SqlAlchemy Dialect class that represents our database
-    :param connection_info: dict defining host, port, user, password and database.
-    :returns: s: A dbapi object
+    :param dialect: the SqlAlchemy Dialect class that represents our database
+    :param connection_info: dict defining host, port, user, password and database
+
+    :returns: a dbapi object
 
     '''
     try:
         plusmoin = _plusmoin_status()
         if plusmoin:
-            if len(plusmoin[u'clusters']) == 0 or not plusmoin[u'clusters'][0][u'has_master']:
+            if len(plusmoin[u'clusters']) == 0 or not plusmoin[u'clusters'][0][
+                u'has_master']:
                 raise Exception(u'Plusmoin advertises no available masters')
             master = plusmoin[u'clusters'][0][u'master']
         else:
             master = connection_info
         logger = logging.getLogger(u'db_load_balancing')
         logger.debug(u'Read/write connection using %s', str(master))
-        return dialect.connect(
-            user=connection_info[u'user'],
-            password=connection_info[u'password'],
-            database=connection_info[u'database'],
-            host=master[u'host'],
-            port=master[u'port']
-        )
-except Exception as e:
+        return dialect.connect(user=connection_info[u'user'],
+                               password=connection_info[u'password'],
+                               database=connection_info[u'database'],
+                               host=master[u'host'], port=master[u'port'])
+    except Exception as e:
         import sys
-        raise DBAPIError.instance(
-            None, None, e, dialect.dbapi.Error,
-            connection_invalidated=
-                    dialect.is_disconnect(e, None, None)), \
-            None, sys.exc_info()[2]
+        raise DBAPIError.instance(None, None, e, dialect.dbapi.Error,
+                                  connection_invalidated=dialect.is_disconnect(e, None,
+                                                                               None)), None, \
+            sys.exc_info()[2]
 
 
 def _read_only_connect(dialect, connection_info):
     '''Creator function invoked for creating read only connections
-    
+
     Note that the parameters are first created using a partial. SqlAlchemy
     invokes this without parameters.
-    
+
     Every time a new connection is created, we query plusmoin for the current
     list of servers, and serve these in a round robin fashion.
 
-    :param dialect: The SqlAlchemy Dialect class that represents our database
-    :param connection_info: dict defining host, port, user, password and database.
-    :returns: s: A dbapi object
+    :param dialect: the SqlAlchemy Dialect class that represents our database
+    :param connection_info: dict defining host, port, user, password and database
+
+    :returns: a dbapi object
 
     '''
     global _last_host
@@ -218,7 +211,7 @@ def _read_only_connect(dialect, connection_info):
                 raise Exception(u'Plusmoin advertises no available servers')
             try:
                 p = available.index(_last_host)
-                host = available[(p+1) % len(available)]
+                host = available[(p + 1) % len(available)]
             except ValueError:
                 host = available[0]
 
@@ -227,27 +220,23 @@ def _read_only_connect(dialect, connection_info):
             host = connection_info
         logger = logging.getLogger(u'db_load_balancing')
         logger.debug(u'Read only connection using %s', str(host))
-        return dialect.connect(
-            user=connection_info[u'user'],
-            password=connection_info[u'password'],
-            database=connection_info[u'database'],
-            host=host[u'host'],
-            port=host[u'port']
-        )
-except Exception as e:
+        return dialect.connect(user=connection_info[u'user'],
+                               password=connection_info[u'password'],
+                               database=connection_info[u'database'], host=host[u'host'],
+                               port=host[u'port'])
+
+    except Exception as e:
         import sys
-        raise DBAPIError.instance(
-            None, None, e, dialect.dbapi.Error,
-            connection_invalidated=
-                    dialect.is_disconnect(e, None, None)), \
-            None, sys.exc_info()[2]
+        raise DBAPIError.instance(None, None, e, dialect.dbapi.Error,
+                                  connection_invalidated=dialect.is_disconnect(e, None,
+                                                                               None)), None, \
+            sys.exc_info()[2]
 
 
 def _plusmoin_status():
-    '''Return the plusmoin status from the configured status url
+    '''Return the plusmoin status from the configured status url.
 
-
-    :returns: s: dict parsed from the plusmoin status or None on failure.
+    :returns: dict parsed from the plusmoin status or None on failure.
 
     '''
     global config
@@ -255,7 +244,7 @@ def _plusmoin_status():
     try:
         cx = urllib2.urlopen(config[u'db_load_balancing.plusmoin_url'])
         return json.loads(cx.read())
-except urllib2.URLError:
+    except urllib2.URLError:
         logger = logging.getLogger(u'db_load_balancing')
         logger.exception(u'Failed to get plusmoin status')
         return None
@@ -267,10 +256,11 @@ except urllib2.URLError:
 def _parse_conn_info(conn_str):
     '''Parse a postgresql connection string
 
-    :param conn_str: Postgresql connection string, of the form
+    :param conn_str: postgresql connection string, of the form
                      postgresql://user:pass@host:port/db
-    :returns: s: A dict defining 'user', 'password', 'host',  and 'db'
-    :raises s: ValueError if the string cannot be parsed
+
+    :returns: a dict defining 'user', 'password', 'host',  and 'db'
+    :raises ValueError: if the string cannot be parsed
 
     '''
     rex = re.compile(r'''^postgresql://
@@ -287,5 +277,4 @@ def _parse_conn_info(conn_str):
         u'password': result.group(u'password'),
         u'host': result.group(u'host'),
         u'database': result.group(u'database')
-    }
-
+        }

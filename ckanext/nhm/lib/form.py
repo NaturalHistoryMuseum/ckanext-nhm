@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # encoding: utf-8
 #
@@ -7,12 +6,12 @@
 
 
 def list_to_form_options(values, allow_empty=False, allow_empty_text=u'None'):
-    '''Format a list of values into a list of dict suitable for use in forms: [{value: x, name: y}]
+    '''Format a list of values into a list of dict suitable
+    for use in forms: [{value: x, name: y}]
 
     :param values: list or list of tuples [(value, name)]
-    :param allow_empty: If true, will add none option (Default value = False)
-    :param allow_empty_name: Label for none value
-    :param allow_empty_text:  (Default value = u'None')
+    :param allow_empty: if true, will add none option (optional, default: False)
+    :param allow_empty_text: label for none value (optional, default: u'None')
 
     '''
     options = []

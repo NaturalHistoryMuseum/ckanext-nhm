@@ -1,15 +1,15 @@
-
 #!/usr/bin/env python
 # encoding: utf-8
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from jinja2.ext import Extension
-from jinja2 import nodes
-import re
-import abc
 from collections import OrderedDict
+
+import abc
+import re
+from jinja2 import nodes
+from jinja2.ext import Extension
 
 
 class TaxonomyFormatExtension(Extension):
@@ -25,13 +25,15 @@ class TaxonomyFormatExtension(Extension):
     common_strings = {
         u'italics': u'<em>{0}</em>',
         u'bold': u'<b>{0}</b>',
-        u'deitalicise': u'<span style="font-style: normal;">{0}</span>'}
+        u'deitalicise': u'<span style="font-style: normal;">{0}</span>'
+        }
 
     def parse(self, parser):
         '''The main function of the tag - mostly Jinja2 logic.
 
-        :param parser: return: The HTML-formatted body of the tag.
-        :returns: The HTML-formatted body of the tag.
+        :param parser:
+
+        :returns: the HTML-formatted body of the tag
 
         '''
         lineno = next(parser.stream).lineno
@@ -42,18 +44,20 @@ class TaxonomyFormatExtension(Extension):
         parser.stream.skip_if(u'comma')
         args.append(parser.parse_expression())
 
-        body = parser.parse_statements([u'name:endtaxonomy'],
-                                       drop_needle = True)
+        body = parser.parse_statements([u'name:endtaxonomy'], drop_needle=True)
         return nodes.CallBlock(self.call_method(u'_reformat', args), [], [],
                                body).set_lineno(lineno)
 
     def _reformat(self, field_name, collection_code, record_dict, caller):
         '''Controls the reformatting of the tag body.
 
-        :param field_name: the name of the field whose value is being parsed currently, e.g. 'specificEpithet' or 'genus'
-        :param collection_code: the code for the collection this record belongs to (for collection-specific rules)
+        :param field_name: the name of the field whose value is being parsed currently,
+                            e.g. 'specificEpithet' or 'genus'
+        :param collection_code: the code for the collection this record belongs to
+                                (for collection-specific rules)
         :param record_dict: the full record
         :param caller: the tag body
+
         :returns: HTML-formatted tag body
 
         '''
@@ -69,7 +73,8 @@ class TaxonomyFormatExtension(Extension):
             u'(?i)bmnh\(e\)': self._ent,
             u'(?i)pal': self._pal,
             u'(?i)bot': self._bot,
-            u'(?i)min': self._min, }
+            u'(?i)min': self._min,
+            }
 
         # get collection-specific rules
         for rgx, p in collections.items():
@@ -77,14 +82,13 @@ class TaxonomyFormatExtension(Extension):
                 collection_formatted_fields, collection_parsed_fields = p
                 self.format_to_fields = self._merge(global_formatted_fields,
                                                     collection_formatted_fields)
-                self.parsed_fields = global_parsed_fields + \
-                                     collection_parsed_fields
+                self.parsed_fields = global_parsed_fields + collection_parsed_fields
                 break
 
         self.field_to_formats = {
-            f: [k for k, v in self.format_to_fields.items() if f in v] for f in
-            set([item for field_names in self.format_to_fields.values() for
-                 item in field_names])}
+            f: [k for k, v in self.format_to_fields.items() if f in v] for f in set(
+                [item for field_names in self.format_to_fields.values() for item in
+                 field_names])}
 
         for f, keys in self.format_to_fields.items():
             if field_name in keys:
@@ -99,8 +103,14 @@ class TaxonomyFormatExtension(Extension):
     def _merge(ff1, ff2):
         '''Helper method to merge two lists of field formats.
 
-        :param ff1: function, string> dict (function must take 1 string arg)
-        :param ff2: function, string> dict (function must take 1 string arg)
+        :param ff1: a dict where the keys are functions taking and outputting a single
+                    string, and the values are the names of fields to which that
+                    function should be applied
+        :type ff1: <function, string[]> dict
+        :param ff2: a dict where the keys are functions taking and outputting a single
+                    string, and the values are the names of fields to which that
+                    function should be applied
+        :type ff2: <function, string[]> dict
         :returns: a combined dict
 
         '''
@@ -110,23 +120,27 @@ class TaxonomyFormatExtension(Extension):
     @property
     def _zoo(self):
         '''Zoology-specific rules.
-        :return:
 
+        :returns: a tuple of collections; a dictionary of string formatting functions
+                  and corresponding field names, and a list of fields to be parsed
 
         '''
         formatted_fields = {
             self.common_strings[u'italics'].format: [u'specificEpithet', u'genus',
-                                                    u'subgenus'],
-            unicode.lower: [u'specificEpithet', u'infraspecificEpithet']}
-        parsed_fields = [u'scientificName', u'infraspecificEpithet', u'determinations Names']
+                                                     u'subgenus'],
+            unicode.lower: [u'specificEpithet', u'infraspecificEpithet']
+            }
+        parsed_fields = [u'scientificName', u'infraspecificEpithet',
+                         u'determinations Names']
         return formatted_fields, parsed_fields
 
     @property
     def _ent(self):
         '''Entomology-specific rules. Will almost always follow zoology rules but
         can override them if necessary.
-        :return:
 
+        :returns: a tuple of collections; a dictionary of string formatting functions
+                  and corresponding field names, and a list of fields to be parsed
 
         '''
         return self._zoo
@@ -135,8 +149,9 @@ class TaxonomyFormatExtension(Extension):
     def _pal(self):
         '''Palaeontology-specific rules. Will almost always follow zoology rules
         but can override them if necessary.
-        :return:
 
+        :returns: a tuple of collections; a dictionary of string formatting functions
+                  and corresponding field names, and a list of fields to be parsed
 
         '''
         return self._zoo
@@ -144,22 +159,26 @@ class TaxonomyFormatExtension(Extension):
     @property
     def _bot(self):
         '''Botany-specific rules.
-        :return:
 
+        :returns: a tuple of collections; a dictionary of string formatting functions
+                  and corresponding field names, and a list of fields to be parsed
 
         '''
         formatted_fields = {
             self.common_strings[u'italics'].format: [u'specificEpithet', u'genus',
-                                                    u'subgenus'],
-            unicode.lower: [u'specificEpithet', u'infraspecificEpithet']}
-        parsed_fields = [u'scientificName', u'infraspecificEpithet', u'determinations Names']
+                                                     u'subgenus'],
+            unicode.lower: [u'specificEpithet', u'infraspecificEpithet']
+            }
+        parsed_fields = [u'scientificName', u'infraspecificEpithet',
+                         u'determinations Names']
         return formatted_fields, parsed_fields
 
     @property
     def _min(self):
         '''Mineralogy-specific rules.
-        :return:
 
+        :returns: a tuple of collections; a dictionary of string formatting functions
+                  and corresponding field names, and a list of fields to be parsed
 
         '''
         formatted_fields = {}
@@ -167,19 +186,21 @@ class TaxonomyFormatExtension(Extension):
         return formatted_fields, parsed_fields
 
     def _parse_field(self, body, record_dict):
-        '''For longer/more complex fields with multiple parts that need to be variably italicised/not italicised. Mostly achieved via regex.
+        '''For longer/more complex fields with multiple parts that need to be variably
+        italicised/not italicised. Mostly achieved via regex.
 
         :param body: the tag body
         :param record_dict: the full record
-        :returns: the tag body wrapped in italics tags, with certain parts deitalicised by wrapping in span tags
+
+        :returns: the tag body wrapped in italics tags, with certain parts deitalicised
+                  by wrapping in span tags
 
         '''
         # abbreviations should not be italicised
         abbr = [u'var', u'subsp', u'subvar', u'f', u'subf', u'ssp', u'cv']
         for a in abbr:
             body = re.sub(u'(\s?{0}\.?\s)'.format(a),
-                          u'<span style="font-style: normal;">\\1</span>',
-                          body)
+                          u'<span style="font-style: normal;">\\1</span>', body)
 
         # neither should authors
         body = self._find_authors(body, record_dict)
@@ -191,6 +212,7 @@ class TaxonomyFormatExtension(Extension):
 
         :param body: the tag body
         :param record_dict: the full record
+
         :returns: the tag body with the authors wrapped in deitalicising tags
 
         '''
@@ -213,20 +235,22 @@ class TaxonomyFormatExtension(Extension):
 
         if ix:
             authors = body[ix:]
-            return u'{0}'.format(body[:ix]) + self.common_strings[
-                u'deitalicise'].format(authors)
+            return u'{0}'.format(body[:ix]) + self.common_strings[u'deitalicise'].format(
+                    authors)
         else:
             return body
 
 
 class BaseParserStage(object):
     '''Represents a single stage of a field parsing process.'''
+
     @abc.abstractmethod
     def _meets_criteria(self, body, record_dict):
         '''Tests to see if the item meets certain criteria.
 
         :param body: the tag body to search in
         :param record_dict: the full record
+
         :returns: boolean for pass/fail
 
         '''
@@ -238,6 +262,7 @@ class BaseParserStage(object):
 
         :param body: the tag body
         :param record_dict: the full record
+
         :returns: a character index
 
         '''
@@ -248,6 +273,7 @@ class BaseParserStage(object):
 
         :param body: the tag body
         :param record_dict: the full record
+
         :returns: character index if criteria met, None if not
 
         '''
@@ -257,82 +283,71 @@ class BaseParserStage(object):
 
 class AuthorParserStage(BaseParserStage):
     '''A specific stage for searching for authors in the tag body.'''
+
     def _meets_criteria(self, body, record_dict):
         '''Ensures an author field is present in the record.
-
-        :param body: 
-        :param record_dict: 
 
         '''
         return u'scientificNameAuthorship' in record_dict.keys()
 
     def _extract(self, body, record_dict):
-        '''Searches for the full author string, then breaks it up into smaller pieces (sections in brackets, individual names) if that's not found
-        :return: the start index of the author string if found, otherwise None
+        '''Searches for the full author string, then breaks it up into smaller pieces
+        (sections in brackets, individual names) if that's not found
 
-        :param body: 
-        :param record_dict: 
+        :returns: the start index of the author string if found, otherwise None
 
         '''
         full_author = record_dict[u'scientificNameAuthorship']
         author_strings = [full_author] + [p.strip() for p in set(
-                re.findall(u'\(([\w\s]+)\)', full_author) + re.findall(
-                        u'([\w.\s]+)', full_author))]
+                re.findall(u'\(([\w\s]+)\)', full_author) + re.findall(u'([\w.\s]+)',
+                                                                       full_author))]
         for a in author_strings:
             matches = re.search(u'\s\(?{0}\)?(\s|$)'.format(re.escape(a)), body)
             return matches.start() if matches else None
 
 
 class SimpleFieldParserStage(BaseParserStage):
-    '''A generic stage for searching for a certain field within the tag body (for the purposes of finding authors).'''
+    '''A generic stage for searching for a certain field within the tag body
+    (for the purposes of finding authors).'''
+
     def __init__(self, field_name):
         self.field_name = field_name
 
     def _meets_criteria(self, body, record_dict):
-        '''Checks that the record contains a value for this field and that the value is present in the tag body.
-
-        :param body: 
-        :param record_dict: 
-
-        '''
+        '''Checks that the record contains a value for this field and that the value is
+         present in the tag body.'''
         return self.field_name in record_dict.keys() and record_dict[
-                                                             self.field_name] in body
+            self.field_name] in body
 
     def _extract(self, body, record_dict):
-        '''If the value is at the end of the string, there is no point in continuing; otherwise, it looks for the first capitalised word after that value.
-        :return: the start index of the estimated author string if found, else None.
+        '''If the value is at the end of the string, there is no point in continuing;
+        otherwise, it looks for the first capitalised word after that value.
 
-        :param body: 
-        :param record_dict: 
+        :returns: the start index of the estimated author string if found, else None
 
         '''
         field_value = record_dict[self.field_name]
         if re.search(u'{0}$'.format(re.escape(field_value)), body):
             return len(body)
-        split_by_value = re.split(u'{0}'.format(re.escape(field_value)), body,
-                                  1)
+        split_by_value = re.split(u'{0}'.format(re.escape(field_value)), body, 1)
         matches = re.search(u'\(?[A-Z]\w*', split_by_value[1])
         return matches.start() + len(split_by_value[0]) + len(
                 field_value) if matches else None
 
 
 class CapitalisedParserStage(BaseParserStage):
-    '''The last resort stage in the search for authors - searches for the second capitalised word in the tag body.'''
+    '''The last resort stage in the search for authors - searches for the second
+    capitalised word in the tag body.'''
+
     def _meets_criteria(self, body, record_dict):
-        '''Checks for multiple capitalised words in the tag body.
-
-        :param body: 
-        :param record_dict: 
-
-        '''
+        '''Checks for multiple capitalised words in the tag body.'''
         capit = re.findall(u'([A-Z]\S*)(?:\s|$)', body)
         return len(capit) > 1
 
     def _extract(self, body, record_dict):
         '''Finds the start index of the second capitalised word.
 
-        :param body: 
-        :param record_dict: 
+        :returns: the start index of the second capitalised word
 
         '''
         matches = [m for m in re.finditer(u'[A-Z]', body)]
