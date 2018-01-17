@@ -1,16 +1,12 @@
-
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import ckan.plugins as p
 from collections import OrderedDict
-import ckan.logic as logic
 
-
-NotFound = logic.NotFound
+from ckan.plugins import toolkit
 
 
 class DefaultView(object):
@@ -40,33 +36,33 @@ class DefaultView(object):
             u'enableCellNavigation': False,
             u'enableColumnReorder': False,
             u'defaultColumnWidth': 70
-        },
-        u'columnsWidth': [
-            {
-                u'column': u'_id',
-                u'width': 45
             },
-        ],
-        u'columnsTitle': [
-            {
-                u'column': u'_id',
-                u'title': u''  # This is just converted into a link so lets hide the title
-            }
-        ],
+        u'columnsWidth': [{
+            u'column': u'_id',
+            u'width': 45
+            }, ],
+        u'columnsTitle': [{
+            u'column': u'_id',
+            u'title': u''
+            # This is just converted into a link so lets hide the title
+            }],
         u'columnsToolTip': []
-    }
+        }
 
     @staticmethod
     def get_ordered_fields(resource_id):
         '''Get fields ordered the same as the uploaded dataset
 
-        :param resource_id: return:
+        :param resource_id:
 
         '''
-        data = {u'resource_id': resource_id, u'limit': 0}
+        data = {
+            u'resource_id': resource_id,
+            u'limit': 0
+            }
         try:
-            result = p.toolkit.get_action(u'datastore_search')({}, data)
-        except NotFound:
+            result = toolkit.get_action(u'datastore_search')({}, data)
+        except toolkit.ObjectNotFound:
             return []
         else:
             return [f[u'id'] for f in result[u'fields']]
@@ -80,13 +76,13 @@ class DefaultView(object):
 
         # The record_dict does not have fields in the correct order
         # So load the fields, and create an OrderedDict with field: value
-        c.field_data = OrderedDict()
+        toolkit.c.field_data = OrderedDict()
 
-        for field in self.get_ordered_fields(c.resource[u'id']):
+        for field in self.get_ordered_fields(toolkit.c.resource[u'id']):
             if not field.startswith(u'_'):
-                c.field_data[field] = c.record_dict.get(field, None)
+                toolkit.c.field_data[field] = toolkit.c.record_dict.get(field, None)
 
-        return p.toolkit.render(u'record/view.html')
+        return toolkit.render(u'record/view.html')
 
     def get_field_groups(self, resource):
         '''

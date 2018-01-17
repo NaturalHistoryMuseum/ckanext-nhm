@@ -4,29 +4,23 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import logging
-import re
 import json
-import ckan.model as model
-import ckan.logic as logic
-import ckan.plugins as p
-from copy import deepcopy
-from ckan.plugins import toolkit as tk
-from pylons import config
+import logging
 from collections import OrderedDict
+from copy import deepcopy
+
+import re
 from ckanext.nhm.views.default import DefaultView
 from ckanext.nhm.views.dwc import DarwinCoreView
 
-ValidationError = logic.ValidationError
+from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
-
-get_action = logic.get_action
 
 
 class SpecimenView(DefaultView):
     '''Controller for displaying a specimen record'''
-    resource_id = config.get(u'ckanext.nhm.specimen_resource_id')
+    resource_id = toolkit.config.get(u'ckanext.nhm.specimen_resource_id')
 
     grid_default_columns = DarwinCoreView.grid_default_columns
     grid_column_widths = DarwinCoreView.grid_column_widths
@@ -38,34 +32,27 @@ class SpecimenView(DefaultView):
         u'genus',
         u'imageCategory',
         u'gbifIssue'
-    ]
+        ]
 
     # Additional search filter options
     filter_options = {
         u'_has_image': {
             u'label': u'Has image',
-            # 'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
             u'solr': u'_has_multimedia:true'
-        },
+            },
         u'_has_lat_long': {
             u'label': u'Has lat/long',
-            # BS: Changed to look for latitude field,as _geom is only available after a map has been added
+            # BS: Changed to look for latitude field,as _geom is only available after a
+            # map has been added
             # As this works for all DwC, we might get datasets without a map
-            # 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
             u'solr': u'decimalLatitude:[* TO *]'
-        },
-        # '_exclude_centroid': {
-        #     'label': 'Exclude centroids',
-        #     # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
-        #     'solr': 'centroid:false'
-        # },
+            },
         u'_exclude_mineralogy': {
             u'label': u'Exclude Mineralogy',
             u'hide': True,
-            # 'sql': ('"{}"."collectionCode" <> \'MIN\''.format(resource_id),),
             u'solr': u'-collectionCode:MIN'
+            }
         }
-    }
 
     field_groups = OrderedDict([
         (u'Classification', OrderedDict([
@@ -82,7 +69,7 @@ class SpecimenView(DefaultView):
             (u'infraspecificEpithet', u'Subspecies'),
             (u'higherClassification', u'Higher classification'),
             (u'taxonRank', u'Taxon rank'),
-        ])),
+            ])),
         (u'Location', OrderedDict([
             (u'labelLocality', u'Label locality'),
             (u'locality', u'Locality'),
@@ -108,7 +95,7 @@ class SpecimenView(DefaultView):
             (u'maximumElevationInMeters', u'Maximum elevation(m)'),
             (u'minimumDepthInMeters', u'Minimum depth(m)'),
             (u'maximumDepthInMeters', u'Maximum depth(m)'),
-        ])),
+            ])),
         (u'Collection event', OrderedDict([
             (u'recordedBy', u'Recorded by'),
             (u'recordNumber', u'Record number'),
@@ -120,14 +107,14 @@ class SpecimenView(DefaultView):
             (u'habitat', u'Habitat'),
             (u'vessel', u'Vessel'),
             (u'samplingProtocol', u'Sampling protocol'),
-        ])),
+            ])),
         (u'Identification', OrderedDict([
             (u'identifiedBy', u'Identified by'),
             (u'dateIdentified', u'Date identified'),
             (u'identificationQualifier', u'Identification qualifier'),
             (u'typeStatus', u'Type status'),
             (u'determinations', u'Determinations'),
-        ])),
+            ])),
         (u'Specimen', OrderedDict([
             (u'catalogNumber', u'Catalogue number'),
             (u'collectionCode', u'Collection code'),
@@ -147,7 +134,7 @@ class SpecimenView(DefaultView):
             (u'sex', u'Sex'),
             (u'lifeStage', u'Life stage'),
             (u'catalogueDescription', u'Catalogue description'),
-        ])),
+            ])),
         (u'Mineralogy', OrderedDict([
             (u'dateRegistered', u'Date registered'),
             (u'occurrence', u'Occurrence'),
@@ -165,7 +152,7 @@ class SpecimenView(DefaultView):
             (u'mineralComplex', u'Mineral complex'),
             (u'tectonicProvince', u'Tectonic province'),
             (u'registeredWeight', u'Registered weight'),
-        ])),
+            ])),
         (u'Stratigraphy', OrderedDict([
             (u'earliestEonOrLowestEonothem', u'Earliest eon/lowest eonothem'),
             (u'latestEonOrHighestEonothem', u'Latest eon/highest eonothem'),
@@ -185,7 +172,7 @@ class SpecimenView(DefaultView):
             (u'bed', u'Bed'),
             (u'chronostratigraphy', u'Chronostratigraphy'),
             (u'lithostratigraphy', u'Lithostratigraphy'),
-        ])),
+            ])),
         (u'Meteorites', OrderedDict([
             (u'meteoriteType', u'Meteorite type'),
             (u'meteoriteGroup', u'Meteorite group'),
@@ -197,13 +184,13 @@ class SpecimenView(DefaultView):
             (u'recoveryDate', u'Recovery date'),
             (u'recoveryWeight', u'Recovery weight'),
             # "Registered weight unit",  # Merged into Registered weight
-        ])),
+            ])),
         (u'Botany', OrderedDict([
             (u'exsiccata', u'Exsiccata'),
             (u'exsiccataNumber', u'Exsiccata number'),
             (u'plantDescription', u'Plant description'),
             (u'cultivated', u'Cultivated'),
-        ])),
+            ])),
         (u'Zoology', OrderedDict([
             (u'populationCode', u'Population code'),
             (u'nestShape', u'Nest shape'),
@@ -215,14 +202,14 @@ class SpecimenView(DefaultView):
             (u'resuspendedIn', u'Resuspended in'),
             (u'totalVolume', u'Total volume'),
             (u'partType', u'Part type'),
-        ])),
+            ])),
         (u'Record', OrderedDict([
             (u'occurrenceID', u'Occurrence ID'),
             (u'modified', u'Modified'),
             (u'created', u'Created'),
             (u'recordType', u'Record type')
-        ])),
-    ])
+            ])),
+        ])
 
     def render_record(self, c):
         '''Render a record
@@ -239,18 +226,24 @@ class SpecimenView(DefaultView):
 
         c.record_title = c.record_dict.get(u'catalogNumber', None) or occurrence_id
 
-        # Act on a deep copy of field groups, so deleting element will not have any impact
+        # Act on a deep copy of field groups, so deleting element will not have
+        # any impact
         c.field_groups = deepcopy(self.field_groups)
 
         # Some fields are being merged together - in which case we'll need custom filters
         # This can be set to bool false to not display a filter
         c.custom_filters = {}
 
-        if c.record_dict.get(u'registeredWeight', None) and c.record_dict.get(u'registeredWeightUnit', None):
+        if c.record_dict.get(u'registeredWeight', None) and c.record_dict.get(
+                u'registeredWeightUnit', None):
             # Create custom filter which acts on both weight and units
-            c.custom_filters[u'registeredWeight'] = u'registeredWeight:%s|registeredWeightUnit:%s' % (c.record_dict[u'registeredWeight'], c.record_dict[u'registeredWeightUnit'])
+            c.custom_filters[
+                u'registeredWeight'] = u'registeredWeight:%s|registeredWeightUnit:%s' % (
+                c.record_dict[u'registeredWeight'],
+                c.record_dict[u'registeredWeightUnit'])
             # Merge unit into the field
-            c.record_dict[u'registeredWeight'] += u' %s' % c.record_dict[u'registeredWeightUnit']
+            c.record_dict[u'registeredWeight'] += u' %s' % c.record_dict[
+                u'registeredWeightUnit']
 
         collection_date = []
         collection_date_filter = []
@@ -280,7 +273,8 @@ class SpecimenView(DefaultView):
         c.record_dict[u'determinations'] = {}
         c.record_dict[u'determination_labels'] = []
 
-        for field in [u'determinationNames', u'determinationTypes', u'determinationFiledAs']:
+        for field in [u'determinationNames', u'determinationTypes',
+                      u'determinationFiledAs']:
 
             label = field.replace(u'determination', u'')
             # Add a space before capital letters
@@ -296,9 +290,11 @@ class SpecimenView(DefaultView):
                 else:
                     c.record_dict[u'determinations'][label] = []
 
-        c.record_dict[u'determinations'][u'_len'] = max([len(l) for l in c.record_dict[u'determinations'].values()])
+        c.record_dict[u'determinations'][u'_len'] = max(
+            [len(l) for l in c.record_dict[u'determinations'].values()])
 
-        # Set determinations to None if we don't have any values - required by the specimen template
+        # Set determinations to None if we don't have any values - required by the
+        # specimen template
         # to hide the Identification block
         if not c.record_dict[u'determinations'][u'_len']:
             c.record_dict[u'determinations'] = None
@@ -306,5 +302,4 @@ class SpecimenView(DefaultView):
         # No filters for determinations
         c.custom_filters[u'determinations'] = None
 
-        return p.toolkit.render(u'record/specimen.html')
-
+        return toolkit.render(u'record/specimen.html')
