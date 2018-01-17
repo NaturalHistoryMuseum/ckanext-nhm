@@ -1,6 +1,8 @@
 ckanext-nhm
 ===========
 
+[![Travis branch](https://img.shields.io/travis/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://travis-ci.org/NaturalHistoryMuseum/ckanext-nhm) [![Coveralls github branch](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
+
 CKAN extension for data.nhm.ac.uk
 
 paster datastore update-stats -c /etc/ckan/default/development.ini
