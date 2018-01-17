@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # encoding: utf-8
 #
@@ -16,4 +15,4 @@ COLLECTION_CONTACTS = {
     u'Library & Archives': u'library@nhm.ac.uk',
     u'Mineral & Planetary Sciences': u'm.rumsey@nhm.ac.uk',
     u'Vertebrates': u'simon.loader@nhm.ac.uk',
-}
+    }
