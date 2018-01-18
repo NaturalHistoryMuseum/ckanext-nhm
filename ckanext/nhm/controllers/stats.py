@@ -11,7 +11,6 @@ import os
 import requests
 from ckanext.nhm.lib.helpers import get_contributor_count
 from dateutil import rrule
-from pylons import config
 from requests import ConnectionError
 from sqlalchemy import and_, func
 
@@ -40,7 +39,7 @@ class StatsController(toolkit.BaseController):
 
         # Get the oldest tracking date
         oldest_created_date = model.Session.query(model.Resource.created, ).order_by(
-                model.Resource.created).limit(1).scalar()
+            model.Resource.created).limit(1).scalar()
 
         # If oldest date is none (no stats yet) we don't want to continue
         if oldest_created_date:
@@ -66,10 +65,18 @@ class StatsController(toolkit.BaseController):
 
         toolkit.c.graph_options = {
             u'series': {
-                u'lines': {u'show': True}, u'points': {u'show': True}
-                }, u'xaxis': {
-                u'mode': u'time', u'ticks': []
-                }, u'yaxis': {
+                u'lines': {
+                    u'show': True
+                    },
+                u'points': {
+                    u'show': True
+                    }
+                },
+            u'xaxis': {
+                u'mode': u'time',
+                u'ticks': []
+                },
+            u'yaxis': {
                 u'tickDecimals': 0
                 }
             }
@@ -85,38 +92,54 @@ class StatsController(toolkit.BaseController):
             toolkit.c.graph_options[u'xaxis'][u'ticks'].append([i, formatted_date])
 
         return toolkit.render(u'stats/resources.html',
-                              {u'title': u'Resource statistics'})
+                              {
+                                  u'title': u'Resource statistics'
+                                  })
 
     def contributors(self):
         '''Render the contributor stats page.'''
 
         # Get number of contributors
         toolkit.c.contributors = model.Session.execute(
-                u"SELECT u.id AS user_id, u.name, u.fullname, COUNT(p.id) AS count "
-                u"FROM package p INNER JOIN public.user u ON u.id = p.creator_user_id "
-                u"WHERE u.state='active' AND p.state='active' "
-                u"GROUP BY u.id ORDER BY count DESC").fetchall()
+            u"SELECT u.id AS user_id, u.name, u.fullname, COUNT(p.id) AS count "
+            u"FROM package p INNER JOIN public.user u ON u.id = p.creator_user_id "
+            u"WHERE u.state='active' AND p.state='active' "
+            u"GROUP BY u.id ORDER BY count DESC").fetchall()
 
         contributor_count = get_contributor_count()
 
         toolkit.c.num_contributors = [
-            {u'date': datetime.now() - timedelta(days=7), u'count': 0},
-            {u'date': datetime.now(), u'count': contributor_count}, ]
+            {
+                u'date': datetime.now() - timedelta(days=7),
+                u'count': 0
+                },
+            {
+                u'date': datetime.now(),
+                u'count': contributor_count
+                }, ]
 
         return toolkit.render(u'stats/contributors.html',
-                              {u'title': u'Contributor statistics'})
+                              {
+                                  u'title': u'Contributor statistics'
+                                  })
 
     def records(self):
         '''Render the records stats page.'''
 
         toolkit.c.datastore_stats = toolkit.get_action(u'dataset_statistics')(
-                self.context, {})
+            self.context, {})
         toolkit.c.num_records = [
-            {u'date': datetime.now() - timedelta(days=7), u'count': 0}, {
-                u'date': datetime.now(), u'count': toolkit.c.datastore_stats[u'total']
+            {
+                u'date': datetime.now() - timedelta(days=7),
+                u'count': 0
+                }, {
+                u'date': datetime.now(),
+                u'count': toolkit.c.datastore_stats[u'total']
                 }, ]
 
-        return toolkit.render(u'stats/records.html', {u'title': u'Record statistics'})
+        return toolkit.render(u'stats/records.html', {
+            u'title': u'Record statistics'
+            })
 
     def dataset_metrics(self, id):
         '''Render a page displaying metrics for a given dataset.
@@ -125,7 +148,9 @@ class StatsController(toolkit.BaseController):
 
         '''
 
-        data_dict = {u'id': id}
+        data_dict = {
+            u'id': id
+            }
 
         # check if package exists
         try:
@@ -142,8 +167,8 @@ class StatsController(toolkit.BaseController):
 
         # Get the oldest tracking date
         oldest_date = model.Session.query(model.TrackingSummary.tracking_date, ).filter(
-                model.TrackingSummary.package_id == toolkit.c.pkg_dict[u'id']).order_by(
-                model.TrackingSummary.tracking_date).limit(1).scalar()
+            model.TrackingSummary.package_id == toolkit.c.pkg_dict[u'id']).order_by(
+            model.TrackingSummary.tracking_date).limit(1).scalar()
 
         # If oldest date is none (no stats yet) we don't want to continue
         if oldest_date:
@@ -168,7 +193,7 @@ class StatsController(toolkit.BaseController):
                                     func.sum(model.TrackingSummary.count).label(u'sum'))
 
             q = q.filter(
-                    and_(model.TrackingSummary.package_id == toolkit.c.pkg_dict[u'id']))
+                and_(model.TrackingSummary.package_id == toolkit.c.pkg_dict[u'id']))
             q = q.order_by(date_func)
             q = q.group_by(date_func)
 
@@ -184,13 +209,22 @@ class StatsController(toolkit.BaseController):
             toolkit.c.pageviews = []
             toolkit.c.pageviews_options = {
                 u'grid': {
-                    u'borderWidth': {u'top': 0, u'right': 0, u'bottom': 1, u'left': 1},
+                    u'borderWidth': {
+                        u'top': 0,
+                        u'right': 0,
+                        u'bottom': 1,
+                        u'left': 1
+                        },
                     u'borderColor': u'#D4D4D4'
-                    }, u'xaxis': {
-                    u'ticks': [], u'tickLength': 0
-                    }, u'yaxis': {
+                    },
+                u'xaxis': {
+                    u'ticks': [],
                     u'tickLength': 0
-                    }, u'bars': {
+                    },
+                u'yaxis': {
+                    u'tickLength': 0
+                    },
+                u'bars': {
                     u'show': 1,
                     u'align': u'center',
                     u'zero': 1,
@@ -198,7 +232,9 @@ class StatsController(toolkit.BaseController):
                     u'barWidth': 0.9,
                     u'showNumbers': 1,
                     u'numbers': {
-                        u'xAlign': 1, u'yAlign': 1, u'top': -15
+                        u'xAlign': 1,
+                        u'yAlign': 1,
+                        u'top': -15
                         # BS: Added this. Need to patch flot.barnumbers properly
                         }
                     }
@@ -221,7 +257,7 @@ class StatsController(toolkit.BaseController):
 
                 # Add date label to ticks
                 toolkit.c.pageviews_options[u'xaxis'][u'ticks'].append(
-                        [i, formatted_date])
+                    [i, formatted_date])
 
         # Try and get resource download metrics - these are per resource
         # So need to loop through all resources, looking up download stats
@@ -240,14 +276,14 @@ class StatsController(toolkit.BaseController):
         toolkit.c.resource_downloads = []
         toolkit.c.total_downloads = 0
 
-        endpoint = os.path.join(config.get(u'ckanpackager.url'), u'statistics')
+        endpoint = os.path.join(toolkit.config.get(u'ckanpackager.url'), u'statistics')
 
         # FIXME: This does not work!!
 
         for resource in toolkit.c.pkg_dict[u'resources']:
 
             params = {
-                u'secret': config.get(u'ckanpackager.secret'),
+                u'secret': toolkit.config.get(u'ckanpackager.secret'),
                 u'resource_id': resource[u'id']
                 }
 
@@ -257,8 +293,8 @@ class StatsController(toolkit.BaseController):
             except ValueError:  # includes simplejson.decoder.JSONDecodeError
                 # Unable to retrieve download stats for this resource
                 log.critical(
-                        u'ERROR %s: Unable to retrieve download stats for resource %s',
-                        r.status_code, resource[u'id'])
+                    u'ERROR %s: Unable to retrieve download stats for resource %s',
+                    r.status_code, resource[u'id'])
             except ConnectionError, e:
                 log.critical(e)
             else:
