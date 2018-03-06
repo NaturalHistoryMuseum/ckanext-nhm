@@ -43,7 +43,9 @@ AUTHOR_MAX_LENGTH = 100
 def get_site_statistics():
     '''Get statistics for the site.'''
     stats = dict()
-    stats[u'dataset_count'] = toolkit.get_action(u'package_search')({}, {u'rows': 1})[
+    stats[u'dataset_count'] = toolkit.get_action(u'package_search')({}, {
+        u'rows': 1
+        })[
         u'count']
     # Get a count of all distinct user IDs
     stats[u'contributor_count'] = get_contributor_count()
@@ -55,7 +57,7 @@ def get_site_statistics():
 def get_contributor_count():
     '''Get the total number of contributors to active packages.'''
     return model.Session.execute(
-            u"SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE state='active'").scalar()
+        u"SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE state='active'").scalar()
 
 
 def _get_action(action, params):
@@ -65,7 +67,10 @@ def _get_action(action, params):
     :param params: 
 
     '''
-    context = {u'ignore_auth': True, u'for_view': True}
+    context = {
+        u'ignore_auth': True,
+        u'for_view': True
+        }
 
     try:
         return toolkit.get_action(action)(context, params)
@@ -81,7 +86,9 @@ def get_package(package_id):
     :param package_id: the ID of the package
 
     '''
-    return _get_action(u'package_show', {u'id': package_id})
+    return _get_action(u'package_show', {
+        u'id': package_id
+        })
 
 
 def get_resource(resource_id):
@@ -90,7 +97,9 @@ def get_resource(resource_id):
     :param resource_id: the ID of the resource
 
     '''
-    return _get_action(u'resource_show', {u'id': resource_id})
+    return _get_action(u'resource_show', {
+        u'id': resource_id
+        })
 
 
 def get_record(resource_id, record_id):
@@ -101,7 +110,10 @@ def get_record(resource_id, record_id):
 
     '''
     record = _get_action(u'record_show',
-                         {u'resource_id': resource_id, u'record_id': record_id})
+                         {
+                             u'resource_id': resource_id,
+                             u'record_id': record_id
+                             })
     return record.get(u'data', None)
 
 
@@ -130,7 +142,9 @@ def dataset_categories():
     '''
     try:
         return toolkit.get_action(u'tag_list')(
-                data_dict={u'vocabulary_id': DATASET_TYPE_VOCABULARY})
+            data_dict={
+                u'vocabulary_id': DATASET_TYPE_VOCABULARY
+                })
     except toolkit.ObjectNotFound:
         return []
 
@@ -167,10 +181,14 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
     :param view_type:  (optional, default: None)
 
     '''
-    context = {u'user': toolkit.c.user}
+    context = {
+        u'user': toolkit.c.user
+        }
 
     try:
-        views = toolkit.get_action(u'resource_view_list')(context, {u'id': resource_id})
+        views = toolkit.get_action(u'resource_view_list')(context, {
+            u'id': resource_id
+            })
     except toolkit.ObjectNotFound:
         return None
     else:
@@ -199,7 +217,9 @@ def indexlot_count():
     if not resource_id:
         log.error(u'Please configure index lot resource ID')
 
-    context = {u'user': toolkit.c.user}
+    context = {
+        u'user': toolkit.c.user
+        }
 
     search_params = dict(resource_id=resource_id, limit=1, )
     search = toolkit.get_action(u'datastore_search')(context, search_params)
@@ -212,7 +232,8 @@ def get_nhm_organisation_id():
     :returns: ID for the NHM organisation
 
     '''
-    return toolkit.config.get(u'ldap.organization.id')
+    value = toolkit.config.get(u'ldap.organization.id')
+    return unicode(value) if value is not None else None
 
 
 def get_specimen_resource_id():
@@ -221,7 +242,8 @@ def get_specimen_resource_id():
     :returns: ID for the specimen resource
 
     '''
-    return toolkit.config.get(u'ckanext.nhm.specimen_resource_id')
+    value = toolkit.config.get(u'ckanext.nhm.specimen_resource_id')
+    return unicode(value) if value is not None else None
 
 
 def get_indexlot_resource_id():
@@ -230,7 +252,8 @@ def get_indexlot_resource_id():
     :returns: ID for indexlot resource
 
     '''
-    return toolkit.config.get(u'ckanext.nhm.indexlot_resource_id')
+    value = toolkit.config.get(u'ckanext.nhm.indexlot_resource_id')
+    return unicode(value) if value is not None else None
 
 
 @cache_region(u'permanent', u'collection_stats')
@@ -244,9 +267,12 @@ def collection_stats():
                          # Get an extra facet, so we can determine if there are more
                          )
 
-    context = {u'user': toolkit.c.user}
+    context = {
+        u'user': toolkit.c.user
+        }
     try:
-        search = toolkit.get_action(u'datastore_search')(context, search_params)
+        search = toolkit.get_action(u'datastore_search')(context=context,
+                                                         data_dict=search_params)
     except SolrException:
         pass
     else:
@@ -256,7 +282,8 @@ def collection_stats():
             total += num
 
     stats = {
-        u'total': total, u'collections': collections
+        u'total': total,
+        u'collections': collections
         }
     return stats
 
@@ -290,7 +317,10 @@ def delimit_number(num):
 
 def api_doc_link():
     '''Link to API documentation.'''
-    attr = {u'class': u'external', u'target': u'_blank'}
+    attr = {
+        u'class': u'external',
+        u'target': u'_blank'
+        }
     return toolkit.h.link_to(toolkit._(u'API guide'),
                              u'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
@@ -318,9 +348,13 @@ def persistent_follow_button(obj_type, obj_id):
     assert obj_type in toolkit.h._follow_objects
 
     if toolkit.c.user:
-        context = {u'user': toolkit.c.user}
+        context = {
+            u'user': toolkit.c.user
+            }
         action = u'am_following_%s' % obj_type
-        following = toolkit.get_action(action)(context, {u'id': obj_id})
+        following = toolkit.get_action(action)(context, {
+            u'id': obj_id
+            })
         return toolkit.h.snippet(u'snippets/follow_button.html', following=following,
                                  obj_id=obj_id, obj_type=obj_type)
 
@@ -429,7 +463,8 @@ def resource_view_state(resource_view_json, resource_json):
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
             resource_view[u'state'][u'columnsWidth'].append({
-                u'column': column, u'width': width
+                u'column': column,
+                u'width': width
                 })
 
     try:
@@ -717,7 +752,10 @@ def get_image_licence_options():
     licenses = [(u'', u'')] + model.Package.get_license_options()
 
     # Format licences as form options list of dicts
-    return [{u'value': value, u'text': text} for text, value in licenses]
+    return [{
+        u'value': value,
+        u'text': text
+        } for text, value in licenses]
 
 
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
@@ -805,8 +843,8 @@ def dataset_author_truncate(author_str):
             shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end=u'')
 
         return literal(
-                u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(
-                        shortened, author_str))
+            u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(
+                shortened, author_str))
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
@@ -832,7 +870,9 @@ def get_resource_facets(resource):
     # If facets aren't defined in the resource view, then just return
     if not resource_view.field_facets:
         return
-    context = {u'user': toolkit.c.user}
+    context = {
+        u'user': toolkit.c.user
+        }
     # Build query parameters for the faceted search
     # We'll use the same query parameters used in the current request
     # And then add extras to perform a solr faceted query, returning
@@ -885,7 +925,7 @@ def get_resource_facets(resource):
             u'facet_values': [],
             u'has_more': len(search[u'facets'][u'facet_fields'][
                                  field_name]) > num_facets and field_name not in search_params.get(
-                    u'facets_field_limit', {}),
+                u'facets_field_limit', {}),
             u'active': active_facet
             }
 
@@ -896,7 +936,9 @@ def get_resource_facets(resource):
             except KeyError:
                 pass
             facet[u'facet_values'].append({
-                u'name': value, u'label': label, u'count': count,
+                u'name': value,
+                u'label': label,
+                u'count': count,
                 })
 
         facet[u'facet_values'] = sorted(facet[u'facet_values'], key=itemgetter(u'count'),
@@ -1023,7 +1065,8 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     filter_dict = parse_request_filters()
     extras = {
-        u'id': package[u'id'], u'resource_id': resource[u'id']
+        u'id': package[u'id'],
+        u'resource_id': resource[u'id']
         }
 
     pills = []
@@ -1057,7 +1100,8 @@ def resource_view_get_filterable_fields(resource):
         return []
 
     data = {
-        u'resource_id': resource[u'id'], u'limit': 0,
+        u'resource_id': resource[u'id'],
+        u'limit': 0,
         # As these are for the filters, only get the indexed fields
         u'indexed_only': True
         }

@@ -381,7 +381,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     def enforce_max_limit(query_dict, field_name=u'limit'):
         '''
 
-        :param query_dict: 
+        :param query_dict:
         :param field_name:  (Default value = u'limit')
 
         '''
@@ -475,12 +475,12 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     ## IPackageController
     def after_update(self, context, pkg_dict):
         '''If this is the specimen resource, clear memcached
-        
+
         NB: Our version of ckan doesn't have the IResource after_update method
         But updating a resource calls IPackageController.after_update
         ..seealso:: ckan.plugins.interfaces.IPackageController.after_update
         :param context:
-        :param pkg_dict: 
+        :param pkg_dict:
 
         '''
         for resource in pkg_dict.get(u'resources', []):
