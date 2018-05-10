@@ -94,3 +94,11 @@
     {{ form.markdown('content', label=_('Your request'), id='field-content', value=data.content, error=errors.content, is_required=true) }}
 
 {% endblock %}
+
+{% block contact_form_actions %}
+    <div class="action-info small">
+      <p><i>{{ _('Data Protection') }}</i></p>
+      <p>{{ _('The Natural History Museum will use your personal data in accordance with data protection legislation to process your requests. For more information please read our') }} <a href="{{ h.url_for('legal_privacy') }}">privacy notice</a>.</p>
+    </div>
+    {{ super() }}
+{% endblock %}

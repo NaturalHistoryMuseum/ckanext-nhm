@@ -1,8 +1,5 @@
 
 import ckan.plugins as p
-from ckan.common import _, g, c
-import ckan.lib.helpers as h
-from ckanext.stats import stats as stats_lib
 
 
 class LegalController(p.toolkit.BaseController):
@@ -11,7 +8,8 @@ class LegalController(p.toolkit.BaseController):
     """
 
     def privacy(self):
-        return p.toolkit.render('legal/privacy.html', {'title': 'Privacy notice'})
+        # redirect to the Museum's main privacy page
+        p.toolkit.redirect_to('http://www.nhm.ac.uk/about-us/privacy-notice.html')
 
     def terms(self):
         return p.toolkit.render('legal/terms.html', {'title': 'Terms and conditions'})
