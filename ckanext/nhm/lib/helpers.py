@@ -58,8 +58,14 @@ def get_site_statistics():
     stats['dataset_count'] = logic.get_action('package_search')({}, {"rows": 1})['count']
     # Get a count of all distinct user IDs
     stats['contributor_count'] = get_contributor_count()
-    dataset_statistics = _get_action('dataset_statistics', {})
-    stats['record_count'] = dataset_statistics.get('total', 0)
+    record_count = 0
+    try:
+        dataset_statistics = _get_action('dataset_statistics', {})
+        record_count = dataset_statistics.get('total', 0)
+    except Exception as _e:
+        # if there was a problem getting the stats return 0 and log an exception
+        log.exception('Could not gather dataset statistics')
+    stats['record_count'] = record_count
     return stats
 
 
