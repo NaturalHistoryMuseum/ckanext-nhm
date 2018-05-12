@@ -1520,6 +1520,12 @@ div.ckanpackager-form div {
   text-align: center;
   padding: 10px 0;
 }
+div.ckanpackager-form .privacy-warning {
+  text-align: left;
+  padding: 10px 0 5px 0;
+  font-size: 75%;
+  border-top: 1px solid #b8b8b8;
+}
 .search-form .search-input.search-giant input {
   line-height: inherit;
 }
