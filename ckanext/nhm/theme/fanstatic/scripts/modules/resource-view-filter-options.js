@@ -28,7 +28,7 @@ this.ckan.module('resource-view-filter-options', function ($, _) {
 
             $input.prependTo($label);
             $label.appendTo($filterOptions);
-
+            $filterOptions.append($('<br />'))
           }
 
         self.el.append($filterOptions);
