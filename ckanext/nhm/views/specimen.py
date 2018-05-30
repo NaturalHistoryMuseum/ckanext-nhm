@@ -36,6 +36,10 @@ class SpecimenView(DefaultView):
         'gbifIssue'
     ]
 
+    type_status_filters = ['Type', 'Paratype', 'Holotype', 'Syntype', 'Isotype', 'Lectotype', 'Syntypes', 'Paratypes',
+                    'Paralectotype', 'Isolectotype', 'Types', 'Cotype', 'Isosyntype', 'Cotypes', 'Paralectotypes',
+                    'Allotype', 'Neotype', 'Topotype', 'Neohapantotype', 'Hapantotype', 'Parahapantotype',
+                    'Schizoholotype', 'Topotypes', 'Isoneotype', 'Hypotype']
     # Additional search filter options
     filter_options = {
         '_has_image': {
@@ -55,6 +59,10 @@ class SpecimenView(DefaultView):
         #     # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
         #     'solr': 'centroid:false'
         # },
+        '_has_type': {
+            'label': 'Is type',
+            'solr': 'typeStatus:({})'.format(' OR '.join(type_status_filters))
+        },
         '_exclude_mineralogy': {
             'label': 'Exclude Mineralogy',
             'hide': True,
