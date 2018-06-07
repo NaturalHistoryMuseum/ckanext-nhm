@@ -1520,6 +1520,12 @@ div.ckanpackager-form div {
   text-align: center;
   padding: 10px 0;
 }
+div.ckanpackager-form .privacy-warning {
+  text-align: left;
+  padding: 10px 0 5px 0;
+  font-size: 75%;
+  border-top: 1px solid #b8b8b8;
+}
 .search-form .search-input.search-giant input {
   line-height: inherit;
 }
@@ -1545,6 +1551,9 @@ div.ckanpackager-form div {
 }
 .external_links p {
   margin: 4px 6px;
+}
+.external_links ul {
+  margin: 0 0 10px 26px;
 }
 /* MAM original image */
 .download-tooltip {
