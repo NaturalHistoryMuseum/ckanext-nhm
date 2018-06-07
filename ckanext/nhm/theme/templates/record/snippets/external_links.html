@@ -1,18 +1,20 @@
 {% block external_links %}
-    {% set external_links = h.get_external_links(record) %}
-    {% if external_links %}
-        <section class="module additional-info">
-            <div class="module-content external_links">
-                <h3>{{ _('External Links') }}</h3>
-                {% for text, icon, links in external_links %}
-                    <p><img width="16" height="16" src="{{ icon }}"> {{ text }}</p>
-                    <ul>
-                        {% for link_text, link in links %}
-                            <li><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
-                        {% endfor %}
-                    </ul>
-                {% endfor %}
-            </div>
-        </section>
-    {% endif %}
+    <section class="module additional-info">
+        <div class="module-content external_links">
+            <h3>{{ _('External Links') }}</h3>
+            {% block external_links_content %}
+                {% set external_links = h.get_external_links(record) %}
+                {% if external_links %}
+                    {% for text, icon, links in external_links %}
+                        <p><img width="16" height="16" src="{{ icon }}"> {{ text }}</p>
+                        <ul>
+                            {% for link_text, link in links %}
+                                <li><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+                {% endif %}
+            {% endblock %}
+        </div>
+    </section>
 {% endblock %}
