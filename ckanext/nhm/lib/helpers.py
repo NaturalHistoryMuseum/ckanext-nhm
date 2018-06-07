@@ -20,7 +20,9 @@ from ckan.lib import helpers as h
 
 from webhelpers.html import literal
 
+from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
+from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
 
@@ -1092,3 +1094,18 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
         return '{} ({})'.format(h.render_datetime(date, date_format=date_format), name)
     # there is no available update so we return 'unknown'
     return _('unknown')
+
+
+def get_external_links(record):
+    '''
+    Helper called on collection record pages (i.e. records in the specimens, indexlots or artefacts resources) which is
+    expected to return a list of tuples. Each tuple provides a title and a list of links, respectively, which are
+    relevant to the record.
+    :param record:
+    :return:
+    '''
+    sites = external_links.get_relevant_sites(record)
+    ranks = extract_ranks(record)
+    if ranks:
+        return [(name, icon, [(rank, link.format(rank)) for rank in ranks.values()]) for name, icon, link in sites]
+    return []
