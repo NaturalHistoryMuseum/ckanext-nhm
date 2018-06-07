@@ -19,6 +19,8 @@ SITES = {
     'MIN': [Mindat],
     'PAL': [PBDB],
     'ZOO': [BHL, CoL],
+    # if there is no collection code, just check the BHL and CoL. This catches index lot entries.
+    None: [BHL, CoL]
 }
 
 
@@ -28,4 +30,5 @@ def get_relevant_sites(record):
     :param record: the record dict
     :return: a list of sites
     '''
-    return SITES.get(record['collectionCode'], [])
+    # if no collection code is available, default to None
+    return SITES.get(record.get('collectionCode', None), [])
