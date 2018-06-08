@@ -47,8 +47,7 @@
 
                                     {% resource 'ckanext-ckanpackager/main' %}
 
-                                    <a data-module="ckanpackager-download-link" data-module-anon_message="Please enter your email address below, and the record will be packaged and sent to you."
-                                       data-module-auth_message="The record will be packaged and sent to the email address registered with your account."
+                                    <a data-module="ckanpackager-download-link" data-module-resource-id="{{ res.id }}" data-module-is-record="true"
                                        class="packager-link btn btn-primary" href="{{ h.url_for_package_resource(pkg.id, res.id, extra_filters={'_id': rec['_id']}) }}">
                                         <i class="icon-download"></i> Download
                                     </a>
