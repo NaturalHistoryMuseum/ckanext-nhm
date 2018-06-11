@@ -1,3 +1,5 @@
+{% resource 'ckanext-nhm/external-links' %}
+
 {% block external_links %}
     <section class="module additional-info">
         <div class="module-content external_links">
@@ -6,10 +8,10 @@
                 {% set external_links = h.get_external_links(record) %}
                 {% if external_links %}
                     {% for text, icon, links in external_links %}
-                        <p><img width="16" height="16" src="{{ icon }}"> {{ text }}</p>
-                        <ul>
+                        <ul class="external-link-parent">
+                            <span class="external-link-name"><img width="16" height="16" src="{{ icon }}"> {{ text }}</span>
                             {% for link_text, link in links %}
-                                <li><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
+                                <li class="external-link-child"><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
                             {% endfor %}
                         </ul>
                     {% endfor %}
