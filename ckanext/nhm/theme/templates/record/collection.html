@@ -88,18 +88,19 @@
 
 {% endblock %}
 
-{% block record_additional_information_rows %}
-   <tr>
-    <th scope="row">{{ _('Created') }}</th>
-    <td>{{ h.render_datetime(c.record_dict['created']) }}</td>
-  </tr>
-   <tr>
-    <th scope="row">{{ _('Last updated') }}</th>
-    <td>{{ h.render_datetime(c.record_dict['modified']) }}</td>
-  </tr>
-
-  {{ super() }}
-
+{% block record_additional_information_inner %}
+    {% snippet "record/snippets/external_links.html", pkg=pkg, res=res, record=c.record_dict %}
+    {{ super() }}
 {% endblock %}
 
-
+{% block record_additional_information_rows %}
+    <tr>
+        <th scope="row">{{ _('Created') }}</th>
+        <td>{{ h.render_datetime(c.record_dict['created']) }}</td>
+    </tr>
+    <tr>
+        <th scope="row">{{ _('Last updated') }}</th>
+        <td>{{ h.render_datetime(c.record_dict['modified']) }}</td>
+    </tr>
+    {{ super() }}
+{% endblock %}

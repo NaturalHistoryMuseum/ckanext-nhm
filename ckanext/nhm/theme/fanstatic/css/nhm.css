@@ -1546,6 +1546,18 @@ div.ckanpackager-form .privacy-warning {
 .citation p {
   margin: 4px 6px;
 }
+.external-links {
+  margin-bottom: 20px;
+}
+.external-links p {
+  margin: 4px 6px;
+}
+.external-links ul {
+  margin: 0 0 10px 26px;
+}
+.external-links .external-link-name {
+  cursor: pointer;
+}
 /* MAM original image */
 .download-tooltip {
   min-width: 290px;

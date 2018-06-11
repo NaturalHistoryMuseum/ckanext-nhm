@@ -3,8 +3,8 @@
 from jinja2.ext import Extension
 from jinja2 import nodes
 import re
-import abc
-from collections import OrderedDict
+
+from ckanext.nhm.lib.taxonomy import find_author_split
 
 
 class TaxonomyFormatExtension(Extension):
@@ -182,133 +182,10 @@ class TaxonomyFormatExtension(Extension):
         :param record_dict: the full record
         :return: the tag body with the authors wrapped in deitalicising tags
         '''
-        # if it's just a single word, no need to parse
-        first_space = re.search('\s', body)
-        if not first_space:
-            return body
-
-        evaluators = OrderedDict()
-        evaluators['authors'] = AuthorParserStage()
-        evaluators['species'] = SimpleFieldParserStage('specificEpithet')
-        evaluators['subgenus'] = SimpleFieldParserStage('subgenus')
-        evaluators['capitalisation'] = CapitalisedParserStage()
-
-        ix = None
-        for t, e in evaluators.items():
-            ix = e.evaluate(body, record_dict)
-            if ix:
-                break
-
+        ix = find_author_split(body, record_dict)
         if ix:
             authors = body[ix:]
             return u'{0}'.format(body[:ix]) + self.common_strings[
                 'deitalicise'].format(authors)
         else:
             return body
-
-
-class BaseParserStage(object):
-    '''
-    Represents a single stage of a field parsing process.
-    '''
-    @abc.abstractmethod
-    def _meets_criteria(self, body, record_dict):
-        '''
-        Tests to see if the item meets certain criteria.
-        :param body: the tag body to search in
-        :param record_dict: the full record
-        :return: boolean for pass/fail
-        '''
-        return True
-
-    @abc.abstractmethod
-    def _extract(self, body, record_dict):
-        '''
-        Finds an index within a string
-        :param body: the tag body
-        :param record_dict: the full record
-        :return: a character index
-        '''
-        return 0
-
-    def evaluate(self, body, record_dict):
-        '''
-        Checks if the item meets the criteria then returns the index
-        :param body: the tag body
-        :param record_dict: the full record
-        :return: character index if criteria met, None if not
-        '''
-        if self._meets_criteria(body, record_dict):
-            return self._extract(body, record_dict)
-
-
-class AuthorParserStage(BaseParserStage):
-    '''
-    A specific stage for searching for authors in the tag body.
-    '''
-    def _meets_criteria(self, body, record_dict):
-        '''
-        Ensures an author field is present in the record.
-        '''
-        return 'scientificNameAuthorship' in record_dict.keys()
-
-    def _extract(self, body, record_dict):
-        '''
-        Searches for the full author string, then breaks it up into smaller pieces (sections in brackets, individual names) if that's not found
-        :return: the start index of the author string if found, otherwise None
-        '''
-        full_author = record_dict['scientificNameAuthorship']
-        author_strings = [full_author] + [p.strip() for p in set(
-                re.findall(u'\(([\w\s]+)\)', full_author) + re.findall(
-                        u'([\w.\s]+)', full_author))]
-        for a in author_strings:
-            matches = re.search(u'\s\(?{0}\)?(\s|$)'.format(re.escape(a)), body)
-            return matches.start() if matches else None
-
-
-class SimpleFieldParserStage(BaseParserStage):
-    '''
-    A generic stage for searching for a certain field within the tag body (for the purposes of finding authors).
-    '''
-    def __init__(self, field_name):
-        self.field_name = field_name
-
-    def _meets_criteria(self, body, record_dict):
-        '''
-        Checks that the record contains a value for this field and that the value is present in the tag body.
-        '''
-        return self.field_name in record_dict.keys() and record_dict[
-                                                             self.field_name] in body
-
-    def _extract(self, body, record_dict):
-        '''
-        If the value is at the end of the string, there is no point in continuing; otherwise, it looks for the first capitalised word after that value.
-        :return: the start index of the estimated author string if found, else None.
-        '''
-        field_value = record_dict[self.field_name]
-        if re.search('{0}$'.format(re.escape(field_value)), body):
-            return len(body)
-        split_by_value = re.split('{0}'.format(re.escape(field_value)), body,
-                                  1)
-        matches = re.search('\(?[A-Z]\w*', split_by_value[1])
-        return matches.start() + len(split_by_value[0]) + len(
-                field_value) if matches else None
-
-
-class CapitalisedParserStage(BaseParserStage):
-    '''
-    The last resort stage in the search for authors - searches for the second capitalised word in the tag body.
-    '''
-    def _meets_criteria(self, body, record_dict):
-        '''
-        Checks for multiple capitalised words in the tag body.
-        '''
-        capit = re.findall('([A-Z]\S*)(?:\s|$)', body)
-        return len(capit) > 1
-
-    def _extract(self, body, record_dict):
-        '''
-        Finds the start index of the second capitalised word.
-        '''
-        matches = [m for m in re.finditer('[A-Z]', body)]
-        return matches[1].start()
