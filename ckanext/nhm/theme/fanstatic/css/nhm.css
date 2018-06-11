@@ -1546,16 +1546,16 @@ div.ckanpackager-form .privacy-warning {
 .citation p {
   margin: 4px 6px;
 }
-.external_links {
+.external-links {
   margin-bottom: 20px;
 }
-.external_links p {
+.external-links p {
   margin: 4px 6px;
 }
-.external_links ul {
+.external-links ul {
   margin: 0 0 10px 26px;
 }
-.external_links .external-link-name {
+.external-links .external-link-name {
   margin-left: -21px;
   cursor: pointer;
 }
