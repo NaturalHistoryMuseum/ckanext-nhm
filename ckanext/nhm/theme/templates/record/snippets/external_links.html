@@ -8,12 +8,14 @@
                 {% set external_links = h.get_external_links(record) %}
                 {% if external_links %}
                     {% for text, icon, links in external_links %}
-                        <ul class="external-link-parent">
-                            <span class="external-link-name"><img width="16" height="16" src="{{ icon }}"> {{ text }}</span>
-                            {% for link_text, link in links %}
-                                <li class="external-link-child"><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
-                            {% endfor %}
-                        </ul>
+                        <div class="external-link-parent">
+                            <div class="external-link-name"><img width="16" height="16" src="{{ icon }}">&nbsp;<span>{{ text }}</span></div>
+                            <ul>
+                                {% for link_text, link in links %}
+                                    <li class="external-link-child"><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     {% endfor %}
                 {% endif %}
             {% endblock %}
