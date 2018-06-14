@@ -9,7 +9,7 @@
                 {% if external_links %}
                     {% for text, icon, links in external_links %}
                         <div class="external-link-parent">
-                            <div class="external-link-name"><img width="16" height="16" src="{{ icon }}">&nbsp;<span>{{ text }}</span></div>
+                            <div class="external-link-name"><img width="16" height="16" src="{{ icon }}">&nbsp;<span>{{ text }}&nbsp;<i class="icon-caret-down"></i></span></div>
                             <ul>
                                 {% for link_text, link in links %}
                                     <li class="external-link-child"><a href="{{ link }}" target="_blank">{{ link_text }}</a></li>
