@@ -1107,5 +1107,6 @@ def get_external_links(record):
     sites = external_links.get_relevant_sites(record)
     ranks = extract_ranks(record)
     if ranks:
-        return [(name, icon, set((rank, link.format(rank)) for rank in ranks.values())) for name, icon, link in sites]
+        return [(name, icon, OrderedDict.fromkeys([(rank, link.format(rank)) for rank in ranks.values()]))
+                for name, icon, link in sites]
     return []
