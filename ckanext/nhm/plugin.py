@@ -21,6 +21,7 @@ import ckanext.nhm.lib.helpers as helpers
 import logging
 from jinja2 import Environment
 
+from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import (
     resource_view_get_filter_options,
     # NOTE: Need to import a function with a cached decorator so clear caches works
@@ -34,6 +35,7 @@ from collections import OrderedDict
 from ckanext.doi.interfaces import IDoi
 from ckanext.datasolr.interfaces import IDataSolr
 from ckanext.gallery.plugins.interfaces import IGalleryImage
+from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 
 get_action = logic.get_action
@@ -65,6 +67,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(IContact)
     p.implements(IDoi)
     p.implements(IGalleryImage)
+    p.implements(ICkanPackager)
 
     ## IConfigurer
     def update_config(self, config):
@@ -492,3 +495,22 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     'record_id': record['_id']
                 })
         return images
+
+    ## ICkanPackager
+    def before_package_request(self, resource_id, package_id, packager_url, request_params):
+        '''
+        Modify the request params that are about to be sent through to the ckanpackager backend so that an EML param is
+        included.
+
+        :param resource_id: the resource id of the resource that is about to be packaged
+        :param package_id: the package id of the resource that is about to be packaged
+        :param packager_url: the target url for this packaging request
+        :param request_params: a dict of parameters that will be sent with the request
+        :return: the url and the params as a tuple
+        '''
+        resource = get_action('resource_show')(None, {'id': resource_id})
+        package = get_action('package_show')(None, {'id': package_id})
+        if resource.get('datastore_active', False) and resource.get('format', '').lower() == 'dwc':
+            # if it's a datastore resource and it's in the DwC format, add EML
+            request_params['eml'] = generate_eml(package, resource)
+        return packager_url, request_params
