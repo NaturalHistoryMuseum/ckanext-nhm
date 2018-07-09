@@ -510,8 +510,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         '''
         resource = get_action('resource_show')(None, {'id': resource_id})
         package = get_action('package_show')(None, {'id': package_id})
-        if resource.get('datastore_active', False):
-            if resource.get('format', '').lower() == 'dwc':
-                # if it's a datastore resource and it's in the DwC format, add EML
-                request_params['eml'] = generate_eml(package, resource)
+        if resource.get('datastore_active', False) and resource.get('format', '').lower() == 'dwc':
+            # if it's a datastore resource and it's in the DwC format, add EML
+            request_params['eml'] = generate_eml(package, resource)
         return packager_url, request_params
