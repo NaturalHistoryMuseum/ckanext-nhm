@@ -12,7 +12,7 @@
     {% if datastore_fields.__len__() > 1 %}
 
         {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs={'data-module': 'toggle-select', 'data-module-target': '#image-licence-options'}) %}
-            {{ form.info(_('Does your dataset contain images?.  If so, please select the field here.'), inline=True) }}
+            {{ form.info(_('Does your dataset contain images?  If so, please select the field here.'), inline=True) }}
         {% endcall %}
 
         {# If there's an image field in this dataset #}
