@@ -22,7 +22,7 @@
         {# If there's an image field in this dataset #}
         <div id="image-options">
             {% call form.select('_image_licence', label=_('Image licence'), options=h.get_image_licence_options(), selected=data._image_licence, error=errors._image_licence) %}
-                {{ form.info(_('Please seelct a licence for images in this dataset.  This licence will be displayed next to the image.'), inline=True) }}
+                {{ form.info(_('Please select a licence for images in this dataset.  This licence will be displayed next to the image.'), inline=True) }}
             {% endcall %}
 
             {% call form.input('_image_delimiter', label=_('Image list delimiter'), value=data._image_delimiter, error=errors._image_delimiter) %}
