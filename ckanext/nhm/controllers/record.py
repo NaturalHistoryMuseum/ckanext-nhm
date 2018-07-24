@@ -118,8 +118,8 @@ class RecordController(base.BaseController):
                     else:
                         images = [image_field_value]
                     # loop through the images, adding dicts with their details to the context
-                    for image in map(lambda i: i.strip(), images):
-                        if image.split():
+                    for image in images:
+                        if image.strip():
                             c.images.append({
                                 'title': c.record_title,
                                 'href': image.strip(),
