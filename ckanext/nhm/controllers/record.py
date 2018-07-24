@@ -86,69 +86,64 @@ class RecordController(base.BaseController):
 
         # Sanity check: image field hasn't been set to _id
         if field_names['image'] and field_names['image'] != '_id':
-
-            try:
-                image_field_type = record_field_types[field_names['image']]
-            except KeyError:
-                pass
-            else:
-                default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
-                licence_id = c.resource.get('_image_licence') or 'cc-by'
-                short_licence_id = licence_id[:5].lower()
-                # licence_id = c.resource.get('_image_licence') or 'ODC-BY-1.0'
-                # Set default licence - cc-by
-                # FIXME: This is such a mess!!! Have licences changed in the update??
+            default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
+            licence_id = c.resource.get('_image_licence') or 'cc-by'
+            short_licence_id = licence_id[:5].lower()
+            # try and overwrite default licence with more specific one
+            for l_id in [licence_id, short_licence_id]:
                 try:
-                    licence = model.Package.get_license_register()['ODC-BY-1.0']
+                    licence = model.Package.get_license_register()[l_id]
+                    break
                 except KeyError:
-                    licence = model.Package.get_license_register()['cc-by']
-                # Try and overwrite default licence with more specific one
-                for l_id in [licence_id, short_licence_id]:
-                    try:
-                        licence = model.Package.get_license_register()[l_id]
-                        break
-                    except KeyError:
-                        continue
+                    continue
 
-                default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
+            default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
-                image_field_value = c.record_dict.pop(field_names['image'], None)
+            # pop the image field so it isn't output as part of the record_dict/field_data dict (see self.view())
+            image_field_value = c.record_dict.pop(field_names['image'], None)
 
-                if image_field_value:
+            if image_field_value:
+                # init the images list on the context var
+                c.images = []
 
-                    c.images = []
-
-                    # DOn't test for field type, just try and convert image to json
-                    try:
-                        images = json.loads(image_field_value)
-                    except ValueError:
-                        # String field value
-                        try:
-                            # Pop the image field so it won't be output as part of the record_dict / field_data dict (see self.view())
-                            c.images = [{'title': c.record_title, 'href': image.strip(), 'copyright': '%s<br />%s' % (default_licence, default_copyright)} for image in image_field_value.split(';') if
-                                        image.strip()]
-                        except (KeyError, AttributeError):
-                            # Skip errors - there are no images
-                            pass
+                # try and convert image to json
+                try:
+                    images = json.loads(image_field_value)
+                except ValueError:
+                    # if it fails, it's a string field value
+                    # use the delimiter to split up the field value (if there is one!)
+                    delimiter = c.resource.get('_image_delimiter', None)
+                    if delimiter:
+                        images = image_field_value.split(delimiter)
                     else:
-                        for image in images:
-                            href = image.get('identifier', None)
-                            if href:
-                                license_link = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
-                                c.images.append({
-                                    'title': image.get('title', None) or c.record_title,
-                                    'href': href,
-                                    'copyright': '%s<br />%s' % (license_link or default_licence, image.get('rightsHolder', None) or default_copyright),
-                                    'record_id': record_id,
-                                    'resource_id': resource_id,
-                                    'link': url_for(
-                                        controller='ckanext.nhm.controllers.record:RecordController',
-                                        action='view',
-                                        package_name=package_name,
-                                        resource_id=resource_id,
-                                        record_id=record_id
-                                    ),
-                                })
+                        images = [image_field_value]
+                    # loop through the images, adding dicts with their details to the context
+                    for image in images:
+                        if image.strip():
+                            c.images.append({
+                                'title': c.record_title,
+                                'href': image.strip(),
+                                'copyright': '%s<br />%s' % (default_licence, default_copyright)
+                            })
+                else:
+                    for image in images:
+                        href = image.get('identifier', None)
+                        if href:
+                            license_link = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
+                            c.images.append({
+                                'title': image.get('title', None) or c.record_title,
+                                'href': href,
+                                'copyright': '%s<br />%s' % (license_link or default_licence, image.get('rightsHolder', None) or default_copyright),
+                                'record_id': record_id,
+                                'resource_id': resource_id,
+                                'link': url_for(
+                                    controller='ckanext.nhm.controllers.record:RecordController',
+                                    action='view',
+                                    package_name=package_name,
+                                    resource_id=resource_id,
+                                    record_id=record_id
+                                ),
+                            })
 
         if field_names['latitude'] and field_names['longitude']:
             latitude, longitude = c.record_dict.get(field_names['latitude']), c.record_dict.get(field_names['longitude'])

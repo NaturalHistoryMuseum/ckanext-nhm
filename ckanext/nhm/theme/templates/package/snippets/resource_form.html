@@ -11,24 +11,26 @@
     {# We allow empty to has to be greater than 1 for there to be fields #}
     {% if datastore_fields.__len__() > 1 %}
 
-        {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs={'data-module': 'toggle-select', 'data-module-target': '#image-licence-options'}) %}
-            {{ form.info(_('Does your dataset contain images?.  If so, please select the field here.'), inline=True) }}
+        {% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field) %}
+            {{ form.info(_('Please select the field to use for the record title.'), inline=True) }}
+        {% endcall %}
+
+        {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs={'data-module': 'toggle-select', 'data-module-target': '#image-options'}) %}
+            {{ form.info(_('Does your dataset contain images?  If so, please select the field here.'), inline=True) }}
         {% endcall %}
 
         {# If there's an image field in this dataset #}
-        <div id="image-licence-options">
-
+        <div id="image-options">
             {% call form.select('_image_licence', label=_('Image licence'), options=h.get_image_licence_options(), selected=data._image_licence, error=errors._image_licence) %}
                 {{ form.info(_('Please seelct a licence for images in this dataset.  This licence will be displayed next to the image.'), inline=True) }}
             {% endcall %}
 
+            {% call form.input('_image_delimiter', label=_('Image list delimiter'), value=data._image_delimiter, error=errors._image_delimiter) %}
+                {{ form.info(_('If your image field contains a series of delimited image URLs instead of just a single one enter it here'), inline=True) }}
+            {% endcall %}
         </div>
 
         {% resource 'ckanext-nhm/toggle-select' %}
-
-        {% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field) %}
-            {{ form.info(_('Please select the field to use for the record title.'), inline=True) }}
-        {% endcall %}
 
     {% endif %}
 
