@@ -4,7 +4,7 @@
   "description": "Natural History Museum CKAN Plugin",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-nhm.git"
+    "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-nhm.git@ckan-upgrade-2.8.0a"
   },
   "author": "",
   "license": "ISC",
