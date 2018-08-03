@@ -100,7 +100,7 @@ def show_package_schema():
     convert_from_extras = toolkit.get_converter(u'convert_from_extras')
     convert_to_tags = toolkit.get_converter(u'convert_from_tags')
     schema = default_show_package_schema()
-    schema[u'tags'][u'__extras'].append(p.toolkit.get_converter(u'free_tags_only'))
+    schema[u'tags'][u'__extras'].append(toolkit.get_converter(u'free_tags_only'))
     schema[DATASET_TYPE_VOCABULARY] = [convert_to_tags(DATASET_TYPE_VOCABULARY)]
     schema[u'temporal_extent'] = [convert_from_extras, ignore_missing]
     schema[u'update_frequency'] = [convert_from_extras, ignore_missing]
