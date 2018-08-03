@@ -4,9 +4,9 @@
    with the Organizations link removed #}
 {% block header_site_navigation_tabs %}
   {{ h.build_nav_main(
-    ('home', _('Home')),
+    ('home.index', _('Home')),
     ('search', _('Data')),
-    ('about', _('About'))
+    ('home.about', _('About'))
   ) }}
 {% endblock %}
 
@@ -22,11 +22,11 @@
                     {% block header_logo %}
 
                     {% if g.site_logo %}
-                      <a class="logo" href="{{ h.url('home') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+                      <a class="logo" href="{{ h.url('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
                     {% endif %}
 
                       <h1 class="site-title">
-                        <a href="{{ h.url('home') }}">{{ g.site_title }}</a>
+                        <a href="{{ h.url('home.index') }}">{{ g.site_title }}</a>
                       </h1>
 
                     {% endblock %}
