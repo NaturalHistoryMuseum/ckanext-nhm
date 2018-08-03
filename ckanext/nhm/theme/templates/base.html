@@ -1,14 +1,7 @@
 {% ckan_extends %}
 
 {%- block meta -%}
-  {#
-  <meta charset="utf-8" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  meta charset must be specified withint the first 512 bytes - but our version of fanstatic
-  inserts resources at the top of the head (need to upgrade to 1.02 plus to fix
-  Instead, specify utf-8 charset using old html4 style (which is still html5 valid)
-  #}
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <meta charset="UTF-8"/>
   {% block meta_generator %}<meta name="generator" content="ckan {{ c.__version__ }}" />{% endblock %}
 {%- endblock -%}
 
