@@ -49,7 +49,8 @@ class RecordController(toolkit.BaseController):
             toolkit.c.pkg = self.context[u'package']
             toolkit.c.pkg_dict = toolkit.c.package
             record = toolkit.get_action(u'record_show')(self.context, {
-                u'resource_id': resource_id, u'record_id': record_id
+                u'resource_id': resource_id,
+                u'record_id': record_id
                 })
             toolkit.c.record_dict = record[u'data']
             record_field_types = {f[u'id']: f[u'type'] for f in record[u'fields']}
@@ -71,7 +72,9 @@ class RecordController(toolkit.BaseController):
         # Loop through all the views - if we have a tiled map view with lat/lon fields
         # We'll use those fields to add the map
         views = toolkit.get_action(u'resource_view_list')(self.context,
-                                                          {u'id': resource_id})
+                                                          {
+                                                              u'id': resource_id
+                                                              })
         for view in views:
             if view[u'view_type'] == TILED_MAP_TYPE:
                 field_names[u'latitude'] = view[u'latitude_field']
@@ -87,98 +90,94 @@ class RecordController(toolkit.BaseController):
 
         # Assign title based on the title field
         toolkit.c.record_title = toolkit.c.record_dict.get(field_names[u'title'],
-                                                           u'Record %s' % toolkit.c.record_dict.get(
-                                                                   u'_id'))
+                                                           u'Record %s' %
+                                                           toolkit.c.record_dict.get(
+                                                               u'_id'))
 
         # Sanity check: image field hasn't been set to _id
         if field_names[u'image'] and field_names[u'image'] != u'_id':
-
-            try:
-                image_field_type = record_field_types[field_names[u'image']]
-            except KeyError:
-                pass
-            else:
-                default_copyright = u'<small>&copy; The Trustees of the ' \
-                                    u'Natural History Museum, London</small>'
-                licence_id = toolkit.c.resource.get(u'_image_licence') or u'cc-by'
-                short_licence_id = licence_id[:5].lower()
-                # licence_id = toolkit.c.resource.get('_image_licence') or 'ODC-BY-1.0'
-                # Set default licence - cc-by
-                # FIXME: This is such a mess!!! Have licences changed in the update??
+            default_copyright = u'<small>&copy; The Trustees of the Natural History ' \
+                                u'Museum, London</small>'
+            licence_id = toolkit.c.resource.get(u'_image_licence') or u'cc-by'
+            short_licence_id = licence_id[:5].lower()
+            # try and overwrite default licence with more specific one
+            for l_id in [licence_id, short_licence_id]:
                 try:
-                    licence = model.Package.get_license_register()[u'ODC-BY-1.0']
+                    licence = model.Package.get_license_register()[l_id]
+                    break
                 except KeyError:
-                    licence = model.Package.get_license_register()[u'cc-by']
-                # Try and overwrite default licence with more specific one
-                for l_id in [licence_id, short_licence_id]:
-                    try:
-                        licence = model.Package.get_license_register()[l_id]
-                        break
-                    except KeyError:
-                        continue
+                    continue
 
-                default_licence = u'Licence: %s' % toolkit.h.link_to(licence.title,
-                                                                     licence.url,
-                                                                     target=u'_blank')
+            default_licence = u'Licence: %s' % toolkit.h.link_to(licence.title,
+                                                                 licence.url,
+                                                                 target=u'_blank')
 
-                image_field_value = toolkit.c.record_dict.pop(field_names[u'image'],
-                                                              None)
+            # pop the image field so it isn't output as part of the
+            # record_dict/field_data dict (see self.view())
+            image_field_value = toolkit.c.record_dict.pop(field_names[u'image'], None)
 
-                if image_field_value:
+            if image_field_value:
+                # init the images list on the context var
+                toolkit.c.images = []
 
-                    toolkit.c.images = []
-
-                    # DOn't test for field type, just try and convert image to json
-                    try:
-                        images = json.loads(image_field_value)
-                    except ValueError:
-                        # String field value
-                        try:
-                            # Pop the image field so it won't be output as part of the
-                            # record_dict / field_data dict (see self.view())
-                            toolkit.c.images = [{
+                # try and convert image to json
+                try:
+                    images = json.loads(image_field_value)
+                except ValueError:
+                    # if it fails, it's a string field value
+                    # use the delimiter to split up the field value (if there is one!)
+                    delimiter = toolkit.c.resource.get(u'_image_delimiter', None)
+                    if delimiter:
+                        images = image_field_value.split(delimiter)
+                    else:
+                        images = [image_field_value]
+                    # loop through the images, adding dicts with their details to the
+                    # context
+                    for image in images:
+                        if image.strip():
+                            toolkit.c.images.append({
                                 u'title': toolkit.c.record_title,
                                 u'href': image.strip(),
                                 u'copyright': u'%s<br />%s' % (
                                     default_licence, default_copyright)
-                                } for image in image_field_value.split(u';') if
-                                image.strip()]
-                        except (KeyError, AttributeError):
-                            # Skip errors - there are no images
-                            pass
-                    else:
-                        for image in images:
-                            href = image.get(u'identifier', None)
-                            if href:
-                                license_link = toolkit.h.link_to(image.get(u'license'),
-                                                                 image.get(
-                                                                         u'license')) if image.get(
-                                        u'license', None) else None
-                                toolkit.c.images.append({
-                                    u'title': image.get(u'title',
-                                                        None) or toolkit.c.record_title,
-                                    u'href': href,
-                                    u'copyright': u'%s<br />%s' % (
-                                        license_link or default_licence,
-                                        image.get(u'rightsHolder',
-                                                  None) or default_copyright),
-                                    u'record_id': record_id,
-                                    u'resource_id': resource_id,
-                                    u'link': toolkit.url_for(
-                                            controller=u'ckanext.nhm.controllers.record:RecordController',
-                                            action=u'view', package_name=package_name,
-                                            resource_id=resource_id,
-                                            record_id=record_id),
-                                    })
+                                })
+                else:
+                    for image in images:
+                        href = image.get(u'identifier', None)
+                        if href:
+                            license_link = toolkit.h.link_to(image.get(u'license'),
+                                                             image.get(
+                                                                 u'license')) if \
+                                image.get(
+                                    u'license', None) else None
+                            toolkit.c.images.append({
+                                u'title': image.get(u'title',
+                                                    None) or toolkit.c.record_title,
+                                u'href': href,
+                                u'copyright': u'%s<br />%s' % (
+                                    license_link or default_licence,
+                                    image.get(u'rightsHolder',
+                                              None) or default_copyright),
+                                u'record_id': record_id,
+                                u'resource_id': resource_id,
+                                u'link': toolkit.url_for(
+                                    controller=u'ckanext.nhm.controllers.record:RecordController',
+                                    action=u'view',
+                                    package_name=package_name,
+                                    resource_id=resource_id,
+                                    record_id=record_id
+                                    ),
+                                })
 
         if field_names[u'latitude'] and field_names[u'longitude']:
             latitude, longitude = toolkit.c.record_dict.get(
-                    field_names[u'latitude']), toolkit.c.record_dict.get(
-                    field_names[u'longitude'])
+                field_names[u'latitude']), toolkit.c.record_dict.get(
+                field_names[u'longitude'])
 
             if latitude and longitude:
                 toolkit.c.record_map = json.dumps({
-                    u'type': u'Point', u'coordinates': [longitude, latitude]
+                    u'type': u'Point',
+                    u'coordinates': [longitude, latitude]
                     })
 
     def view(self, package_name, resource_id, record_id):

@@ -1,0 +1,9 @@
+{% ckan_extends %}
+
+{% block action_buttons %}
+    <div class="privacy-warning">
+      <p><i>{{ _('Data Protection') }}</i></p>
+      <p>{{ _('The Natural History Museum will use your personal data in accordance with data protection legislation to process your requests. For more information please read our') }} <a href="{{ h.url_for('legal_privacy') }}">privacy notice</a>.</p>
+    </div>
+    {{ super() }}
+{% endblock %}

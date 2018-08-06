@@ -14,9 +14,11 @@ import os
 import re
 from beaker.cache import cache_region
 from ckanext.gbif.lib.errors import GBIF_ERRORS
+from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
                                            resource_view_get_view)
+from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from jinja2.filters import do_truncate
@@ -31,7 +33,8 @@ log = logging.getLogger(__name__)
 re_dwc_field_label = re.compile(u'([A-Z]+)')
 
 re_url_validation = re.compile(r'^(?:http)s?://'  # http:// or https://
-                               r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+                               r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:['
+                               r'A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
                                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
                                r'(?::\d+)?'  # optional port
                                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
@@ -49,15 +52,22 @@ def get_site_statistics():
         u'count']
     # Get a count of all distinct user IDs
     stats[u'contributor_count'] = get_contributor_count()
-    dataset_statistics = _get_action(u'dataset_statistics', {})
-    stats[u'record_count'] = dataset_statistics.get(u'total', 0)
+    record_count = 0
+    try:
+        dataset_statistics = _get_action(u'dataset_statistics', {})
+        record_count = dataset_statistics.get(u'total', 0)
+    except Exception as _e:
+        # if there was a problem getting the stats return 0 and log an exception
+        log.exception(u'Could not gather dataset statistics')
+    stats[u'record_count'] = record_count
     return stats
 
 
 def get_contributor_count():
     '''Get the total number of contributors to active packages.'''
     return model.Session.execute(
-        u"SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE state='active'").scalar()
+        u"SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE "
+        u"state='active'").scalar()
 
 
 def _get_action(action, params):
@@ -380,7 +390,7 @@ def get_map_styles():
     '''New map config overriding the marker point img'''
     return {
         u'point': {
-            u'iconUrl': '/images/leaflet/marker.png',
+            u'iconUrl': u'/images/leaflet/marker.png',
             u'iconSize': [20, 34],
             u'iconAnchor': [12, 30]
             }
@@ -681,7 +691,7 @@ def get_contact_form_template_url(params):
 
     '''
 
-    url = '/api/1/util/snippet/contact_form.html'
+    url = u'/api/1/util/snippet/contact_form.html'
 
     if params:
         url += u'?%s' % urllib.urlencode(params)
@@ -787,7 +797,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     text.append(u'on the @NHM_London Data Portal')
 
     try:
-        text.append(u'DOI: %s' % os.path.join(u'http://dx.doi.org', pkg_dict[u'doi']))
+        text.append(u'DOI: %s' % os.path.join(u'https://doi.org', pkg_dict[u'doi']))
     except KeyError:
         pass
 
@@ -924,7 +934,8 @@ def get_resource_facets(resource):
             u'label': facet_label_formatters[field_name](field_name),
             u'facet_values': [],
             u'has_more': len(search[u'facets'][u'facet_fields'][
-                                 field_name]) > num_facets and field_name not in search_params.get(
+                                 field_name]) > num_facets and field_name not in
+                         search_params.get(
                 u'facets_field_limit', {}),
             u'active': active_facet
             }
@@ -946,7 +957,8 @@ def get_resource_facets(resource):
         # If this is the active facet, only show the highest item
         if active_facet:
             facet[u'facet_values'] = facet[u'facet_values'][:1]
-        # Slice the facet values, so length matches num_facets - need to do this after the key sort
+        # Slice the facet values, so length matches num_facets - need to do this after
+        #  the key sort
         if facet[u'has_more']:
             facet[u'facet_values'] = facet[u'facet_values'][0:num_facets]
         facets.append(facet)
@@ -1055,7 +1067,8 @@ def parse_request_filters():
 
 def get_resource_filter_pills(package, resource, resource_view=None):
     '''Get filter pills
-    We don't want the field group pills - these are handled separately in get_resource_field_groups
+    We don't want the field group pills - these are handled separately in
+    get_resource_field_groups
 
     :param resource: param package:
     :param package: 
@@ -1122,3 +1135,63 @@ def form_select_datastore_field_options(resource, allow_empty=True):
     '''
     fields = toolkit.h.resource_view_get_fields(resource)
     return list_to_form_options(fields, allow_empty)
+
+
+def get_last_resource_update_for_package(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime across all resources in this
+    package. If there is no update time found then 'unknown' is returned. If
+    there is datetime found then it is rendered using the standard ckan helper.
+    :param pkg_dict:        the package dict
+    :param date_format:     date format for the return datetime
+    :return: 'unknown' or a string containing the rendered datetime and the
+    resource name
+    '''
+
+    def get_resource_last_update(resource):
+        '''
+        Given a resource dict, return the most recent update time available from
+        it, or None if there is no update time.
+        :param resource:    the resource dict
+        :return: a datetime or None
+        '''
+        # a list of fields on the resource that should contain update dates
+        fields = [u'last_modified', u'revision_timestamp', u'Created']
+        # find the available update dates on the resource and filter out Nones
+        update_dates = filter(None,
+                              [toolkit.h._datestamp_to_datetime(resource[field]) for
+                               field in fields])
+        # return the latest non-None value, or None
+        return max(update_dates) if update_dates else None
+
+    # find the latest update date for each resource using the above function and
+    # then filter out the ones that don't have an update date available
+    dates_and_names = filter(lambda x: x[0],
+                             [(get_resource_last_update(r), r[u'name']) for r in
+                              pkg_dict[u'resources']])
+    if dates_and_names:
+        # find the most recent date and name combo
+        date, name = max(dates_and_names, key=lambda x: x[0])
+        return u'{} ({})'.format(
+            toolkit.h.render_datetime(date, date_format=date_format), name)
+    # there is no available update so we return 'unknown'
+    return toolkit._(u'unknown')
+
+
+def get_external_links(record):
+    '''
+    Helper called on collection record pages (i.e. records in the specimens, indexlots
+    or artefacts resources) which is
+    expected to return a list of tuples. Each tuple provides a title and a list of
+    links, respectively, which are
+    relevant to the record.
+    :param record:
+    :return:
+    '''
+    sites = external_links.get_relevant_sites(record)
+    ranks = extract_ranks(record)
+    if ranks:
+        return [(name, icon, OrderedDict.fromkeys(
+            [(rank, link.format(rank)) for rank in ranks.values()]))
+                for name, icon, link in sites]
+    return []

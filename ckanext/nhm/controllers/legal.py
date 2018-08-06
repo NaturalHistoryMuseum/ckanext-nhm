@@ -12,8 +12,11 @@ class LegalController(toolkit.BaseController):
 
     def privacy(self):
         '''Render the privacy notice page.'''
-        return toolkit.render(u'legal/privacy.html', {u'title': u'Privacy notice'})
+        # redirect to the Museum's main privacy page
+        toolkit.redirect_to(u'http://www.nhm.ac.uk/about-us/privacy-notice.html')
 
     def terms(self):
         '''Render the terms and conditions page.'''
-        return toolkit.render(u'legal/terms.html', {u'title': u'Terms and conditions'})
+        return toolkit.render(u'legal/terms.html', {
+            u'title': u'Terms and conditions'
+        })

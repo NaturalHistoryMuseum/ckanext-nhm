@@ -14,11 +14,13 @@ import ckanext.nhm.logic.schema as nhm_schema
 import os
 import re
 from beaker.cache import cache_managers
+from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
 from ckanext.datasolr.interfaces import IDataSolr
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
+from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import (get_site_statistics,
                                      resource_view_get_filter_options)
 from ckanext.nhm.settings import COLLECTION_CONTACTS
@@ -43,6 +45,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     (CKAN) model
 
     '''
+
     implements(interfaces.IRoutes, inherit=True)
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.ITemplateHelpers, inherit=True)
@@ -56,6 +59,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IContact)
     implements(IDoi)
     implements(IGalleryImage)
+    implements(ICkanPackager)
 
     ## IConfigurer
     def update_config(self, config):
@@ -86,77 +90,77 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         '''
         # Add view record
         _map.connect(u'record',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
+                     u'/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
                      controller=u'ckanext.nhm.controllers.record:RecordController',
                      action=u'view')
 
         # Add dwc view
         _map.connect(u'dwc',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
+                     u'/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
                      controller=u'ckanext.nhm.controllers.record:RecordController',
                      action=u'dwc')
 
         # About pages
-        _map.connect(u'about_citation', '/about/citation',
+        _map.connect(u'about_citation', u'/about/citation',
                      controller=u'ckanext.nhm.controllers.about:AboutController',
                      action=u'citation')
-        _map.connect(u'about_download', '/about/download',
+        _map.connect(u'about_download', u'/about/download',
                      controller=u'ckanext.nhm.controllers.about:AboutController',
                      action=u'download')
-        _map.connect(u'about_licensing', '/about/licensing',
+        _map.connect(u'about_licensing', u'/about/licensing',
                      controller=u'ckanext.nhm.controllers.about:AboutController',
                      action=u'licensing')
-        _map.connect(u'about_credits', '/about/credits',
+        _map.connect(u'about_credits', u'/about/credits',
                      controller=u'ckanext.nhm.controllers.about:AboutController',
                      action=u'credits')
 
         # Legal pages
-        _map.connect(u'legal_privacy', '/privacy',
+        _map.connect(u'legal_privacy', u'/privacy',
                      controller=u'ckanext.nhm.controllers.legal:LegalController',
                      action=u'privacy')
-        _map.connect(u'legal_terms', '/terms-conditions',
+        _map.connect(u'legal_terms', u'/terms-conditions',
                      controller=u'ckanext.nhm.controllers.legal:LegalController',
                      action=u'terms')
 
         # About stats pages
-        _map.connect(u'stats_resources', '/about/statistics/resources',
+        _map.connect(u'stats_resources', u'/about/statistics/resources',
                      controller=u'ckanext.nhm.controllers.stats:StatsController',
                      action=u'resources', ckan_icon=u'bar-chart')
-        _map.connect(u'stats_contributors', '/about/statistics/contributors',
+        _map.connect(u'stats_contributors', u'/about/statistics/contributors',
                      controller=u'ckanext.nhm.controllers.stats:StatsController',
                      action=u'contributors', ckan_icon=u'user')
-        _map.connect(u'stats_records', '/about/statistics/records',
+        _map.connect(u'stats_records', u'/about/statistics/records',
                      controller=u'ckanext.nhm.controllers.stats:StatsController',
                      action=u'records', ckan_icon=u'file-text')
 
         # Dataset metrics
-        _map.connect(u'dataset_metrics', '/dataset/metrics/{id}',
+        _map.connect(u'dataset_metrics', u'/dataset/metrics/{id}',
                      controller=u'ckanext.nhm.controllers.stats:StatsController',
                      action=u'dataset_metrics', ckan_icon=u'bar-chart')
         # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
         object_controller = u'ckanext.nhm.controllers.object:ObjectController'
 
-        _map.connect(u'object_rdf', '/object/{uuid}.{_format}',
+        _map.connect(u'object_rdf', u'/object/{uuid}.{_format}',
                      controller=object_controller, action=u'rdf',
                      requirements={
                          u'_format': u'xml|rdf|n3|ttl|jsonld'
                          })
 
         # Permalink for specimens - needs to come after the DCAT format dependent
-        _map.connect(u'object_view', '/object/{uuid}',
+        _map.connect(u'object_view', u'/object/{uuid}',
                      controller=object_controller,
                      action=u'view')
 
         # Redirect the old specimen url to the object
-        _map.redirect('/specimen/{url:.*}', '/object/{url}')
+        _map.redirect(u'/specimen/{url:.*}', u'/object/{url}')
 
         # The DCAT plugin breaks these links if enable content negotiation is enabled
         # because it maps to /dataset/{_id} without excluding these actions
         # So we re=add them here to make sure it's working
-        _map.connect(u'add dataset', '/dataset/new', controller=u'package',
+        _map.connect(u'add dataset', u'/dataset/new', controller=u'package',
                      action=u'new')
-        _map.connect('/dataset/{action}',
+        _map.connect(u'/dataset/{action}',
                      controller=u'package',
                      requirements=dict(action=u'|'.join([
                          u'list',
@@ -370,8 +374,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             for o in options:
                 if o in data_dict[u'filters'] and u'true' in data_dict[u'filters'][
                     o] and u'solr' in options[o]:
-                    # By default filters are added as {filed_name}:*{value}* but some filters
-                    # might require special statements - so add them here
+                    # By default filters are added as {filed_name}:*{value}* but some
+                    # filters might require special statements - so add them here
                     query_dict.setdefault(u'filter_statements', {})[o] = options[o][
                         u'solr']
         self.enforce_max_limit(query_dict, u'rows')
@@ -445,14 +449,18 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             else:
                 mail_dict[u'recipient_name'] = department
                 mail_dict[
-                    u'body'] += u'\nThe contactee has chosen to send this to the {0} department.  Our apologies if this enquiry isn\'t relevant -  please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n'.format(
-                    department)
+                    u'body'] += u'\nThe contactee has chosen to send this to the {0} ' \
+                                u'department. Our apologies if this enquiry isn\'t ' \
+                                u'relevant - please forward this onto data@nhm.ac.uk ' \
+                                u'and we will respond.\nMany thanks, Data Portal ' \
+                                u'team\n\n'.format(department)
                 # If we have a package ID, load the package
         elif package_id:
             package_dict = toolkit.get_action(u'package_show')(context, {
                 u'id': package_id
                 })
-            # Load the user - using model rather user_show API which loads all the users packages etc.,
+            # Load the user - using model rather user_show API which loads all the
+            # users packages etc.,
             user_obj = model.User.get(package_dict[u'creator_user_id'])
             mail_dict[u'recipient_name'] = user_obj.fullname or user_obj.name
             # Update send to with creator username
@@ -460,7 +468,11 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             mail_dict[u'subject'] = u'Message regarding dataset: %s' % package_dict[
                 u'title']
             mail_dict[
-                u'body'] += u'\n\nYou have been sent this enquiry via the data portal as you are the author of dataset %s.  Our apologies if this isn\'t relevant - please forward this onto data@nhm.ac.uk and we will respond.\nMany thanks, Data Portal team\n\n' % \
+                u'body'] += u'\n\nYou have been sent this enquiry via the data portal ' \
+                            u'as you are the author of dataset %s.  Our apologies if ' \
+                            u'this isn\'t relevant - please forward this onto ' \
+                            u'data@nhm.ac.uk and we will respond.\nMany thanks, ' \
+                            u'Data Portal team\n\n' % \
                             package_dict[u'title'] or package_dict[u'name']
 
         for i, url in urls.items():
@@ -609,3 +621,29 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     u'record_id': record[u'_id']
                     })
         return images
+
+    ## ICkanPackager
+    def before_package_request(self, resource_id, package_id, packager_url,
+                               request_params):
+        '''
+        Modify the request params that are about to be sent through to the
+        ckanpackager backend so that an EML param is
+        included.
+
+        :param resource_id: the resource id of the resource that is about to be packaged
+        :param package_id: the package id of the resource that is about to be packaged
+        :param packager_url: the target url for this packaging request
+        :param request_params: a dict of parameters that will be sent with the request
+        :return: the url and the params as a tuple
+        '''
+        resource = toolkit.get_action(u'resource_show')(None, {
+            u'id': resource_id
+        })
+        package = toolkit.get_action(u'package_show')(None, {
+            u'id': package_id
+        })
+        if resource.get(u'datastore_active', False) and resource.get(u'format',
+                                                                    '').lower() == u'dwc':
+            # if it's a datastore resource and it's in the DwC format, add EML
+            request_params[u'eml'] = generate_eml(package, resource)
+        return packager_url, request_params

@@ -4,10 +4,8 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from collections import OrderedDict
-
-import abc
 import re
+from ckanext.nhm.lib.taxonomy import find_author_split
 from jinja2 import nodes
 from jinja2.ext import Extension
 
@@ -77,13 +75,14 @@ class TaxonomyFormatExtension(Extension):
             }
 
         # get collection-specific rules
-        for rgx, p in collections.items():
-            if re.match(rgx, collection_code):
-                collection_formatted_fields, collection_parsed_fields = p
-                self.format_to_fields = self._merge(global_formatted_fields,
-                                                    collection_formatted_fields)
-                self.parsed_fields = global_parsed_fields + collection_parsed_fields
-                break
+        if collection_code:
+            for rgx, p in collections.items():
+                if re.match(rgx, collection_code):
+                    collection_formatted_fields, collection_parsed_fields = p
+                    self.format_to_fields = self._merge(global_formatted_fields,
+                                                        collection_formatted_fields)
+                    self.parsed_fields = global_parsed_fields + collection_parsed_fields
+                    break
 
         self.field_to_formats = {
             f: [k for k, v in self.format_to_fields.items() if f in v] for f in set(
@@ -216,139 +215,10 @@ class TaxonomyFormatExtension(Extension):
         :returns: the tag body with the authors wrapped in deitalicising tags
 
         '''
-        # if it's just a single word, no need to parse
-        first_space = re.search(u'\s', body)
-        if not first_space:
-            return body
-
-        evaluators = OrderedDict()
-        evaluators[u'authors'] = AuthorParserStage()
-        evaluators[u'species'] = SimpleFieldParserStage(u'specificEpithet')
-        evaluators[u'subgenus'] = SimpleFieldParserStage(u'subgenus')
-        evaluators[u'capitalisation'] = CapitalisedParserStage()
-
-        ix = None
-        for t, e in evaluators.items():
-            ix = e.evaluate(body, record_dict)
-            if ix:
-                break
-
+        ix = find_author_split(body, record_dict)
         if ix:
             authors = body[ix:]
             return u'{0}'.format(body[:ix]) + self.common_strings[u'deitalicise'].format(
-                    authors)
+                authors)
         else:
             return body
-
-
-class BaseParserStage(object):
-    '''Represents a single stage of a field parsing process.'''
-
-    @abc.abstractmethod
-    def _meets_criteria(self, body, record_dict):
-        '''Tests to see if the item meets certain criteria.
-
-        :param body: the tag body to search in
-        :param record_dict: the full record
-
-        :returns: boolean for pass/fail
-
-        '''
-        return True
-
-    @abc.abstractmethod
-    def _extract(self, body, record_dict):
-        '''Finds an index within a string
-
-        :param body: the tag body
-        :param record_dict: the full record
-
-        :returns: a character index
-
-        '''
-        return 0
-
-    def evaluate(self, body, record_dict):
-        '''Checks if the item meets the criteria then returns the index
-
-        :param body: the tag body
-        :param record_dict: the full record
-
-        :returns: character index if criteria met, None if not
-
-        '''
-        if self._meets_criteria(body, record_dict):
-            return self._extract(body, record_dict)
-
-
-class AuthorParserStage(BaseParserStage):
-    '''A specific stage for searching for authors in the tag body.'''
-
-    def _meets_criteria(self, body, record_dict):
-        '''Ensures an author field is present in the record.
-
-        '''
-        return u'scientificNameAuthorship' in record_dict.keys()
-
-    def _extract(self, body, record_dict):
-        '''Searches for the full author string, then breaks it up into smaller pieces
-        (sections in brackets, individual names) if that's not found
-
-        :returns: the start index of the author string if found, otherwise None
-
-        '''
-        full_author = record_dict[u'scientificNameAuthorship']
-        author_strings = [full_author] + [p.strip() for p in set(
-                re.findall(u'\(([\w\s]+)\)', full_author) + re.findall(u'([\w.\s]+)',
-                                                                       full_author))]
-        for a in author_strings:
-            matches = re.search(u'\s\(?{0}\)?(\s|$)'.format(re.escape(a)), body)
-            return matches.start() if matches else None
-
-
-class SimpleFieldParserStage(BaseParserStage):
-    '''A generic stage for searching for a certain field within the tag body
-    (for the purposes of finding authors).'''
-
-    def __init__(self, field_name):
-        self.field_name = field_name
-
-    def _meets_criteria(self, body, record_dict):
-        '''Checks that the record contains a value for this field and that the value is
-         present in the tag body.'''
-        return self.field_name in record_dict.keys() and record_dict[
-            self.field_name] in body
-
-    def _extract(self, body, record_dict):
-        '''If the value is at the end of the string, there is no point in continuing;
-        otherwise, it looks for the first capitalised word after that value.
-
-        :returns: the start index of the estimated author string if found, else None
-
-        '''
-        field_value = record_dict[self.field_name]
-        if re.search(u'{0}$'.format(re.escape(field_value)), body):
-            return len(body)
-        split_by_value = re.split(u'{0}'.format(re.escape(field_value)), body, 1)
-        matches = re.search(u'\(?[A-Z]\w*', split_by_value[1])
-        return matches.start() + len(split_by_value[0]) + len(
-                field_value) if matches else None
-
-
-class CapitalisedParserStage(BaseParserStage):
-    '''The last resort stage in the search for authors - searches for the second
-    capitalised word in the tag body.'''
-
-    def _meets_criteria(self, body, record_dict):
-        '''Checks for multiple capitalised words in the tag body.'''
-        capit = re.findall(u'([A-Z]\S*)(?:\s|$)', body)
-        return len(capit) > 1
-
-    def _extract(self, body, record_dict):
-        '''Finds the start index of the second capitalised word.
-
-        :returns: the start index of the second capitalised word
-
-        '''
-        matches = [m for m in re.finditer(u'[A-Z]', body)]
-        return matches[1].start()
