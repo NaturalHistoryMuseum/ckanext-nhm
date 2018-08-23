@@ -1,24 +1,24 @@
 from collections import namedtuple
 
 
-Site = namedtuple('Site', ['name', 'icon', 'link'])
+Site = namedtuple(u'Site', [u'name', u'icon', u'link'])
 
-BHL = Site(name='Biodiversity Heritage Library', icon='https://www.biodiversitylibrary.org/favicon.ico',
-           link='https://www.biodiversitylibrary.org/name/{}')
-CoL = Site(name='Catalogue of Life', icon='http://www.catalogueoflife.org/favicon.ico',
-           link='http://www.catalogueoflife.org/col/search/all/key/{}')
-PBDB = Site(name='Paleobiology Database', icon='https://paleobiodb.org/favicon.ico',
-            link='https://paleobiodb.org/classic/checkTaxonInfo?taxon_name={}')
-Mindat = Site(name='Mindat', icon='https://www.mindat.org/favicon.ico',
-              link='https://www.mindat.org/search.php?search={}')
+BHL = Site(name=u'Biodiversity Heritage Library', icon=u'https://www.biodiversitylibrary.org/favicon.ico',
+           link=u'https://www.biodiversitylibrary.org/name/{}')
+CoL = Site(name=u'Catalogue of Life', icon=u'http://www.catalogueoflife.org/favicon.ico',
+           link=u'http://www.catalogueoflife.org/col/search/all/key/{}')
+PBDB = Site(name=u'Paleobiology Database', icon=u'https://paleobiodb.org/favicon.ico',
+            link=u'https://paleobiodb.org/classic/checkTaxonInfo?taxon_name={}')
+Mindat = Site(name=u'Mindat', icon=u'https://www.mindat.org/favicon.ico',
+              link=u'https://www.mindat.org/search.php?search={}')
 
 
 SITES = {
-    'BMNH(E)': [BHL, CoL],
-    'BOT': [BHL, CoL],
-    'MIN': [Mindat],
-    'PAL': [PBDB],
-    'ZOO': [BHL, CoL],
+    u'BMNH(E)': [BHL, CoL],
+    u'BOT': [BHL, CoL],
+    u'MIN': [Mindat],
+    u'PAL': [PBDB],
+    u'ZOO': [BHL, CoL],
     # if there is no collection code, just check the BHL and CoL. This catches index lot entries.
     None: [BHL, CoL]
 }
@@ -31,4 +31,4 @@ def get_relevant_sites(record):
     :return: a list of sites
     '''
     # if no collection code is available, default to None
-    return SITES.get(record.get('collectionCode', None), [])
+    return SITES.get(record.get(u'collectionCode', None), [])

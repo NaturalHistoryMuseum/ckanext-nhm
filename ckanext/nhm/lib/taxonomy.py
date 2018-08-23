@@ -11,12 +11,12 @@ def extract_ranks(record):
     :return: the ranks as an OrderedDict in rank order.
     '''
     ranks = [
-        ('kingdom', extract_kingdom),
-        ('phylum', extract_phylum),
-        ('class', extract_class),
-        ('family', extract_family),
-        ('genus', extract_genus),
-        ('species', extract_species)
+        (u'kingdom', extract_kingdom),
+        (u'phylum', extract_phylum),
+        (u'class', extract_class),
+        (u'family', extract_family),
+        (u'genus', extract_genus),
+        (u'species', extract_species)
     ]
     # extract all the rank values
     extracted_ranks = [(rank, extractor(record)) for rank, extractor in ranks]
@@ -30,7 +30,7 @@ def extract_kingdom(record):
     :param record: the record dict
     :return: the kingdom value, or None if it is not present
     '''
-    return record.get('kingdom', None)
+    return record.get(u'kingdom', None)
 
 
 def extract_phylum(record):
@@ -39,7 +39,7 @@ def extract_phylum(record):
     :param record: the record dict
     :return: the phylum value, or None if it is not present
     '''
-    return record.get('phylum', None)
+    return record.get(u'phylum', None)
 
 
 def extract_class(record):
@@ -48,7 +48,7 @@ def extract_class(record):
     :param record: the record dict
     :return: the class value, or None if it is not present
     '''
-    return record.get('class', None)
+    return record.get(u'class', None)
 
 
 def extract_family(record):
@@ -57,7 +57,7 @@ def extract_family(record):
     :param record: the record dict
     :return: the family value, or None if it is not present
     '''
-    return record.get('family', None)
+    return record.get(u'family', None)
 
 
 def extract_genus(record):
@@ -66,7 +66,7 @@ def extract_genus(record):
     :param record: the record dict
     :return: the genus value, or None if it is not present
     '''
-    return record.get('genus', None)
+    return record.get(u'genus', None)
 
 
 def extract_species(record):
@@ -79,7 +79,7 @@ def extract_species(record):
     '''
     # try extracting the species from the scientific name, which starts with the species but often has an author or date
     # after it
-    scientific_name = record.get('scientificName', None)
+    scientific_name = record.get(u'scientificName', None)
     if scientific_name:
         ix = find_author_split(scientific_name, record)
         return scientific_name[:ix].strip()
@@ -95,14 +95,14 @@ def find_author_split(value, record_dict):
     :param record_dict:     the record dictionary to use as a supplementary source of information
     :return: the index at the start of the author part or None
     '''
-    first_space = re.search('\s', value)
+    first_space = re.search(u'\s', value)
     if not first_space:
         return None
 
     evaluators = [
         AuthorParserStage(),
-        SimpleFieldParserStage('specificEpithet'),
-        SimpleFieldParserStage('subgenus'),
+        SimpleFieldParserStage(u'specificEpithet'),
+        SimpleFieldParserStage(u'subgenus'),
         CapitalisedParserStage()
     ]
 
@@ -160,7 +160,7 @@ class AuthorParserStage(BaseParserStage):
         '''
         Ensures an author field is present in the record.
         '''
-        return 'scientificNameAuthorship' in record_dict.keys()
+        return u'scientificNameAuthorship' in record_dict.keys()
 
     def _extract(self, body, record_dict):
         '''
@@ -168,7 +168,7 @@ class AuthorParserStage(BaseParserStage):
         names) if that's not found
         :return: the start index of the author string if found, otherwise None
         '''
-        full_author = record_dict['scientificNameAuthorship']
+        full_author = record_dict[u'scientificNameAuthorship']
         author_strings = [full_author] + [p.strip() for p in set(
             re.findall(u'\(([\w\s]+)\)', full_author) + re.findall(
                 u'([\w.\s]+)', full_author))]
@@ -199,11 +199,11 @@ class SimpleFieldParserStage(BaseParserStage):
         :return: the start index of the estimated author string if found, else None.
         '''
         field_value = record_dict[self.field_name]
-        if re.search('{0}$'.format(re.escape(field_value)), body):
+        if re.search(u'{0}$'.format(re.escape(field_value)), body):
             return len(body)
-        split_by_value = re.split('{0}'.format(re.escape(field_value)), body,
+        split_by_value = re.split(u'{0}'.format(re.escape(field_value)), body,
                                   1)
-        matches = re.search('\(?[A-Z]\w*', split_by_value[1])
+        matches = re.search(u'\(?[A-Z]\w*', split_by_value[1])
         return matches.start() + len(split_by_value[0]) + len(
             field_value) if matches else None
 
@@ -217,12 +217,12 @@ class CapitalisedParserStage(BaseParserStage):
         '''
         Checks for multiple capitalised words in the tag body.
         '''
-        capit = re.findall('([A-Z]\S*)(?:\s|$)', body)
+        capit = re.findall(u'([A-Z]\S*)(?:\s|$)', body)
         return len(capit) > 1
 
     def _extract(self, body, record_dict):
         '''
         Finds the start index of the second capitalised word.
         '''
-        matches = [m for m in re.finditer('[A-Z]', body)]
+        matches = [m for m in re.finditer(u'[A-Z]', body)]
         return matches[1].start()
