@@ -34,7 +34,7 @@
                                 <li>
 
                                     <a data-module="back-button" class="btn btn-primary" href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id) }}">
-                                        <i class="icon-circle-arrow-left"></i>
+                                        <i class="fa fa-circle-arrow-left"></i>
                                     </a>
 
                                     {% resource 'ckanext-nhm/back-button' %}
@@ -49,7 +49,7 @@
 
                                     <a data-module="ckanpackager-download-link" data-module-resource-id="{{ res.id }}" data-module-is-record="true"
                                        class="packager-link btn btn-primary" href="{{ h.url_for_package_resource(pkg.id, res.id, extra_filters={'_id': rec['_id']}) }}">
-                                        <i class="icon-download"></i> Download
+                                        <i class="fa fa-download"></i> Download
                                     </a>
 
                                 </li>
@@ -102,7 +102,7 @@
                                             {% if field_name in filterable_fields %}
                                                 <a title="View all records where {{ field_name }}={{ value }}"
                                                    href="{{ h.url_for(controller='package', action='resource_read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
-                                                    <i class="icon-filter"></i>
+                                                    <i class="fa fa-filter"></i>
                                                 </a>
                                             {% endif %}
                                         </td>

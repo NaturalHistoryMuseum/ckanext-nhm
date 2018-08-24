@@ -51,7 +51,7 @@
                                 <li>
                                   <a href="{{ h.url_for(controller='admin', action='index') }}" title="{{ _('Sysadmin settings') }}">
                                     <span class="sr-only">Sysadmin settings</span>
-                                    <i class="icon-legal"></i>
+                                    <i class="fa fa-legal"></i>
                                   </a>
                                 </li>
                               {% endif %}
@@ -65,7 +65,7 @@
                               <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
                                 {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
                                 <a href="{{ h.url_for(controller='user', action='dashboard') }}" title="{{ notifications_tooltip }}">
-                                  <i class="icon-dashboard"></i>
+                                  <i class="fa fa-dashboard"></i>
                                   <span>{{ new_activities }}</span>
                                 </a>
                               </li>
@@ -74,7 +74,7 @@
                                 <li>
                                   <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
                                     <span class="sr-only">Edit settings</span>
-                                    <i class="icon-cog"></i>
+                                    <i class="fa fa-cog"></i>
                                   </a>
                                 </li>
                                 {% endif %}
@@ -83,7 +83,7 @@
                                     <li>
                                       <a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">
                                         <span class="sr-only">Log out</span>
-                                        <i class="icon-signout"></i>
+                                        <i class="fa fa-signout"></i>
                                       </a>
                                     </li>
                                   {% endblock %}
