@@ -39,8 +39,8 @@
     <div class="span2 no-margin menu-links">
       <ul class="nav unstyled">
         {% block footer_menu_links %}
-            {% if c.userobj %}
-                <li><a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" title="My account">My account</a></li>
+            {% if g.userobj %}
+                <li><a href="{{ h.url_for(controller='user', action='read', id=g.userobj.name) }}" title="My account">My account</a></li>
                 <li><a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">Log out</a></li>
             {% else %}
                 <li><a href="{{ h.url_for('login') }}">Login</a></li>

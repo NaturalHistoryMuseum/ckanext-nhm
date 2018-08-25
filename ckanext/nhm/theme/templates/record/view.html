@@ -1,23 +1,23 @@
 {% extends "package/base.html" %}
 
-{% set rec = c.record_dict %}
-{% set res = c.resource %}
-{% set pkg = c.pkg_dict or pkg_dict %}
+{% set rec = g.record_dict %}
+{% set res = g.resource %}
+{% set pkg = g.pkg_dict or pkg_dict %}
 {% set filterable_fields = h.resource_view_get_filterable_fields(res) %}
 
 {% block head_extras -%}
     {{ super() }}
-    <meta property="og:title" content="{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ c.record_title }} - {{ g.site_title }}">
+    <meta property="og:title" content="{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} - {{ g.site_title }}">
 {% endblock -%}
 
-{% block subtitle %}{{ h.dataset_display_name(c.package) }} - {{ h.resource_display_name(res) }} - {{ c.record_title }} {% endblock %}
+{% block subtitle %}{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} {% endblock %}
 
 {% block breadcrumb_content_selected %}{% endblock %}
 
 {% block breadcrumb_content %}
     {{ super() }}
     <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
-    <li class="active"><a href="">{{ c.record_title|truncate(30) }}</a></li>
+    <li class="active"><a href="">{{ g.record_title|truncate(30) }}</a></li>
 {% endblock %}
 
 {% block pre_primary %}
@@ -78,13 +78,13 @@
                 <div class="record-content">
 
                     {% block heading %}
-                        <h1 class="page-heading">{{ c.record_title }}</h1>
+                        <h1 class="page-heading">{{ g.record_title }}</h1>
                     {% endblock %}
 
                     {% block record_data %}
 
                         <table>
-                            {% for field_name, value in c.field_data.items() %}
+                            {% for field_name, value in g.field_data.items() %}
                                 {% if h.record_display_field(field_name, value) %}
 
                                     <tr>
@@ -120,17 +120,17 @@
 
                 {% block record_map %}
 
-                    {% if c.record_map %}
+                    {% if g.record_map %}
                         <h3>Location</h3>
-                        {% snippet "record/snippets/map.html", extent=c.record_map %}
+                        {% snippet "record/snippets/map.html", extent=g.record_map %}
                     {% endif %}
 
                 {% endblock %}
 
                 {% block record_images %}
-                    {% if c.images %}
+                    {% if g.images %}
                         <h3>Images</h3>
-                        {% snippet 'gallery/snippets/gallery.html', images=c.images, resource_id=res.id %}
+                        {% snippet 'gallery/snippets/gallery.html', images=g.images, resource_id=res.id %}
                     {% endif %}
                 {% endblock %}
 

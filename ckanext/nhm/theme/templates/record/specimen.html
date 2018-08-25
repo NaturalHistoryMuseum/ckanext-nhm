@@ -2,10 +2,10 @@
 
 {% block styles %}
    {{ super() }}
-   <link rel="alternate" type="text/n3" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='n3', qualified=True) }}"/>
-   <link rel="alternate" type="text/ttl" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='ttl', qualified=True) }}"/>
-   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='xml', qualified=True) }}"/>
-   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='rdf', qualified=True) }}"/>
+   <link rel="alternate" type="text/n3" href="{{ h.url_for('object_rdf', uuid=g.record_dict['occurrenceID'], _format='n3', qualified=True) }}"/>
+   <link rel="alternate" type="text/ttl" href="{{ h.url_for('object_rdf', uuid=g.record_dict['occurrenceID'], _format='ttl', qualified=True) }}"/>
+   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=g.record_dict['occurrenceID'], _format='xml', qualified=True) }}"/>
+   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=g.record_dict['occurrenceID'], _format='rdf', qualified=True) }}"/>
 {% endblock -%}
 
 {% block content_primary_nav %}
@@ -16,8 +16,8 @@
 {% endblock %}
 
 {% block record_additional_information %}
-    {% if c.record_dict['occurrenceID']%}
-        {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.object:ObjectController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
+    {% if g.record_dict['occurrenceID']%}
+        {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.object:ObjectController', action='view', uuid=g.record_dict['occurrenceID'], qualified=True) %}
         {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
     {% endif %}
     {{ super() }}

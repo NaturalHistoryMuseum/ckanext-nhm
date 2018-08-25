@@ -43,11 +43,11 @@
 
                     {# Accessibility fix - links need to have text #}
                     {% block header_account_container_content %}
-                        {% if c.userobj %}
-                          <div class="account avatar authed" data-module="me" data-me="{{ c.userobj.id }}">
+                        {% if g.userobj %}
+                          <div class="account avatar authed" data-module="me" data-me="{{ g.userobj.id }}">
                             <ul class="unstyled">
                               {% block header_account_logged %}
-                              {% if c.userobj.sysadmin %}
+                              {% if g.userobj.sysadmin %}
                                 <li>
                                   <a href="{{ h.url_for(controller='admin', action='index') }}" title="{{ _('Sysadmin settings') }}">
                                     <span class="sr-only">Sysadmin settings</span>
@@ -56,9 +56,9 @@
                                 </li>
                               {% endif %}
                               <li>
-                                <a href="{{ h.url_for(controller='user', action='read', id=c.userobj.name) }}" class="image" title="{{ _('View profile') }}">
-                                  {{ h.accessible_gravatar((c.userobj.email_hash if c and c.userobj else ''), size=22, userobj=c.userobj) }}
-                                  <span class="username">{{ c.userobj.display_name }}</span>
+                                <a href="{{ h.url_for(controller='user', action='read', id=g.userobj.name) }}" class="image" title="{{ _('View profile') }}">
+                                  {{ h.accessible_gravatar((g.userobj.email_hash if g and g.userobj else ''), size=22, userobj=g.userobj) }}
+                                  <span class="username">{{ g.userobj.display_name }}</span>
                                 </a>
                               </li>
                               {% set new_activities = h.new_activities() %}
@@ -72,7 +72,7 @@
                               {% block header_account_settings_link %}
                                 {% if not h.is_ldap_user() %}
                                 <li>
-                                  <a href="{{ h.url_for(controller='user', action='edit', id=c.userobj.name) }}" title="{{ _('Edit settings') }}">
+                                  <a href="{{ h.url_for(controller='user', action='edit', id=g.userobj.name) }}" title="{{ _('Edit settings') }}">
                                     <span class="sr-only">Edit settings</span>
                                     <i class="fa fa-cog"></i>
                                   </a>

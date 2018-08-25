@@ -31,8 +31,8 @@
 
 {% block secondary_content %}
 
-    {% for facet in c.facet_titles %}
-        {{ h.snippet('snippets/facet_list.html', title=c.facet_titles[facet], name=facet,
+    {% for facet in g.facet_titles %}
+        {{ h.snippet('snippets/facet_list.html', title=g.facet_titles[facet], name=facet,
                      label_function=h.get_facet_label_function(facet)) }}
     {% endfor %}
 
@@ -51,11 +51,11 @@
 
 {% block form %}
     {% set facets = {
-      'fields': c.fields_grouped,
-      'search': c.search_facets,
-      'titles': c.facet_titles,
-      'translated_fields': c.translated_fields,
-      'remove_field': c.remove_field }
+      'fields': g.fields_grouped,
+      'search': g.search_facets,
+      'titles': g.facet_titles,
+      'translated_fields': g.translated_fields,
+      'remove_field': g.remove_field }
     %}
     {% set sorting = [
       (_('Promoted'), 'promoted asc'),
@@ -65,5 +65,5 @@
       (_('Last Modified'), 'metadata_modified desc'),
       (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false) ]
     %}
-    {% snippet 'snippets/search_form.html', type='dataset', query=c.q, sorting=sorting, sorting_selected=c.sort_by_selected, count=c.page.item_count, facets=facets, show_empty=request.params, error=c.query_error, fields=c.fields %}
+    {% snippet 'snippets/search_form.html', type='dataset', query=g.q, sorting=sorting, sorting_selected=g.sort_by_selected, count=g.page.item_count, facets=facets, show_empty=request.params, error=g.query_error, fields=g.fields %}
 {% endblock %}

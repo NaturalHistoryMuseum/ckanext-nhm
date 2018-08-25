@@ -11,7 +11,7 @@
     <section id="stats-total-resources">
 
       <h4>{{ _('Total number of resources') }}</h4>
-      <div data-module="graph" data-module-data="{{ h.dump_json(c.graph_data) }}" data-module-config="{{ h.dump_json(c.graph_options) }}" style="width:100%; height:300px;"></div>
+      <div data-module="graph" data-module-data="{{ h.dump_json(g.graph_data) }}" data-module-config="{{ h.dump_json(g.graph_options) }}" style="width:100%; height:300px;"></div>
       {% resource 'ckanext-graph/main' %}
 
     </section>
