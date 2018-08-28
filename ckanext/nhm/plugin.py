@@ -87,7 +87,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_public_directory(config, u'files')
 
     ## IBlueprint
-    def get_blueprints(self):
+    def get_multiple_blueprints(self):
         return routes.blueprints
 
     ## IRoutes
@@ -107,14 +107,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                      u'/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
                      controller=u'ckanext.nhm.controllers.record:RecordController',
                      action=u'dwc')
-
-        # Legal pages
-        _map.connect(u'legal_privacy', u'/privacy',
-                     controller=u'ckanext.nhm.controllers.legal:LegalController',
-                     action=u'privacy')
-        _map.connect(u'legal_terms', u'/terms-conditions',
-                     controller=u'ckanext.nhm.controllers.legal:LegalController',
-                     action=u'terms')
 
         # Dataset metrics
         _map.connect(u'dataset_metrics', u'/dataset/metrics/{id}',
