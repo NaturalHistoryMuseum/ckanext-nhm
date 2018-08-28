@@ -11,6 +11,7 @@ from collections import OrderedDict
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
+from . import routes
 import os
 import re
 from beaker.cache import cache_managers
@@ -30,7 +31,7 @@ import ckan.model as model
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.datastore.interfaces import IDatastore
 
-# NOTE: Need to import a function with a cached decorator so clear caches works
+# NOTE: Need to import a function with a cached decorator so clear caches works.
 # assigning here as the function is not used anywhere and would be lost in automatic
 # import optimisations
 _this_function_has_a_cached_decorator = get_site_statistics
@@ -46,6 +47,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     '''
 
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    template_dir = os.path.join(root_dir, u'ckanext', u'nhm', u'theme', u'templates')
+
+    implements(interfaces.IBlueprint)
     implements(interfaces.IRoutes, inherit=True)
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.ITemplateHelpers, inherit=True)
@@ -70,10 +75,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # Add template directory - we manually add to extra_template_paths
         # rather than using add_template_directory to ensure it is always used
         # to override templates
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        template_dir = os.path.join(root_dir, u'ckanext', u'nhm', u'theme', u'templates')
+
         config[u'extra_template_paths'] = u','.join(
-            [template_dir, config.get(u'extra_template_paths', u'')])
+            [self.template_dir, config.get(u'extra_template_paths', u'')])
 
         toolkit.add_public_directory(config, u'theme/public')
         toolkit.add_resource(u'theme/fanstatic', u'ckanext-nhm')
@@ -81,6 +85,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # Add another public directory for dataset files - this will hopefully
         # be temporary, until DAMS
         toolkit.add_public_directory(config, u'files')
+
+    ## IBlueprint
+    def get_blueprints(self):
+        return routes.blueprints
 
     ## IRoutes
     def before_map(self, _map):
@@ -99,20 +107,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                      u'/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
                      controller=u'ckanext.nhm.controllers.record:RecordController',
                      action=u'dwc')
-
-        # About pages
-        _map.connect(u'about_citation', u'/about/citation',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'citation')
-        _map.connect(u'about_download', u'/about/download',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'download')
-        _map.connect(u'about_licensing', u'/about/licensing',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'licensing')
-        _map.connect(u'about_credits', u'/about/credits',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'credits')
 
         # Legal pages
         _map.connect(u'legal_privacy', u'/privacy',
