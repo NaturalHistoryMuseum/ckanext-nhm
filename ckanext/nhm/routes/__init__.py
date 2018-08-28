@@ -4,6 +4,6 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from . import about
+from . import about, statistics
 
-blueprints = [about.blueprint]
+blueprints = [about.blueprint, statistics.blueprint]

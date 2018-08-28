@@ -116,17 +116,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                      controller=u'ckanext.nhm.controllers.legal:LegalController',
                      action=u'terms')
 
-        # About stats pages
-        _map.connect(u'stats_resources', u'/about/statistics/resources',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'resources', ckan_icon=u'bar-chart')
-        _map.connect(u'stats_contributors', u'/about/statistics/contributors',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'contributors', ckan_icon=u'user')
-        _map.connect(u'stats_records', u'/about/statistics/records',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'records', ckan_icon=u'file-text')
-
         # Dataset metrics
         _map.connect(u'dataset_metrics', u'/dataset/metrics/{id}',
                      controller=u'ckanext.nhm.controllers.stats:StatsController',
