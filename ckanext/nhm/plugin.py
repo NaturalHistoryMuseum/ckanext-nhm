@@ -11,7 +11,7 @@ from collections import OrderedDict
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-from . import routes
+from ckanext.nhm import routes
 import os
 import re
 from beaker.cache import cache_managers
@@ -50,7 +50,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     template_dir = os.path.join(root_dir, u'ckanext', u'nhm', u'theme', u'templates')
 
-    implements(interfaces.IBlueprint)
+    implements(interfaces.IBlueprint, inherit=True)
     implements(interfaces.IRoutes, inherit=True)
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.ITemplateHelpers, inherit=True)
@@ -65,6 +65,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IDoi)
     implements(IGalleryImage)
     implements(ICkanPackager)
+
 
     ## IConfigurer
     def update_config(self, config):
@@ -87,7 +88,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_public_directory(config, u'files')
 
     ## IBlueprint
-    def get_multiple_blueprints(self):
+    def get_blueprint(self):
         return routes.blueprints
 
     ## IRoutes

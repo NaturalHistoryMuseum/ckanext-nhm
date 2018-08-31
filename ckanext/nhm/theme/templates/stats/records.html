@@ -2,7 +2,7 @@
 
 {% block breadcrumb_content %}
     {{ super() }}
-    <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.stats:StatsController', action='records' %}</li>
+    <li class="active">{% link_for _(title), controller='statistics', action='records' %}</li>
 {% endblock %}
 
 {% block stats_content %}
