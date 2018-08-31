@@ -5,7 +5,7 @@
     <ul class="unstyled inline pull-right">
 
       <li>
-        <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='records') }}">
+        <a href="{{ h.url_for(controller='statistics', action='records') }}">
           {{ h.SI_number_span(stats.record_count) }}
           <span class="default-text-color">{{ _('record') if stats.record_count == 1 else _('records') }}</span>
         </a>
@@ -19,7 +19,7 @@
       </li>
 
       <li>
-        <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='contributors') }}">
+        <a href="{{ h.url_for(controller='statistics', action='contributors') }}">
           {{ h.SI_number_span(stats.contributor_count) }}
           <span class="default-text-color">{{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}</span>
         </a>

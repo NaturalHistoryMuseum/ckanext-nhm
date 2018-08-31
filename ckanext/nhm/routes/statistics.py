@@ -18,15 +18,18 @@ blueprint = Blueprint(name=u'statistics', import_name=__name__,
                       url_prefix=u'/about/statistics')
 
 
+def _context():
+    return {
+        u'user': toolkit.c.user or toolkit.c.author,
+        u'auth_user_obj': toolkit.c.userobj
+        }
+
+
 @blueprint.before_request
 def before_request():
     u'''set context and check authorization'''
     try:
-        context = {
-            u'user': toolkit.c.user or toolkit.c.author,
-            u'auth_user_obj': toolkit.c.userobj
-            }
-        toolkit.check_access('site_read', context)
+        toolkit.check_access('site_read', _context())
     except toolkit.NotAuthorized:
         toolkit.abort(401, toolkit._(u'Not authorized to see this page'))
 
@@ -129,7 +132,7 @@ def records():
     '''Render the records stats page.'''
 
     toolkit.c.datastore_stats = toolkit.get_action(u'dataset_statistics')(
-        toolkit.c, {})
+        _context(), {})
     toolkit.c.num_records = [
         {
             u'date': datetime.now() - timedelta(days=7),
