@@ -97,7 +97,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
         :param _map:
         '''
-        
+
         # Redirect the old specimen url to the object
         _map.redirect(u'/specimen/{url:.*}', u'/object/{url}')
 
