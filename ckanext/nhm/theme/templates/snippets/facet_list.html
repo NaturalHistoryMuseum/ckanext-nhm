@@ -22,7 +22,7 @@
 
             <p class="module-footer">
                 {% if h.get_param_int('_%s_limit' % name) %}
-                    {% if h.has_more_facets(name) %}
+                    {% if h.has_more_facets(name, g.search_facets) %}
                         <a href="{{ h.remove_url_param('_%s_limit' % name, replace=0, extras=extras, alternative_url=alternative_url) }}"
                            class="read-more">{{ _('Show More {facet_type}').format(facet_type=title) }} <i class="fa fa-plus-sign"></i></a>
                     {% endif %}

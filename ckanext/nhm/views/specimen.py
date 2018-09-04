@@ -278,7 +278,7 @@ class SpecimenView(DefaultView):
 
             label = field.replace(u'determination', u'')
             # Add a space before capital letters
-            label = re.sub('([A-Z])"', ' \1"', label)
+            label = re.sub(u'([A-Z])"', u' \1"', label)
 
             c.record_dict[u'determination_labels'].append(label)
             value = c.record_dict.get(field, None)

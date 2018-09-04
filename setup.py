@@ -1,28 +1,28 @@
 from setuptools import find_packages, setup
 
-version = '0.4'
+version = u'0.4'
 
 setup(
-    name='ckanext-nhm',
+    name=u'ckanext-nhm',
     version=version,
-    description="",
-    long_description="""""",
+    description=u'',
+    long_description=u'''''',
     classifiers=[],
     # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
-    keywords='',
-    author='Natural History Museum',
-    author_email='',
-    url='',
-    license='',
-    packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-    namespace_packages=['ckanext', 'ckanext.nhm'],
+    keywords=u'',
+    author=u'Natural History Museum',
+    author_email=u'',
+    url=u'',
+    license=u'',
+    packages=find_packages(exclude=[u'ez_setup', u'examples', u'tests']),
+    namespace_packages=[u'ckanext', u'ckanext.nhm'],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
         # -*- Extra requirements: -*-
         ],
     entry_points= \
-        """
+        u'''
             [ckan.plugins]
                 nhm = ckanext.nhm.plugin:NHMPlugin
     
@@ -34,5 +34,5 @@ setup(
     
             [ckan.rdf.profiles]
                 nhm_dcat=ckanext.nhm.dcat.profiles:NHMDCATProfile
-        """,
+        ''',
     )

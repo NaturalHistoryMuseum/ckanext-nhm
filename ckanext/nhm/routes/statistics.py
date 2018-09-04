@@ -29,7 +29,7 @@ def _context():
 def before_request():
     u'''set context and check authorization'''
     try:
-        toolkit.check_access('site_read', _context())
+        toolkit.check_access(u'site_read', _context())
     except toolkit.NotAuthorized:
         toolkit.abort(401, toolkit._(u'Not authorized to see this page'))
 

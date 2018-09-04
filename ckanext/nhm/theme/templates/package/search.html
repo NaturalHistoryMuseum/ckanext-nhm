@@ -3,7 +3,7 @@
 {% block subtitle %}{{ _("Data") }}{% endblock %}
 
 {% block breadcrumb_content %}
-    <li class="active">{{ h.nav_link(_('Data'), controller='package', action='search', highlight_actions = 'new index') }}</li>
+    <li class="active">{{ h.nav_link(_('Data'), controller='dataset', action='search', highlight_actions = 'new index') }}</li>
 {% endblock %}
 
 {% block package_search_results_api %}

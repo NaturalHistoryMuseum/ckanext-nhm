@@ -47,7 +47,7 @@
               {% set name = '%s (%s)' % (row['fullname'], row['name']) if row['fullname'] else row['name'] %}
 
             <tr>
-              <th><a href="{{ h.url_for(controller='package', action='search', creator_user_id=row['user_id']) }}">{{ name }}</a></th>
+              <th><a href="{{ h.url_for(controller='dataset', action='search', creator_user_id=row['user_id']) }}">{{ name }}</a></th>
               <td>{{ row['count'] }}</td>
             </tr>
           {% endfor %}

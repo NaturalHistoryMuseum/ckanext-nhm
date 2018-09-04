@@ -20,4 +20,4 @@ class TestNHMCacheFunctions(helpers.FunctionalTestBase):
         params = {u'name': u'test-group'}
         response = self._test_app.post(u'/api/action/group_create', params=params,
                                        extra_environ=auth)
-        assert json.loads(response.body)['success'] is True
+        assert json.loads(response.body)[u'success'] is True

@@ -26,6 +26,7 @@ from solr import SolrException
 from webhelpers.html import literal
 
 import ckan.model as model
+from ckan.lib.helpers import _datestamp_to_datetime
 from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
@@ -214,7 +215,7 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
 
         filters = u'|'.join([u'%s:%s' % (k, v) for k, v in filters.items()])
 
-        return toolkit.url_for(controller=u'package', action=u'resource_read',
+        return toolkit.url_for(controller=u'dataset', action=u'resource_read',
                                id=view[u'package_id'], resource_id=view[u'resource_id'],
                                view_id=view[u'id'], filters=filters)
 
@@ -346,8 +347,8 @@ def get_google_analytics_config():
 
 def persistent_follow_button(obj_type, obj_id):
     '''Replaces ckan.lib.follow_button which returns an empty string for anonymous users.
-    For anon users this function outputs a follow button which links through
-    to the login page
+    For anon users this function outputs a follow button which links through to the
+    login page
 
     :param obj_type: 
     :param obj_id: 
@@ -507,8 +508,7 @@ def get_resource_filter_options(resource, resource_view):
 
     :param resource: Dictionary representing a resource
     :param resource_view: 
-    :returns: A dictionary associating each option's name to a dict
-            defining:
+    :returns: A dictionary associating each option's name to a dict defining:
                 - label: The label to display to users;
                 - checked: True if the option is currently applied.
 
@@ -588,8 +588,9 @@ def get_facet_label_function(facet_name, multi=False):
     '''For a given facet, return the function used to fetch the facet's items labels
 
     :param facet_name: Facet name
-    :param multi: If True, the function returned should take a list of facets and a filter value to find the matching
-                  facet on the name field (optional, default: False)
+    :param multi: If True, the function returned should take a list of facets and a
+                  filter value to find the matching facet on the name field (optional,
+                  default: False)
     :returns: A function or None
 
     '''
@@ -633,7 +634,6 @@ def get_creator_id_facet_label(facet):
 def field_name_label(field_name):
     '''Convert a field name into a label - replacing _s and upper casing first character
 
-    :param field: return: str label
     :param field_name: 
     :returns: str label
 
@@ -646,7 +646,7 @@ def field_name_label(field_name):
 def field_is_link(value):
     '''Is a field a link (starts with http and is a valid URL)
 
-    :param value: return: boolean
+    :param value:
     :returns: boolean
 
     '''
@@ -660,9 +660,9 @@ def field_is_link(value):
 def get_contact_form_params(pkg=None, res=None, rec=None):
     '''Get a list of IDS
 
-    :param pkg: param res: (optional, default: None)
-    :param rec: return: (optional, default: None)
-    :param res:  (optional, default: None)
+    :param pkg: (optional, default: None)
+    :param rec: (optional, default: None)
+    :param res: (optional, default: None)
 
     '''
 
@@ -724,7 +724,7 @@ def record_display_field(field_name, value):
     '''Decide whether to display a field
     Evaluates whether a field has value
 
-    :param field_name: param value:
+    :param field_name:
     :param value: 
     :returns: bool - true to display field; false not to
 
@@ -771,9 +771,9 @@ def get_image_licence_options():
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     '''Generate social share text for a package
 
-    :param pkg_dict: return: (optional, default: None)
-    :param res_dict:  (optional, default: None)
-    :param rec_dict:  (optional, default: None)
+    :param pkg_dict: (optional, default: None)
+    :param res_dict: (optional, default: None)
+    :param rec_dict: (optional, default: None)
 
     '''
 
@@ -810,8 +810,8 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     '''Port of ckan helper gravatar
     Adds title text to the image so it passes accessibility checks
 
-    :param email_hash: param size:
-    :param default: param userobj: (optional, default: None)
+    :param email_hash:
+    :param default: (optional, default: None)
     :param size:  (optional, default: 100)
     :param userobj:  (optional, default: None)
 
@@ -833,7 +833,7 @@ def dataset_author_truncate(author_str):
     insert et al as abbreviation tag
 
     :param author_str: dataset author
-    :returns: shortened author str, will full text in abbr tag
+    :returns: shortened author str, full text in abbr tag
 
     '''
 
@@ -871,7 +871,7 @@ def dataset_author_truncate(author_str):
 def get_resource_facets(resource):
     '''Return a list of facets for a particular resource
 
-    :param resource: return:
+    :param resource:
 
     '''
     # Number of facets to display
@@ -936,7 +936,7 @@ def get_resource_facets(resource):
             u'has_more': len(search[u'facets'][u'facet_fields'][
                                  field_name]) > num_facets and field_name not in
                          search_params.get(
-                u'facets_field_limit', {}),
+                             u'facets_field_limit', {}),
             u'active': active_facet
             }
 
@@ -972,7 +972,7 @@ def remove_url_filter(field, value, extras=None):
     This replaces remove_url_param for filters
 
     :param field: param value:
-    :param extras: return: (optional, default: None)
+    :param extras: (optional, default: None)
     :param value: 
 
     '''
@@ -1159,7 +1159,7 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
         fields = [u'last_modified', u'revision_timestamp', u'Created']
         # find the available update dates on the resource and filter out Nones
         update_dates = filter(None,
-                              [toolkit.h._datestamp_to_datetime(resource[field]) for
+                              [_datestamp_to_datetime(resource.get(field, None)) for
                                field in fields])
         # return the latest non-None value, or None
         return max(update_dates) if update_dates else None

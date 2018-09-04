@@ -97,23 +97,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
         :param _map:
         '''
-        # Add view record
-        _map.connect(u'record',
-                     u'/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                     controller=u'ckanext.nhm.controllers.record:RecordController',
-                     action=u'view')
-
-        # Add dwc view
-        _map.connect(u'dwc',
-                     u'/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
-                     controller=u'ckanext.nhm.controllers.record:RecordController',
-                     action=u'dwc')
-
-        # Dataset metrics
-        _map.connect(u'dataset_metrics', u'/dataset/metrics/{id}',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'dataset_metrics', ckan_icon=u'bar-chart')
-        # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
         object_controller = u'ckanext.nhm.controllers.object:ObjectController'
 
@@ -134,10 +117,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # The DCAT plugin breaks these links if enable content negotiation is enabled
         # because it maps to /dataset/{_id} without excluding these actions
         # So we re=add them here to make sure it's working
-        _map.connect(u'add dataset', u'/dataset/new', controller=u'package',
+        _map.connect(u'add dataset', u'/dataset/new', controller=u'dataset',
                      action=u'new')
         _map.connect(u'/dataset/{action}',
-                     controller=u'package',
+                     controller=u'dataset',
                      requirements=dict(action=u'|'.join([
                          u'list',
                          u'autocomplete'
@@ -395,10 +378,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # Build dictionary of URLs
         urls = {}
         if package_id:
-            urls[u'dataset'] = toolkit.url_for(controller=u'package', action=u'read',
+            urls[u'dataset'] = toolkit.url_for(controller=u'dataset', action=u'read',
                                                id=package_id, qualified=True)
             if resource_id:
-                urls[u'resource'] = toolkit.url_for(controller=u'package',
+                urls[u'resource'] = toolkit.url_for(controller=u'dataset',
                                                     action=u'resource_read',
                                                     id=package_id,
                                                     resource_id=resource_id,
@@ -619,7 +602,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             u'id': package_id
         })
         if resource.get(u'datastore_active', False) and resource.get(u'format',
-                                                                    '').lower() == u'dwc':
+                                                                    u'').lower() == u'dwc':
             # if it's a datastore resource and it's in the DwC format, add EML
             request_params[u'eml'] = generate_eml(package, resource)
         return packager_url, request_params

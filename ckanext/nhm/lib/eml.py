@@ -18,7 +18,7 @@ def generate_eml(package, resource):
     # raise an exception and therefore stop the request from being sent if something is missing
     formatting_data = {
         u'resource_id': resource[u'id'],
-        u'title': resource.get(u'name', ''),
+        u'title': resource.get(u'name', u''),
         u'abstract': resource.get(u'description', u''),
         u'license': package.get(u'license_title', u'License not specified'),
         u'package_name': package.get(u'name', u''),
@@ -40,7 +40,7 @@ def generate_eml(package, resource):
         '''.format(**{
             u'doi': package[u'doi'],
             u'citation': u'Natural History Museum http://data.nhm.ac.uk ({0}): {1}'.format(
-                package.get(u'doi_date_published', '')[:4], package.get(u'title', '')),
+                package.get(u'doi_date_published', u'')[:4], package.get(u'title', u'')),
         }).strip()
 
     # build the xml string and return it

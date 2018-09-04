@@ -12,7 +12,7 @@
       </li>
 
       <li>
-        <a href="{{ h.url_for(controller='package', action='search') }}">
+        <a href="{{ h.url_for(controller='dataset', action='search') }}">
           {{ h.SI_number_span(stats.dataset_count) }}
           <span class="default-text-color">{{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}</span>
         </a>

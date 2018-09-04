@@ -45,8 +45,8 @@
 
           {% for row in g.datastore_stats['resources'] %}
             <tr>
-              <th><a href="{{ h.url_for(controller='package', action='read', id=row.pkg_name ) }}">{{ row.pkg_title }}</a></th>
-              <th><a href="{{ h.url_for(controller='package', action='resource_read', id=row.pkg_name, resource_id=row.id ) }}">{{ row.name }}</a></th>
+              <th><a href="{{ h.url_for(controller='dataset', action='read', id=row.pkg_name ) }}">{{ row.pkg_title }}</a></th>
+              <th><a href="{{ h.url_for(controller='dataset', action='resource_read', id=row.pkg_name, resource_id=row.id ) }}">{{ row.name }}</a></th>
               <td>{{ h.delimit_number(row.total) }}</td>
             </tr>
           {% endfor %}
