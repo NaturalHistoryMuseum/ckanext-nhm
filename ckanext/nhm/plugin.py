@@ -97,20 +97,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
         :param _map:
         '''
-
-        object_controller = u'ckanext.nhm.controllers.object:ObjectController'
-
-        _map.connect(u'object_rdf', u'/object/{uuid}.{_format}',
-                     controller=object_controller, action=u'rdf',
-                     requirements={
-                         u'_format': u'xml|rdf|n3|ttl|jsonld'
-                         })
-
-        # Permalink for specimens - needs to come after the DCAT format dependent
-        _map.connect(u'object_view', u'/object/{uuid}',
-                     controller=object_controller,
-                     action=u'view')
-
+        
         # Redirect the old specimen url to the object
         _map.redirect(u'/specimen/{url:.*}', u'/object/{url}')
 
