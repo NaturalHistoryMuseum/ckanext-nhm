@@ -717,22 +717,17 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     @param pkg_dict:
     @return:
     """
-
-    text = list()
-
+    text = []
     if rec_dict:
-
-        try:
-            title = rec_dict.get(res_dict['_title_field'], None) or 'Record %s' % rec_dict['_id']
-        except KeyError:
-            title = 'Record %s' % rec_dict['_id']
-
-        text.append(title)
-
+        title_field = res_dict.get('_title_field', None)
+        if title_field and rec_dict.get(title_field, None):
+            text.append(rec_dict[title_field])
+        else:
+            text.append('Record {}'.format(rec_dict['_id']))
     elif res_dict:
-        text.append('%s' % (res_dict['name']))
+        text.append(res_dict['name'])
     elif pkg_dict:
-        text.append('%s' % (pkg_dict['title'] or pkg_dict['name']))
+        text.append(pkg_dict['title'] or pkg_dict['name'])
 
     text.append('on the @NHM_London Data Portal')
 
@@ -741,9 +736,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     except KeyError:
         pass
 
-    text = ' '.join(text)
-
-    return urllib.quote(text.encode('utf8'))
+    return urllib.quote(' '.join(map(str, text)).encode('utf8'))
 
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
