@@ -17,7 +17,7 @@
 {% block breadcrumb_content %}
     {{ super() }}
     <li>{% link_for h.resource_display_name(res)|truncate(40), controller='package', action='resource_read', id=pkg.name, resource_id=res.id %}</li>
-    <li class="active"><a href="">{{ c.record_title|truncate(30) }}</a></li>
+    <li class="active"><a href="">{{ c.record_title|string|truncate(30) }}</a></li>
 {% endblock %}
 
 {% block pre_primary %}
