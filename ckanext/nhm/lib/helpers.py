@@ -736,7 +736,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     except KeyError:
         pass
 
-    return urllib.quote(' '.join(text).encode('utf8'))
+    return urllib.quote(' '.join(map(str, text)).encode('utf8'))
 
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
