@@ -22,11 +22,13 @@ from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from jinja2.filters import do_truncate
+from lxml import etree
 from solr import SolrException
 from webhelpers.html import literal
 
 import ckan.model as model
-from ckan.lib.helpers import _datestamp_to_datetime
+from ckan.lib.helpers import (_datestamp_to_datetime,
+                              get_allowed_view_types as core_get_allowed_view_types)
 from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
@@ -67,7 +69,7 @@ def get_site_statistics():
 def get_contributor_count():
     '''Get the total number of contributors to active packages.'''
     return model.Session.execute(
-        u"SELECT COUNT(DISTINCT creator_user_id) FROM package WHERE "
+        u"select COUNT(distinct creator_user_id) from package where "
         u"state='active'").scalar()
 
 
@@ -192,12 +194,9 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
     :param view_type:  (optional, default: None)
 
     '''
-    context = {
-        u'user': toolkit.c.user
-        }
 
     try:
-        views = toolkit.get_action(u'resource_view_list')(context, {
+        views = toolkit.get_action(u'resource_view_list')({}, {
             u'id': resource_id
             })
     except toolkit.ObjectNotFound:
@@ -215,7 +214,7 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
 
         filters = u'|'.join([u'%s:%s' % (k, v) for k, v in filters.items()])
 
-        return toolkit.url_for(controller=u'dataset', action=u'resource_read',
+        return toolkit.url_for(u'resource.read',
                                id=view[u'package_id'], resource_id=view[u'resource_id'],
                                view_id=view[u'id'], filters=filters)
 
@@ -565,7 +564,7 @@ def get_allowed_view_types(resource, package):
 
     '''
 
-    view_types = toolkit.h.get_allowed_view_types(resource, package)
+    view_types = core_get_allowed_view_types(resource, package)
     blacklisted_types = [u'image']
 
     filtered_types = []
@@ -816,16 +815,13 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     :param userobj:  (optional, default: None)
 
     '''
-    if default is None:
-        default = toolkit.config.get(u'ckan.gravatar_default', u'identicon')
+    gravatar_literal = toolkit.h.gravatar(email_hash, size, default)
+    if userobj is not None:
+        grav_xml = etree.fromstring(gravatar_literal)
+        grav_xml.attrib['alt'] = userobj.name
+        gravatar_literal = literal(etree.tostring(grav_xml))
 
-    if not default in toolkit.h._VALID_GRAVATAR_DEFAULTS:
-        # treat the default as a url
-        default = urllib.quote(default, safe=u'')
-
-    return literal(u'''<img alt="%s" src="//gravatar.com/avatar/%s?s=%d&amp;d=%s"
-        class="gravatar" width="%s" height="%s" />''' % (
-        userobj.name, email_hash, size, default, size, size))
+    return gravatar_literal
 
 
 def dataset_author_truncate(author_str):
@@ -977,9 +973,6 @@ def remove_url_filter(field, value, extras=None):
 
     '''
 
-    # import copy
-    # params = copy.copy(dict(request.params))
-
     params = dict(toolkit.request.params)
     try:
         del params[u'filters']
@@ -1010,8 +1003,9 @@ def remove_url_filter(field, value, extras=None):
                 filter_parts.append(u'%s:%s' % (filter_field, filter_value))
         # If we have filter parts, add them back to the params dict
         if filter_parts:
-            params[u'filters'] = u'|'.join(filter_parts)
-    return _create_filter_url(params, extras)
+            filters = u'|'.join(filter_parts)
+            return toolkit.h.remove_url_param(u'filters', replace=filters, extras=extras)
+    return toolkit.h.remove_url_param(u'filters', extras=extras)
 
 
 def add_url_filter(field, value, extras=None):
@@ -1027,23 +1021,9 @@ def add_url_filter(field, value, extras=None):
 
     params = dict(toolkit.request.params)
     url_filter = u'%s:%s' % (field, value)
-    if params.get(u'filters', None):
-        params[u'filters'] += u'|%s' % url_filter
-    else:
-        params[u'filters'] = url_filter
+    filters = u'|'.join(params.get(u'filters', []) + [url_filter])
 
-    return _create_filter_url(params, extras)
-
-
-def _create_filter_url(params, extras=None):
-    '''Helper function to create filter URL
-
-    :param params: param extras:
-    :param extras:  (optional, default: None)
-
-    '''
-    params_no_page = [(k, v) for k, v in params.items() if k != u'page']
-    return toolkit.h._create_url_with_params(list(params_no_page), extras=extras)
+    return toolkit.h.add_url_param(u'filters', filters, extras=extras)
 
 
 def parse_request_filters():

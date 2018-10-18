@@ -149,3 +149,7 @@ def abyssline_object_redirect(uuid):
             record_id=record[u'_id'])
 
     toolkit.abort(404, toolkit._(u'Record not found'))
+
+@blueprint.route('/specimen/<url>')
+def specimen_redirect(url):
+    return view(url)

@@ -68,7 +68,7 @@
                        {% for collection_code, count in collection_stats['collections'].items() %}
 			                {% if collection_code %}
                           	    {% set dept = h.get_department(collection_code) %}
-                                <li><a href="{{ h.url_for_collection_view(filters={"collectionCode": collection_code}) }}"><i class="{{ dept|lower }}"></i><span>{{ h.delimit_number(count) }}</span><span class="default-text-color">{{ dept }}</span></a></li>
+                                <li><a href="{{ h.url_for_collection_view(filters={'collectionCode': collection_code}) }}"><i class="{{ dept|lower }}"></i><span>{{ h.delimit_number(count) }}</span><span class="default-text-color">{{ dept }}</span></a></li>
                        	   {% endif %}		
 			            {% endfor %}
                    </ul>
