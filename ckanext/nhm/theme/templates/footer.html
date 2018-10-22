@@ -25,10 +25,10 @@
             <li><a href="{{ h.url_for('dataset.search') }}">Data</a></li>
             <li><a href="{{ h.url_for('home.about') }}">About</a>
                 <ul>
-                    <li><a href="{{ h.url_for('about_citation') }}">Citation &amp; attribution</a></li>
-                    <li><a href="{{ h.url_for('about_download') }}">Download &amp; API</a></li>
-                    <li><a href="{{ h.url_for('stats_resources') }}">Site statistics</a></li>
-                    <li><a href="{{ h.url_for('about_credits') }}">Credits</a></li>
+                    <li><a href="{{ h.url_for('about.citation') }}">Citation &amp; attribution</a></li>
+                    <li><a href="{{ h.url_for('about.download') }}">Download &amp; API</a></li>
+                    <li><a href="{{ h.url_for('statistics.resources') }}">Site statistics</a></li>
+                    <li><a href="{{ h.url_for('about.credits') }}">Credits</a></li>
                 </ul>
             </li>
 
@@ -40,16 +40,17 @@
       <ul class="nav unstyled">
         {% block footer_menu_links %}
             {% if g.userobj %}
-                <li><a href="{{ h.url_for(controller='user', action='read', id=g.userobj.name) }}" title="My account">My account</a></li>
-                <li><a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">Log out</a></li>
+                <li><a href="{{ h.url_for('user.read', id=g.userobj.name) }}" title="My account">My account</a></li>
+                <li><a href="{{ h.url_for('user.logout') }}" title="{{ _('Log out') }}">Log out</a></li>
             {% else %}
-                <li><a href="{{ h.url_for('login') }}">Login</a></li>
-                <li><a href="{{ h.url_for('register') }}">Register</a></li>
+                <li><a href="{{ h.url_for('user.login') }}">Login</a></li>
+                <li><a href="{{ h.url_for('user.register') }}">Register</a></li>
             {% endif %}
+          <!--TODO: change this once the contact_form controller is updated-->
             <li><a href="{{ h.url_for('contact_form') }}">Contact</a></li>
             <li class="extra-divide">{{ h.api_doc_link() }}</li>
-            <li class="extra-divide"><a href="{{ h.url_for('legal_privacy') }}">Privacy notice</a></li>
-            <li><a href="{{ h.url_for('legal_terms') }}">T&amp;C</a></li>
+            <li class="extra-divide"><a href="{{ h.url_for('legal.privacy') }}">Privacy notice</a></li>
+            <li><a href="{{ h.url_for('legal.terms') }}">T&amp;C</a></li>
         {% endblock %}
       </ul>
 

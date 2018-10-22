@@ -3,7 +3,7 @@
 {% block subtitle %}{{ _("Data") }}{% endblock %}
 
 {% block breadcrumb_content %}
-    <li class="active">{{ h.nav_link(_('Data'), controller='dataset', action='search', highlight_actions = 'new index') }}</li>
+    <li class="active">{{ h.nav_link(_('Data'), 'dataset.search', highlight_actions = 'new index') }}</li>
 {% endblock %}
 
 {% block package_search_results_api %}
@@ -11,7 +11,7 @@
         <div class="module-content">
             <p class="text-center">
                 <small>
-                    {% set api_link = h.link_to(_('API'), h.url_for(controller='api', action='get_api', ver=3)) %}
+                    {% set api_link = h.link_to(_('API'), h.url_for('api.get_api', ver=3)) %}
                     {% set api_doc_link = h.api_doc_link() %}
                     {% if g.dumps_url -%}
                         {% set dump_link = h.link_to(_('full {format} dump').format(format=g.dumps_format), g.dumps_url) %}

@@ -3,7 +3,7 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li>{% link_for _('About'), named_route='home.about' %}</li>
 {% endblock %}
 
 {% block content_primary_nav %}

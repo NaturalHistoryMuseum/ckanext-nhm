@@ -3,7 +3,7 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _(title), controller='legal', action='terms' %}</li>
+  <li class="active">{% link_for _(title), named_route='legal.terms' %}</li>
 {% endblock %}
 
 {% block pre_primary %}

@@ -366,16 +366,15 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # Build dictionary of URLs
         urls = {}
         if package_id:
-            urls[u'dataset'] = toolkit.url_for(controller=u'dataset', action=u'read',
+            urls[u'dataset'] = toolkit.url_for(u'dataset.read',
                                                id=package_id, qualified=True)
             if resource_id:
-                urls[u'resource'] = toolkit.url_for(controller=u'dataset',
-                                                    action=u'resource_read',
+                urls[u'resource'] = toolkit.url_for(u'resource.read',
                                                     id=package_id,
                                                     resource_id=resource_id,
                                                     qualified=True)
                 if record_id:
-                    urls[u'record'] = toolkit.url_for(u'record', action=u'view',
+                    urls[u'record'] = toolkit.url_for(u'record.view',
                                                       package_name=package_id,
                                                       resource_id=resource_id,
                                                       record_id=record_id,
@@ -553,9 +552,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 images.append({
                     u'href': i[u'identifier'],
                     u'thumbnail': i[u'identifier'].replace(u'preview', u'thumbnail'),
-                    u'link': toolkit.url_for(
-                        controller=u'ckanext.nhm.controllers.record:RecordController',
-                        action=u'view',
+                    u'link': toolkit.url_for(u'record.view',
                         package_name=data_dict[u'package'][u'name'],
                         resource_id=data_dict[u'resource'][u'id'],
                         record_id=record[u'_id']

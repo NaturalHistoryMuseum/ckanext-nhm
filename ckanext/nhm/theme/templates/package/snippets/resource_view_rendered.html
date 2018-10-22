@@ -20,8 +20,7 @@
   {% if not to_preview %}
       {# BS: Added q to persistent filters #}
       {% set query_params = h.get_query_params() %}
-      {% set src = h.url_for(controller='dataset',
-                         action='resource_view', qualified=true, id=package['name'],
+      {% set src = h.url_for('resource.view', qualified=true, id=package['name'],
                          resource_id=resource['id'],
                          view_id=resource_view['id'],
                          **query_params)  %}

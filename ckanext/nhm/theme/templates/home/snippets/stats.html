@@ -5,21 +5,21 @@
     <ul class="unstyled inline pull-right">
 
       <li>
-        <a href="{{ h.url_for(controller='statistics', action='records') }}">
+        <a href="{{ h.url_for('statistics.records') }}">
           {{ h.SI_number_span(stats.record_count) }}
           <span class="default-text-color">{{ _('record') if stats.record_count == 1 else _('records') }}</span>
         </a>
       </li>
 
       <li>
-        <a href="{{ h.url_for(controller='dataset', action='search') }}">
+        <a href="{{ h.url_for('dataset.search') }}">
           {{ h.SI_number_span(stats.dataset_count) }}
           <span class="default-text-color">{{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}</span>
         </a>
       </li>
 
       <li>
-        <a href="{{ h.url_for(controller='statistics', action='contributors') }}">
+        <a href="{{ h.url_for('statistics.contributors') }}">
           {{ h.SI_number_span(stats.contributor_count) }}
           <span class="default-text-color">{{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}</span>
         </a>

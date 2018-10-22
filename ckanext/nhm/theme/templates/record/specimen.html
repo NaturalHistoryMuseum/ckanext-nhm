@@ -17,7 +17,7 @@
 
 {% block record_additional_information %}
     {% if g.record_dict['occurrenceID']%}
-        {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.object:ObjectController', action='view', uuid=g.record_dict['occurrenceID'], qualified=True) %}
+        {% set citation_url = h.url_for('object.view', uuid=g.record_dict['occurrenceID'], qualified=True) %}
         {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
     {% endif %}
     {{ super() }}

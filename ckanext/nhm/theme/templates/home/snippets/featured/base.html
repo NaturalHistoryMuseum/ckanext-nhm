@@ -1,4 +1,4 @@
-{% set url=h.url_for(controller='dataset', action='read', id=id) %}
+{% set url=h.url_for('dataset.read', id=id) %}
 
 <div class="span4 box">
     <a class="media-image" href="{{ url }}">
