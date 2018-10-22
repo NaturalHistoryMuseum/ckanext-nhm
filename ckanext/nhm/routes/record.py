@@ -160,9 +160,7 @@ def _load_data(package_name, resource_id, record_id):
                                           None) or default_copyright),
                             u'record_id': record_id,
                             u'resource_id': resource_id,
-                            u'link': toolkit.url_for(
-                                controller=u'ckanext.nhm.controllers.record:RecordController',
-                                action=u'view',
+                            u'link': toolkit.url_for(u'record.view',
                                 package_name=package_name,
                                 resource_id=resource_id,
                                 record_id=record_id

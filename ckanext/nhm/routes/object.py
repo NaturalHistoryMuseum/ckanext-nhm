@@ -113,9 +113,7 @@ def view(uuid):
                                                               {
                                                                   u'id': package_id
                                                                   })
-                toolkit.redirect_to(
-                    controller=u'ckanext.nhm.controllers.record:RecordController',
-                    action=u'view', package_name=package[u'name'],
+                toolkit.redirect_to(u'record.view', package_name=package[u'name'],
                     resource_id=resource.id, record_id=record[u'_id'])
 
     toolkit.abort(404, toolkit._(u'Record not found'))
@@ -143,9 +141,7 @@ def abyssline_object_redirect(uuid):
     except KeyError:
         pass
     else:
-        toolkit.redirect_to(
-            controller=u'ckanext.nhm.controllers.record:RecordController',
-            action=u'view', package_name=u'abyssline', resource_id=resource_id,
+        toolkit.redirect_to(u'record.view', package_name=u'abyssline', resource_id=resource_id,
             record_id=record[u'_id'])
 
     toolkit.abort(404, toolkit._(u'Record not found'))
