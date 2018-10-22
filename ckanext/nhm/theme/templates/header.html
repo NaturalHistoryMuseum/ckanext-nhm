@@ -22,11 +22,11 @@
                     {% block header_logo %}
 
                     {% if g.site_logo %}
-                      <a class="logo" href="{{ h.url('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
+                      <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" /></a>
                     {% endif %}
 
                       <h1 class="site-title">
-                        <a href="{{ h.url('home.index') }}">{{ g.site_title }}</a>
+                        <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
                       </h1>
 
                     {% endblock %}
@@ -64,7 +64,7 @@
                               {% set new_activities = h.new_activities() %}
                               <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
                                 {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard (%(num)d new items)', new_activities) %}
-                                <a href="{{ h.url('user.dashboard') }}" title="{{ notifications_tooltip }}">
+                                <a href="{{ h.url_for('user.dashboard') }}" title="{{ notifications_tooltip }}">
                                   <i class="fa fa-dashboard"></i>
                                   <span>{{ new_activities }}</span>
                                 </a>
