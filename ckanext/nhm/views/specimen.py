@@ -32,7 +32,7 @@ class SpecimenView(DefaultView):
         'typeStatus',
         'family',
         'genus',
-        'imageCategory',
+        'associatedMedia.category',
         'gbifIssue'
     ]
 

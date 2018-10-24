@@ -29,7 +29,7 @@ class IndexLotView(DefaultView):
         'family',
         'type',
         'taxonRank',
-        'imageCategory',
+        'associatedMedia.category',
         'kindOfMaterial'
     ]
 
