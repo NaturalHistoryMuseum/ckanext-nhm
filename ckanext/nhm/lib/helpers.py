@@ -17,9 +17,8 @@ import ckan.logic as logic
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
 from ckan.lib import helpers as h
-
-from webhelpers.html import literal
-
+from ckan.lib.helpers import format_resource_items
+from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.taxonomy import extract_ranks
@@ -329,16 +328,20 @@ def persistent_follow_button(obj_type, obj_id):
                      obj_type=obj_type)
 
 
-def filter_resource_items(key):
-    """
-    Filter resource items - if key is in blacklist, return false
-    @param key:
-    @return: boolean
-    """
+def filter_and_format_resource_items(resource):
+    '''
+    Given a resource, return the items from it that are whitelisted for display and format them.
 
-    blacklist = ['image field', 'title field', 'datastore active', 'has views', 'on same domain', 'resource group id', 'revision id', 'url type']
-
-    return key.strip() not in blacklist
+    :param resource: the resource dict
+    :return: a list of made up of 2-tuples containing formatted keys and values from the resource
+    '''
+    blacklist = {'_image_field', '_title_field', 'datastore_active', 'has_views',
+                 'on_same_domain', 'resource_group_id', 'revision_id', 'url_type'}
+    items = []
+    for key, value in resource.items():
+        if key not in blacklist:
+            items.append((key, value))
+    return format_resource_items(items)
 
 
 def get_map_styles():
