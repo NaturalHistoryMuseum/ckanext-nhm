@@ -1,4 +1,3 @@
-from pylons import config
 import ckan.logic as logic
 import ckan.lib.base as base
 import ckan.model as model
@@ -51,7 +50,6 @@ class RecordController(base.BaseController):
             c.pkg_dict = c.package
             record = get_action('record_show')(self.context, {'resource_id': resource_id, 'record_id': record_id})
             c.record_dict = record['data']
-            record_field_types = {f['id']: f['type'] for f in record['fields']}
 
         except NotFound:
             abort(404, _('Resource not found'))
@@ -99,34 +97,15 @@ class RecordController(base.BaseController):
 
             default_licence = 'Licence: %s' % link_to(licence.title, licence.url, target='_blank')
 
-            # pop the image field so it isn't output as part of the record_dict/field_data dict (see self.view())
+            # pop the image field so it isn't output as part of the record_dict/field_data dict
+            # (see self.view())
             image_field_value = c.record_dict.pop(field_names['image'], None)
 
             if image_field_value:
                 # init the images list on the context var
                 c.images = []
-
-                # try and convert image to json
-                try:
-                    images = json.loads(image_field_value)
-                except ValueError:
-                    # if it fails, it's a string field value
-                    # use the delimiter to split up the field value (if there is one!)
-                    delimiter = c.resource.get('_image_delimiter', None)
-                    if delimiter:
-                        images = image_field_value.split(delimiter)
-                    else:
-                        images = [image_field_value]
-                    # loop through the images, adding dicts with their details to the context
-                    for image in images:
-                        if image.strip():
-                            c.images.append({
-                                'title': c.record_title,
-                                'href': image.strip(),
-                                'copyright': '%s<br />%s' % (default_licence, default_copyright)
-                            })
-                else:
-                    for image in images:
+                if isinstance(image_field_value, list):
+                    for image in image_field_value:
                         href = image.get('identifier', None)
                         if href:
                             license_link = link_to(image.get('license'), image.get('license')) if image.get('license', None) else None
@@ -143,6 +122,22 @@ class RecordController(base.BaseController):
                                     resource_id=resource_id,
                                     record_id=record_id
                                 ),
+                            })
+                else:
+                    # it's a string field value, use the delimiter to split up the field value (if
+                    # there is one!)
+                    delimiter = c.resource.get('_image_delimiter', None)
+                    if delimiter:
+                        images = image_field_value.split(delimiter)
+                    else:
+                        images = [image_field_value]
+                    # loop through the images, adding dicts with their details to the context
+                    for image in images:
+                        if image.strip():
+                            c.images.append({
+                                'title': c.record_title,
+                                'href': image.strip(),
+                                'copyright': '%s<br />%s' % (default_licence, default_copyright)
                             })
 
         if field_names['latitude'] and field_names['longitude']:
