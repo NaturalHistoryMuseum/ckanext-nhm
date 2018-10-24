@@ -234,20 +234,15 @@ def collection_stats():
     collections = OrderedDict()
     search_params = dict(
         resource_id=resource_id,
+        # use limit 0 as we're not interested in getting any results, just the facet counts
         limit=0,
-        facets=['collectionCode'],
-        facets_limit=5,  # Get an extra facet, so we can determine if there are more
+        facets=[u'collectionCode'],
     )
 
-    context = {'model': model, 'session': model.Session, 'user': c.user}
-    try:
-        search = logic.get_action('datastore_search')(context, search_params)
-    except SolrException:
-        pass
-    else:
-        for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
-            collections[collection_code] = num
-            total += num
+    result = logic.get_action(u'datastore_search')({}, search_params)
+    for collection_code, num in result[u'facets'][u'collectionCode']['values'].items():
+        collections[collection_code] = num
+        total += num
 
     stats = {
         'total': total,
@@ -804,17 +799,13 @@ def get_resource_facets(resource):
     @param resource:
     @return:
     """
-    # Number of facets to display
-    num_facets = 10
     resource_view = resource_view_get_view(resource)
-    # If facets aren't defined in the resource view, then just return
+    # if facets aren't defined in the resource view, then just return
     if not resource_view.field_facets:
         return
-    context = {'model': model, 'session': model.Session, 'user': c.user}
-    # Build query parameters for the faceted search
-    # We'll use the same query parameters used in the current request
-    # And then add extras to perform a solr faceted query, returning
-    # facets but zero results (limit=0)
+    # Build query parameters for the faceted search. We'll use the same query parameters used in the
+    # current request and then add extras to perform a faceted query, returning facets but zero
+    # results (limit=0)
     query_params = get_query_params()
 
     # Convert filters to a dictionary as this won't happen automatically
@@ -823,70 +814,58 @@ def get_resource_facets(resource):
     if query_params.get('filters'):
         for f in query_params.get('filters').split('|'):
             filter_field, filter_value = f.split(':', 1)
-            filters.setdefault(filter_field, []).append(filter_value)
+            filters[filter_field] = filter_value
 
     search_params = dict(
         resource_id=resource.get('id'),
+        # use limit 0 as we're not interested in getting any results, just the facets
         limit=0,
         facets=resource_view.field_facets,
         q=query_params.get('q', None),
         filters=filters,
-        facets_limit=num_facets + 1,  # Get an extra facet, so we can determine if there are more
     )
 
+    # if the show more button is clicked, a parameter is added to the query which informs us we need
+    # to show more facets, so use 50 for the facet limit on the given field
     for field_name in resource_view.field_facets:
-        if h.get_param_int('_%s_limit' % field_name) == 0:
-            search_params.setdefault('facets_field_limit', {})[field_name] = 50
+        if h.get_param_int(u'_{}_limit'.format(field_name)) == 0:
+            search_params.setdefault(u'facet_limits', {})[field_name] = 50
 
-    search = logic.get_action('datastore_search')(context, search_params)
+    search = logic.get_action('datastore_search')({}, search_params)
     facets = []
 
-    # dictionary of facet name => formatter function with camel_case_to_string defined as the default formatting
-    # function and then any overrides for specific edge cases
+    # dictionary of facet name => formatter function with camel_case_to_string defined as the
+    # default formatting function and then any overrides for specific edge cases
     facet_label_formatters = defaultdict(lambda: camel_case_to_string, **{
         # specific lambda for GBIF to ensure it's capitalised correctly
         'gbifIssue': lambda _: 'GBIF Issue'
     })
 
     # Dictionary of field name => formatter function
-    # Pass facet value to a formatter to get a better facet item label
-    facet_field_label_formatters = {
+    # Pass facet value to a formatter to get a better facet item label, if the facet doesn't have a
+    # formatter defined then the value is just used as is
+    facet_field_label_formatters = defaultdict(lambda: (lambda v: v.capitalize()), **{
         'collectionCode': get_department
-    }
+    })
 
     # Loop through original facets to ensure order is preserved
     for field_name in resource_view.field_facets:
-        # Parse the facets into a list of dictionary values, similar to that
-        # Built for the dataset search solr facets
-        active_facet = field_name in filters
-        facet = {
+        # parse the facets into a list of dictionary values
+        facets.append({
             'name': field_name,
             'label': facet_label_formatters[field_name](field_name),
-            'facet_values': [],
-            'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
-            'active': active_facet
-        }
-
-        for value, count in search['facets']['facet_fields'][field_name].items():
-            label = value
-            try:
-                label = facet_field_label_formatters[field_name](label)
-            except KeyError:
-                pass
-            facet['facet_values'].append({
-                'name': value,
-                'label': label,
-                'count': count,
-            })
-
-        facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
-        # If this is the active facet, only show the highest item
-        if active_facet:
-            facet['facet_values'] = facet['facet_values'][:1]
-        # Slice the facet values, so length matches num_facets - need to do this after the key sort
-        if facet['has_more']:
-            facet['facet_values'] = facet['facet_values'][0:num_facets]
-        facets.append(facet)
+            'has_more': search['facets'][field_name]['details']['sum_other_doc_count'] > 0,
+            'active': field_name in filters,
+            'facet_values': [
+                {
+                    'name': value,
+                    'label': facet_field_label_formatters[field_name](value),
+                    'count': count
+                    # loop over the top values, sorted by count desc so that the top value is first
+                } for value, count in sorted(search['facets'][field_name]['values'].items(),
+                                             key=itemgetter(1), reverse=True)
+            ]
+        })
 
     return facets
 
