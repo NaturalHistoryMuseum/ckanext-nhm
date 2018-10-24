@@ -51,5 +51,18 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
         return '<div title="' + value + '" class="dqi-traffic-light dqi-' + dqi_class + '"><span></span></div>';
     }
 
+    if (columnDef.id === 'associatedMedia') {
+        // this is a hack to stop the associatedMedia column being sortable
+        columnDef.sortable = false;
+        if (value.length > 0) {
+            // return an image icon and a count of how many images there are for this record
+            return '<i class="icon-picture"></i> x' + value.length;
+        } else {
+            // if there are no images, just return nothing
+            return '';
+        }
+    }
+
+    // if we don't want to override the functionality, just return the value for the field
     return value;
 };
