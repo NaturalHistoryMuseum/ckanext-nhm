@@ -221,6 +221,13 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
+def get_artefact_resource_id():
+    """
+    @return:  ID for artefact resource
+    """
+    return config.get("ckanext.nhm.artefact_resource_id")
+
+
 @cache_region('permanent', 'collection_stats')
 def collection_stats():
     """
