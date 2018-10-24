@@ -33,6 +33,7 @@ from ckanext.nhm.lib.helpers import (
     get_site_statistics,
 )
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from ckanext.versioned_datastore.interfaces import IVersionedDatastore
 
 get_action = logic.get_action
 unflatten = dictization_functions.unflatten
@@ -64,6 +65,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(IDoi)
     p.implements(IGalleryImage)
     p.implements(ICkanPackager)
+    p.implements(IVersionedDatastore)
 
     ## IConfigurer
     def update_config(self, config):
@@ -503,3 +505,100 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             # if it's a datastore resource and it's in the DwC format, add EML
             request_params['eml'] = generate_eml(package, resource)
         return packager_url, request_params
+
+    # IVersionedDatastore
+    def datastore_modify_data_dict(self, context, data_dict):
+        '''
+        This function allows overriding of the data dict before datastore_search gets to it. We use
+        this opportunity to:
+
+            - remove any of our custom filter options (has image, lat long only etc) and add info
+              to the context so that we can pick them up and handle them in datastore_modify_search.
+              This is necessary because we define the actual query the filter options use in the
+              elasticsearch-dsl lib's objects and therefore need to modify the actual search object
+              prior to it being sent to the elasticsearch server.
+
+            - alter the sort if the resource being searched is one of the EMu ones, this allows us
+              to enforce a modified by sort order instead of the default and therefore means we can
+              show the last changed EMu data first
+
+        :param context: the context dict
+        :param data_dict: the data dict
+        :return: the modified data dict
+        '''
+        # remove our custom filters from the filters dict, we'll add them ourselves in the modify
+        # search function below
+        if u'filters' in data_dict:
+            # figure out which options are available for this resource
+            resource_show = p.toolkit.get_action(u'resource_show')
+            resource = resource_show(context, {u'id': data_dict[u'resource_id']})
+            options = resource_view_get_filter_options(resource)
+            # we'll store the filters that need applying on the context to avoid repeating our work
+            # in the modify search function below
+            context[u'option_filters'] = []
+            for option in options:
+                if option.name in data_dict[u'filters']:
+                    # if the option is in the filters, delete it and add it's filter to the context
+                    del data_dict[u'filters'][option.name]
+                    context[u'option_filters'].append(option.filter_dsl)
+
+        if u'sort' not in data_dict:
+            # by default sort the EMu resources by modified so that the latest records are first
+            if data_dict['resource_id'] in {helpers.get_specimen_resource_id(),
+                                            helpers.get_artefact_resource_id(),
+                                            helpers.get_indexlot_resource_id()}:
+                data_dict['sort'] = ['modified desc']
+
+        return data_dict
+
+    # IVersionedDatastore
+    def datastore_modify_search(self, context, original_data_dict, data_dict, search):
+        '''
+        This function allows us to modify the search object itself before it is serialised and sent
+        to elasticsearch. In this function we currently only do one thing: add the actual
+        elasticsearch query DSL for each filter option that was removed in the
+        datastore_modify_data_dict above (they are stored in the context so that we can identify
+        which ones to add in).
+
+        :param context: the context dict
+        :param original_data_dict: the original data dict before any plugins modified it
+        :param data_dict: the data dict after all plugins have had a chance to modify it
+        :param search: the search object itself
+        :return: the modified search object
+        '''
+        # add our custom filters by looping through the filter dsl objects on the context. These are
+        # added by the datastore_modify_data_dict function above if any of our custom filters exist
+        for filter_dsl in context.pop(u'option_filters', []):
+            # add the filter to the search
+            search = search.filter(filter_dsl)
+        return search
+
+    # IVersionedDatastore
+    def datastore_modify_result(self, context, original_data_dict, data_dict, result):
+        # we don't do anything to the result currently
+        return result
+
+    # IVersionedDatastore
+    def datastore_modify_fields(self, resource_id, mapping, fields):
+        '''
+        This function allows us to modify the field definitions before they are returned as part of
+        the datastore_search action. All we do here is just modify the associatedMedia field if it
+        exists to ensure it is treated as an array.
+
+        :param resource_id: the resource id
+        :param mapping: the original mapping dict returned by elasticsearch from which the field
+                        info has been derived
+        :param fields: the fields dict itself
+        :return: the fields dict
+        '''
+        # if we're dealing with one of our EMu backed resources and the associatedMedia field is
+        # present set its type to array rather than string (the default). This isn't really
+        # necessary from recline's point of view as we override the render of this field's data
+        # anyway, but for completeness and correctness we'll do the override
+        if resource_id in {helpers.get_specimen_resource_id(), helpers.get_artefact_resource_id(),
+                           helpers.get_indexlot_resource_id()}:
+            for field_def in fields:
+                if field_def['id'] == 'associatedMedia':
+                    field_def['type'] = 'array'
+                    field_def['sortable'] = False
+        return fields
