@@ -99,7 +99,9 @@ class ObjectController(base.BaseController):
                 if record:
                     package_id = resource.get_package_id()
                     package = get_action('package_show')(self.context, {'id': package_id})
-                    h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name=package['name'], resource_id=resource.id, record_id=record['_id'])
+                    h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController',
+                                  action='view', package_name=package['name'],
+                                  resource_id=resource.id, record_id=record['_id'])
 
         abort(404, _('Record not found'))
 
@@ -136,6 +138,8 @@ class ObjectController(base.BaseController):
         except KeyError:
             pass
         else:
-            h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController', action='view', package_name='abyssline', resource_id=resource_id, record_id=record['_id'])
+            h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController',
+                          action='view', package_name='abyssline', resource_id=resource_id,
+                          record_id=record['_id'])
 
         abort(404, _('Record not found'))
