@@ -1,25 +1,23 @@
 
+import json
+
 import os
 import rdflib
-import json
-from rdflib.namespace import Namespace, RDF, XSD, RDFS
-from rdflib import URIRef, BNode, Literal
-from rdflib import OWL
-from rdflib.namespace import FOAF, SKOS
 from dateutil.parser import parse as parse_date
 from pylons import request
+from rdflib import OWL
+from rdflib import URIRef, BNode, Literal
+from rdflib.namespace import FOAF, SKOS
+from rdflib.namespace import Namespace, RDF, XSD, RDFS
 
-from ckan.plugins import toolkit
-from ckan.lib.helpers import url_for
 import ckan.lib.base as base
 import ckan.logic as logic
-
-from ckanext.dcat.utils import resource_uri, dataset_uri, catalog_uri
+from ckan.lib.helpers import url_for
+from ckan.plugins import toolkit
 from ckanext.dcat.profiles import RDFProfile
-
+from ckanext.dcat.utils import resource_uri, dataset_uri, catalog_uri
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.lib.helpers import get_department
-from ckanext.nhm.dcat.utils import rdf_resources
 
 abort = base.abort
 NotFound = logic.NotFound
@@ -421,25 +419,19 @@ class NHMDCATProfile(RDFProfile):
                 pass
 
         # Adding images as JSON is rubbish! So lets try and do it properly
-        try:
-            associated_media = record_dict.pop('associatedMedia')
-        except KeyError:
-            pass
-        else:
-            images = json.loads(associated_media)
-            for image in images:
-                image_uri = URIRef(image['identifier'])
-                g.set((image_uri, RDF.type, FOAF.Image))
-                title = image.get('title', None)
-                if title:
-                    g.set((image_uri, DC.title, Literal(title)))
-                g.set((image_uri, CC.license, URIRef(image['license'])))
-                g.set((image_uri, DC.RightsStatement, Literal(image['rightsHolder'])))
-                g.set((image_uri, DC.Format, Literal(image['format'])))
-                # Add link from image to object...
-                g.set((image_uri, FOAF.depicts, object_uri))
-                # And object to image
-                g.add((object_uri, FOAF.depiction, image_uri))
+        for image in record_dict.pop('associatedMedia', []):
+            image_uri = URIRef(image['identifier'])
+            g.set((image_uri, RDF.type, FOAF.Image))
+            title = image.get('title', None)
+            if title:
+                g.set((image_uri, DC.title, Literal(title)))
+            g.set((image_uri, CC.license, URIRef(image['license'])))
+            g.set((image_uri, DC.RightsStatement, Literal(image['rightsHolder'])))
+            g.set((image_uri, DC.Format, Literal(image['format'])))
+            # Add link from image to object...
+            g.set((image_uri, FOAF.depicts, object_uri))
+            # And object to image
+            g.add((object_uri, FOAF.depiction, image_uri))
 
         # This record belongs in X dataset
         dataset_ref = URIRef(dataset_uri({'id': package_id}) + '#dataset')
