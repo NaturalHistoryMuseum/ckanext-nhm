@@ -1,42 +1,38 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import logging
+from collections import OrderedDict
+
 import os
 import re
-import json
-import ckan.plugins as p
+from beaker.cache import cache_managers
+from webhelpers.html import literal
+
+import ckan.lib.helpers as h
+import ckan.lib.navl.dictization_functions as dictization_functions
 import ckan.logic as logic
 import ckan.model as model
-import ckan.lib.helpers as h
-from beaker.cache import region_invalidate
-from webhelpers.html import literal
-from beaker.cache import cache_managers
-from ckan.common import c, request
-from ckan.lib.helpers import url_for
-from itertools import chain
-import ckan.lib.navl.dictization_functions as dictization_functions
+import ckan.plugins as p
+import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-import ckanext.nhm.lib.helpers as helpers
-import logging
-from jinja2 import Environment
-
+from ckan.common import c
+from ckan.lib.helpers import url_for
+from ckanext.ckanpackager.interfaces import ICkanPackager
+from ckanext.contact.interfaces import IContact
+from ckanext.datasolr.interfaces import IDataSolr
+from ckanext.datastore.interfaces import IDatastore
+from ckanext.doi.interfaces import IDoi
+from ckanext.gallery.plugins.interfaces import IGalleryImage
+from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import (
     resource_view_get_filter_options,
     # NOTE: Need to import a function with a cached decorator so clear caches works
     get_site_statistics,
 )
-
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from ckanext.contact.interfaces import IContact
-from ckanext.datastore.interfaces import IDatastore
-from collections import OrderedDict
-from ckanext.doi.interfaces import IDoi
-from ckanext.datasolr.interfaces import IDataSolr
-from ckanext.gallery.plugins.interfaces import IGalleryImage
-from ckanext.ckanpackager.interfaces import ICkanPackager
-from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 
 get_action = logic.get_action
 unflatten = dictization_functions.unflatten
@@ -460,40 +456,33 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     ## IGalleryImage
     def get_images(self, raw_images, record, data_dict):
         images = []
-        try:
-            image_json = json.loads(raw_images)
-        except ValueError:
-            # Cannot parse field, ignore it
-            pass
-        except TypeError:
-            # Has the wrong image field been selected?
-            pass
-        else:
-            for i in image_json:
-                title = []
-                for title_field in ['scientificName', 'catalogNumber']:
-                    if record.get(title_field, None):
-                        title.append(record.get(title_field))
-                copyright = '%s<br />&copy; %s' % (
-                    h.link_to(i['license'], i['license'], target='_blank'),
-                    i['rightsHolder']
-                )
-                images.append({
-                    'href': i['identifier'],
-                    'thumbnail': i['identifier'].replace('preview', 'thumbnail'),
-                    'link': h.url_for(
-                        controller='ckanext.nhm.controllers.record:RecordController',
-                        action='view',
-                        package_name=data_dict['package']['name'],
-                        resource_id=data_dict['resource']['id'],
-                        record_id=record['_id']
-                    ),
-                    'copyright': copyright,
-                    # Description of image in gallery view
-                    'description': literal(''.join(['<span>%s</span>' % t for t in title])),
-                    'title': ' - '.join(title),
-                    'record_id': record['_id']
-                })
+        title_field = data_dict['resource_view'].get('image_title', None)
+        for image in raw_images:
+            title = []
+            if title_field and title_field in record:
+                title.append(record[title_field])
+            title.append(image.get('title', image['_id']))
+
+            copyright = '%s<br />&copy; %s' % (
+                h.link_to(image['license'], image['license'], target='_blank'),
+                image['rightsHolder']
+            )
+            images.append({
+                'href': image['identifier'],
+                'thumbnail': image['identifier'].replace('preview', 'thumbnail'),
+                'link': h.url_for(
+                    controller='ckanext.nhm.controllers.record:RecordController',
+                    action='view',
+                    package_name=data_dict['package']['name'],
+                    resource_id=data_dict['resource']['id'],
+                    record_id=record['_id']
+                ),
+                'copyright': copyright,
+                # Description of image in gallery view
+                'description': literal(''.join(['<span>%s</span>' % t for t in title])),
+                'title': ' - '.join(title),
+                'record_id': record['_id']
+            })
         return images
 
     ## ICkanPackager
