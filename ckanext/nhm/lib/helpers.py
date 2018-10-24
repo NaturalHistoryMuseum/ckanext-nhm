@@ -1004,26 +1004,23 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
 def resource_view_get_filterable_fields(resource):
     """
+    Retrieves the fields that can be filtered on.
 
-    @return:
+    @return: a list of sorted fields
     """
-
-    filterable_field_types = ['int', 'text', 'numeric']
-
+    # if this isn't a datastore resource, return an empty list
     if not resource.get('datastore_active'):
         return []
 
+    # otherwise, query the datastore for the fields
     data = {
         'resource_id': resource['id'],
         'limit': 0,
-        # As these are for the filters, only get the indexed fields
-        'indexed_only': True
     }
-
     result = logic.get_action('datastore_search')({}, data)
 
-    fields = [f['id'] for f in result.get('fields', []) if f['type'] in filterable_field_types]
-    return sorted(fields)
+    # sort and filter the fields ensuring we only return string type fields and don't return the id field
+    return sorted(f['id'] for f in result.get('fields', []) if f['type'] == 'string' and f['id'] != '_id')
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
