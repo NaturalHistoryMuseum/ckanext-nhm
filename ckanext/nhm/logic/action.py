@@ -18,6 +18,7 @@ _validate = ckan.lib.navl.dictization_functions.validate
 
 log = logging.getLogger(__name__)
 
+
 def record_show(context, data_dict):
 
     """
@@ -38,13 +39,14 @@ def record_show(context, data_dict):
     record_id = _get_or_bust(data_dict, 'record_id')
 
     # Retrieve datastore record
-    search_result = get_action('datastore_search')(context, {'resource_id': resource_id, 'filters': {'_id': record_id}})
+    search_result = get_action('datastore_search')(context, {'resource_id': resource_id,
+                                                             'filters': {'_id': record_id}})
 
     try:
         record = {
             'data': search_result['records'][0],
             'fields': search_result['fields'],
-            'resource_id': search_result['resource_id']
+            'resource_id': resource_id
         }
     except IndexError:
         # If we don't have a result, raise not found
