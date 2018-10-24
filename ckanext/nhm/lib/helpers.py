@@ -179,7 +179,8 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
 
         filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
-        return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
+        return h.url_for(controller='package', action='resource_read', id=view['package_id'],
+                         resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
 @cache_region('permanent', 'collection_stats')
@@ -776,7 +777,9 @@ def dataset_author_truncate(author_str):
             # Otherwise use the jinja truncate function (may split author name)
             shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
 
-        return literal(u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened, author_str))
+        return literal(
+            u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened,
+                                                                                   author_str))
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
@@ -1056,7 +1059,8 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
     # find the latest update date for each resource using the above function and
     # then filter out the ones that don't have an update date available
     dates_and_names = filter(lambda x: x[0],
-                             [(get_resource_last_update(r), r['name']) for r in pkg_dict[u'resources']])
+                             [(get_resource_last_update(r), r['name']) for r in
+                              pkg_dict[u'resources']])
     if dates_and_names:
         # find the most recent date and name combo
         date, name = max(dates_and_names, key=lambda x: x[0])
@@ -1076,6 +1080,7 @@ def get_external_links(record):
     sites = external_links.get_relevant_sites(record)
     ranks = extract_ranks(record)
     if ranks:
-        return [(name, icon, OrderedDict.fromkeys([(rank, link.format(rank)) for rank in ranks.values()]))
+        return [(name, icon,
+                 OrderedDict.fromkeys([(rank, link.format(rank)) for rank in ranks.values()]))
                 for name, icon, link in sites]
     return []
