@@ -1,19 +1,18 @@
-import logging
 import json
+import logging
 import urllib
-import re
-import os
-import urllib
-
-from beaker.cache import cache_region
-from pylons import config
 from collections import defaultdict, OrderedDict
-from jinja2.filters import do_truncate
 from operator import itemgetter
-from solr import SolrException
 
-import ckan.model as model
+import os
+import re
+from beaker.cache import cache_region
+from jinja2.filters import do_truncate
+from pylons import config
+from webhelpers.html import literal
+
 import ckan.logic as logic
+import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
 from ckan.lib import helpers as h
@@ -21,12 +20,10 @@ from ckan.lib.helpers import format_resource_items
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
+from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
-
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from ckanext.gbif.lib.errors import GBIF_ERRORS
 
 log = logging.getLogger(__name__)
 
@@ -483,11 +480,11 @@ def get_resource_filter_options(resource, resource_view):
         else:
             filters[key].append(value)
     result = {}
-    for o in options:
-        if options[o].get('hide', False):
+    for option in options:
+        if option.hide:
             continue
-        result[o] = options[o]
-        result[o]['checked'] = o in filters and 'true' in filters[o]
+        result[option.name] = option.as_dict()
+        result[option.name]['checked'] = option.name in filters and 'true' in filters[option.name]
     return result
 
 

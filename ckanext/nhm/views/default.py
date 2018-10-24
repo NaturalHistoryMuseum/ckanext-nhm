@@ -25,7 +25,7 @@ class DefaultView(object):
     field_groups = {}
     field_facets = []
 
-    filter_options = {}
+    filter_options = []
 
     # Default columns to show in grid
     grid_default_columns = []

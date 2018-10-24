@@ -1,10 +1,13 @@
-import ckan.logic as logic
-import ckan.lib.base as base
 import logging
-from ckanext.nhm.views.default import DefaultView
-from pylons import config
-import ckan.plugins as p
 from collections import OrderedDict
+
+from pylons import config
+
+import ckan.lib.base as base
+import ckan.logic as logic
+import ckan.plugins as p
+from ckanext.nhm.lib.filter_options import has_image
+from ckanext.nhm.views.default import DefaultView
 
 log = logging.getLogger(__name__)
 
@@ -34,12 +37,7 @@ class IndexLotView(DefaultView):
     ]
 
     # Additional search filter options
-    filter_options = {
-        '_has_image': {
-            'label': 'Has images',
-            'solr': "_has_multimedia:true"
-        },
-    }
+    filter_options = [has_image]
 
     field_groups = OrderedDict([
         ("Classification", OrderedDict([
