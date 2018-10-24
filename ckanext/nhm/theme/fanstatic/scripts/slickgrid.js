@@ -8,8 +8,18 @@ if (baseURL.indexOf('?') > -1) {
     baseURL = baseURLparts[0];
 }
 
-// Slickgrid formatter for making the _id field into a link
-// and the dqi field into a traffic light!
+/**
+ * Slickgrid formatter for:
+ *  - making the id field into a link
+ *  - dqi field into a traffic light
+ *  - the associatedMedia field into a list of icons
+ * @param row the row index
+ * @param cell the column index
+ * @param value the value of the cell
+ * @param columnDef the column definition for this cell
+ * @param dataContext the current dataContext (the entire row's data as an object)
+ * @return {*} value to show in the cell, this can be raw html
+ */
 var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
 
     if (columnDef.id === "del") {
