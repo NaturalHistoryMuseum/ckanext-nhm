@@ -83,9 +83,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
     }
 
     function applyDropdown($input, $select, resourceId) {
-        var filterName = $select.val(),
-            queryLimit = 20;
-
+        var filterName = $select.val();
         var searchParams = ckan.views.filters._searchParams;
 
         $input.select2({
@@ -93,48 +91,43 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
             minimumInputLength: 0,
             allowClear: true,
             ajax: {
-                url: '/api/3/action/datastore_search',
+                url: '/api/3/action/datastore_autocomplete',
                 datatype: 'json',
                 quietMillis: 200,
                 cache: true,
                 data: function (term, page) {
-                    var offset = (page - 1) * queryLimit,
-                        query;
-
-                    query = {
-                        plain: false,
-                        resource_id: resourceId,
-                        limit: queryLimit,
-                        offset: offset,
-                        fields: filterName,
-                        distinct: true,
-                        sort: filterName
-                    };
-
-                    // filter based on the entered term
-                    if (term) {
-                        var q = {};
-                        q[filterName] = term + ":*";
-                        query.q = JSON.stringify(q);
+                    if (page === 1) {
+                        // because we're using searchAfter instead of offsets to page through the
+                        // results we need to keep a track of the after from the previous result.
+                        // When a new search starts the page is always 1 so when this happens we can
+                        // clear out the nextAfter value
+                        self.nextAfter = false;
                     }
-                    if(searchParams['filters']){
+                    const query = {
+                        resource_id: resourceId,
+                        limit: 20,
+                        field: filterName,
+                        term: term,
+                    };
+                    if (searchParams['filters']) {
+                        // if we don't stringify the filters object they aren't passed through
+                        // correctly
                         query.filters = JSON.stringify(searchParams['filters']);
                     }
-
+                    if (self.nextAfter) {
+                        query['after'] = self.nextAfter;
+                    }
                     return query;
                 },
                 results: function (data, page) {
-
-                    var records = data.result.records,
-                        hasMore = (records.length < data.result.total),
-                        results;
-
-                    results = $.map(records, function (record) {
-                        if (record[filterName]) {
-                            return {id: record[filterName], text: String(record[filterName])};
-                        }
+                    if ('after' in data.result) {
+                        // if there is an after value, store it for the next page query
+                        self.nextAfter = data.result['after'];
+                    }
+                    const results = $.map(data.result.values, function (value) {
+                        return {id: value, text: String(value)};
                     });
-                    return {results: results, more: hasMore};
+                    return {results: results, more: 'after' in data.result};
                 },
             },
             initSelection: function (element, callback) {
