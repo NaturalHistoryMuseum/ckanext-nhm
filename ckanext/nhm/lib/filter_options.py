@@ -40,7 +40,7 @@ class FilterOption(object):
 has_image = FilterOption(u'_has_image', u'Has image',
                          Q(u'exists', field=prefix_field(u'associatedMedia')))
 
-has_lat_long = FilterOption(u'_has_lat_long', u'Has lat/long', Q(u'exists', field=u'meta.geom'))
+has_lat_long = FilterOption(u'_has_lat_long', u'Has lat/long', Q(u'exists', field=u'meta.geo'))
 
 exclude_mineralogy = FilterOption(u'_exclude_mineralogy', u'Exclude Mineralogy',
                                   # note the ~ which inverts the query
