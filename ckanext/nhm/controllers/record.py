@@ -56,34 +56,16 @@ class RecordController(base.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
-        field_names = {
-            'image': c.resource.get('_image_field', None),
-            'title': c.resource.get('_title_field', None),
-            'latitude': None,
-            'longitude': None
-        }
-
-        # Get lat/long fields
-        # Loop through all the views - if we have a tiled map view with lat/lon fields
-        # We'll use those fields to add the map
-        views = p.toolkit.get_action('resource_view_list')(self.context, {'id': resource_id})
-        for view in views:
-            if view['view_type'] == TILED_MAP_TYPE:
-                field_names['latitude'] = view[u'latitude_field']
-                field_names['longitude'] = view[u'longitude_field']
-                break
-
-        # If this is a DwC dataset, add some default for image and lat/lon fields
-        if c.resource['format'].lower() == 'dwc':
-            for field_name, dwc_field in [('latitude', 'decimalLatitude'), ('longitude', 'decimalLongitude')]:
-                if dwc_field in c.record_dict:
-                    field_names[field_name] = dwc_field
+        title_field = c.resource.get('_title_field', None)
+        image_field = c.resource.get('_image_field', None)
+        latitude_field = c.resource.get('_latitude_field', None),
+        longitude_field = c.resource.get('_longitude_field', None),
 
         # Assign title based on the title field
-        c.record_title = c.record_dict.get(field_names['title'], 'Record %s' % c.record_dict.get('_id'))
+        c.record_title = c.record_dict.get(title_field, 'Record %s' % c.record_dict.get('_id'))
 
         # Sanity check: image field hasn't been set to _id
-        if field_names['image'] and field_names['image'] != '_id':
+        if image_field != '_id':
             default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
             licence_id = c.resource.get('_image_licence') or 'cc-by'
             short_licence_id = licence_id[:5].lower()
@@ -99,7 +81,7 @@ class RecordController(base.BaseController):
 
             # pop the image field so it isn't output as part of the record_dict/field_data dict
             # (see self.view())
-            image_field_value = c.record_dict.pop(field_names['image'], None)
+            image_field_value = c.record_dict.pop(image_field, None)
 
             if image_field_value:
                 # init the images list on the context var
@@ -140,13 +122,15 @@ class RecordController(base.BaseController):
                                 'copyright': '%s<br />%s' % (default_licence, default_copyright)
                             })
 
-        if field_names['latitude'] and field_names['longitude']:
-            latitude, longitude = c.record_dict.get(field_names['latitude']), c.record_dict.get(field_names['longitude'])
+        if latitude_field and longitude_field:
+            latitude = c.record_dict.get(latitude_field, None)
+            longitude = c.record_dict.get(longitude_field, None)
 
             if latitude and longitude:
+                # create a piece of GeoJSON to point at the specific record location on a map
                 c.record_map = json.dumps({
                     'type': 'Point',
-                    'coordinates': [longitude, latitude]
+                    'coordinates': [float(longitude), float(latitude)]
                 })
 
     def view(self, package_name, resource_id, record_id):
