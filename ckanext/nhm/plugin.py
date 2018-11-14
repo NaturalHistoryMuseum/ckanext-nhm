@@ -602,3 +602,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
                     field_def['type'] = 'array'
                     field_def['sortable'] = False
         return fields
+
+    # IVersionedDatastore
+    def datastore_modify_index_doc(self, resource_id, index_doc):
+        return index_doc
