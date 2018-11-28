@@ -1027,10 +1027,11 @@ def resource_view_get_filterable_fields(resource):
         'resource_id': resource['id'],
         'limit': 0,
     }
-    result = logic.get_action('datastore_search')({}, data)
+    fields = logic.get_action('datastore_search')({}, data).get('fields', [])
 
-    # sort and filter the fields ensuring we only return string type fields and don't return the id field
-    return sorted(f['id'] for f in result.get('fields', []) if f['type'] == 'string' and f['id'] != '_id')
+    # sort and filter the fields ensuring we only return string type fields and don't return the id
+    # field
+    return sorted(f['id'] for f in fields if f['type'] == 'string' and f['id'] != '_id')
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
