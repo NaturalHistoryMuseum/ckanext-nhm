@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 import urllib
 from collections import defaultdict, OrderedDict
 from operator import itemgetter
@@ -997,11 +998,18 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     pills = []
 
     for filter_field, filter_value in filter_dict.items():
-        # If the field name stars with an underscore, don't include it in the pills
-        if filter_field.startswith('_'):
+        # if the field name stars with an underscore, don't include it in the pills (unless it's
+        # special!)
+        if filter_field.startswith('_') and filter_field != u'__version__':
             continue
-        # Remove filter from url function
+
+        # remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
+
+        # special handling of __version__ field so that we can format it as a date
+        if filter_field == u'__version__':
+            filter_value = [time.strftime('%Y/%m/%d, %H:%M:%S',
+                                          time.localtime(int(v) / 1000)) for v in filter_value]
         pills.append({
             'label': camel_case_to_string(filter_field),
             'field': filter_field,
