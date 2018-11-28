@@ -991,8 +991,18 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     filter_dict = parse_request_filters()
     extras = {
-        'id': package['id'],
-        'resource_id': resource['id']
+        u'id': package[u'id'],
+        u'resource_id': resource[u'id']
+    }
+
+    # there are some special filter field names provided by versioned-datastore which should have
+    # their values formatted differently to normal filter values
+    special = {
+        # display a human readable timestamp
+        u'__version__': lambda value: [time.strftime('%Y/%m/%d, %H:%M:%S',
+                                                     time.localtime(int(v) / 1000)) for v in value],
+        # display the type of the GeoJSON filter
+        u'__geo__': lambda value: [json.loads(v)[u'type'] for v in filter_value],
     }
 
     pills = []
@@ -1000,21 +1010,18 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     for filter_field, filter_value in filter_dict.items():
         # if the field name stars with an underscore, don't include it in the pills (unless it's
         # special!)
-        if filter_field.startswith('_') and filter_field != u'__version__':
+        if filter_field.startswith(u'_') and filter_field not in special:
             continue
 
         # remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
 
-        # special handling of __version__ field so that we can format it as a date
-        if filter_field == u'__version__':
-            filter_value = [time.strftime('%Y/%m/%d, %H:%M:%S',
-                                          time.localtime(int(v) / 1000)) for v in filter_value]
         pills.append({
-            'label': camel_case_to_string(filter_field),
-            'field': filter_field,
-            'value': ' '.join(filter_value),
-            'href': href
+            u'label': camel_case_to_string(filter_field),
+            u'field': filter_field,
+            # if the filter isn't a special one, just use the value
+            u'value': u' '.join(special.get(filter_field, lambda value: value)(filter_value)),
+            u'href': href,
         })
 
     return pills
