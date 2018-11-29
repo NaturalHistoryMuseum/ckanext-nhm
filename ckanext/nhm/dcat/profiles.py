@@ -346,9 +346,6 @@ class NHMDCATProfile(RDFProfile):
         for prefix, namespace in namespaces.iteritems():
             g.bind(prefix, namespace)
 
-        # Get the GBIF record if it exists
-        occurrence_id = record_dict.get('occurrenceID')
-
         package_id = resource.get_package_id()
 
         # Create licences metadata for record
@@ -388,20 +385,20 @@ class NHMDCATProfile(RDFProfile):
                 g.add((record_ref, getattr(DWC, term), Literal(_date.isoformat(), datatype=XSD.dateTime)))
 
         try:
-            gbif_record = toolkit.get_action('gbif_record_show')(context, {
-                'occurrence_id': occurrence_id
+            gbif_record = toolkit.get_action(u'gbif_record_show')(context, {
+                u'gbif_id': record_dict.get(u'gbif', {}).get(u'id')
             })
         except NotFound:
             gbif_record = {}
         else:
             # Assert equivalence with the GBIF record
-            gbif_uri = os.path.join('http://www.gbif.org/occurrence', gbif_record['gbifID'])
+            gbif_uri = os.path.join(u'http://www.gbif.org/occurrence', gbif_record[u'gbifID'])
             g.add((object_uri, OWL.sameAs, URIRef(gbif_uri)))
             # If we have a GBIF country code, add it
             # Annoyingly, this seems to be the only geographic element on GBIF with URI
-            country_code = gbif_record.get('gbifCountryCode')
+            country_code = gbif_record.get(u'countryCode')
             if country_code:
-                g.add((object_uri, DWC.countryCode, URIRef(os.path.join('http://www.gbif.org/country', country_code))))
+                g.add((object_uri, DWC.countryCode, URIRef(os.path.join(u'http://www.gbif.org/country', country_code))))
 
         # Now, create the specimen object
         # Remove nulls and hidden fields from record_dict
@@ -445,10 +442,7 @@ class NHMDCATProfile(RDFProfile):
         for group, terms in dwc_terms_dict.items():
             for uri, term in terms.items():
                 # Do we have a GBIF key value?
-                # Uppercase first letter of term, and convert to GBIF key format => gbifGenusKey
-                uc_term = term[0].upper() + term[1:]
-                gbif_term_key = 'gbif%sKey' % uc_term
-                gbif_key = gbif_record.get(gbif_term_key)
+                gbif_key = gbif_record.get(term)
 
                 # Do we have a GBIF key value? If we do, we can provide a URI to GBIF
                 if gbif_key:
