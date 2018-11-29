@@ -818,11 +818,11 @@ def get_resource_facets(resource):
 
     # Convert filters to a dictionary as this won't happen automatically
     # as we're retrieving raw get parameters from get_query_params
-    filters = {}
+    filters = defaultdict(list)
     if query_params.get('filters'):
         for f in query_params.get('filters').split('|'):
             filter_field, filter_value = f.split(':', 1)
-            filters[filter_field] = filter_value
+            filters[filter_field].append(filter_value)
 
     search_params = dict(
         resource_id=resource.get('id'),
@@ -862,13 +862,14 @@ def get_resource_facets(resource):
         facets.append({
             'name': field_name,
             'label': facet_label_formatters[field_name](field_name),
-            'has_more': search['facets'][field_name]['details']['sum_other_doc_count'] > 0,
             'active': field_name in filters,
+            'has_more': search['facets'][field_name]['details']['sum_other_doc_count'] > 0,
             'facet_values': [
                 {
                     'name': value,
                     'label': facet_field_label_formatters[field_name](value),
-                    'count': count
+                    'count': count,
+                    'active': field_name in filters and value in filters[field_name],
                     # loop over the top values, sorted by count desc so that the top value is first
                 } for value, count in sorted(search['facets'][field_name]['values'].items(),
                                              key=itemgetter(1), reverse=True)
@@ -883,15 +884,12 @@ def remove_url_filter(field, value, extras=None):
     The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
-    @param field:
-    @param value:
-    @param extras:
-    @return:
+
+    :param field: the field to remove the filter for
+    :param value: the value of the field to remove the filter for
+    :param extras: extra parameters to include in the created URL
+    :return: a URL
     """
-
-    # import copy
-    # params = copy.copy(dict(request.params))
-
     params = dict(request.params)
     try:
         del params['filters']

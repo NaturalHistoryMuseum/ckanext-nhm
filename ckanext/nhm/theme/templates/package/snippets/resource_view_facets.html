@@ -23,8 +23,8 @@
         <nav>
           <ul class="unstyled nav nav-simple nav-facet">
             {% for item in facet.facet_values %}
-               {% set href = h.remove_url_filter(facet.name, item.name, extras=extras) if facet.active else h.add_url_filter(facet.name, item.name, extras=extras) %}
-                <li class="nav-item{% if facet.active %} active{% endif %}">
+               {% set href = h.remove_url_filter(facet.name, item.name, extras=extras) if item.active else h.add_url_filter(facet.name, item.name, extras=extras) %}
+                <li class="nav-item{% if item.active %} active{% endif %}">
                     <a href="{{ href }}" title="{{ item.label }}">
                         <span>{{ item.label|title }} ({{ item.count }})</span>
                     </a>
