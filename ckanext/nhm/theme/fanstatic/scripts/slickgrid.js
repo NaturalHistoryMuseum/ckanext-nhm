@@ -37,10 +37,10 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
     if (columnDef.id === 'gbifIssue') {
         var dqi_class;
 
-        if (dataContext['gbifID'] === null) {
+        if (!dataContext['gbifID']) {
             dqi_class = 'unknown';
             value = 'Unknown';
-        } else if (value === null) {
+        } else if (!value) {
             dqi_class = 'no-errors';
             value = 'No errors';
         } else {
