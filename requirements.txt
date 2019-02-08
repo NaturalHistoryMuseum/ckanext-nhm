@@ -25,6 +25,7 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-sketchfab.git#egg=ckanext_sketchfab
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore.git#egg=ckanext_versioned_datastore
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-tiledmap.git#egg=ckanext_versioned_tiledmap
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-query-dois.git#egg=ckanext_query_dois
 -e git+https://github.com/ckan/ckanext-rq.git#egg=ckanext_rq
 pytz==2013.9
 python-memcached==1.53
