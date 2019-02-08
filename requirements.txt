@@ -19,14 +19,13 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-dataspatial.git#egg=ckanext_dataspatial
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-video.git#egg=ckanext_video
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-gbif.git#egg=ckanext_gbif
--e git+https://github.com/NaturalHistoryMuseum/ckanext-datasolr.git#egg=ckanext_datasolr
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-statistics.git#egg=ckanext_statistics
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-list.git#egg=ckanext_list
--e git+https://github.com/NaturalHistoryMuseum/ckanext-solr-heatmap.git#egg=ckanext_solr_heatmap
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-status.git#egg=ckanext_status
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-twitter.git#egg=ckanext_twitter
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-sketchfab.git#egg=ckanext_sketchfab
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore.git#egg=ckanext_versioned_datastore
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-tiledmap.git#egg=ckanext_versioned_datastore
 -e git+https://github.com/ckan/ckanext-rq.git#egg=ckanext_rq
 pytz==2013.9
 python-memcached==1.53
