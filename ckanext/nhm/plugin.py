@@ -21,8 +21,6 @@ from ckan.common import c
 from ckan.lib.helpers import url_for
 from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
-from ckanext.datasolr.interfaces import IDataSolr
-from ckanext.datastore.interfaces import IDatastore
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
@@ -59,8 +57,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     p.implements(p.IFacets, inherit=True)
     p.implements(p.IPackageController, inherit=True)
     p.implements(p.IResourceController, inherit=True)
-    p.implements(IDatastore)
-    p.implements(IDataSolr)
     p.implements(IContact)
     p.implements(IDoi)
     p.implements(IGalleryImage)
@@ -211,98 +207,6 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         pkg_dict['all_authors'] = pkg_dict['author']
         pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
         return pkg_dict
-
-    ## IDataStore
-    def datastore_validate(self, context, data_dict, all_field_ids):
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
-            # Remove both filter options and field groups from filters
-            # These will be handled separately
-            for option in resource_view_get_filter_options(resource).keys():
-                if option in data_dict['filters']:
-                    del data_dict['filters'][option]
-        return data_dict
-
-    def datastore_search(self, context, data_dict, all_field_ids, query_dict):
-        # Add our options filters
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
-            options = resource_view_get_filter_options(resource)
-            for o in options:
-                if o in data_dict['filters'] and 'true' in data_dict['filters'][o]:
-                    if 'sql' in options[o]:
-                        query_dict['where'].append(options[o]['sql'])
-                elif 'sql_false' in options[o]:
-                    query_dict['where'].append(options[o]['sql_false'])
-
-        # Remove old field selection _f from search
-        try:
-            query_dict['filters'].pop("_f", None)
-        except KeyError:
-            pass
-
-        # Enhance the full text search, by adding support for double quoted expressions. We leave the
-        # full text search query intact (so we benefit from the full text index) and add an additional
-        # LIKE statement for each quoted group.
-        if 'q' in data_dict and not isinstance(data_dict['q'], dict):
-            for match in re.findall('"[^"]+"', data_dict['q']):
-                query_dict['where'].append((
-                    '"{}"::text LIKE %s'.format(resource['id']),
-                    '%' + match[1:-1] + '%'
-                ))
-
-        self.enforce_max_limit(query_dict)
-
-        # CKAN's field auto-completion uses full text search on individual fields. This causes
-        # problems because of stemming issues, and is quite slow on our data set (even with an
-        # appropriate index). We detect this type of queries and replace them with a LIKE query.
-        # We also cancel the count query which is not needed for this query and slows things down.
-        if 'q' in data_dict and isinstance(data_dict['q'], dict) and len(data_dict['q']) == 1:
-            field_name = data_dict['q'].keys()[0]
-            if data_dict['fields'] == field_name and data_dict['q'][field_name].endswith(':*'):
-                escaped_field_name = '"' + field_name.replace('"', '') + '"'
-                value = '%' + data_dict['q'][field_name].replace(':*', '%')
-
-                query_dict = {
-                    'distinct': True,
-                    'limit': query_dict['limit'],
-                    'offset': query_dict['offset'],
-                    'sort': [escaped_field_name],
-                    'where': [(escaped_field_name + '::citext LIKE %s', value)],
-                    'select': [escaped_field_name],
-                    'ts_query': '',
-                    'count': False
-                }
-        return query_dict
-
-    def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
-        return query_dict
-
-    ## IDataSolr
-    def datasolr_validate(self, context, data_dict, field_types):
-        return self.datastore_validate(context, data_dict, field_types)
-
-    def datasolr_search(self, context, data_dict, field_types, query_dict):
-        # Add our custom filters
-        if 'filters' in data_dict:
-            resource_show = p.toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
-            options = resource_view_get_filter_options(resource)
-            for o in options:
-                if o in data_dict['filters'] and 'true' in data_dict['filters'][o] and 'solr' in options[o]:
-                    # By default filters are added as {filed_name}:*{value}* but some filters
-                    # might require special statements - so add them here
-                    query_dict.setdefault('filter_statements', {})[o] = options[o]['solr']
-        self.enforce_max_limit(query_dict, 'rows')
-        return query_dict
-
-    @staticmethod
-    def enforce_max_limit(query_dict, field_name='limit'):
-        limit = query_dict.get(field_name, 0)
-        if MAX_LIMIT and limit > MAX_LIMIT:
-            query_dict[field_name] = MAX_LIMIT
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
