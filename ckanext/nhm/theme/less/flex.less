@@ -1,0 +1,63 @@
+@import "variables";
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+
+  & > * {
+    align-self: center;
+  }
+}
+
+.flex-top {
+  align-items: flex-start;
+
+  & > * {
+    align-self: flex-start;
+  }
+}
+
+.flex-stretch-first {
+  & > *:first-child {
+    flex-grow: 1;
+  }
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-equal > * {
+  // evenly spaces on large screens, stacks on smaller ones
+  @media (max-width: @lg - 1) {
+    flex: 0 1 auto;
+    width: 100%;
+  }
+
+  @media (min-width: @lg) {
+    flex: 1 1 0;
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+.flex-around {
+  justify-content: space-around;
+}
+
+.flex-right {
+  justify-content: flex-end;
+  @media (max-width: @sm) {
+    justify-content: space-around;
+  }
+}

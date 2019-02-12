@@ -1,17 +1,25 @@
 {% ckan_extends %}
 
 {% block page_header %}
-  <header class="module-content page-header hug">
+<header class="module-content page-header hug">
 
-   {% if not h.is_ldap_user() %}
+    {% if not h.is_ldap_user() %}
     <div class="content_action">
-      {% link_for _('Edit settings'), named_route='user.edit', id=user.name, class_='btn', icon='cog' %}
+        {% link_for _('Edit settings'), named_route='user.edit', id=user.name,
+        class_='btn', icon='cog' %}
     </div>
-  {% endif %}
+    {% endif %}
 
-    <ul class="nav nav-tabs">
-      {{ h.build_nav_icon('dashboard.index', _('News feed')) }}
-      {{ h.build_nav_icon('dashboard.datasets', _('My Datasets')) }}
-    </ul>
-  </header>
-{% endblock %}
+    <nav>
+        <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target="#navtabs" aria-expanded="false">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+
+        <ul class="nav nav-tabs collapse navbar-collapse" id="navtabs">
+            {{ h.build_nav_icon('dashboard.index', _('News feed')) }} {{
+            h.build_nav_icon('dashboard.datasets', _('My Datasets')) }}
+        </ul>
+    </nav>
+
+</header>{% endblock %}

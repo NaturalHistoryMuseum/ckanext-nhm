@@ -3,7 +3,7 @@
 {% set action = 'edit_view' if is_edit else 'resource_read' %}
 {% set query_params = h.get_query_params() %}
 {# BS: Added q to query params & removed crappy if statement #}
-  {% set url = h.url_for(controller='dataset', action=action, id=pkg.name,
+  {% set url = h.url_for(controller='dataset', action=action, id=g.pkg.name,
                          resource_id=view.resource_id, view_id=view.id,
                          **query_params) %}
 <li class="resource-view-item{% if is_selected %} active{% endif %}" data-id="{{ view.id }}">

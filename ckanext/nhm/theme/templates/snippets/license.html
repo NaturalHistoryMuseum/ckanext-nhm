@@ -1,0 +1,17 @@
+{% ckan_extends %}
+
+{% block license_wrapper %}
+<section class="module module-narrow module-shallow license">
+    {% block license_title %}
+    <div class="flex-container flex-between flex-stretch-first">
+        <h2 class="module-heading"><i class="fas fa-lock inline-icon-left"></i> {{ _('License') }}</h2>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                data-target="#nav-license" aria-expanded="false">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+    </div>
+    {% endblock %} {% block license_content %}
+    <p class="module-content nav nav-simple navbar-collapse collapse" id="nav-license">
+        {{ self.license_content_inner() }} </p>
+    {% endblock %}
+</section>{% endblock %}

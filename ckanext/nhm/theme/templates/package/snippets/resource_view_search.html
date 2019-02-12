@@ -8,10 +8,10 @@
 {% set query_params = h.get_query_params() %}
 {% set filter_pills = h.get_resource_filter_pills(package, resource, resource_view) %}
 
-<div class="row resource-view-filter-form">
+<div class="resource-view-filter-form">
     <form class="module-content search-form" method="get">
 
-            <div class="span9">
+            <div class="col-md-9">
                 <div class="search-input control-group">
                   <input type="text" class="search" name="q" autocomplete="off" value="{{ q.decode('utf-8') }}" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
                   <input type="hidden" name="view_id" value="{{ resource_view['id'] }}" />
@@ -24,7 +24,7 @@
                   </button>
                 </div>
              </div>
-            <div class="span3 no-margin">
+            <div class="col-md-3 no-margin">
                 <div
                   class="resource-view-field-filters"
                   data-module="resource-view-field-filters"
@@ -38,8 +38,8 @@
 
     {% if filter_pills %}
 
-        <div class="row resource-view-filter-pills">
-            <div class="span12">
+        <div class="resource-view-filter-pills">
+            <div class="col-md-12">
                 <p class="filtered-list">
                     {% for pill in filter_pills %}
                 <div class="filter">

@@ -1,53 +1,70 @@
-// Colors
-@mastheadBackgroundColor: #228900;
-@mastheadTextColor: #fff;
-@mastheadLinkColor: @mastheadTextColor;
-@mastheadLinkHoverColor: @toolbarBackgroundColor;
+@import "colours";
+@import "fonts";
 
-@baseBackgroundColor: #fff;
-@baseTextColor:#444;
-@baseLinkColor:@mastheadBackgroundColor;
-@baseLinkHoverColor: @baseTextColor;
 
-@smallTextColor: #5B5B5B;
+// Base
+@baseBackgroundColor: @grey10;
+@baseTextColor: @grey1;
+@baseLinkColor: @primary3;
+@baseLinkHoverColor: @grey1;
+@smallTextColor: @grey2;
 
-@sidebarBackgroundColor: #f6f6f6;
-@sidebarHeaderBackgroundColor: #ddd;
-@sidebarNavHighlightColor: #656565;
-@sidebarNavHoverColor: #eee;
+// Header
+@mastheadBackgroundColor: @primary3;
+@mastheadTextColor: @grey10;
+@mastheadLinkColor: @grey10;
+@mastheadLinkHoverColor: @primary6;
 
-@pillColor: @sidebarNavHighlightColor;
-@pillTextColor: #fff;
-@pillHoverColor: #E0E0E0;
+// Sidebar
+@sidebarBackgroundColor: @grey10;
+@sidebarHeaderBackgroundColor: @grey5;
+@sidebarNavHighlightColor: @grey3;
+@sidebarNavHoverColor: @grey7;
 
-@footerBackgroundColor: #434343;
-@footerTextColor: #999;
-@footerLinkColor: #fff;
+// Footer
+@footerBackgroundColor: @grey1;
+@footerTextColor: @grey5;
+@footerLinkColor: @grey10;
 
-@toolbarBackgroundColor: #BBEDA9;
-
-// Buttons
-@buttonColor: @mastheadBackgroundColor;
-@buttonTextColor: #fff;
-@buttonHoverColor: #015B28;
-@buttonWarningColor: #890022;
-@buttonWarningHoverColor: #6E001B;
-@buttonDisabledColor: #9A9A9A;
+// Pills
+@pillColor: @grey3;
+@pillTextColor: @grey10;
+@pillHoverColor: @grey6;
 
 // Tabs
-@tabColor: @sidebarBackgroundColor;
-@tabActiveColor: @sidebarNavHighlightColor;
-@tabHoverColor: @sidebarNavHoverColor;
-@tabTextColor: #fff;
+@tabColor: @grey10;
+@tabActiveColor: @grey3;
+@tabHoverColor: @grey7;
+@tabTextColor: @grey10;
+
+// Toolbar
+@toolbarBackgroundColor: @primary6;
+
+// Buttons
+@buttonColor: @primary3;
+@buttonTextColor: @grey10;
+@buttonHoverColor: @primary1;
+@buttonWarningColor: @warning2;
+@buttonWarningHoverColor: @warning1;
+@buttonDisabledColor: @grey4;
 
 // Tables
-@tableHeaderColor: #F2F2F2;
-@tableBorderColor: #F2F2F2;
+@tableHeaderColor: @grey8;
+@tableBorderColor: @grey8;
 
 // Lists
-@listDividerGrey: #FAFAFA;
+@listDividerGrey: @grey8;
 
 // URLS
 @images: "/images";
 @icons: "/images/icons";
-@fonts: "/fonts";
+
+// Breakpoints
+@sm: 576px;
+@md: 768px;
+@lg: 992px;
+@xl: 1200px;
+
+@margin-search: 20px;
+@min-pad: 15px;
+@rounding: 2px;

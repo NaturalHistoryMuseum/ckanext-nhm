@@ -2,7 +2,6 @@
 
   {% block skip %}
     {% snippet 'snippets/google_analytics.html' %}
-    <img src="/images/beta.png" alt="Beta" id="beta">
     {{ super() }}
   {% endblock %}
 
@@ -13,7 +12,7 @@
         <div class="toolbar">
             <div class="container">
                 <div class="row">
-                    <div class="span12">
+                    <div class="col-md-12">
                         <ol class="breadcrumb">
                             {% snippet 'snippets/home_breadcrumb_item.html' %}
                             {% block breadcrumb_content %}{% endblock %}
@@ -27,3 +26,19 @@
 
 {# And remove the toolbar from the mainbody #}
 {% block toolbar %}{% endblock %}
+
+{% block page_header %}
+  <header class="module-content page-header flex-container flex-between flex-wrap flex-stretch-first flex-top">
+    <ul class="nav nav-tabs navbar-collapse collapse" id="nav-header">
+        {% block content_primary_nav %}{% endblock %}
+    </ul>
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-header" aria-expanded="false">
+        <i class="fas fa-ellipsis-h"></i>
+    </button>
+    {% if self.content_action() | trim %}
+      <div class="content_action">
+        {% block content_action %}{% endblock %}
+      </div>
+    {% endif %}
+  </header>
+{% endblock %}

@@ -4,8 +4,11 @@
     {% with items = items or h.get_facet_items_dict(name) %}
         {% if items %}
             <nav>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-{{ name }}" aria-expanded="false">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
 
-                <ul class="{{ nav_class or 'unstyled nav nav-simple nav-facet' }}">
+                <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }} navbar-collapse collapse" id="nav-{{ name }}">
                     {% for item in items %}
                         {% set href = h.remove_url_param(name, item.name, extras=extras, alternative_url=alternative_url) if item.active else h.add_url_param(new_params={name: item.name}, extras=extras, alternative_url=alternative_url) %}
                         {% set label = label_function(item) if label_function else item.display_name %}

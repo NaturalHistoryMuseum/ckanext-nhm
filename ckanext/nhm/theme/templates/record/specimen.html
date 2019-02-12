@@ -10,15 +10,15 @@
 
 {% block content_primary_nav %}
 
-{{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-{{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+{{ h.build_nav_icon('record.view', _('Normal view'), package_name=g.pkg.name, resource_id=res.id, record_id=rec._id) }}
+{{ h.build_nav_icon('record.dwc', _('Darwin Core view'), package_name=g.pkg.name, resource_id=res.id, record_id=rec._id) }}
 
 {% endblock %}
 
 {% block record_additional_information %}
     {% if g.record_dict['occurrenceID']%}
         {% set citation_url = h.url_for('object.view', uuid=g.record_dict['occurrenceID'], qualified=True) %}
-        {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
+        {% snippet "doi/snippets/record_citation.html", pkg_dict=g.pkg_dict, res=res, citation_url=citation_url %}
     {% endif %}
     {{ super() }}
 {% endblock %}

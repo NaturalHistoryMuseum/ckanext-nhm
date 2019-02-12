@@ -1,3 +1,20 @@
+@font-face {
+  font-family: 'nhm_ingrid_lightregular';
+  src: url('/fonts/nhmingligreg-webfont.eot');
+  src: url('/fonts/nhmingligreg-webfont.woff') format('woff');
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
+}
+@font-face {
+  font-family: 'nhm_ingridregular';
+  src: url('/fonts/nhmingreg-webfont.eot');
+  src: url('/fonts/nhmingreg-webfont.woff') format('woff');
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
+}
+.mixin-font-body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
 /* Leaflet controls */
 .leaflet-container .leaflet-bar {
   border: none;
@@ -19,7 +36,7 @@
 .leaflet-container .leaflet-bar a,
 .leaflet-container .leaflet-bar a:after,
 .leaflet-container .leaflet-bar a:visited {
-  color: #228900;
+  color: #188100;
 }
 .leaflet-container .leaflet-control-draw-rectangle {
   background-image: url("/images/leaflet/pencil.png");
@@ -30,7 +47,7 @@
 .leaflet-container .leaflet-draw-actions a,
 .leaflet-container .leaflet-draw-actions a:hover {
   background-color: rgba(255, 255, 255, 0.8) !important;
-  color: #228900 !important;
+  color: #188100 !important;
 }
 .leaflet-container .leaflet-draw-actions {
   left: 40px!important;
