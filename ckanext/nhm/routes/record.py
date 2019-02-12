@@ -11,16 +11,16 @@ from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
 from ckanext.nhm.views import DarwinCoreView
 
-import ckan.model as model
+from ckan import model, common
+from flask import Blueprint
+
+from ckan.plugins import toolkit
 
 # from ckanext.nhm.views import DarwinCoreView
 
 log = logging.getLogger(__name__)
 
 TILED_MAP_TYPE = u'tiledmap'
-from flask import Blueprint
-
-from ckan.plugins import toolkit
 
 blueprint = Blueprint(name=u'record', import_name=__name__, url_prefix=u'/dataset')
 
@@ -193,7 +193,7 @@ def view(package_name, resource_id, record_id):
     view_cls = resource_view_get_view(toolkit.c.resource)
 
     # Load the taxonomy formatter
-    toolkit.c.pylons.app_globals.jinja_env.add_extension(TaxonomyFormatExtension)
+    common.current_app.jinja_env.add_extension(TaxonomyFormatExtension)
 
     return view_cls.render_record(toolkit.c)
 
