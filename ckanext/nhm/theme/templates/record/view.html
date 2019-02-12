@@ -1,200 +1,185 @@
 {% extends "package/base.html" %}
 
-{% set rec = g.record_dict %}
-{% set res = g.resource %}
-{% set pkg = g.pkg_dict or pkg_dict %}
-{% set filterable_fields = h.resource_view_get_filterable_fields(res) %}
+{% set rec = g.record_dict %}{% set res = g.resource %}{% set filterable_fields = h.resource_view_get_filterable_fields(res) %}
 
-{% block head_extras -%}
-    {{ super() }}
-    <meta property="og:title" content="{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} - {{ g.site_title }}">
-{% endblock -%}
+{% block head_extras -%}{{ super() }}
+<meta property="og:title"
+      content="{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} - {{ g.site_title }}">{% endblock -%}
 
 {% block subtitle %}{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} {% endblock %}
 
 {% block breadcrumb_content_selected %}{% endblock %}
 
-{% block breadcrumb_content %}
-    {{ super() }}
-    <li>{% link_for h.resource_display_name(res)|truncate(40), 'resource.read', id=pkg.name, resource_id=res.id %}</li>
-    <li class="active"><a href="">{{ g.record_title|truncate(30) }}</a></li>
-{% endblock %}
+{% block breadcrumb_content %}{{ super() }}
+<li>{% link_for h.resource_display_name(res)|truncate(40), 'resource.read', id=g.pkg.name,
+    resource_id=res.id %}
+</li>
+<li class="active"><a href="">{{ g.record_title|truncate(30) }}</a></li>{% endblock %}
 
 {% block pre_primary %}
 
-    {% block record %}
-        <section class="module module-record">
-            <div class="module-content">
+{% block record %}
+<section class="module module-record">
+    <div class="module-content">
 
-                {% block page_header %}
-                    <header class="page-header">
-                        <div class="actions">
-                            <ul>
-
-                                <li>
-
-                                    <a data-module="back-button" class="btn btn-primary" href="{{ h.url_for('resource.read', id=pkg.name, resource_id=res.id) }}">
-                                        <i class="fa fa-circle-arrow-left"></i>
-                                    </a>
-
-                                    {% resource 'ckanext-nhm/back-button' %}
-
-                                </li>
-
-                                <li>
-
-                                    {# Taken from ckanpackager/snippets/package_resource.html, but altered anon + auth messages #}
-
-                                    {% resource 'ckanext-ckanpackager/main' %}
-
-                                    <a data-module="ckanpackager-download-link" data-module-resource-id="{{ res.id }}" data-module-is-record="true"
-                                       class="packager-link btn btn-primary" href="{{ h.url_for_package_resource(pkg.id, res.id, extra_filters={'_id': rec['_id']}) }}">
-                                        <i class="fa fa-download"></i> Download
-                                    </a>
-
-                                </li>
-
-                                <li>
-                                    {% snippet "contact/snippets/modal_link.html", pkg=pkg, res=res, rec=rec, link_text="Contact record curator" %}
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        {% if self.content_primary_nav() | trim %}
-                            <ul class="nav nav-tabs">
-                                {% block content_primary_nav %}{% endblock %}
-                            </ul>
-                        {% endif %}
-
-                    </header>
-                {% endblock %}
-
-
-            </div>
-
-            <div class="module-content">
-
-                <div class="record-content">
-
-                    {% block heading %}
-                        <h1 class="page-heading">{{ g.record_title }}</h1>
-                    {% endblock %}
-
-                    {% block record_data %}
-
-                        <table>
-                            {% for field_name, value in g.field_data.items() %}
-                                {% if h.record_display_field(field_name, value) %}
-
-                                    <tr>
-                                        <th>{{ h.field_name_label(field_name) }}:</th>
-
-                                        <td>
-                                            {% if h.field_is_link(value) %}
-                                                <a href="{{ value }}" title="{{ value }}" target="_blank">{{ value }}</a>
-                                            {% else %}
-                                                {{ value }}
-                                            {% endif %}
-                                        </td>
-
-                                        <td width="50" class="filterable">
-                                            {% if field_name in filterable_fields %}
-                                                <a title="View all records where {{ field_name }}={{ value }}"
-                                                   href="{{ h.url_for('resource.read', id=pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
-                                                    <i class="fa fa-filter"></i>
-                                                </a>
-                                            {% endif %}
-                                        </td>
-
-                                    </tr>
-
-                                {% endif %}
-                            {% endfor %}
-
-                        </table>
-
-                    {% endblock %}
-
+        {% block page_header %}
+        <header class="page-header">
+            <div class="row">
+                <div class="col-md-6">
+                    {% if self.content_primary_nav() | trim %}
+                    <ul class="nav nav-tabs">
+                        {% block content_primary_nav %}{% endblock %}
+                    </ul>
+                    {% endif %}
                 </div>
 
-                {% block record_map %}
+                <div class="col-md-6">
+                    <ul class="list-unstyled flex-container flex-wrap flex-right inline-list-pad">
+                        <li>
+                            <a data-module="back-button" class="btn btn-primary"
+                               href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id) }}">
+                                <i class="fas fa-arrow-circle-left"></i> </a>
 
-                    {% if g.record_map %}
-                        <h3>Location</h3>
-                        {% snippet "record/snippets/map.html", extent=g.record_map %}
-                    {% endif %}
+                            {% resource 'ckanext-nhm/back-button' %}
+                        </li>
 
-                {% endblock %}
+                        <li>
+                            {# Taken from ckanpackager/snippets/package_resource.html, but
+                            altered anon + auth messages #}
 
-                {% block record_images %}
-                    {% if g.images %}
-                        <h3>Images</h3>
-                        {% snippet 'gallery/snippets/gallery.html', images=g.images, resource_id=res.id %}
-                    {% endif %}
-                {% endblock %}
+                            {% resource 'ckanext-ckanpackager/main' %}
 
+                            <a data-module="ckanpackager-download-link"
+                               data-module-resource-id="{{ res.id }}"
+                               data-module-is-record="true"
+                               class="packager-link btn btn-primary"
+                               href="{{ h.url_for_package_resource(g.pkg.id, res.id, extra_filters={'_id': rec['_id']}) }}">
+                                <i class="fas fa-download"></i> Download </a>
+                        </li>
+
+                        <li>
+                            {% snippet "contact/snippets/modal_link.html", pkg=g.pkg,
+                            res=res, rec=rec, link_text="Contact record curator" %}
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </section>
+        </header>
+        {% endblock %}
+
+
+    </div>
+
+    <div class="module-content">
+
+        <div class="record-content">
+
+            {% block heading %}
+            <h1 class="page-heading">{{ g.record_title }}</h1>
+            {% endblock %}
+
+            {% block record_data %}
+
+            <table>
+                {% for field_name, value in g.field_data.items() %} {% if
+                h.record_display_field(field_name, value) %}
+
+                <tr>
+                    <th>{{ h.field_name_label(field_name) }}:</th>
+
+                    <td>
+                        {% if h.field_is_link(value) %} <a href="{{ value }}"
+                                                           title="{{ value }}"
+                                                           target="_blank">{{ value }}</a>
+                        {% else %} {{ value }} {% endif %}
+                    </td>
+
+                    <td class="filterable">
+                        {% if field_name in filterable_fields %} <a
+                            title="View all records where {{ field_name }}={{ value }}"
+                            href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
+                        <i class="fas fa-filter"></i> </a> {% endif %}
+                    </td>
+
+                </tr>
+
+                {% endif %} {% endfor %}
+
+            </table>
+
+            {% endblock %}
+
+        </div>
+
+        {% block record_map %}
+
+        {% if g.record_map %}
+        <h3>Location</h3>
+        {% snippet "record/snippets/map.html", extent=g.record_map %} {% endif %}
+
+        {% endblock %}
+
+        {% block record_images %} {% if g.images %}
+        <h3>Images</h3>
+        {% snippet 'gallery/snippets/gallery.html', images=g.images, resource_id=res.id %}
+        {% endif %} {% endblock %}
+
+    </div>
+</section>{% endblock %}{% endblock %}
+
+{% block primary_content %}{% block record_additional_information %}{% if res %}
+<section class="additional-info">
+    {% block record_additional_information_inner %}
+    <div class="module module-content">
+        <h3>{{ _('Additional Information') }}</h3>
+        <table class="table table-striped table-bordered table-condensed"
+               data-module="table-toggle-more">
+            <thead>
+            <tr>
+                <th scope="col">{{ _('Field') }}</th>
+                <th scope="col">{{ _('Value') }}</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% block record_additional_information_rows %}
+            <tr>
+                <th scope="row">{{ _('Format') }}</th>
+                <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">{{ _('License') }}</th>
+                <td>{% snippet "snippets/license.html", pkg_dict=g.pkg_dict,
+                    text_only=True %}
+                </td>
+            </tr>
+            <tr class="toggle-more">
+                <th scope="row">{{ _('Dataset') }}</th>
+                <td>{{ g.pkg.name }}</td>
+            </tr>
+            <tr class="toggle-more">
+                <th scope="row">{{ _('Dataset ID') }}</th>
+                <td>{{ g.pkg.id }}</td>
+            </tr>
+            <tr class="toggle-more">
+                <th scope="row">{{ _('Resource') }}</th>
+                <td>{{ res.name }}</td>
+            </tr>
+            <tr class="toggle-more">
+                <th scope="row">{{ _('Resource ID') }}</th>
+                <td>{{ res.id }}</td>
+            </tr>
+            {% endblock %}
+
+            </tbody>
+        </table>
+    </div>
     {% endblock %}
-{% endblock %}
-
-{% block primary_content %}
-    {% block record_additional_information %}
-        {% if res %}
-            <section class="additional-info">
-                {% block record_additional_information_inner %}
-                    <div class="module-content">
-                        <h3>{{ _('Additional Information') }}</h3>
-                        <table class="table table-striped table-bordered table-condensed" data-module="table-toggle-more">
-                            <thead>
-                            <tr>
-                                <th scope="col">{{ _('Field') }}</th>
-                                <th scope="col">{{ _('Value') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            {% block record_additional_information_rows %}
-                                <tr>
-                                    <th scope="row">{{ _('Format') }}</th>
-                                    <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">{{ _('License') }}</th>
-                                    <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
-                                </tr>
-                                <tr class="toggle-more">
-                                    <th scope="row">{{ _('Dataset') }}</th>
-                                    <td>{{ pkg.name }}</td>
-                                </tr>
-                                <tr class="toggle-more">
-                                    <th scope="row">{{ _('Dataset ID') }}</th>
-                                    <td>{{ pkg.id }}</td>
-                                </tr>
-                                <tr class="toggle-more">
-                                    <th scope="row">{{ _('Resource') }}</th>
-                                    <td>{{ res.name }}</td>
-                                </tr>
-                                <tr class="toggle-more">
-                                    <th scope="row">{{ _('Resource ID') }}</th>
-                                    <td>{{ res.id }}</td>
-                                </tr>
-                            {% endblock %}
-
-                            </tbody>
-                        </table>
-                    </div>
-                {% endblock %}
-            </section>
-        {% endif %}
-    {% endblock %}
-{% endblock %}
+</section>{% endif %}{% endblock %}{% endblock %}
 
 {% block secondary_content %}
 
-    {% block resource_license %}
-        {% snippet "snippets/social.html", pkg_dict=pkg, res_dict=res, rec_dict=rec %}
-    {% endblock %}
+{% block resource_license %}{% snippet "snippets/social.html", pkg_dict=g.pkg_dict, res_dict=res, rec_dict=rec %}{% endblock %}
 
 {% endblock %}

@@ -1,6 +1,6 @@
 {% set url=h.url_for('dataset.read', id=id) %}
 
-<div class="span4 box">
+<div class="col-md-4 box">
     <a class="media-image" href="{{ url }}">
       {% block image %}{% endblock %}
     </a>

@@ -3,8 +3,8 @@
 {% block content_primary_nav %}
     {% if g.additional_view %}
 
-        {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-        {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+        {{ h.build_nav_icon('record', _('Normal view'), package_name=g.pkg.name, resource_id=res.id, record_id=rec._id) }}
+        {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=g.pkg.name, resource_id=res.id, record_id=rec._id) }}
 
     {% endif %}
 {% endblock %}

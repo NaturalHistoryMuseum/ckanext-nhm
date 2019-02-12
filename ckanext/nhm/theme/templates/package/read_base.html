@@ -2,12 +2,12 @@
 
 {% block content_action %}
     {{ super() }}
-    {% snippet "contact/snippets/modal_link.html", pkg=pkg %}
+    {% snippet "contact/snippets/modal_link.html", pkg=g.pkg %}
 {% endblock %}
 
 {% block content_primary_nav %}
-  {{ h.build_nav_icon('dataset.read', _('Dataset'), id=pkg.name) }}
-  {{ h.build_nav_icon('dataset.activity', _('Activity Stream'), id=pkg.name) }}
+  {{ h.build_nav_icon('dataset.read', _('Dataset'), id=g.pkg.name) }}
+  {{ h.build_nav_icon('dataset.activity', _('Activity Stream'), id=g.pkg.name) }}
 {% endblock %}
 
 {# Reorder blocks so DOI and licence goes to top #}
@@ -25,11 +25,11 @@
 
 {# Pass package into social share links #}
 {% block package_social %}
-    {% snippet "snippets/social.html", pkg_dict=pkg %}
+    {% snippet "snippets/social.html", pkg_dict=g.pkg_dict %}
 {% endblock %}
 
 {% block package_info %}
-{% snippet 'package/snippets/info.html', pkg=pkg %}
+{% snippet 'package/snippets/info.html', pkg=g.pkg %}
 {% endblock %}
 
 {% block package_extent_info %}

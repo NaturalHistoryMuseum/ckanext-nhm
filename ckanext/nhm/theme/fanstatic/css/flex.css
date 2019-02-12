@@ -1,0 +1,51 @@
+@font-face {
+  font-family: 'nhm_ingrid_lightregular';
+  src: url('/fonts/nhmingligreg-webfont.eot');
+  src: url('/fonts/nhmingligreg-webfont.woff') format('woff');
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
+}
+@font-face {
+  font-family: 'nhm_ingridregular';
+  src: url('/fonts/nhmingreg-webfont.eot');
+  src: url('/fonts/nhmingreg-webfont.woff') format('woff');
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+  font-style: normal;
+}
+.mixin-font-body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  max-width: 100%;
+}
+.flex-container > * {
+  align-self: center;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+@media (max-width: 991px) {
+  .flex-equal > * {
+    flex: 0 1 auto;
+    width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .flex-equal > * {
+    flex: 1 1 0;
+  }
+  .flex-equal > *:first-child {
+    margin-left: 0;
+  }
+  .flex-equal > *:last-child {
+    margin-right: 0;
+  }
+}
+.flex-between {
+  justify-content: space-between;
+}
+.flex-around {
+  justify-content: space-around;
+}
