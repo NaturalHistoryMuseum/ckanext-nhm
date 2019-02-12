@@ -105,8 +105,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # because it maps to /dataset/{_id} without excluding these actions
         # So we re=add them here to make sure it's working
         # TODO: are these still broken?
-        _map.connect(u'add dataset', u'/dataset/new', controller=u'dataset',
-                     action=u'new')
+        # _map.connect(u'add dataset', u'/dataset/new', controller=u'dataset',
+        #              action=u'new')
         _map.connect(u'/dataset/{action}',
                      controller=u'dataset',
                      requirements=dict(action=u'|'.join([
