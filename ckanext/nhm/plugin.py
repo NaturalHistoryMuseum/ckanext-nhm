@@ -510,3 +510,11 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
     # IVersionedDatastore
     def datastore_modify_index_doc(self, resource_id, index_doc):
         return index_doc
+
+    # IVersionedDatastore
+    def datastore_is_read_only_resource(self, resource_id):
+        # we don't want any of the versioned datastore ingestion and indexing code modifying the
+        # collections data as we manage it all through the data importer
+        return resource_id in {helpers.get_specimen_resource_id(),
+                               helpers.get_artefact_resource_id(),
+                               helpers.get_indexlot_resource_id()}
