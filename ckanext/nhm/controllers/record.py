@@ -1,11 +1,11 @@
-import ckan.logic as logic
+import json
+import logging
+
 import ckan.lib.base as base
+import ckan.logic as logic
 import ckan.model as model
-import ckan.plugins as p
 from ckan.common import _, c
 from ckan.lib.helpers import link_to, url_for
-import logging
-import json
 from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
 from ckanext.nhm.views import DarwinCoreView
@@ -20,8 +20,6 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
-
-TILED_MAP_TYPE = 'tiledmap'  # The view type for the tiledmap
 
 
 class RecordController(base.BaseController):
@@ -48,7 +46,8 @@ class RecordController(base.BaseController):
             # required for nav menu
             c.pkg = self.context['package']
             c.pkg_dict = c.package
-            record = get_action('record_show')(self.context, {'resource_id': resource_id, 'record_id': record_id})
+            record = get_action('record_show')(self.context, {'resource_id': resource_id,
+                                                              'record_id': record_id})
             c.record_dict = record['data']
 
         except NotFound:
@@ -56,16 +55,26 @@ class RecordController(base.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
-        title_field = c.resource.get('_title_field', None)
-        image_field = c.resource.get('_image_field', None)
-        latitude_field = c.resource.get('_latitude_field', None),
-        longitude_field = c.resource.get('_longitude_field', None),
+        field_names = {
+            'image': c.resource.get('_image_field', None),
+            'title': c.resource.get('_title_field', None),
+            'latitude': c.resource.get('_latitude_field', None),
+            'longitude': c.resource.get('_longitude_field', None),
+        }
 
-        # Assign title based on the title field
-        c.record_title = c.record_dict.get(title_field, 'Record %s' % c.record_dict.get('_id'))
+        # if this is a DwC dataset, add some default for image and lat/lon fields
+        if c.resource['format'].lower() == 'dwc':
+            for field_name, dwc_field in [('latitude', 'decimalLatitude'),
+                                          ('longitude', 'decimalLongitude')]:
+                if dwc_field in c.record_dict:
+                    field_names[field_name] = dwc_field
 
-        # Sanity check: image field hasn't been set to _id
-        if image_field != '_id':
+        # assign title based on the title field
+        c.record_title = c.record_dict.get(field_names['title'],
+                                           'Record {}'.format(c.record_dict.get('_id')))
+
+        # sanity check: image field hasn't been set to _id
+        if field_names['image'] and field_names['image'] != '_id':
             default_copyright = '<small>&copy; The Trustees of the Natural History Museum, London</small>'
             licence_id = c.resource.get('_image_licence') or 'cc-by'
             short_licence_id = licence_id[:5].lower()
@@ -81,7 +90,7 @@ class RecordController(base.BaseController):
 
             # pop the image field so it isn't output as part of the record_dict/field_data dict
             # (see self.view())
-            image_field_value = c.record_dict.pop(image_field, None)
+            image_field_value = c.record_dict.pop(field_names['image'], None)
 
             if image_field_value:
                 # init the images list on the context var
@@ -122,9 +131,9 @@ class RecordController(base.BaseController):
                                 'copyright': '%s<br />%s' % (default_licence, default_copyright)
                             })
 
-        if latitude_field and longitude_field:
-            latitude = c.record_dict.get(latitude_field, None)
-            longitude = c.record_dict.get(longitude_field, None)
+        if field_names['latitude'] and field_names['longitude']:
+            latitude = c.record_dict.get(field_names['latitude'])
+            longitude = c.record_dict.get(field_names['longitude'])
 
             if latitude and longitude:
                 # create a piece of GeoJSON to point at the specific record location on a map
