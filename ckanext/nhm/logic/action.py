@@ -109,21 +109,22 @@ def object_rdf(context, data_dict):
     :param data_dict:
     :return:
     """
-
-    # Validate the data
+    # validate the data
     context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
     schema = context.get('schema', nhm_schema.object_rdf_schema())
     data_dict, errors = _validate(data_dict, schema, context)
-    # Raise any validation errors
+    # raise any validation errors
     if errors:
         raise p.toolkit.ValidationError(errors)
 
-    # Get the record
-    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'])
+    # get the record
+    version = data_dict.get(u'version', None)
+    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'], version)
     if record_dict:
         record_dict['uuid'] = data_dict['uuid']
         serializer = RDFSerializer()
-        output = serializer.serialize_record(record_dict, resource_dict, _format=data_dict.get('format'))
+        output = serializer.serialize_record(record_dict, resource_dict,
+                                             _format=data_dict.get('format'))
         return output
     raise NotFound
 

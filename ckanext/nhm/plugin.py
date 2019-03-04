@@ -119,11 +119,18 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
         object_controller = 'ckanext.nhm.controllers.object:ObjectController'
 
+        _map.connect('object_rdf_versioned', '/object/{uuid}/{version}.{_format}',
+                     controller=object_controller, action='rdf',
+                     requirements={'_format': 'xml|rdf|n3|ttl|jsonld', 'version': '\d+'})
+
         _map.connect('object_rdf', '/object/{uuid}.{_format}',
                      controller=object_controller, action='rdf',
                      requirements={'_format': 'xml|rdf|n3|ttl|jsonld'})
 
         # Permalink for specimens - needs to come after the DCAT format dependent
+        _map.connect('object_view_versioned', '/object/{uuid}/{version}',
+                     controller=object_controller,
+                     action='view', requirements={'version': '\d+'})
         _map.connect('object_view', '/object/{uuid}',
                      controller=object_controller,
                      action='view')

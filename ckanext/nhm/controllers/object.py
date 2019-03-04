@@ -112,18 +112,20 @@ class ObjectController(base.BaseController):
 
         abort(404, _('Record not found'))
 
-    # TODO: add versions to this
-    def rdf(self, uuid, _format):
+    def rdf(self, uuid, _format, version=None):
         """
         Return RDF view of object.
 
         :param uuid: the uuid of the object
         :param _format: the format requested
+        :param version: the version of the record to retrieve, or None if the current version is
+                        desired
         :return: the data to display
         """
         data_dict = {
             'uuid': uuid,
             'format': _format,
+            'version': version,
         }
 
         p.toolkit.response.headers.update({'Content-type': CONTENT_TYPES[_format]})

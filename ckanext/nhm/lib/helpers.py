@@ -1144,10 +1144,7 @@ def get_object_url(resource_id, guid, version=None):
         u'resource_id': resource_id,
         u'version': version,
     })
-    return url_for(controller=u'ckanext.nhm.controllers.object:ObjectController',
-                   action=u'view',
-                   uuid=guid,
-                   version=rounded_version,
+    return url_for(u'object_view_versioned', action=u'view', uuid=guid, version=rounded_version,
                    qualified=True)
 
 

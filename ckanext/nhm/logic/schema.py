@@ -47,7 +47,8 @@ def object_rdf_schema():
 
     schema = {
         'uuid': [not_missing, unicode],
-        'format': [not_missing]
+        'format': [not_missing],
+        'version': [ignore_missing, int_validator],
     }
     return schema
 
