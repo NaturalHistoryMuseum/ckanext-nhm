@@ -6,7 +6,8 @@ Renders a citation for a resource
     <div class="module-content citation">
         <h3>{{ _('Cite this as') }}</h3>
         {% block citation_link %}
-            <p>Permanent URL: {{ h.link_to(citation_url, citation_url) }}</p>
+            <p>Permanent URL:<p>
+            <p>{{ h.link_to(citation_url, citation_url) }}</p>
         {% endblock %}
 
         {% block citation_status %}
@@ -14,4 +15,3 @@ Renders a citation for a resource
         {% endblock %}
     </div>
 </section>
-
