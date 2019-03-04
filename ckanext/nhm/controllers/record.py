@@ -29,7 +29,7 @@ class RecordController(base.BaseController):
     Loads all the data and then defers render function to view objects
     """
 
-    def _load_data(self, package_name, resource_id, record_id):
+    def _load_data(self, package_name, resource_id, record_id, version=None):
         """
         Load the data for dataset, resource and record (into C var)
         @param package_name:
@@ -46,8 +46,13 @@ class RecordController(base.BaseController):
             # required for nav menu
             c.pkg = self.context['package']
             c.pkg_dict = c.package
-            record = get_action('record_show')(self.context, {'resource_id': resource_id,
-                                                              'record_id': record_id})
+
+            record_data_dict = {'resource_id': resource_id, 'record_id': record_id}
+            if version is not None:
+                version = int(version)
+                record_data_dict['version'] = version
+            c.version = version
+            record = get_action('record_show')(self.context, record_data_dict)
             c.record_dict = record['data']
 
         except NotFound:
@@ -142,7 +147,7 @@ class RecordController(base.BaseController):
                     'coordinates': [float(longitude), float(latitude)]
                 })
 
-    def view(self, package_name, resource_id, record_id):
+    def view(self, package_name, resource_id, record_id, version=None):
         """
         View an individual record
         @param package_name:
@@ -150,17 +155,16 @@ class RecordController(base.BaseController):
         @param record_id:
         @return:
         """
-        self._load_data(package_name, resource_id, record_id)
+        self._load_data(package_name, resource_id, record_id, version)
 
         view_cls = resource_view_get_view(c.resource)
 
         # Load the taxonomy formatter
-        c.pylons.app_globals.jinja_env.add_extension(
-            TaxonomyFormatExtension)
+        c.pylons.app_globals.jinja_env.add_extension(TaxonomyFormatExtension)
 
         return view_cls.render_record(c)
 
-    def dwc(self, package_name, resource_id, record_id):
+    def dwc(self, package_name, resource_id, record_id, version=None):
         """
         Explicit DwC view
         @param package_name:
@@ -169,7 +173,7 @@ class RecordController(base.BaseController):
         @return:
         """
 
-        self._load_data(package_name, resource_id, record_id)
+        self._load_data(package_name, resource_id, record_id, version)
 
         # Is this a DwC view of an additional dataset?
         # In which case, provide links back to the original record view

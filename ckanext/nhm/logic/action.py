@@ -39,8 +39,10 @@ def record_show(context, data_dict):
     record_id = _get_or_bust(data_dict, 'record_id')
 
     # Retrieve datastore record
-    search_result = get_action('datastore_search')(context, {'resource_id': resource_id,
-                                                             'filters': {'_id': record_id}})
+    record_data_dict = {'resource_id': resource_id, 'filters': {'_id': record_id}}
+    if 'version' in data_dict:
+        record_data_dict['version'] = data_dict['version']
+    search_result = get_action('datastore_search')(context, record_data_dict)
 
     try:
         record = {

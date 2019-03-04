@@ -2,10 +2,9 @@
 
 {% block content_primary_nav %}
     {% if c.additional_view %}
-
-        {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-        {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-
+        {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, c.version) %}
+            {{ nav }}
+        {% endfor %}
     {% endif %}
 {% endblock %}
 

@@ -18,7 +18,7 @@ import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
 from ckan.lib import helpers as h
-from ckan.lib.helpers import format_resource_items
+from ckan.lib.helpers import format_resource_items, url_for, build_nav_icon
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
@@ -1124,3 +1124,61 @@ def render_epoch(epoch_timestamp, in_milliseconds=True, date_format=u'%Y-%m-%d %
     if in_milliseconds:
         epoch_timestamp = epoch_timestamp / 1000
     return datetime.utcfromtimestamp(epoch_timestamp).strftime(date_format)
+
+
+def get_object_url(resource_id, guid, version=None):
+    '''
+    Retrieves the object url for the given guid in the given resource with the given version. If the
+    version is None then the latest version of the resource is used.
+
+    The version passed (if one is passed) is not used verbatim, a call to the versioned search
+    extension is put in to retrieve the rounded version of the resource so that the object url we
+    create is always correct.
+
+    :param resource_id: the resource id
+    :param guid: the guid of the object
+    :param version: the version (optional, default is None which means latest version)
+    :return: the object url
+    '''
+    rounded_version = get_action(u'datastore_get_rounded_version')({}, {
+        u'resource_id': resource_id,
+        u'version': version,
+    })
+    return url_for(controller=u'ckanext.nhm.controllers.object:ObjectController',
+                   action=u'view',
+                   uuid=guid,
+                   version=rounded_version,
+                   qualified=True)
+
+
+def build_specimen_nav_items(package_name, resource_id, record_id, version=None):
+    '''
+    Creates the specimen nav items allowing the user to navigate to different views of the specimen
+    record data. A list of nav items is returned.
+
+    :param package_name: the package name (or id)
+    :param resource_id: the resource id
+    :param record_id: the record id
+    :param version: the version of the record, or None if no version is present
+    :return: a list of nav items
+    '''
+    link_definitions = [
+        (u'record', _(u'Normal view')),
+        (u'dwc', _(u'Darwin Core view')),
+    ]
+    links = []
+    for route_name, link_text in link_definitions:
+        kwargs = {
+            u'package_name': package_name,
+            u'resource_id': resource_id,
+            u'record_id': record_id,
+        }
+        # if there's a version, alter the target of our nav item (the name of the route) and add the
+        # version to kwargs we're going to pass to the nav builder helper function
+        if version is not None:
+            route_name = u'{}_versioned'.format(route_name)
+            kwargs[u'version'] = version
+        # build the nav and add it to the list
+        links.append(build_nav_icon(route_name, link_text, **kwargs))
+
+    return links

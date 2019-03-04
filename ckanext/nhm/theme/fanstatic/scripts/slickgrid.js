@@ -1,12 +1,31 @@
-// Get id of the view/* part of the URL
-var pattern = /view\/[0-9a-z\-]+/;
-var baseURL = document.URL.replace(pattern, '');
+// remove view/* part of the URL
+let baseURL = document.URL.replace(/view\/[0-9a-z\-]+/, '');
+let version = '';
 
-// Remove query string from BaseURL
+// extract query string from baseURL
 if (baseURL.indexOf('?') > -1) {
-    baseURLparts = baseURL.split('?');
-    baseURL = baseURLparts[0];
+    let baseURLParts = baseURL.split('?');
+    // remove the query string from our baseURL
+    baseURL = baseURLParts[0];
+
+    if (window.parent.ckan.views && window.parent.ckan.views.filters) {
+        let versionFilter = window.parent.ckan.views.filters.get('__version__');
+        if (typeof versionFilter !== 'undefined') {
+            // version will be an array, get the first element as there should only ever be
+            // one
+            version = versionFilter[0];
+        }
+    }
 }
+
+if (version === '') {
+    // if the version wasn't present, set it to null
+    version = null;
+} else {
+    // otherwise convert the version to an integer
+    version = Number.parseInt(version);
+}
+
 
 /**
  * Slickgrid formatter for:
@@ -27,10 +46,13 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
     }
 
     if (columnDef.id === "_id") {
-        // Build URL, ensuring query is at the end
-        var url = baseURL + 'record/' + value;
-        // Slickgrid uses preventDefault() preventing the link from working,
-        // so am using the onclick handler to change location
+        // build URL, adding the record id to the end of the base url
+        let url = baseURL + 'record/' + value;
+        if (version != null) {
+            url += '/' + version;
+        }
+        // Slickgrid uses preventDefault() preventing the link from working, so use the onclick
+        // handler to change location
         return '<a title="View record" target="_parent" href="' + url + '" onclick="window.top.location=this.href">View</a>';
     }
 

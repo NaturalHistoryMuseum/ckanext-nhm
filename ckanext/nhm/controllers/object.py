@@ -62,77 +62,100 @@ class ObjectController(base.BaseController):
 
     If someone accesses URL:
         object/73f450db-46b3-45a0-ac18-f00547be5af1
-    It will 302 redirect to the specimen, artefact or index lot page
+    It will 302 redirect to the specimen, artefact or index lot page (though currently we only
+    support specimens).
 
     If a user requests the object in RDF format:
         object/73f450db-46b3-45a0-ac18-f00547be5af1.ttl
     Returns RDF
 
+    In both cases, if a version is appended to the end of the URL then that version of the record is
+    returned. For example:
+        object/73f450db-46b3-45a0-ac18-f00547be5af1/1551692486000
+    otherwise the current version is returned.
     """
 
     def __before__(self, action, **env):
-
         base.BaseController.__before__(self, action, **env)
         self.context = {'model': model, 'user': c.user or c.author, 'auth_user_obj': c.userobj}
 
-    def view(self, uuid):
-        """
-        View object
-        If this is basic HTTP request, this will redirect to the record
-        If the request is for RDF (content negotiation) return the rdf
-        """
-        if uuid in ABYSSLINE_UUIDS:
-            self.abyssline_object_redirect(uuid)
+    def view(self, uuid, version=None):
+        '''
+        View object. If this is normal HTTP request, this will redirect to the record, otherwise if
+        the request is for RDF (content negotiation) return the rdf.
 
-        # Is the request for a particular format
+        :param uuid: the uuid of the object
+        :param version: the version of the object, or None for current version
+        '''
+        if uuid in ABYSSLINE_UUIDS:
+            self.abyssline_object_redirect(uuid, version)
+
+        # is the request for a particular format
         _format = check_access_header()
 
         if _format:
             return self.rdf(uuid, _format)
         else:
             try:
-                # This is a normal HTTP request, so redirect to the object record
-                record, resource = get_record_by_uuid(uuid)
+                # get the record at the given version
+                record, resource = get_record_by_uuid(uuid, version)
             except TypeError:
                 pass
             else:
                 if record:
                     package_id = resource.get_package_id()
                     package = get_action('package_show')(self.context, {'id': package_id})
+                    # redirect to the object record
                     h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController',
                                   action='view', package_name=package['name'],
-                                  resource_id=resource.id, record_id=record['_id'])
+                                  resource_id=resource.id, record_id=record['_id'], version=version)
 
         abort(404, _('Record not found'))
 
+    # TODO: add versions to this
     def rdf(self, uuid, _format):
         """
-        Return RDF
-        :param uuid:
-        :param _format:
-        :return:
+        Return RDF view of object.
+
+        :param uuid: the uuid of the object
+        :param _format: the format requested
+        :return: the data to display
         """
         data_dict = {
             'uuid': uuid,
             'format': _format,
         }
 
-        p.toolkit.response.headers.update(
-            {'Content-type': CONTENT_TYPES[_format]})
+        p.toolkit.response.headers.update({'Content-type': CONTENT_TYPES[_format]})
         try:
             return p.toolkit.get_action('object_rdf')(self.context, data_dict)
         except p.toolkit.ValidationError, e:
             p.toolkit.abort(409, str(e))
 
-    def abyssline_object_redirect(self, uuid):
+    def abyssline_object_redirect(self, uuid, version=None):
         """
-        Temporary fix to allow abyssline object references to resolve to the temp dataset
-        :param uuid:
-        :return:
+        Temporary fix to allow abyssline object references to resolve to the temp dataset.
+
+        :param uuid: the uuid of the object
+        :param version: the version to get
         """
         resource_id = config.get("ckanext.nhm.abyssline_resource_id")
-        context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-        search_result = get_action('datastore_search')(context, {'resource_id': resource_id, 'filters': {'catalogNumber': uuid}})
+
+        # figure out the rounded version
+        data_dict = {
+            u'resource_id': resource_id,
+            u'version': version,
+        }
+        version = get_action(u'datastore_get_rounded_version')(self.context, data_dict)
+
+        # search for the record
+        search_data_dict = {
+            'resource_id': resource_id,
+            'filters': {
+                'catalogNumber': uuid
+            }
+        }
+        search_result = get_action('datastore_search')(self.context, search_data_dict)
         try:
             record = search_result['records'][0]
         except KeyError:
@@ -140,6 +163,6 @@ class ObjectController(base.BaseController):
         else:
             h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController',
                           action='view', package_name='abyssline', resource_id=resource_id,
-                          record_id=record['_id'])
+                          record_id=record['_id'], version=version)
 
         abort(404, _('Record not found'))

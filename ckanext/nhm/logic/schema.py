@@ -35,12 +35,13 @@ UPDATE_FREQUENCIES = [
 
 
 def record_show_schema():
-
     schema = {
         'resource_id': [not_missing, unicode, resource_id_exists],
-        'record_id': [not_missing, int_validator]
+        'record_id': [not_missing, int_validator],
+        'version': [ignore_missing, int_validator],
     }
     return schema
+
 
 def object_rdf_schema():
 

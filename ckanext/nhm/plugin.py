@@ -80,13 +80,20 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
 
     ## IRoutes
     def before_map(self, _map):
-
         # Add view record
+        _map.connect('record_versioned',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/{version}',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='view', requirements={'version': '\d+'})
         _map.connect('record', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
                      controller='ckanext.nhm.controllers.record:RecordController',
                      action='view')
 
         # Add dwc view
+        _map.connect('dwc_versioned',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc/{version}',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='dwc', requirements={'version': '\d+'})
         _map.connect('dwc', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/dwc',
                      controller='ckanext.nhm.controllers.record:RecordController',
                      action='dwc')
