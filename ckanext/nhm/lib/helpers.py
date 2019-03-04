@@ -3,6 +3,7 @@ import logging
 import time
 import urllib
 from collections import defaultdict, OrderedDict
+from datetime import datetime
 from operator import itemgetter
 
 import os
@@ -1105,3 +1106,21 @@ def get_external_links(record):
                  OrderedDict.fromkeys([(rank, link.format(rank)) for rank in ranks.values()]))
                 for name, icon, link in sites]
     return []
+
+
+def render_epoch(epoch_timestamp, in_milliseconds=True, date_format=u'%Y-%m-%d %H:%M:%S (UTC)'):
+    '''
+    Renders an epoch timestamp in the given date format. The timestamp is rendered in UTC.
+
+    :param epoch_timestamp: the timestamp, represented as the number of seconds (or milliseconds if
+                            in_milliseconds is True) since the UNIX epoch
+    :param in_milliseconds: whether the timestamp is in milliseconds or seconds. By default this is
+                            True and therefore the timestamp is expected to be in milliseconds
+    :param date_format: the output format. This will be passed straight to datetime's strftime
+                        function and therefore uses its keywords etc. Defaults to:
+                        %Y-%m-%d %H:%M:%S (UTC)
+    :return: a string rendering of the timestamp using the
+    '''
+    if in_milliseconds:
+        epoch_timestamp = epoch_timestamp / 1000
+    return datetime.utcfromtimestamp(epoch_timestamp).strftime(date_format)

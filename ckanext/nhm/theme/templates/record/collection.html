@@ -49,6 +49,8 @@
 
                                     {% elif field == 'collectionCode' %}
                                         {{ c.record_dict[field] }} ({{ h.get_department(c.record_dict[field]) }})
+                                    {% elif field == 'created' or field == 'modified' %}
+                                        {{ h.render_epoch(c.record_dict[field]) }}
                                     {% else %}
                                         {% taxonomy field, c.record_dict['collectionCode'], c.record_dict %}
                                             {{ c.record_dict[field] }}
@@ -96,11 +98,11 @@
 {% block record_additional_information_rows %}
     <tr>
         <th scope="row">{{ _('Created') }}</th>
-        <td>{{ h.render_datetime(c.record_dict['created']) }}</td>
+        <td>{{ h.render_epoch(c.record_dict['created']) }}</td>
     </tr>
     <tr>
         <th scope="row">{{ _('Last updated') }}</th>
-        <td>{{ h.render_datetime(c.record_dict['modified']) }}</td>
+        <td>{{ h.render_epoch(c.record_dict['modified']) }}</td>
     </tr>
     {{ super() }}
 {% endblock %}
