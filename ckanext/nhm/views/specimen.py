@@ -1,9 +1,8 @@
-import json
 import logging
-from collections import OrderedDict
 from copy import deepcopy
 
 import re
+from collections import OrderedDict
 from pylons import config
 
 import ckan.logic as logic
@@ -259,13 +258,11 @@ class SpecimenView(DefaultView):
 
             c.record_dict['determination_labels'].append(label)
             value = c.record_dict.get(field, None)
-            try:
-                c.record_dict['determinations'][label] = list(json.loads(value))
-            except(ValueError, TypeError):
-                if value:
-                    c.record_dict['determinations'][label] = [value]
-                else:
-                    c.record_dict['determinations'][label] = []
+            if not value:
+                value = []
+            elif not isinstance(value, list):
+                value = [value]
+            c.record_dict['determinations'][label] = value
 
         c.record_dict['determinations']['_len'] = max([len(l) for l in c.record_dict['determinations'].values()])
 
