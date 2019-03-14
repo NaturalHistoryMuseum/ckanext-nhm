@@ -6,7 +6,9 @@ from collections import OrderedDict
 
 import os
 import re
+import requests
 from beaker.cache import cache_managers
+from pylons import config
 from webhelpers.html import literal
 
 import ckan.lib.helpers as h
@@ -532,3 +534,12 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return resource_id in {helpers.get_specimen_resource_id(),
                                helpers.get_artefact_resource_id(),
                                helpers.get_indexlot_resource_id()}
+
+    # IVersionedDatastore
+    def datastore_after_indexing(self, request, eevee_stats, stats_id):
+        try:
+            # whenever anything is indexed, we should clear the cache, catch exceptions on failures
+            # and only wait a couple of seconds for the request to complete
+            requests.request(u'purge', config.get(u'ckan.site_url'), timeout=2)
+        except:
+            pass
