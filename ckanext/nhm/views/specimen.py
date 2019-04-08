@@ -1,13 +1,13 @@
 import logging
+from copy import deepcopy
+
 import re
-import json
-import ckan.model as model
+from collections import OrderedDict
+from pylons import config
+
 import ckan.logic as logic
 import ckan.plugins as p
-from copy import deepcopy
-from ckan.plugins import toolkit as tk
-from pylons import config
-from collections import OrderedDict
+from ckanext.nhm.lib.filter_options import exclude_mineralogy, has_lat_long, has_image
 from ckanext.nhm.views.default import DefaultView
 from ckanext.nhm.views.dwc import DarwinCoreView
 
@@ -32,36 +32,12 @@ class SpecimenView(DefaultView):
         'typeStatus',
         'family',
         'genus',
-        'imageCategory',
+        'associatedMedia.category',
         'gbifIssue'
     ]
 
     # Additional search filter options
-    filter_options = {
-        '_has_image': {
-            'label': 'Has image',
-            # 'sql': ('"{}"."associatedMedia" IS NOT NULL'.format(resource_id),),
-            'solr': "_has_multimedia:true"
-        },
-        '_has_lat_long': {
-            'label': 'Has lat/long',
-            # BS: Changed to look for latitude field,as _geom is only available after a map has been added
-            # As this works for all DwC, we might get datasets without a map
-            # 'sql': ('"{}"."decimalLatitude" IS NOT NULL'.format(resource_id),),
-            'solr': 'decimalLatitude:[* TO *]'
-        },
-        # '_exclude_centroid': {
-        #     'label': 'Exclude centroids',
-        #     # 'sql': ('NOT (LOWER("{}"."centroid"::text) = ANY(\'{{true,yes,1}}\'))'.format(resource_id),),
-        #     'solr': 'centroid:false'
-        # },
-        '_exclude_mineralogy': {
-            'label': 'Exclude Mineralogy',
-            'hide': True,
-            # 'sql': ('"{}"."collectionCode" <> \'MIN\''.format(resource_id),),
-            'solr': '-collectionCode:MIN'
-        }
-    }
+    filter_options = [has_image, has_lat_long, exclude_mineralogy]
 
     field_groups = OrderedDict([
         ("Classification", OrderedDict([
@@ -282,13 +258,11 @@ class SpecimenView(DefaultView):
 
             c.record_dict['determination_labels'].append(label)
             value = c.record_dict.get(field, None)
-            try:
-                c.record_dict['determinations'][label] = list(json.loads(value))
-            except(ValueError, TypeError):
-                if value:
-                    c.record_dict['determinations'][label] = [value]
-                else:
-                    c.record_dict['determinations'][label] = []
+            if not value:
+                value = []
+            elif not isinstance(value, list):
+                value = [value]
+            c.record_dict['determinations'][label] = value
 
         c.record_dict['determinations']['_len'] = max([len(l) for l in c.record_dict['determinations'].values()])
 

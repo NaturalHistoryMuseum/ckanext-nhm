@@ -1,33 +1,31 @@
-import logging
 import json
+import logging
+import time
 import urllib
-import re
-import os
-import urllib
-
-from beaker.cache import cache_region
-from pylons import config
 from collections import defaultdict, OrderedDict
-from jinja2.filters import do_truncate
+from datetime import datetime
 from operator import itemgetter
-from solr import SolrException
 
-import ckan.model as model
+import os
+import re
+from beaker.cache import cache_region
+from jinja2.filters import do_truncate
+from pylons import config
+from webhelpers.html import literal
+
 import ckan.logic as logic
+import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from ckan.common import c, _, request
 from ckan.lib import helpers as h
-
-from webhelpers.html import literal
-
+from ckan.lib.helpers import format_resource_items, url_for, build_nav_icon
+from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
+from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.lib.resource_view import resource_view_get_view, resource_view_get_filter_options
-
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from ckanext.gbif.lib.errors import GBIF_ERRORS
 
 log = logging.getLogger(__name__)
 
@@ -183,7 +181,8 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
 
         filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
-        return h.url_for(controller='package', action='resource_read', id=view['package_id'], resource_id=view['resource_id'], view_id=view['id'], filters=filters)
+        return h.url_for(controller='package', action='resource_read', id=view['package_id'],
+                         resource_id=view['resource_id'], view_id=view['id'], filters=filters)
 
 
 @cache_region('permanent', 'collection_stats')
@@ -224,6 +223,13 @@ def get_indexlot_resource_id():
     return config.get("ckanext.nhm.indexlot_resource_id")
 
 
+def get_artefact_resource_id():
+    """
+    @return:  ID for artefact resource
+    """
+    return config.get("ckanext.nhm.artefact_resource_id")
+
+
 @cache_region('permanent', 'collection_stats')
 def collection_stats():
     """
@@ -235,20 +241,15 @@ def collection_stats():
     collections = OrderedDict()
     search_params = dict(
         resource_id=resource_id,
+        # use limit 0 as we're not interested in getting any results, just the facet counts
         limit=0,
-        facets=['collectionCode'],
-        facets_limit=5,  # Get an extra facet, so we can determine if there are more
+        facets=[u'collectionCode'],
     )
 
-    context = {'model': model, 'session': model.Session, 'user': c.user}
-    try:
-        search = logic.get_action('datastore_search')(context, search_params)
-    except SolrException:
-        pass
-    else:
-        for collection_code, num in search['facets']['facet_fields']['collectionCode'].items():
-            collections[collection_code] = num
-            total += num
+    result = logic.get_action(u'datastore_search')({}, search_params)
+    for collection_code, num in result[u'facets'][u'collectionCode']['values'].items():
+        collections[collection_code] = num
+        total += num
 
     stats = {
         'total': total,
@@ -329,16 +330,20 @@ def persistent_follow_button(obj_type, obj_id):
                      obj_type=obj_type)
 
 
-def filter_resource_items(key):
-    """
-    Filter resource items - if key is in blacklist, return false
-    @param key:
-    @return: boolean
-    """
+def filter_and_format_resource_items(resource):
+    '''
+    Given a resource, return the items from it that are whitelisted for display and format them.
 
-    blacklist = ['image field', 'title field', 'datastore active', 'has views', 'on same domain', 'resource group id', 'revision id', 'url type']
-
-    return key.strip() not in blacklist
+    :param resource: the resource dict
+    :return: a list of made up of 2-tuples containing formatted keys and values from the resource
+    '''
+    blacklist = {'_image_field', '_title_field', 'datastore_active', 'has_views',
+                 'on_same_domain', 'resource_group_id', 'revision_id', 'url_type'}
+    items = []
+    for key, value in resource.items():
+        if key not in blacklist:
+            items.append((key, value))
+    return format_resource_items(items)
 
 
 def get_map_styles():
@@ -485,11 +490,11 @@ def get_resource_filter_options(resource, resource_view):
         else:
             filters[key].append(value)
     result = {}
-    for o in options:
-        if options[o].get('hide', False):
+    for option in options:
+        if option.hide:
             continue
-        result[o] = options[o]
-        result[o]['checked'] = o in filters and 'true' in filters[o]
+        result[option.name] = option.as_dict()
+        result[option.name]['checked'] = option.name in filters and 'true' in filters[option.name]
     return result
 
 
@@ -781,7 +786,9 @@ def dataset_author_truncate(author_str):
             # Otherwise use the jinja truncate function (may split author name)
             shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
 
-        return literal(u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened, author_str))
+        return literal(
+            u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(shortened,
+                                                                                   author_str))
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
@@ -801,89 +808,74 @@ def get_resource_facets(resource):
     @param resource:
     @return:
     """
-    # Number of facets to display
-    num_facets = 10
     resource_view = resource_view_get_view(resource)
-    # If facets aren't defined in the resource view, then just return
+    # if facets aren't defined in the resource view, then just return
     if not resource_view.field_facets:
         return
-    context = {'model': model, 'session': model.Session, 'user': c.user}
-    # Build query parameters for the faceted search
-    # We'll use the same query parameters used in the current request
-    # And then add extras to perform a solr faceted query, returning
-    # facets but zero results (limit=0)
+    # Build query parameters for the faceted search. We'll use the same query parameters used in the
+    # current request and then add extras to perform a faceted query, returning facets but zero
+    # results (limit=0)
     query_params = get_query_params()
 
     # Convert filters to a dictionary as this won't happen automatically
     # as we're retrieving raw get parameters from get_query_params
-    filters = {}
+    filters = defaultdict(list)
     if query_params.get('filters'):
         for f in query_params.get('filters').split('|'):
             filter_field, filter_value = f.split(':', 1)
-            filters.setdefault(filter_field, []).append(filter_value)
+            filters[filter_field].append(filter_value)
 
     search_params = dict(
         resource_id=resource.get('id'),
+        # use limit 0 as we're not interested in getting any results, just the facets
         limit=0,
         facets=resource_view.field_facets,
         q=query_params.get('q', None),
         filters=filters,
-        facets_limit=num_facets + 1,  # Get an extra facet, so we can determine if there are more
     )
 
+    # if the show more button is clicked, a parameter is added to the query which informs us we need
+    # to show more facets, so use 50 for the facet limit on the given field
     for field_name in resource_view.field_facets:
-        if h.get_param_int('_%s_limit' % field_name) == 0:
-            search_params.setdefault('facets_field_limit', {})[field_name] = 50
+        if h.get_param_int(u'_{}_limit'.format(field_name)) == 0:
+            search_params.setdefault(u'facet_limits', {})[field_name] = 50
 
-    search = logic.get_action('datastore_search')(context, search_params)
+    search = logic.get_action('datastore_search')({}, search_params)
     facets = []
 
-    # dictionary of facet name => formatter function with camel_case_to_string defined as the default formatting
-    # function and then any overrides for specific edge cases
+    # dictionary of facet name => formatter function with camel_case_to_string defined as the
+    # default formatting function and then any overrides for specific edge cases
     facet_label_formatters = defaultdict(lambda: camel_case_to_string, **{
         # specific lambda for GBIF to ensure it's capitalised correctly
         'gbifIssue': lambda _: 'GBIF Issue'
     })
 
     # Dictionary of field name => formatter function
-    # Pass facet value to a formatter to get a better facet item label
-    facet_field_label_formatters = {
+    # Pass facet value to a formatter to get a better facet item label, if the facet doesn't have a
+    # formatter defined then the value is just used as is
+    facet_field_label_formatters = defaultdict(lambda: (lambda v: v.capitalize()), **{
         'collectionCode': get_department
-    }
+    })
 
     # Loop through original facets to ensure order is preserved
     for field_name in resource_view.field_facets:
-        # Parse the facets into a list of dictionary values, similar to that
-        # Built for the dataset search solr facets
-        active_facet = field_name in filters
-        facet = {
+        # parse the facets into a list of dictionary values
+        facets.append({
             'name': field_name,
             'label': facet_label_formatters[field_name](field_name),
-            'facet_values': [],
-            'has_more': len(search['facets']['facet_fields'][field_name]) > num_facets and field_name not in search_params.get('facets_field_limit', {}),
-            'active': active_facet
-        }
-
-        for value, count in search['facets']['facet_fields'][field_name].items():
-            label = value
-            try:
-                label = facet_field_label_formatters[field_name](label)
-            except KeyError:
-                pass
-            facet['facet_values'].append({
-                'name': value,
-                'label': label,
-                'count': count,
-            })
-
-        facet['facet_values'] = sorted(facet['facet_values'], key=itemgetter('count'), reverse=True)
-        # If this is the active facet, only show the highest item
-        if active_facet:
-            facet['facet_values'] = facet['facet_values'][:1]
-        # Slice the facet values, so length matches num_facets - need to do this after the key sort
-        if facet['has_more']:
-            facet['facet_values'] = facet['facet_values'][0:num_facets]
-        facets.append(facet)
+            'active': field_name in filters,
+            'has_more': search['facets'][field_name]['details']['sum_other_doc_count'] > 0,
+            'facet_values': [
+                {
+                    'name': value,
+                    'label': facet_field_label_formatters[field_name](value),
+                    'count': count,
+                    'active': field_name in filters and value in filters[field_name],
+                    # loop over the top values, sorted by count desc so that the top value is first
+                } for value, count in sorted(search['facets'][field_name]['values'].items(),
+                                             key=itemgetter(1), reverse=True)
+            ]
+        })
 
     return facets
 
@@ -893,15 +885,12 @@ def remove_url_filter(field, value, extras=None):
     The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
-    @param field:
-    @param value:
-    @param extras:
-    @return:
+
+    :param field: the field to remove the filter for
+    :param value: the value of the field to remove the filter for
+    :param extras: extra parameters to include in the created URL
+    :return: a URL
     """
-
-    # import copy
-    # params = copy.copy(dict(request.params))
-
     params = dict(request.params)
     try:
         del params['filters']
@@ -1001,23 +990,37 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     filter_dict = parse_request_filters()
     extras = {
-        'id': package['id'],
-        'resource_id': resource['id']
+        u'id': package[u'id'],
+        u'resource_id': resource[u'id']
+    }
+
+    # there are some special filter field names provided by versioned-datastore which should have
+    # their values formatted differently to normal filter values
+    special = {
+        # display a human readable timestamp
+        u'__version__': lambda value: [time.strftime('%Y/%m/%d, %H:%M:%S',
+                                                     time.localtime(int(v) / 1000)) for v in value],
+        # display the type of the GeoJSON filter
+        u'__geo__': lambda value: [json.loads(v)[u'type'] for v in filter_value],
     }
 
     pills = []
 
     for filter_field, filter_value in filter_dict.items():
-        # If the field name stars with an underscore, don't include it in the pills
-        if filter_field.startswith('_'):
+        # if the field name stars with an underscore, don't include it in the pills (unless it's
+        # special!)
+        if filter_field.startswith(u'_') and filter_field not in special:
             continue
-        # Remove filter from url function
+
+        # remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
+
         pills.append({
-            'label': camel_case_to_string(filter_field),
-            'field': filter_field,
-            'value': ' '.join(filter_value),
-            'href': href
+            u'label': camel_case_to_string(filter_field),
+            u'field': filter_field,
+            # if the filter isn't a special one, just use the value
+            u'value': u' '.join(special.get(filter_field, lambda value: value)(filter_value)),
+            u'href': href,
         })
 
     return pills
@@ -1025,26 +1028,24 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
 def resource_view_get_filterable_fields(resource):
     """
+    Retrieves the fields that can be filtered on.
 
-    @return:
+    @return: a list of sorted fields
     """
-
-    filterable_field_types = ['int', 'text', 'numeric']
-
+    # if this isn't a datastore resource, return an empty list
     if not resource.get('datastore_active'):
         return []
 
+    # otherwise, query the datastore for the fields
     data = {
         'resource_id': resource['id'],
         'limit': 0,
-        # As these are for the filters, only get the indexed fields
-        'indexed_only': True
     }
+    fields = logic.get_action('datastore_search')({}, data).get('fields', [])
 
-    result = logic.get_action('datastore_search')({}, data)
-
-    fields = [f['id'] for f in result.get('fields', []) if f['type'] in filterable_field_types]
-    return sorted(fields)
+    # sort and filter the fields ensuring we only return string type fields and don't return the id
+    # field
+    return sorted(f['id'] for f in fields if f['type'] == 'string' and f['id'] != '_id')
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
@@ -1080,7 +1081,8 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
     # find the latest update date for each resource using the above function and
     # then filter out the ones that don't have an update date available
     dates_and_names = filter(lambda x: x[0],
-                             [(get_resource_last_update(r), r['name']) for r in pkg_dict[u'resources']])
+                             [(get_resource_last_update(r), r['name']) for r in
+                              pkg_dict[u'resources']])
     if dates_and_names:
         # find the most recent date and name combo
         date, name = max(dates_and_names, key=lambda x: x[0])
@@ -1100,6 +1102,80 @@ def get_external_links(record):
     sites = external_links.get_relevant_sites(record)
     ranks = extract_ranks(record)
     if ranks:
-        return [(name, icon, OrderedDict.fromkeys([(rank, link.format(rank)) for rank in ranks.values()]))
+        return [(name, icon,
+                 OrderedDict.fromkeys([(rank, link.format(rank)) for rank in ranks.values()]))
                 for name, icon, link in sites]
     return []
+
+
+def render_epoch(epoch_timestamp, in_milliseconds=True, date_format=u'%Y-%m-%d %H:%M:%S (UTC)'):
+    '''
+    Renders an epoch timestamp in the given date format. The timestamp is rendered in UTC.
+
+    :param epoch_timestamp: the timestamp, represented as the number of seconds (or milliseconds if
+                            in_milliseconds is True) since the UNIX epoch
+    :param in_milliseconds: whether the timestamp is in milliseconds or seconds. By default this is
+                            True and therefore the timestamp is expected to be in milliseconds
+    :param date_format: the output format. This will be passed straight to datetime's strftime
+                        function and therefore uses its keywords etc. Defaults to:
+                        %Y-%m-%d %H:%M:%S (UTC)
+    :return: a string rendering of the timestamp using the
+    '''
+    if in_milliseconds:
+        epoch_timestamp = epoch_timestamp / 1000
+    return datetime.utcfromtimestamp(epoch_timestamp).strftime(date_format)
+
+
+def get_object_url(resource_id, guid, version=None):
+    '''
+    Retrieves the object url for the given guid in the given resource with the given version. If the
+    version is None then the latest version of the resource is used.
+
+    The version passed (if one is passed) is not used verbatim, a call to the versioned search
+    extension is put in to retrieve the rounded version of the resource so that the object url we
+    create is always correct.
+
+    :param resource_id: the resource id
+    :param guid: the guid of the object
+    :param version: the version (optional, default is None which means latest version)
+    :return: the object url
+    '''
+    rounded_version = get_action(u'datastore_get_rounded_version')({}, {
+        u'resource_id': resource_id,
+        u'version': version,
+    })
+    return url_for(u'object_view_versioned', action=u'view', uuid=guid, version=rounded_version,
+                   qualified=True)
+
+
+def build_specimen_nav_items(package_name, resource_id, record_id, version=None):
+    '''
+    Creates the specimen nav items allowing the user to navigate to different views of the specimen
+    record data. A list of nav items is returned.
+
+    :param package_name: the package name (or id)
+    :param resource_id: the resource id
+    :param record_id: the record id
+    :param version: the version of the record, or None if no version is present
+    :return: a list of nav items
+    '''
+    link_definitions = [
+        (u'record', _(u'Normal view')),
+        (u'dwc', _(u'Darwin Core view')),
+    ]
+    links = []
+    for route_name, link_text in link_definitions:
+        kwargs = {
+            u'package_name': package_name,
+            u'resource_id': resource_id,
+            u'record_id': record_id,
+        }
+        # if there's a version, alter the target of our nav item (the name of the route) and add the
+        # version to kwargs we're going to pass to the nav builder helper function
+        if version is not None:
+            route_name = u'{}_versioned'.format(route_name)
+            kwargs[u'version'] = version
+        # build the nav and add it to the list
+        links.append(build_nav_icon(route_name, link_text, **kwargs))
+
+    return links

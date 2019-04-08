@@ -9,15 +9,14 @@
 {% endblock -%}
 
 {% block content_primary_nav %}
-
-{{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-{{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-
+    {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, c.version) %}
+        {{ nav }}
+    {% endfor %}
 {% endblock %}
 
 {% block record_additional_information %}
     {% if c.record_dict['occurrenceID']%}
-        {% set citation_url = h.url_for(controller='ckanext.nhm.controllers.object:ObjectController', action='view', uuid=c.record_dict['occurrenceID'], qualified=True) %}
+        {% set citation_url = h.get_object_url(res.id, c.record_dict['occurrenceID'], c.version) %}
         {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
     {% endif %}
     {{ super() }}
