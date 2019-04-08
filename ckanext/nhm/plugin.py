@@ -383,7 +383,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
             title = []
             if title_field and title_field in record:
                 title.append(record[title_field])
-            title.append(image.get('title', image['_id']))
+            title.append(image.get('title', str(image['_id'])))
 
             copyright = '%s<br />&copy; %s' % (
                 h.link_to(image['license'], image['license'], target='_blank'),
