@@ -371,7 +371,7 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         """
         return {
             'title': 'DwC associated media',
-            'resource_type': ['dwc', 'csv'],
+            'resource_type': ['dwc', 'csv', 'tsv'],
             'field_type': ['json']
         }
 
