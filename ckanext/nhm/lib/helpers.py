@@ -1,3 +1,4 @@
+import itertools
 import json
 import logging
 import time
@@ -1053,40 +1054,61 @@ def form_select_datastore_field_options(resource, allow_empty=True):
     return list_to_form_options(fields, allow_empty)
 
 
-def get_last_resource_update_for_package(pkg_dict, date_format=None):
+def _get_latest_update(package_or_resource_dicts):
     '''
-    Returns the most recent update datetime across all resources in this
-    package. If there is no update time found then 'unknown' is returned. If
-    there is datetime found then it is rendered using the standard ckan helper.
+    Given a sequence of package and/or resource dicts, returns the most recent update datetime
+    available from them, or None if there is no update datetime found.
+
+    :param package_or_resource_dicts: a sequence of the package or resource dicts
+    :return: a 2-tuple containing the latest datetime and the dict from which it came, if no times
+             are found then (None, None) is returned
+    '''
+    # a list of fields on the resource that should contain update dates
+    fields = [u'last_modified', u'revision_timestamp', u'Created']
+
+    latest_dict = None
+    latest_date = None
+    for package_or_resource_dict in package_or_resource_dicts:
+        for field in fields:
+            date = h._datestamp_to_datetime(package_or_resource_dict.get(field, None))
+            if date is not None and (latest_date is None or date > latest_date):
+                latest_date = date
+                latest_dict = package_or_resource_dict
+
+    return latest_date, latest_dict
+
+
+def get_latest_update_for_package(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime (formatted as a string) for the package and its
+    resources. If there is no update time found then 'unknown' is returned. If there is datetime
+    found then it is rendered using the standard ckan helper.
+
     :param pkg_dict:        the package dict
     :param date_format:     date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime and the
-    resource name
+    :return: 'unknown' or a string containing the rendered datetime
     '''
+    latest_date, _ = _get_latest_update(itertools.chain([pkg_dict], pkg_dict.get(u'resources', [])))
+    if latest_date is not None:
+        return h.render_datetime(latest_date, date_format=date_format)
+    else:
+        return _(u'unknown')
 
-    def get_resource_last_update(resource):
-        '''
-        Given a resource dict, return the most recent update time available from
-        it, or None if there is no update time.
-        :param resource:    the resource dict
-        :return: a datetime or None
-        '''
-        # a list of fields on the resource that should contain update dates
-        fields = [u'last_modified', u'revision_timestamp', u'Created']
-        # find the available update dates on the resource and filter out Nones
-        update_dates = filter(None, [h._datestamp_to_datetime(resource[field]) for field in fields])
-        # return the latest non-None value, or None
-        return max(update_dates) if update_dates else None
 
-    # find the latest update date for each resource using the above function and
-    # then filter out the ones that don't have an update date available
-    dates_and_names = filter(lambda x: x[0],
-                             [(get_resource_last_update(r), r[u'name']) for r in
-                              pkg_dict[u'resources']])
-    if dates_and_names:
-        # find the most recent date and name combo
-        date, name = max(dates_and_names, key=lambda x: x[0])
-        return u'{} ({})'.format(h.render_datetime(date, date_format=date_format), name)
+def get_latest_update_for_package_resources(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime (formatted as a string) across all resources in this
+    package. If there is no update time found then 'unknown' is returned. If there is datetime found
+    then it is rendered using the standard ckan helper.
+
+    :param pkg_dict:        the package dict
+    :param date_format:     date format for the return datetime
+    :return: 'unknown' or a string containing the rendered datetime and the resource name
+    '''
+    latest_date, latest_resource = _get_latest_update(pkg_dict.get(u'resources', []))
+    if latest_date is not None:
+        name = latest_resource[u'name']
+        return u'{} ({})'.format(h.render_datetime(latest_date, date_format=date_format), name)
     # there is no available update so we return 'unknown'
     return _(u'unknown')
 
