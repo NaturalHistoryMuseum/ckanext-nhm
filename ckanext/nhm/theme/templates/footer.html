@@ -44,7 +44,6 @@
                 <li><a href="{{ h.url_for('/user/_logout') }}" title="{{ _('Log out') }}">Log out</a></li>
             {% else %}
                 <li><a href="{{ h.url_for('login') }}">Login</a></li>
-                <li><a href="{{ h.url_for('register') }}">Register</a></li>
             {% endif %}
             <li><a href="{{ h.url_for('contact_form') }}">Contact</a></li>
             <li class="extra-divide">{{ h.api_doc_link() }}</li>
