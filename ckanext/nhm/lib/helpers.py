@@ -1081,14 +1081,14 @@ def get_last_resource_update_for_package(pkg_dict, date_format=None):
     # find the latest update date for each resource using the above function and
     # then filter out the ones that don't have an update date available
     dates_and_names = filter(lambda x: x[0],
-                             [(get_resource_last_update(r), r['name']) for r in
+                             [(get_resource_last_update(r), r[u'name']) for r in
                               pkg_dict[u'resources']])
     if dates_and_names:
         # find the most recent date and name combo
         date, name = max(dates_and_names, key=lambda x: x[0])
-        return '{} ({})'.format(h.render_datetime(date, date_format=date_format), name)
+        return u'{} ({})'.format(h.render_datetime(date, date_format=date_format), name)
     # there is no available update so we return 'unknown'
-    return _('unknown')
+    return _(u'unknown')
 
 
 def get_external_links(record):
