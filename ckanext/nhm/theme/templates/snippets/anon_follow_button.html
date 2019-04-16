@@ -1,7 +1,7 @@
 {% set controller = obj_type %}
 
   <a href="{{ h.url_for('user.login', came_from=h.url_for(controller=controller, action='follow', id=obj_id)) }}" class="{% block unfollowing_class %}btn btn-success{% endblock %}">
-    <i class="fa fa-plus-sign"></i>
+    <i class="fas fa-plus"></i>
     {{ _('Follow') }}
   </a>
 

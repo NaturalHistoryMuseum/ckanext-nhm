@@ -85,3 +85,13 @@
     }
   }
 }
+
+.margin-right(@prop, @width) {
+  & @{prop} {
+    margin-right: @width;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}

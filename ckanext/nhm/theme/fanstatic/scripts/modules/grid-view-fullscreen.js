@@ -15,7 +15,7 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
           self.button = $('<a class="expand"></a>')
             .attr('href', '#')
             .attr('title', 'full screen')
-            .html('<i class="fa fa-expand"></i>')
+            .html('<i class="far fa-caret-square-right"></i>')
             .appendTo(self.controls)
             .click(self._toggle_fullscreen);
           self._base_height = $('div.recline-slickgrid').height();

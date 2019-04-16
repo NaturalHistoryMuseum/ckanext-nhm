@@ -3,7 +3,7 @@
 {% else %}
   <div class="data-viewer-error js-hide">
     <p class="text-error">
-      <i class="fa fa-info-sign"></i>
+      <i class="fas fa-info"></i>
       {{ _('This resource view is not available at the moment.') }}
       <a href="#" data-toggle="collapse" data-target="#data-view-error">
         {{ _('Click here for more information.') }}
@@ -12,7 +12,7 @@
     <p id="data-view-error" class="collapse"></p>
     <p>
       <a href="{{ raw_resource_url }}" class="btn btn-large resource-url-analytics" target="_blank">
-        <i class="fa fa-large fa-download"></i>
+        <i class="far fa-lg fa-arrow-alt-circle-down"></i>
         {{ _('Download resource') }}
       </a>
     </p>

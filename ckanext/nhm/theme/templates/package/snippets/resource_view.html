@@ -9,7 +9,7 @@
       {% endif %}
     {% endif %}
 
-    <div class="{% if facets %}ckanext-datapreview-faceted{% endif %}">
+    <div class="row {% if facets %}ckanext-datapreview-faceted{% endif %}">
 
       {% if facets %}
         {% snippet 'package/snippets/resource_view_facets.html', resource=resource, resource_view=resource_view, resource=resource, package=package, facets=facets %}

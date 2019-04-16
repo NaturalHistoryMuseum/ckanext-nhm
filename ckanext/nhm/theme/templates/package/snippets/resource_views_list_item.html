@@ -1,14 +1,11 @@
 {# BS 20140721: Removed description #}
 
-{% set action = 'edit_view' if is_edit else 'resource_read' %}
+{% set action = 'edit' if is_edit else 'read' %}
 {% set query_params = h.get_query_params() %}
-{# BS: Added q to query params & removed crappy if statement #}
-  {% set url = h.url_for(controller='dataset', action=action, id=g.pkg.name,
-                         resource_id=view.resource_id, view_id=view.id,
-                         **query_params) %}
-<li class="resource-view-item{% if is_selected %} active{% endif %}" data-id="{{ view.id }}">
-  <a href="{{ url }}" data-id="{{ view.id }}">
-      <i class="icon fa fa-{{ h.resource_view_icon(view) }}"></i>
-      {{ view.title }}
-  </a>
+{% set url = h.url_for(controller='resource', action=action,
+        id=g.pkg.name,resource_id=view.resource_id, view_id=view.id,**query_params) %}
+<li class="resource-view-item{% if is_selected %} active{% endif %}"
+    data-id="{{ view.id }}">
+    <a href="{{ url }}" data-id="{{ view.id }}"> <i
+            class="icon inline-icon-left fas fa-{{ h.resource_view_icon(view) }}"></i> {{ view.title }} </a>
 </li>

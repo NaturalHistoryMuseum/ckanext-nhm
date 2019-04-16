@@ -28,7 +28,8 @@ from webhelpers.html import literal
 
 import ckan.model as model
 from ckan.lib.helpers import (_datestamp_to_datetime,
-                              get_allowed_view_types as core_get_allowed_view_types)
+                              get_allowed_view_types as core_get_allowed_view_types,
+                              _url_with_params)
 from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
@@ -1011,19 +1012,19 @@ def remove_url_filter(field, value, extras=None):
 def add_url_filter(field, value, extras=None):
     '''The CKAN built in functions remove_url_param / add_url_param cannot handle
     multiple filters which are concatenated with |, not separate query params
-    This replaces remove_url_param for filters
+    This replaces add_url_param for filters
 
-    :param field: param field:
-    :param extras: return: (optional, default: None)
+    :param field:
+    :param extras:
     :param value: 
 
     '''
 
-    params = dict(toolkit.request.params)
+    params = {k: v for k, v in toolkit.request.params.items() if k != 'page'}
     url_filter = u'%s:%s' % (field, value)
-    filters = u'|'.join(params.get(u'filters', []) + [url_filter])
-
-    return toolkit.h.add_url_param(u'filters', filters, extras=extras)
+    filters = u'|'.join(params.get(u'filters', u'').split('|') + [url_filter])
+    params[u'filters'] = filters
+    return _url_with_params(toolkit.request.base_url, params.items())
 
 
 def parse_request_filters():

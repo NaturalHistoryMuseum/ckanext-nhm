@@ -142,6 +142,16 @@ body {
 }
 
 // LAYOUT/CONTAINERS ---------------------------------------------------------------------
+.container {
+  width: 95%;
+  @media (min-width: @lg) {
+    width: 80%;
+  }
+  @media (min-width: @md) {
+    width: 90%;
+  }
+}
+
 [role=main], .main {
   background: transparent;
   padding-top: 40px;
@@ -445,15 +455,24 @@ body {
   padding: 0 !important;
 }
 
+.module-heading {
+  &:before, &:after {
+    display: none; // to fix something ckan did
+  }
+}
+
 // NAVS ----------------------------------------------------------------------------------
+
+@collapse-width: @lg - 1;
 
 .nav-tabs {
   border-bottom: none;
   .no-spacing !important;
   float: none !important;
+  .margin-right(li, 5px);
 
   & li {
-    background-color: @grey9;
+    background-color: lighten(@grey9, 2%);
     border-radius: @rounding;
 
     & a, & a:hover {
@@ -517,12 +536,16 @@ body {
   z-index: 1;
   padding: 0 10px;
   color: @grey6;
+
+  @media (max-width: @collapse-width) {
+    display: block;
+  }
 }
 
-.navbar-collapse.nav-tabs.collapse:not(.in) {
-  @media (max-width: @md - 1) {
-    display: block !important;
-    & > li + li {
+.navbar-collapse.collapse:not(.in) {
+  @media (max-width: @collapse-width) {
+    display: block !important; // display the list, hide the items
+    &.nav-tabs > li + li, & > li:not(.active) {
       display: none;
     }
   }
@@ -537,14 +560,13 @@ body {
 
 .search-form {
   border-bottom: none;
-  padding-bottom: @min-pad;
   margin-bottom: 0;
 
   & .search-input {
     @button-pad: 5px;
     @button-size: 30px;
 
-    margin-bottom: @margin-search;
+    margin-bottom: @min-pad;
 
     & input {
       border: none;
@@ -564,13 +586,17 @@ body {
       right: @button-pad;
       padding: 0;
 
+      &:hover i, &:active i {
+        color: @grey10 !important;
+      }
+
       & i {
         color: @grey10;
         font-size: @font-size-body-l;
         line-height: 16px;
 
         &:hover {
-          color: @grey10;
+          color: @grey10 !important;
         }
       }
     }
@@ -640,10 +666,10 @@ body {
 // BUTTONS -------------------------------------------------------------------------------
 
 .btn-danger {
-  background: @buttonWarningColor;
+  background: @warning2;
 
   &:hover {
-    background: @buttonWarningHoverColor;
+    background: @warning1;
   }
 }
 
@@ -654,19 +680,25 @@ body {
   &, .btn-group > &:first-child {
     background: @primary3;
     padding: 8px 16px;
-    color: @buttonTextColor;
+    color: @grey10;
     font-weight: normal;
     text-shadow: none;
     .no-box-shadow;
   }
 
   &:hover, &.hover, &.active {
-    background: @buttonHoverColor;
-    color: @buttonTextColor;
+    background: @primary1;
+    color: @grey10;
   }
 
-  @media (max-width: @sm) {
+  @media (max-width: @md - 1) {
     font-size: 0;
+    height: 36px;
+    & .fa, & .fas {
+      margin: 0 !important;
+      line-height: 1em;
+      font-size: @font-size-body-l;
+    }
   }
 
   & i {
@@ -681,7 +713,7 @@ body {
 .btn-group {
   margin-top: floor(@min-pad / 3); // to center it - looks better than halving
   &.open .btn-primary.dropdown-toggle {
-    background-color: @buttonHoverColor;
+    background-color: @primary1;
   }
 }
 
@@ -799,12 +831,12 @@ tr.empty {
 
 .alert-danger, .alert-error {
   background-color: @warning3;
-  border-color: @buttonWarningColor;
-  color: @buttonWarningColor;
+  border-color: @warning2;
+  color: @warning2;
 }
 
 .error-block {
-  background-color: @buttonWarningColor;
+  background-color: @warning2;
 }
 
 
@@ -840,6 +872,10 @@ tr.empty {
       color: @primary1;
     }
   }
+}
+
+.gravatar {
+  margin: 7px 5px 10px;
 }
 
 // HOMEPAGE
@@ -960,6 +996,9 @@ tr.empty {
     margin-top: 40px;
   }
 }
+
+// ABOUT
+
 
 // DATASET SEARCH
 .package-list {
@@ -1091,7 +1130,6 @@ tr.empty {
 
 .ckanext-datapreview {
   padding-top: 0;
-  z-index: -1;
 
   & .row {
     & form {
@@ -1102,10 +1140,6 @@ tr.empty {
     & input {
       background: @grey10;
     }
-  }
-
-  & [class^=col-md-] {
-    float: none !important;
   }
 }
 
@@ -1118,7 +1152,7 @@ tr.empty {
   .resource-view-facets {
     @cellheight: 36px;
     background-color: @grey9;
-    border-right: @cellheight solid @grey9;
+    border-right: (ceil(@cellheight / 2) + 5) solid @grey9;
     padding: 0;
 
     .nav-item {
@@ -1138,6 +1172,7 @@ tr.empty {
             border-style: solid;
             border-color: transparent;
             right: 0 - @cellheight;
+            top: 0;
             border-left-color: @grey4;
           }
 
@@ -1232,6 +1267,80 @@ tr.empty {
   }
 }
 
+.resource-view-filter-options {
+  // FIXME: cannot test this because js is broken
+  label {
+    font-weight: normal;
+    display: inline-block;
+    margin: 2px 15px 4px 15px;
+
+    input {
+      top: 0;
+      margin-right: 4px;
+    }
+  }
+
+  padding-bottom: 10px;
+}
+
+.download-tooltip {
+  min-width: 290px;
+
+  & form#mam {
+    // the email form for downloading the original res img
+    width: 95%;
+    display: none;
+    margin: 0;
+    padding: 5px;
+    background: @grey9;
+
+    input.input-large {
+      height: 26px;
+    }
+  }
+}
+
+.citation {
+  margin-bottom: 20px;
+
+  p {
+    margin: 4px 6px;
+  }
+}
+
+// INSIDE RECORD
+
+.module-record {
+  margin-top: 0;
+}
+
+.toggle-empty-rows {
+  float: right;
+  margin: -10px 0 0 0;
+}
+
+.external-links {
+  margin-bottom: @min-pad;
+
+  ul {
+    list-style: none;
+  }
+
+  .external-link-name {
+    cursor: pointer;
+  }
+
+  li {
+    padding: 2px 0;
+  }
+
+  & a.external:before {
+    content: '\f002';
+    .mixin-font-symbol(normal);
+    display: inline-block;
+    padding-right: 10px;
+  }
+}
 
 // FEED
 .activity {
@@ -1261,10 +1370,10 @@ tr.empty {
       }
 
       & .cancel {
-        color: @buttonWarningColor;
+        color: @warning2;
 
         &:hover {
-          color: @buttonWarningHoverColor;
+          color: @warning1;
         }
 
         &:after {
@@ -1276,7 +1385,7 @@ tr.empty {
         color: @primary3;
 
         &:hover {
-          color: @buttonHoverColor;
+          color: @primary1;
         }
 
         &:after {
@@ -1285,7 +1394,7 @@ tr.empty {
       }
 
       & .disabled, & .disabled:hover {
-        color: @buttonDisabledColor;
+        color: @grey4;
       }
     }
   }
@@ -1356,17 +1465,6 @@ tr.empty {
 
 // CHAOS BEGINS ==========================================================================
 
-/* Record */
-
-.module-record {
-  margin-top: 0;
-}
-
-.toggle-empty-rows {
-  float: right;
-  margin: -10px 0 0 0;
-}
-
 /* About page */
 
 .nav-aside li a i {
@@ -1423,9 +1521,6 @@ ol#credits li {
   background: @toolbarBackgroundColor;
   color: @grey1
 }
-
-/* Contact form */
-
 
 // From here down needs tidying up (YA THINK??)
 
@@ -1507,21 +1602,6 @@ ol#credits li {
   padding-left: 10px;
 }
 
-.resource-view-filter-options {
-  label {
-    font-weight: normal;
-    display: inline-block;
-    margin: 2px 15px 4px 15px;
-
-    input {
-      top: 0;
-      margin-right: 4px;
-    }
-  }
-
-  padding-bottom: 10px;
-}
-
 .ckanpackager-tab {
   border: none;
   border-radius: 0;
@@ -1543,51 +1623,5 @@ ol#credits li {
   display: none !important;
 }
 
-.citation {
-  margin-bottom: 20px;
 
-  p {
-    margin: 4px 6px;
-  }
-}
-
-.external-links {
-  margin-bottom: 20px;
-
-  p {
-    margin: 4px 6px;
-  }
-
-  ul {
-    margin: 0 0 10px 26px;
-  }
-
-  .external-link-name {
-    cursor: pointer;
-  }
-}
-
-
-/* MAM original image */
-
-.download-tooltip {
-  min-width: 290px;
-}
-
-form#mam {
-  width: 280px;
-  display: none;
-  margin: 0;
-  padding: 5px;
-  background: @grey8;
-
-  input.input-large {
-    height: 26px;
-  }
-
-}
-
-.gravatar {
-  margin: 7px 5px 10px;
-}
 

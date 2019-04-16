@@ -3,11 +3,14 @@
 .flex-container {
   display: flex;
   flex-direction: row;
-  max-width: 100%;
 
   & > * {
     align-self: center;
   }
+}
+
+.flex-reverse {
+  flex-direction: row-reverse;
 }
 
 .flex-top {
@@ -19,7 +22,10 @@
 }
 
 .flex-stretch-first {
-  & > *:first-child {
+  &:not(.flex-reverse) > *:first-child {
+    flex-grow: 1;
+  }
+  &.flex-reverse > *:last-child {
     flex-grow: 1;
   }
 }

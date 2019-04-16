@@ -11,7 +11,7 @@
 {% block breadcrumb_content_selected %}{% endblock %}
 
 {% block breadcrumb_content %}{{ super() }}
-<li>{% link_for h.resource_display_name(res)|truncate(40), 'resource.read', id=g.pkg.name,
+<li>{% link_for h.resource_display_name(res)|truncate(40), named_route='resource.read', id=g.pkg.name,
     resource_id=res.id %}
 </li>
 <li class="active"><a href="">{{ g.record_title|truncate(30) }}</a></li>{% endblock %}

@@ -8,7 +8,7 @@
 {% set query_params = h.get_query_params() %}
 {% set filter_pills = h.get_resource_filter_pills(package, resource, resource_view) %}
 
-<div class="resource-view-filter-form">
+<div class="resource-view-filter-form row">
     <form class="module-content search-form" method="get">
 
             <div class="col-md-9">
@@ -19,7 +19,7 @@
                       <input type="hidden" name="filters" value="{{ query_params['filters'] }}" />
                   {% endif %}
                   <button type="submit">
-                    <i class="fa fa-search"></i>
+                    <i class="fas fa-search"></i>
                     <span>{{ _('Search') }}</span>
                   </button>
                 </div>
@@ -47,7 +47,7 @@
                     <div class="filtered pill">
                         <div class="pill-txt">{{ pill.value }}</div>
                         <div class="pill-remove">
-                            <a href="{{ pill.href }}" class="remove" title="{{ _('Remove') }}"><i class="fa fa-remove"></i></a>
+                            <a href="{{ pill.href }}" class="remove" title="{{ _('Remove') }}"><i class="fas fa-times"></i></a>
                         </div>
                     </div>
                 </div>

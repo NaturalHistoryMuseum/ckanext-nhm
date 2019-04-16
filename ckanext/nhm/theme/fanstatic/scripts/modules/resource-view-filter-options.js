@@ -1,7 +1,5 @@
-/**
- * Created by bens3 on 20/08/2017.
- */
-this.ckan.module('resource-view-filter-options', function ($, _) {
+
+ckan.module('resource-view-filter-options', function ($) {
 
     var self;
 

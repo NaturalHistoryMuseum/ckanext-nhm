@@ -27,11 +27,11 @@
                 {% if h.get_param_int('_%s_limit' % name) %}
                     {% if h.has_more_facets(name, g.search_facets) %}
                         <a href="{{ h.remove_url_param('_%s_limit' % name, replace=0, extras=extras, alternative_url=alternative_url) }}"
-                           class="read-more">{{ _('Show More {facet_type}').format(facet_type=title) }} <i class="fa fa-plus-sign"></i></a>
+                           class="read-more">{{ _('Show More {facet_type}').format(facet_type=title) }} <i class="fas fa-plus"></i></a>
                     {% endif %}
                 {% else %}
                     <a href="{{ h.remove_url_param('_%s_limit' % name, extras=extras, alternative_url=alternative_url) }}"
-                       class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }} <i class="fa fa-minus-sign"></i></a>
+                       class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }} <i class="fas fa-minus"></i></a>
                 {% endif %}
             </p>
         {% else %}
