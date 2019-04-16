@@ -140,14 +140,9 @@ def _image_exists_on_record(resource, record, asset_id):
     # FIXME - If no image field use gallery
     image_field = resource.get('_image_field', None)
 
-    try:
-        images = json.loads(record[image_field])
-    except ValueError:
-        pass
-    else:
     # Check the asset ID belongs to the record
-        for image in images:
-            url = image.get('identifier', None)
-            if asset_id in url:
-                return True
+    for image in record[image_field]:
+        url = image.get('identifier', None)
+        if asset_id in url:
+            return True
     return False
