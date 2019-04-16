@@ -55,11 +55,20 @@ var MAM = {
                 }
             })).appendTo(ul);
 
-            var form = Mustache.render(MAM.config.formTpl, {
+            // create a context for rendering the mustache form template
+            let mustacheContext = {
                 resource_id: image.resource_id,
                 record_id: image.record_id,
-                asset_id: image.href.replace("http://www.nhm.ac.uk/services/media-store/asset/", "").replace("/contents/preview", "")
-            })
+            };
+
+            // if we can find an asset ID in the image url, add it to the context
+            let match = /asset\/([a-z0-9]+)\//.exec(image.href);
+            if (match != null) {
+                mustacheContext.asset_id = match[1];
+            }
+
+            // render the form
+            let form = Mustache.render(MAM.config.formTpl, mustacheContext);
 
             $(ui.tooltip).html(ul.append(form));
 
