@@ -3,7 +3,7 @@ import json
 
 import os
 import rdflib
-from dateutil.parser import parse as parse_date
+from datetime import datetime
 from pylons import request
 from rdflib import OWL
 from rdflib import URIRef, BNode, Literal
@@ -26,12 +26,10 @@ DC = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 ADMS = Namespace("http://www.w3.org/ns/adms#")
 VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
-FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 SCHEMA = Namespace('http://schema.org/')
 TIME = Namespace('http://www.w3.org/2006/time')
 LOCN = Namespace('http://www.w3.org/ns/locn#')
 GSP = Namespace('http://www.opengis.net/ont/geosparql#')
-OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SDMX_CODE = Namespace("http://purl.org/linked-data/sdmx/2009/code#")
 TDWGI = Namespace('http://rs.tdwg.org/ontology/voc/Institution#')
 AIISO = Namespace('http://purl.org/vocab/aiiso/schema#')
@@ -48,13 +46,13 @@ DQV = Namespace('http://www.w3.org/ns/dqv#')
 # All metadata licence under CC0
 METADATA_LICENCE = 'http://creativecommons.org/publicdomain/zero/1.0/'
 
+
 class NHMDCATProfile(RDFProfile):
     '''
     An RDF profile for the NHM
 
     http://www.w3.org/2011/gld/wiki/Data_Catalog_Vocabulary/Recipes
     http://rdf-vocabulary.ddialliance.org/discovery.html
-
     '''
 
     def _get_update_frequency_code(self, frequency):
@@ -84,7 +82,6 @@ class NHMDCATProfile(RDFProfile):
         return context
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
-
         namespaces = {
             'dc': DC,
             'dcat': DCAT,
@@ -134,8 +131,8 @@ class NHMDCATProfile(RDFProfile):
 
         # Basic fields
         items = [
-            ('title', DC.title, None),
-            ('url', DCAT.landingPage, None),
+            ('title', DC.title, None, Literal),
+            ('url', DCAT.landingPage, None, URIRef),
         ]
         self._add_triples_from_dict(dataset_dict, dataset_uri, items)
 
@@ -153,8 +150,8 @@ class NHMDCATProfile(RDFProfile):
 
         # Dates
         items = [
-            ('issued', DC.issued, ['metadata_created']),
-            ('modified', DC.modified, ['metadata_modified']),
+            ('issued', DC.issued, ['metadata_created'], Literal),
+            ('modified', DC.modified, ['metadata_modified'], Literal),
         ]
         self._add_date_triples_from_dict(dataset_dict, dataset_uri, items)
 
@@ -168,15 +165,16 @@ class NHMDCATProfile(RDFProfile):
         nhm_uri = self.graph_add_museum()
 
         if user:
-            full_name = user.get('fullname', None)
-            # If this is the Natural History Museum user (i.e. admin), just add the contactPoint
-            if full_name == 'Natural History Museum':
+            # if this is the admin user, just add the contactPoint
+            if user['sysadmin'] and user['name'] == 'admin':
                 g.add((dataset_uri, DCAT.contactPoint, nhm_uri))
             else:
                 user_uri = URIRef(self.user_uri(creator_user_id))
                 g.add((user_uri, RDF.type, VCARD.Person))
-                g.add((user_uri, VCARD.fn, Literal(full_name)))
-                g.add((user_uri, VCARD.hasEmail, URIRef(user['email'])))
+                if 'fullname' in user:
+                    g.add((user_uri, VCARD.fn, Literal(user['fullname'])))
+                if 'email' in user:
+                    g.add((user_uri, VCARD.hasEmail, URIRef(user['email'])))
                 # All users are members of the NHM
                 g.add((user_uri, MADS.hasAffiliation, nhm_uri))
                 # This user is the contact point for the dataset
@@ -236,7 +234,6 @@ class NHMDCATProfile(RDFProfile):
         self.graph_add_resources(dataset_uri, dataset_dict)
 
     def graph_add_museum(self):
-
         g = self.g
         nhm_uri = URIRef('http://nhm.ac.uk')
         g.add((nhm_uri, RDF.type, ORG.Organization))
@@ -253,9 +250,7 @@ class NHMDCATProfile(RDFProfile):
         g.add((nhm_uri, OWL.sameAs, URIRef('https://www.wikidata.org/wiki/Q309388')))
         return nhm_uri
 
-
     def graph_add_resources(self, dataset_uri, dataset_dict):
-
         g = self.g
 
         for resource_dict in dataset_dict.get('resources', []):
@@ -272,11 +267,11 @@ class NHMDCATProfile(RDFProfile):
 
             #  Simple values
             items = [
-                ('name', DC.title, None),
-                ('description', DC.description, None),
-                ('status', ADMS.status, None),
-                ('rights', DC.rights, None),
-                ('license', DC.license, None),
+                ('name', DC.title, None, Literal),
+                ('description', DC.description, None, Literal),
+                ('status', ADMS.status, None, Literal),
+                ('rights', DC.rights, None, Literal),
+                ('license', DC.license, None, Literal),
             ]
 
             self._add_triples_from_dict(resource_dict, distribution, items)
@@ -298,8 +293,8 @@ class NHMDCATProfile(RDFProfile):
 
             # Dates
             items = [
-                ('issued', DC.issued, None),
-                ('modified', DC.modified, None),
+                ('issued', DC.issued, None, Literal),
+                ('modified', DC.modified, None, Literal),
             ]
 
             self._add_date_triples_from_dict(resource_dict, distribution, items)
@@ -381,7 +376,7 @@ class NHMDCATProfile(RDFProfile):
                 pass
             else:
                 # Parse into data format, and add as dates
-                _date = parse_date(value)
+                _date = datetime.fromtimestamp(value / 1000.0)
                 g.add((record_ref, getattr(DWC, term), Literal(_date.isoformat(), datatype=XSD.dateTime)))
 
         try:
@@ -424,7 +419,7 @@ class NHMDCATProfile(RDFProfile):
                 g.set((image_uri, DC.title, Literal(title)))
             g.set((image_uri, CC.license, URIRef(image['license'])))
             g.set((image_uri, DC.RightsStatement, Literal(image['rightsHolder'])))
-            g.set((image_uri, DC.Format, Literal(image['format'])))
+            g.set((image_uri, DC.Format, Literal(image['mime'])))
             # Add link from image to object...
             g.set((image_uri, FOAF.depicts, object_uri))
             # And object to image
