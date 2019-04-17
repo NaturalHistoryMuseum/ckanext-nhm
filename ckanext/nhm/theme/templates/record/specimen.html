@@ -9,14 +9,14 @@
 {% endblock -%}
 
 {% block content_primary_nav %}
-    {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, c.version) %}
+    {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, g.version) %}
         {{ nav }}
     {% endfor %}
 {% endblock %}
 
 {% block record_additional_information %}
-    {% if c.record_dict['occurrenceID']%}
-        {% set citation_url = h.get_object_url(res.id, c.record_dict['occurrenceID'], c.version) %}
+    {% if g.record_dict['occurrenceID']%}
+        {% set citation_url = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version) %}
         {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
     {% endif %}
     {{ super() }}
