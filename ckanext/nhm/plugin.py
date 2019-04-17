@@ -26,12 +26,9 @@ from ckanext.nhm.lib.helpers import (get_site_statistics,
 # to import a function with a cached decorator so clear caches works
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.versioned_datastore.interfaces import IVersionedDatastore
-from pylons import config
 from webhelpers.html import literal
 
-import ckan.lib.helpers as h
 import ckan.model as model
-import ckan.plugins as p
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 
 # NOTE: Need to import a function with a cached decorator so clear caches works.
@@ -507,13 +504,14 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             title.append(image.get(u'title', str(image[u'_id'])))
 
             copyright = u'%s<br />&copy; %s' % (
-                h.link_to(image[u'license'], image[u'license'], target=u'_blank'),
+                toolkit.h.link_to(image[u'license'], image[u'license'],
+                                  target=u'_blank'),
                 image[u'rightsHolder']
                 )
             images.append({
                 u'href': image[u'identifier'],
                 u'thumbnail': image[u'identifier'].replace(u'preview', u'thumbnail'),
-                u'link': h.url_for(
+                u'link': toolkit.url_for(
                     controller=u'ckanext.nhm.controllers.record:RecordController',
                     action=u'view',
                     package_name=data_dict[u'package'][u'name'],
@@ -522,7 +520,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     ),
                 u'copyright': copyright,
                 # Description of image in gallery view
-                u'description': literal(u''.join([u'<span>%s</span>' % t for t in title])),
+                u'description': literal(
+                    u''.join([u'<span>%s</span>' % t for t in title])),
                 u'title': u' - '.join(title),
                 u'record_id': record[u'_id']
                 })
@@ -587,7 +586,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # search function below
         if u'filters' in data_dict:
             # figure out which options are available for this resource
-            resource_show = p.toolkit.get_action(u'resource_show')
+            resource_show = toolkit.get_action(u'resource_show')
             resource = resource_show(context, {
                 u'id': data_dict[u'resource_id']
                 })
@@ -607,8 +606,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             # by default sort the EMu resources by modified so that the latest records
             # are first
             if data_dict[u'resource_id'] in {helpers.get_specimen_resource_id(),
-                                            helpers.get_artefact_resource_id(),
-                                            helpers.get_indexlot_resource_id()}:
+                                             helpers.get_artefact_resource_id(),
+                                             helpers.get_indexlot_resource_id()}:
                 data_dict[u'sort'] = [u'modified desc']
 
         return data_dict
@@ -682,7 +681,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     # IVersionedDatastore
     def datastore_is_read_only_resource(self, resource_id):
-        # we don't want any of the versioned datastore ingestion and indexing code modifying the
+        # we don't want any of the versioned datastore ingestion and indexing code
+        # modifying the
         # collections data as we manage it all through the data importer
         return resource_id in {helpers.get_specimen_resource_id(),
                                helpers.get_artefact_resource_id(),
@@ -691,8 +691,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     # IVersionedDatastore
     def datastore_after_indexing(self, request, eevee_stats, stats_id):
         try:
-            # whenever anything is indexed, we should clear the cache, catch exceptions on failures
+            # whenever anything is indexed, we should clear the cache,
+            # catch exceptions on failures
             # and only wait a couple of seconds for the request to complete
-            requests.request(u'purge', config.get(u'ckan.site_url'), timeout=2)
+            requests.request(u'purge', toolkit.config.get(u'ckan.site_url'), timeout=2)
         except:
             pass

@@ -4,7 +4,6 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import json
 import logging
 
 import ckanext.nhm.logic.schema as nhm_schema
@@ -12,8 +11,7 @@ from ckanext.nhm.dcat.processors import RDFSerializer
 from ckanext.nhm.lib.mam import mam_media_request
 from ckanext.nhm.lib.record import get_record_by_uuid
 
-import ckan.logic as logic
-import ckan.model as model
+from ckan.logic import ActionError
 from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
@@ -28,8 +26,6 @@ def record_show(context, data_dict):
     '''
     # Validate the data (TODO: do we need to redefine context here?)
     context = {
-        u'model': model,
-        u'session': model.Session,
         u'user': toolkit.c.user or toolkit.c.author
         }
     schema = context.get(u'schema', nhm_schema.record_show_schema())
@@ -42,17 +38,22 @@ def record_show(context, data_dict):
     record_id = toolkit.get_or_bust(data_dict, u'record_id')
 
     # Retrieve datastore record
-    record_data_dict = {u'resource_id': resource_id, u'filters': {u'_id': record_id}}
+    record_data_dict = {
+        u'resource_id': resource_id,
+        u'filters': {
+            u'_id': record_id
+            }
+        }
     if u'version' in data_dict:
         record_data_dict[u'version'] = data_dict[u'version']
-    search_result = get_action(u'datastore_search')(context, record_data_dict)
+    search_result = toolkit.get_action(u'datastore_search')(context, record_data_dict)
 
     try:
         record = {
             u'data': search_result[u'records'][0],
             u'fields': search_result[u'fields'],
             u'resource_id': resource_id
-        }
+            }
     except IndexError:
         # If we don't have a result, raise not found
         raise toolkit.ObjectNotFound
@@ -74,8 +75,6 @@ def download_original_image(context, data_dict):
 
     # Validate the data
     context = {
-        u'model': model,
-        u'session': model.Session,
         u'user': toolkit.c.user or toolkit.c.author
         }
     schema = context.get(u'schema', nhm_schema.download_original_image_schema())
@@ -86,12 +85,16 @@ def download_original_image(context, data_dict):
 
     # Get the resource
     resource = toolkit.get_action(u'resource_show')(context,
-                                                    {u'id': data_dict[u'resource_id']})
+                                                    {
+                                                        u'id': data_dict[u'resource_id']
+                                                        })
 
     # Retrieve datastore record
     search_result = toolkit.get_action(u'datastore_search')(context, {
         u'resource_id': data_dict[u'resource_id'],
-        u'filters': {u'_id': data_dict[u'record_id']}
+        u'filters': {
+            u'_id': data_dict[u'record_id']
+            }
         })
 
     try:
@@ -107,7 +110,7 @@ def download_original_image(context, data_dict):
         mam_media_request(data_dict[u'asset_id'], data_dict[u'email'])
     except Exception, e:
         log.error(e)
-        raise logic.ActionError(u'Could not request original')
+        raise ActionError(u'Could not request original')
     else:
         return u'Original image request successful'
 
@@ -122,8 +125,6 @@ def object_rdf(context, data_dict):
 
     # Validate the data
     context = {
-        u'model': model,
-        u'session': model.Session,
         u'user': toolkit.c.user or toolkit.c.author
         }
     schema = context.get(u'schema', nhm_schema.object_rdf_schema())
