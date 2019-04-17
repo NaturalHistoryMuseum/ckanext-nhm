@@ -4,6 +4,26 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
+'''Routes for handling stable objects - those with GUIDs in KE EMu
+
+If someone accesses URL:
+    object/73f450db-46b3-45a0-ac18-f00547be5af1
+It will 302 redirect to the specimen, artefact or index lot page (though currently we
+only
+support specimens).
+
+If a user requests the object in RDF format:
+    object/73f450db-46b3-45a0-ac18-f00547be5af1.ttl
+Returns RDF
+
+In both cases, if a version is appended to the end of the URL then that version of the
+record is
+returned. For example:
+    object/73f450db-46b3-45a0-ac18-f00547be5af1/1551692486000
+otherwise the current version is returned.
+
+'''
+
 import logging
 
 from ckanext.dcat.controllers import check_access_header
@@ -61,17 +81,24 @@ def _context():
         }
 
 
-@blueprint.route(u'/object/<uuid>.<_format>')
-def rdf(uuid, _format):
-    '''Return RDF
+@blueprint.route(u'/object/<uuid>.<_format>', defaults={
+    'version': None
+    })
+@blueprint.route(u'/object/<uuid>/<int:version>.<_format>')
+def rdf(uuid, _format, version):
+    '''Return RDF view of object.
 
     :param uuid: the object's uuid
-    :param _format:
+    :param _format: the format requested
+    :param version: the version of the record to retrieve, or None if the current
+    version is desired
+    :return: the data to display
 
     '''
     data_dict = {
         u'uuid': uuid,
         u'format': _format,
+        u'version': version,
         }
 
     toolkit.response.headers.update({
@@ -83,27 +110,30 @@ def rdf(uuid, _format):
         toolkit.abort(409, str(e))
 
 
-@blueprint.route(u'/object/<uuid>')
-def view(uuid):
-    '''View object
-    If this is basic HTTP request, this will redirect to the record
-    If the request is for RDF (content negotiation) return the rdf
-
-    :param uuid: the object's uuid
+@blueprint.route(u'/object/<uuid>', defaults={
+    'version': None
+    })
+@blueprint.route(u'/object/<uuid>/<int:version>')
+def view(uuid, version):
+    '''View object. If this is normal HTTP request, this will redirect to the record,
+    otherwise if
+    the request is for RDF (content negotiation) return the rdf.
+    :param uuid: the uuid of the object
+    :param version: the version of the object, or None for current version
 
     '''
     if uuid in ABYSSLINE_UUIDS:
-        abyssline_object_redirect(uuid)
+        abyssline_object_redirect(uuid, version)
 
-    # Is the request for a particular format
+    # is the request for a particular format
     _format = check_access_header()
 
     if _format:
         return rdf(uuid, _format)
     else:
         try:
-            # This is a normal HTTP request, so redirect to the object record
-            record, resource = get_record_by_uuid(uuid)
+            # get the record at the given version
+            record, resource = get_record_by_uuid(uuid, version)
         except TypeError:
             pass
         else:
@@ -113,38 +143,52 @@ def view(uuid):
                                                               {
                                                                   u'id': package_id
                                                                   })
+                # redirect to the object record
                 toolkit.redirect_to(u'record.view', package_name=package[u'name'],
-                    resource_id=resource.id, record_id=record[u'_id'])
+                                    resource_id=resource.id, record_id=record[u'_id'],
+                                    version=version)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
 
 
-def abyssline_object_redirect(uuid):
+def abyssline_object_redirect(uuid, version):
     '''Temporary fix to allow abyssline object references
-    to resolve to the temp dataset
+    to resolve to the temp dataset.
 
     :param uuid: the object's uuid
+    :param version: the version to get
 
     '''
     resource_id = toolkit.config.get(u'ckanext.nhm.abyssline_resource_id')
-    context = {
-        u'user': toolkit.c.user or toolkit.c.author
+
+    # figure out the rounded version
+
+    data_dict = {
+        u'resource_id': resource_id,
+        u'version': version,
         }
-    search_result = toolkit.get_action(u'datastore_search')(context, {
+    version = toolkit.get_action(u'datastore_get_rounded_version')(_context(), data_dict)
+
+    # search for the record
+    search_data_dict = {
         u'resource_id': resource_id,
         u'filters': {
             u'catalogNumber': uuid
             }
-        })
+        }
+
+    search_result = toolkit.get_action(u'datastore_search')(_context(), search_data_dict)
     try:
         record = search_result[u'records'][0]
     except KeyError:
         pass
     else:
-        toolkit.redirect_to(u'record.view', package_name=u'abyssline', resource_id=resource_id,
-            record_id=record[u'_id'])
+        toolkit.redirect_to(u'record.view', package_name=u'abyssline',
+                            resource_id=resource_id,
+                            record_id=record[u'_id'], version=version)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
+
 
 @blueprint.route('/specimen/<url>')
 def specimen_redirect(url):

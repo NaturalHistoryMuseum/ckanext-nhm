@@ -4,12 +4,12 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import json
 import logging
 from collections import OrderedDict
 from copy import deepcopy
 
 import re
+from ckanext.nhm.lib.filter_options import exclude_mineralogy, has_image, has_lat_long
 from ckanext.nhm.views.default import DefaultView
 from ckanext.nhm.views.dwc import DarwinCoreView
 
@@ -26,33 +26,16 @@ class SpecimenView(DefaultView):
     grid_column_widths = DarwinCoreView.grid_column_widths
 
     field_facets = [
-        u'collectionCode',
-        u'typeStatus',
-        u'family',
-        u'genus',
-        u'imageCategory',
-        u'gbifIssue'
+        'collectionCode',
+        'typeStatus',
+        'family',
+        'genus',
+        'associatedMedia.category',
+        'gbifIssue'
         ]
 
     # Additional search filter options
-    filter_options = {
-        u'_has_image': {
-            u'label': u'Has image',
-            u'solr': u'_has_multimedia:true'
-            },
-        u'_has_lat_long': {
-            u'label': u'Has lat/long',
-            # BS: Changed to look for latitude field,as _geom is only available after a
-            # map has been added
-            # As this works for all DwC, we might get datasets without a map
-            u'solr': u'decimalLatitude:[* TO *]'
-            },
-        u'_exclude_mineralogy': {
-            u'label': u'Exclude Mineralogy',
-            u'hide': True,
-            u'solr': u'-collectionCode:MIN'
-            }
-        }
+    filter_options = [has_image, has_lat_long, exclude_mineralogy]
 
     field_groups = OrderedDict([
         (u'Classification', OrderedDict([
@@ -282,13 +265,11 @@ class SpecimenView(DefaultView):
 
             c.record_dict[u'determination_labels'].append(label)
             value = c.record_dict.get(field, None)
-            try:
-                c.record_dict[u'determinations'][label] = list(json.loads(value))
-            except(ValueError, TypeError):
-                if value:
-                    c.record_dict[u'determinations'][label] = [value]
-                else:
-                    c.record_dict[u'determinations'][label] = []
+            if not value:
+                value = []
+            elif not isinstance(value, list):
+                value = [value]
+            c.record_dict['determinations'][label] = value
 
         c.record_dict[u'determinations'][u'_len'] = max(
             [len(l) for l in c.record_dict[u'determinations'].values()])

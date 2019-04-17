@@ -4,32 +4,35 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import json
 import logging
 from collections import OrderedDict
 
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-from ckanext.nhm import routes
 import os
 import re
+import requests
 from beaker.cache import cache_managers
 from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
-from ckanext.datasolr.interfaces import IDataSolr
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
+from ckanext.nhm import routes
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import (get_site_statistics,
-                                     resource_view_get_filter_options)
+                                     resource_view_get_filter_options)  # NOTE: Need
+# to import a function with a cached decorator so clear caches works
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from ckanext.versioned_datastore.interfaces import IVersionedDatastore
+from pylons import config
 from webhelpers.html import literal
 
+import ckan.lib.helpers as h
 import ckan.model as model
+import ckan.plugins as p
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
-from ckanext.datastore.interfaces import IDatastore
 
 # NOTE: Need to import a function with a cached decorator so clear caches works.
 # assigning here as the function is not used anywhere and would be lost in automatic
@@ -59,13 +62,11 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(interfaces.IFacets, inherit=True)
     implements(interfaces.IPackageController, inherit=True)
     implements(interfaces.IResourceController, inherit=True)
-    implements(IDatastore)
-    implements(IDataSolr)
     implements(IContact)
     implements(IDoi)
     implements(IGalleryImage)
     implements(ICkanPackager)
-
+    implements(IVersionedDatastore)
 
     ## IConfigurer
     def update_config(self, config):
@@ -97,6 +98,97 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
         :param _map:
         '''
+
+        # Add view record
+        _map.connect('record_versioned',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{'
+                     'record_id}/{version}',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='view', requirements={
+                'version': '\d+'
+                })
+        _map.connect('record',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='view')
+
+        # Add dwc view
+        _map.connect('dwc_versioned',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{'
+                     'record_id}/dwc/{version}',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='dwc', requirements={
+                'version': '\d+'
+                })
+        _map.connect('dwc',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{'
+                     'record_id}/dwc',
+                     controller='ckanext.nhm.controllers.record:RecordController',
+                     action='dwc')
+
+        # About pages
+        _map.connect('about_citation', '/about/citation',
+                     controller='ckanext.nhm.controllers.about:AboutController',
+                     action='citation')
+        _map.connect('about_download', '/about/download',
+                     controller='ckanext.nhm.controllers.about:AboutController',
+                     action='download')
+        _map.connect('about_licensing', '/about/licensing',
+                     controller='ckanext.nhm.controllers.about:AboutController',
+                     action='licensing')
+        _map.connect('about_credits', '/about/credits',
+                     controller='ckanext.nhm.controllers.about:AboutController',
+                     action='credits')
+
+        # Legal pages
+        _map.connect('legal_privacy', '/privacy',
+                     controller='ckanext.nhm.controllers.legal:LegalController',
+                     action='privacy')
+        _map.connect('legal_terms', '/terms-conditions',
+                     controller='ckanext.nhm.controllers.legal:LegalController',
+                     action='terms')
+
+        # About stats pages
+        _map.connect('stats_resources', '/about/statistics/resources',
+                     controller='ckanext.nhm.controllers.stats:StatsController',
+                     action='resources', ckan_icon='bar-chart')
+        _map.connect('stats_contributors', '/about/statistics/contributors',
+                     controller='ckanext.nhm.controllers.stats:StatsController',
+                     action='contributors', ckan_icon='user')
+        _map.connect('stats_records', '/about/statistics/records',
+                     controller='ckanext.nhm.controllers.stats:StatsController',
+                     action='records', ckan_icon='file-text')
+
+        # Dataset metrics
+        _map.connect('dataset_metrics', '/dataset/metrics/{id}',
+                     controller='ckanext.nhm.controllers.stats:StatsController',
+                     action='dataset_metrics', ckan_icon='bar-chart')
+        # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
+
+        object_controller = 'ckanext.nhm.controllers.object:ObjectController'
+
+        _map.connect('object_rdf_versioned', '/object/{uuid}/{version}.{_format}',
+                     controller=object_controller, action='rdf',
+                     requirements={
+                         '_format': 'xml|rdf|n3|ttl|jsonld',
+                         'version': '\d+'
+                         })
+
+        _map.connect('object_rdf', '/object/{uuid}.{_format}',
+                     controller=object_controller, action='rdf',
+                     requirements={
+                         '_format': 'xml|rdf|n3|ttl|jsonld'
+                         })
+
+        # Permalink for specimens - needs to come after the DCAT format dependent
+        _map.connect('object_view_versioned', '/object/{uuid}/{version}',
+                     controller=object_controller,
+                     action='view', requirements={
+                'version': '\d+'
+                })
+        _map.connect('object_view', '/object/{uuid}',
+                     controller=object_controller,
+                     action='view')
 
         # Redirect the old specimen url to the object
         _map.redirect(u'/specimen/{url:.*}', u'/object/{url}')
@@ -215,130 +307,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         pkg_dict[u'all_authors'] = pkg_dict[u'author']
         pkg_dict[u'author'] = helpers.dataset_author_truncate(pkg_dict[u'author'])
         return pkg_dict
-
-    ## IDataStore
-    def datastore_validate(self, context, data_dict, all_field_ids):
-        '''
-        ..seealso:: ckanext.datastore.interfaces.IDataStore.datastore_validate
-        '''
-        if u'filters' in data_dict:
-            resource_show = toolkit.get_action(u'resource_show')
-            resource = resource_show(context, {
-                u'id': data_dict[u'resource_id']
-                })
-            # Remove both filter options and field groups from filters
-            # These will be handled separately
-            for option in resource_view_get_filter_options(resource).keys():
-                if option in data_dict[u'filters']:
-                    del data_dict[u'filters'][option]
-        return data_dict
-
-    def datastore_search(self, context, data_dict, all_field_ids, query_dict):
-        '''
-        ..seealso:: ckanext.datastore.interfaces.IDataStore.datastore_search
-        '''
-        # Add our options filters
-        if u'filters' in data_dict:
-            resource_show = toolkit.get_action(u'resource_show')
-            resource = resource_show(context, {
-                u'id': data_dict[u'resource_id']
-                })
-            options = resource_view_get_filter_options(resource)
-            for o in options:
-                if o in data_dict[u'filters'] and u'true' in data_dict[u'filters'][o]:
-                    if u'sql' in options[o]:
-                        query_dict[u'where'].append(options[o][u'sql'])
-                elif u'sql_false' in options[o]:
-                    query_dict[u'where'].append(options[o][u'sql_false'])
-
-        # Remove old field selection _f from search
-        try:
-            query_dict[u'filters'].pop(u'_f', None)
-        except KeyError:
-            pass
-
-        # Enhance the full text search, by adding support for double quoted expressions.
-        # We leave the full text search query intact (so we benefit from the full text
-        # index) and add an additional LIKE statement for each quoted group.
-        if u'q' in data_dict and not isinstance(data_dict[u'q'], dict):
-            for match in re.findall(u'"[^"]+"', data_dict[u'q']):
-                query_dict[u'where'].append((
-                    u'"{}"::text LIKE %s'.format(resource[u'id']),
-                    u'%' + match[1:-1] + u'%'
-                    ))
-
-        self.enforce_max_limit(query_dict)
-
-        # CKAN's field auto-completion uses full text search on individual fields.
-        # This causes problems because of stemming issues, and is quite slow on our
-        # data set (even with an appropriate index). We detect this type of queries and
-        # replace them with a LIKE query. We also cancel the count query which is not
-        # needed for this query and slows things down.
-        if u'q' in data_dict and isinstance(data_dict[u'q'], dict) and len(
-                data_dict[u'q']) == 1:
-            field_name = data_dict[u'q'].keys()[0]
-            if data_dict[u'fields'] == field_name and data_dict[u'q'][
-                field_name].endswith(u':*'):
-                escaped_field_name = u'"' + field_name.replace(u'"', u'') + u'"'
-                value = u'%' + data_dict[u'q'][field_name].replace(u':*', u'%')
-
-                query_dict = {
-                    u'distinct': True,
-                    u'limit': query_dict[u'limit'],
-                    u'offset': query_dict[u'offset'],
-                    u'sort': [escaped_field_name],
-                    u'where': [(escaped_field_name + u'::citext LIKE %s', value)],
-                    u'select': [escaped_field_name],
-                    u'ts_query': u'',
-                    u'count': False
-                    }
-        return query_dict
-
-    def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
-        '''
-        ..seealso:: ckanext.datastore.interfaces.IDataStore.datastore_delete
-        '''
-        return query_dict
-
-    ## IDataSolr
-    def datasolr_validate(self, context, data_dict, field_types):
-        '''
-        ..seealso:: ckanext.datasolr.interfaces.IDataSolr.datasolr_validate
-        '''
-        return self.datastore_validate(context, data_dict, field_types)
-
-    def datasolr_search(self, context, data_dict, field_types, query_dict):
-        '''
-        ..seealso:: ckanext.datasolr.interfaces.IDataSolr.datasolr_validate
-        '''
-        # Add our custom filters
-        if u'filters' in data_dict:
-            resource_show = toolkit.get_action(u'resource_show')
-            resource = resource_show(context, {
-                u'id': data_dict[u'resource_id']
-                })
-            options = resource_view_get_filter_options(resource)
-            for o in options:
-                if o in data_dict[u'filters'] and u'true' in data_dict[u'filters'][
-                    o] and u'solr' in options[o]:
-                    # By default filters are added as {filed_name}:*{value}* but some
-                    # filters might require special statements - so add them here
-                    query_dict.setdefault(u'filter_statements', {})[o] = options[o][
-                        u'solr']
-        self.enforce_max_limit(query_dict, u'rows')
-        return query_dict
-
-    @staticmethod
-    def enforce_max_limit(query_dict, field_name=u'limit'):
-        '''
-
-        :param query_dict:
-        :param field_name:  (Default value = u'limit')
-
-        '''
-        limit = query_dict.get(field_name, 0)
-        if MAX_LIMIT and limit > MAX_LIMIT:
-            query_dict[field_name] = MAX_LIMIT
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
@@ -520,9 +488,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         '''
         return {
-            u'title': u'DwC associated media',
-            u'resource_type': [u'dwc', u'csv'],
-            u'field_type': [u'json']
+            'title': 'DwC associated media',
+            'resource_type': ['dwc', 'csv', 'tsv'],
+            'field_type': ['json']
             }
 
     ## IGalleryImage
@@ -531,39 +499,33 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
         '''
         images = []
-        try:
-            image_json = json.loads(raw_images)
-        except ValueError:
-            # Cannot parse field, ignore it
-            pass
-        except TypeError:
-            # Has the wrong image field been selected?
-            pass
-        else:
-            for i in image_json:
-                title = []
-                for title_field in [u'scientificName', u'catalogNumber']:
-                    if record.get(title_field, None):
-                        title.append(record.get(title_field))
-                copyright = u'%s<br />&copy; %s' % (
-                    toolkit.h.link_to(i[u'license'], i[u'license'], target=u'_blank'),
-                    i[u'rightsHolder']
-                    )
-                images.append({
-                    u'href': i[u'identifier'],
-                    u'thumbnail': i[u'identifier'].replace(u'preview', u'thumbnail'),
-                    u'link': toolkit.url_for(u'record.view',
-                        package_name=data_dict[u'package'][u'name'],
-                        resource_id=data_dict[u'resource'][u'id'],
-                        record_id=record[u'_id']
-                        ),
-                    u'copyright': copyright,
-                    # Description of image in gallery view
-                    u'description': literal(
-                        u''.join([u'<span>%s</span>' % t for t in title])),
-                    u'title': u' - '.join(title),
-                    u'record_id': record[u'_id']
-                    })
+        title_field = data_dict['resource_view'].get('image_title', None)
+        for image in raw_images:
+            title = []
+            if title_field and title_field in record:
+                title.append(record[title_field])
+            title.append(image.get('title', str(image['_id'])))
+
+            copyright = '%s<br />&copy; %s' % (
+                h.link_to(image['license'], image['license'], target='_blank'),
+                image['rightsHolder']
+                )
+            images.append({
+                'href': image['identifier'],
+                'thumbnail': image['identifier'].replace('preview', 'thumbnail'),
+                'link': h.url_for(
+                    controller='ckanext.nhm.controllers.record:RecordController',
+                    action='view',
+                    package_name=data_dict['package']['name'],
+                    resource_id=data_dict['resource']['id'],
+                    record_id=record['_id']
+                    ),
+                'copyright': copyright,
+                # Description of image in gallery view
+                'description': literal(''.join(['<span>%s</span>' % t for t in title])),
+                'title': ' - '.join(title),
+                'record_id': record['_id']
+                })
         return images
 
     ## ICkanPackager
@@ -582,12 +544,155 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         '''
         resource = toolkit.get_action(u'resource_show')(None, {
             u'id': resource_id
-        })
+            })
         package = toolkit.get_action(u'package_show')(None, {
             u'id': package_id
-        })
+            })
         if resource.get(u'datastore_active', False) and resource.get(u'format',
-                                                                    u'').lower() == u'dwc':
+                                                                     u'').lower() == \
+                u'dwc':
             # if it's a datastore resource and it's in the DwC format, add EML
             request_params[u'eml'] = generate_eml(package, resource)
         return packager_url, request_params
+
+    # IVersionedDatastore
+    def datastore_modify_data_dict(self, context, data_dict):
+        '''
+        This function allows overriding of the data dict before datastore_search gets
+        to it. We use
+        this opportunity to:
+
+            - remove any of our custom filter options (has image, lat long only etc)
+            and add info
+              to the context so that we can pick them up and handle them in
+              datastore_modify_search.
+              This is necessary because we define the actual query the filter options
+              use in the
+              elasticsearch-dsl lib's objects and therefore need to modify the actual
+              search object
+              prior to it being sent to the elasticsearch server.
+
+            - alter the sort if the resource being searched is one of the EMu ones,
+            this allows us
+              to enforce a modified by sort order instead of the default and therefore
+              means we can
+              show the last changed EMu data first
+
+        :param context: the context dict
+        :param data_dict: the data dict
+        :return: the modified data dict
+        '''
+        # remove our custom filters from the filters dict, we'll add them ourselves in
+        # the modify
+        # search function below
+        if u'filters' in data_dict:
+            # figure out which options are available for this resource
+            resource_show = p.toolkit.get_action(u'resource_show')
+            resource = resource_show(context, {
+                u'id': data_dict[u'resource_id']
+                })
+            options = resource_view_get_filter_options(resource)
+            # we'll store the filters that need applying on the context to avoid
+            # repeating our work
+            # in the modify search function below
+            context[u'option_filters'] = []
+            for option in options:
+                if option.name in data_dict[u'filters']:
+                    # if the option is in the filters, delete it and add it's filter
+                    # to the context
+                    del data_dict[u'filters'][option.name]
+                    context[u'option_filters'].append(option.filter_dsl)
+
+        if u'sort' not in data_dict:
+            # by default sort the EMu resources by modified so that the latest records
+            # are first
+            if data_dict['resource_id'] in {helpers.get_specimen_resource_id(),
+                                            helpers.get_artefact_resource_id(),
+                                            helpers.get_indexlot_resource_id()}:
+                data_dict['sort'] = ['modified desc']
+
+        return data_dict
+
+    # IVersionedDatastore
+    def datastore_modify_search(self, context, original_data_dict, data_dict, search):
+        '''
+        This function allows us to modify the search object itself before it is
+        serialised and sent
+        to elasticsearch. In this function we currently only do one thing: add the actual
+        elasticsearch query DSL for each filter option that was removed in the
+        datastore_modify_data_dict above (they are stored in the context so that we
+        can identify
+        which ones to add in).
+
+        :param context: the context dict
+        :param original_data_dict: the original data dict before any plugins modified it
+        :param data_dict: the data dict after all plugins have had a chance to modify it
+        :param search: the search object itself
+        :return: the modified search object
+        '''
+        # add our custom filters by looping through the filter dsl objects on the
+        # context. These are
+        # added by the datastore_modify_data_dict function above if any of our custom
+        # filters exist
+        for filter_dsl in context.pop(u'option_filters', []):
+            # add the filter to the search
+            search = search.filter(filter_dsl)
+        return search
+
+    # IVersionedDatastore
+    def datastore_modify_result(self, context, original_data_dict, data_dict, result):
+        # we don't do anything to the result currently
+        return result
+
+    # IVersionedDatastore
+    def datastore_modify_fields(self, resource_id, mapping, fields):
+        '''
+        This function allows us to modify the field definitions before they are
+        returned as part of
+        the datastore_search action. All we do here is just modify the associatedMedia
+        field if it
+        exists to ensure it is treated as an array.
+
+        :param resource_id: the resource id
+        :param mapping: the original mapping dict returned by elasticsearch from which
+        the field
+                        info has been derived
+        :param fields: the fields dict itself
+        :return: the fields dict
+        '''
+        # if we're dealing with one of our EMu backed resources and the
+        # associatedMedia field is
+        # present set its type to array rather than string (the default). This isn't
+        # really
+        # necessary from recline's point of view as we override the render of this
+        # field's data
+        # anyway, but for completeness and correctness we'll do the override
+        if resource_id in {helpers.get_specimen_resource_id(),
+                           helpers.get_artefact_resource_id(),
+                           helpers.get_indexlot_resource_id()}:
+            for field_def in fields:
+                if field_def['id'] == 'associatedMedia':
+                    field_def['type'] = 'array'
+                    field_def['sortable'] = False
+        return fields
+
+    # IVersionedDatastore
+    def datastore_modify_index_doc(self, resource_id, index_doc):
+        return index_doc
+
+    # IVersionedDatastore
+    def datastore_is_read_only_resource(self, resource_id):
+        # we don't want any of the versioned datastore ingestion and indexing code modifying the
+        # collections data as we manage it all through the data importer
+        return resource_id in {helpers.get_specimen_resource_id(),
+                               helpers.get_artefact_resource_id(),
+                               helpers.get_indexlot_resource_id()}
+
+    # IVersionedDatastore
+    def datastore_after_indexing(self, request, eevee_stats, stats_id):
+        try:
+            # whenever anything is indexed, we should clear the cache, catch exceptions on failures
+            # and only wait a couple of seconds for the request to complete
+            requests.request(u'purge', config.get(u'ckan.site_url'), timeout=2)
+        except:
+            pass

@@ -4,7 +4,7 @@
     {% if not to_preview and h.resource_view_is_filterable(resource_view) %}
       {% snippet 'package/snippets/resource_view_search.html', resource_view=resource_view, resource=resource, package=package %}
 
-      {% if h.is_datasolr_resource(resource['id']) %}
+      {% if h.is_datastore_resource(resource['id']) %}
         {% set facets = h.get_resource_facets(resource) %}
       {% endif %}
     {% endif %}

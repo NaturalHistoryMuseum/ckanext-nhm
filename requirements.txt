@@ -3,13 +3,11 @@ amqp==1.4.0
 anyjson==0.3.3
 billiard==3.3.0.13
 celery==3.1.7
--e git+https://github.com/NaturalHistoryMuseum/ckanext-spatial.git@ckan-upgrade-2.8.0a#egg=ckanext-spatial
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-spatial.git#egg=ckanext-spatial
 -e git+https://github.com/okfn/ckanext-issues.git#egg=ckanext-issues
 -e git+https://github.com/ckan/ckanext-viewhelpers.git#egg=ckanext_viewhelpers
 -e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext_dcat
 -e git+https://github.com/ckan/ckanext-pdfview.git#egg=ckanext_pdfview
--e git+https://github.com/NaturalHistoryMuseum/ckanext-feedback.git@ckan-upgrade-2.8.0a#egg=ckanext_feedback
--e git+https://github.com/NaturalHistoryMuseum/ckanext-map.git@ckan-upgrade-2.8.0a#egg=ckanext-map
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-contact.git@ckan-upgrade-2.8.0a#egg=ckanext-contact
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-doi.git@ckan-upgrade-2.8.0a#egg=ckanext-doi
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-ga-report.git@ckan-upgrade-2.8.0a#egg=ckanext-ga-report
@@ -21,14 +19,17 @@ celery==3.1.7
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-dataspatial.git@ckan-upgrade-2.8.0a#egg=ckanext_dataspatial
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-video.git@ckan-upgrade-2.8.0a#egg=ckanext_video
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-gbif.git@ckan-upgrade-2.8.0a#egg=ckanext_gbif
--e git+https://github.com/NaturalHistoryMuseum/ckanext-datasolr.git@ckan-upgrade-2.8.0a#egg=ckanext_datasolr
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-statistics.git@ckan-upgrade-2.8.0a#egg=ckanext_statistics
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-list.git@ckan-upgrade-2.8.0a#egg=ckanext_list
--e git+https://github.com/NaturalHistoryMuseum/ckanext-solr-heatmap.git@ckan-upgrade-2.8.0a#egg=ckanext_solr_heatmap
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-status.git@ckan-upgrade-2.8.0a#egg=ckanext_status
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-twitter.git@ckan-upgrade-2.8.0a#egg=ckanext_twitter
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-sketchfab.git#egg=ckanext_sketchfab
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore.git#egg=ckanext_versioned_datastore
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-tiledmap.git#egg=ckanext_versioned_tiledmap
+-e git+https://github.com/NaturalHistoryMuseum/ckanext-query-dois.git#egg=ckanext_query_dois
+-e git+https://github.com/ckan/ckanext-rq.git#egg=ckanext_rq
 pytz==2013.9
 python-memcached==1.53
-lxml==3.4.4
+lxml>=3.4.4
 Shapely<1.3
 raven==6.0.0

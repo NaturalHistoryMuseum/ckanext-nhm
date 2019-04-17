@@ -4,8 +4,10 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
+import itertools
 import json
 import logging
+import time
 import urllib
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
@@ -21,15 +23,12 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree
-from solr import SolrException
 from webhelpers.html import literal
 
-import ckan.model as model
-from ckan.lib.helpers import (_datestamp_to_datetime,
-                              get_allowed_view_types as core_get_allowed_view_types,
-                              _url_with_params)
+from ckan import model
 from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
@@ -267,30 +266,31 @@ def get_indexlot_resource_id():
     return unicode(value) if value is not None else None
 
 
-@cache_region(u'permanent', u'collection_stats')
+def get_artefact_resource_id():
+    """
+    @return:  ID for artefact resource
+    """
+    return toolkit.config.get(u'ckanext.nhm.artefact_resource_id')
+
+
+@cache_region('permanent', 'collection_stats')
 def collection_stats():
     '''Get collection stats, grouped by Collection code.'''
     resource_id = get_specimen_resource_id()
     total = 0
     collections = OrderedDict()
-    search_params = dict(resource_id=resource_id, limit=0, facets=[u'collectionCode'],
-                         facets_limit=5,
-                         # Get an extra facet, so we can determine if there are more
-                         )
+    search_params = dict(
+        resource_id=resource_id,
+        # use limit 0 as we're not interested in getting any results, just the facet
+        # counts
+        limit=0,
+        facets=[u'collectionCode'],
+        )
 
-    context = {
-        u'user': toolkit.c.user
-        }
-    try:
-        search = toolkit.get_action(u'datastore_search')(context=context,
-                                                         data_dict=search_params)
-    except SolrException:
-        pass
-    else:
-        for collection_code, num in search[u'facets'][u'facet_fields'][
-            u'collectionCode'].items():
-            collections[collection_code] = num
-            total += num
+    result = toolkit.get_action(u'datastore_search')({}, search_params)
+    for collection_code, num in result[u'facets'][u'collectionCode']['values'].items():
+        collections[collection_code] = num
+        total += num
 
     stats = {
         u'total': total,
@@ -373,18 +373,22 @@ def persistent_follow_button(obj_type, obj_id):
                              obj_type=obj_type)
 
 
-def filter_resource_items(key):
-    '''Filter resource items - if key is in blacklist, return false
-
-    :param key: return: boolean
-    :returns: boolean
-
+def filter_and_format_resource_items(resource):
     '''
+    Given a resource, return the items from it that are whitelisted for display and
+    format them.
 
-    blacklist = [u'image field', u'title field', u'datastore active', u'has views',
-                 u'on same domain', u'resource group id', u'revision id', u'url type']
-
-    return key.strip() not in blacklist
+    :param resource: the resource dict
+    :return: a list of made up of 2-tuples containing formatted keys and values from
+    the resource
+    '''
+    blacklist = {'_image_field', '_title_field', 'datastore_active', 'has_views',
+                 'on_same_domain', 'resource_group_id', 'revision_id', 'url_type'}
+    items = []
+    for key, value in resource.items():
+        if key not in blacklist:
+            items.append((key, value))
+    return toolkit.h.format_resource_items(items)
 
 
 def get_map_styles():
@@ -533,11 +537,12 @@ def get_resource_filter_options(resource, resource_view):
         else:
             filters[key].append(value)
     result = {}
-    for o in options:
-        if options[o].get(u'hide', False):
+    for option in options:
+        if option.hide:
             continue
-        result[o] = options[o]
-        result[o][u'checked'] = o in filters and u'true' in filters[o]
+        result[option.name] = option.as_dict()
+        result[option.name]['checked'] = option.name in filters and 'true' in filters[
+            option.name]
     return result
 
 
@@ -565,7 +570,7 @@ def get_allowed_view_types(resource, package):
 
     '''
 
-    view_types = core_get_allowed_view_types(resource, package)
+    view_types = toolkit.h.core_get_allowed_view_types(resource, package)
     blacklisted_types = [u'image']
 
     filtered_types = []
@@ -769,30 +774,22 @@ def get_image_licence_options():
 
 
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
-    '''Generate social share text for a package
-
-    :param pkg_dict: (optional, default: None)
-    :param res_dict: (optional, default: None)
-    :param rec_dict: (optional, default: None)
-
-    '''
-
-    text = list()
-
+    """
+    Generate social share text for a package
+    @param pkg_dict:
+    @return:
+    """
+    text = []
     if rec_dict:
-
-        try:
-            title = rec_dict.get(res_dict[u'_title_field'], None) or u'Record %s' % \
-                    rec_dict[u'_id']
-        except KeyError:
-            title = u'Record %s' % rec_dict[u'_id']
-
-        text.append(title)
-
+        title_field = res_dict.get(u'_title_field', None)
+        if title_field and rec_dict.get(title_field, None):
+            text.append(rec_dict[title_field])
+        else:
+            text.append(u'Record {}'.format(rec_dict[u'_id']))
     elif res_dict:
-        text.append(u'%s' % (res_dict[u'name']))
+        text.append(res_dict[u'name'])
     elif pkg_dict:
-        text.append(u'%s' % (pkg_dict[u'title'] or pkg_dict[u'name']))
+        text.append(pkg_dict[u'title'] or pkg_dict[u'name'])
 
     text.append(u'on the @NHM_London Data Portal')
 
@@ -801,9 +798,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     except KeyError:
         pass
 
-    text = u' '.join(text)
-
-    return urllib.quote(text.encode(u'utf8'))
+    return urllib.quote(u' '.join(map(unicode, text)).encode(u'utf8'))
 
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
@@ -851,7 +846,8 @@ def dataset_author_truncate(author_str):
 
         return literal(
             u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(
-                shortened, author_str))
+                shortened,
+                author_str))
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
@@ -874,7 +870,7 @@ def get_resource_facets(resource):
     # Number of facets to display
     num_facets = 10
     resource_view = resource_view_get_view(resource)
-    # If facets aren't defined in the resource view, then just return
+    # if facets aren't defined in the resource view, then just return
     if not resource_view.field_facets:
         return
     context = {
@@ -888,77 +884,69 @@ def get_resource_facets(resource):
 
     # Convert filters to a dictionary as this won't happen automatically
     # as we're retrieving raw get parameters from get_query_params
-    filters = {}
-    if query_params.get(u'filters'):
-        for f in query_params.get(u'filters').split(u'|'):
-            filter_field, filter_value = f.split(u':', 1)
-            filters.setdefault(filter_field, []).append(filter_value)
+    filters = defaultdict(list)
+    if query_params.get('filters'):
+        for f in query_params.get('filters').split('|'):
+            filter_field, filter_value = f.split(':', 1)
+            filters[filter_field].append(filter_value)
 
-    search_params = dict(resource_id=resource.get(u'id'), limit=0,
-                         facets=resource_view.field_facets,
-                         q=query_params.get(u'q', None), filters=filters,
-                         facets_limit=num_facets + 1,
-                         # Get an extra facet, so we can determine if there are more
-                         )
+    search_params = dict(
+        resource_id=resource.get('id'),
+        # use limit 0 as we're not interested in getting any results, just the facets
+        limit=0,
+        facets=resource_view.field_facets,
+        q=query_params.get('q', None),
+        filters=filters,
+        )
 
+    # if the show more button is clicked, a parameter is added to the query which
+    # informs us we need
+    # to show more facets, so use 50 for the facet limit on the given field
     for field_name in resource_view.field_facets:
-        if toolkit.h.get_param_int(u'_%s_limit' % field_name) == 0:
-            search_params.setdefault(u'facets_field_limit', {})[field_name] = 50
+        if toolkit.h.get_param_int(u'_{}_limit'.format(field_name)) == 0:
+            search_params.setdefault(u'facet_limits', {})[field_name] = 50
 
     search = toolkit.get_action(u'datastore_search')(context, search_params)
     facets = []
 
     # dictionary of facet name => formatter function with camel_case_to_string defined
-    # as the default formatting function and then any overrides for specific edge cases
+    # as the
+    # default formatting function and then any overrides for specific edge cases
     facet_label_formatters = defaultdict(lambda: camel_case_to_string, **{
         # specific lambda for GBIF to ensure it's capitalised correctly
         u'gbifIssue': lambda _: u'GBIF Issue'
         })
 
     # Dictionary of field name => formatter function
-    # Pass facet value to a formatter to get a better facet item label
-    facet_field_label_formatters = {
-        u'collectionCode': get_department
-        }
+    # Pass facet value to a formatter to get a better facet item label, if the facet
+    # doesn't have a
+    # formatter defined then the value is just used as is
+    facet_field_label_formatters = defaultdict(lambda: (lambda v: v.capitalize()), **{
+        'collectionCode': get_department
+        })
 
     # Loop through original facets to ensure order is preserved
     for field_name in resource_view.field_facets:
-        # Parse the facets into a list of dictionary values, similar to that
-        # Built for the dataset search solr facets
-        active_facet = field_name in filters
-        facet = {
-            u'name': field_name,
-            u'label': facet_label_formatters[field_name](field_name),
-            u'facet_values': [],
-            u'has_more': len(search[u'facets'][u'facet_fields'][
-                                 field_name]) > num_facets and field_name not in
-                         search_params.get(
-                             u'facets_field_limit', {}),
-            u'active': active_facet
-            }
-
-        for value, count in search[u'facets'][u'facet_fields'][field_name].items():
-            label = value
-            try:
-                label = facet_field_label_formatters[field_name](label)
-            except KeyError:
-                pass
-            facet[u'facet_values'].append({
-                u'name': value,
-                u'label': label,
-                u'count': count,
-                })
-
-        facet[u'facet_values'] = sorted(facet[u'facet_values'], key=itemgetter(u'count'),
-                                        reverse=True)
-        # If this is the active facet, only show the highest item
-        if active_facet:
-            facet[u'facet_values'] = facet[u'facet_values'][:1]
-        # Slice the facet values, so length matches num_facets - need to do this after
-        #  the key sort
-        if facet[u'has_more']:
-            facet[u'facet_values'] = facet[u'facet_values'][0:num_facets]
-        facets.append(facet)
+        # parse the facets into a list of dictionary values
+        facets.append({
+            'name': field_name,
+            'label': facet_label_formatters[field_name](field_name),
+            'active': field_name in filters,
+            'has_more': search['facets'][field_name]['details'][
+                            'sum_other_doc_count'] > 0,
+            'facet_values': [
+                {
+                    'name': value,
+                    'label': facet_field_label_formatters[field_name](value),
+                    'count': count,
+                    'active': field_name in filters and value in filters[field_name],
+                    # loop over the top values, sorted by count desc so that the top
+                    # value is first
+                    } for value, count in
+                sorted(search['facets'][field_name]['values'].items(),
+                       key=itemgetter(1), reverse=True)
+                ]
+            })
 
     return facets
 
@@ -968,10 +956,10 @@ def remove_url_filter(field, value, extras=None):
     multiple filters which are concatenated with |, not separate query params
     This replaces remove_url_param for filters
 
-    :param field: param value:
-    :param extras: (optional, default: None)
-    :param value: 
-
+    :param field: the field to remove the filter for
+    :param value: the value of the field to remove the filter for
+    :param extras: extra parameters to include in the created URL
+    :return: a URL
     '''
 
     params = dict(toolkit.request.params)
@@ -1016,15 +1004,14 @@ def add_url_filter(field, value, extras=None):
 
     :param field:
     :param extras:
-    :param value: 
-
+    :param value:
     '''
 
     params = {k: v for k, v in toolkit.request.params.items() if k != 'page'}
     url_filter = u'%s:%s' % (field, value)
     filters = u'|'.join(params.get(u'filters', u'').split('|') + [url_filter])
     params[u'filters'] = filters
-    return _url_with_params(toolkit.request.base_url, params.items())
+    return toolkit.h._url_with_params(toolkit.request.base_url, params.items())
 
 
 def parse_request_filters():
@@ -1052,7 +1039,7 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     get_resource_field_groups
 
     :param resource: param package:
-    :param package: 
+    :param package:
     :param resource_view:  (optional, default: None)
 
     '''
@@ -1063,54 +1050,69 @@ def get_resource_filter_pills(package, resource, resource_view=None):
         u'resource_id': resource[u'id']
         }
 
+    # there are some special filter field names provided by versioned-datastore which
+    # should have
+    # their values formatted differently to normal filter values
+    special = {
+        # display a human readable timestamp
+        u'__version__': lambda value: [time.strftime('%Y/%m/%d, %H:%M:%S',
+                                                     time.localtime(int(v) / 1000)) for v
+                                       in value],
+        # display the type of the GeoJSON filter
+        u'__geo__': lambda value: [json.loads(v)[u'type'] for v in filter_value],
+        }
+
     pills = []
 
     for filter_field, filter_value in filter_dict.items():
-        # If the field name stars with an underscore, don't include it in the pills
-        if filter_field.startswith(u'_'):
+        # if the field name stars with an underscore, don't include it in the pills (
+        # unless it's
+        # special!)
+        if filter_field.startswith(u'_') and filter_field not in special:
             continue
-        # Remove filter from url function
+
+        # remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
+
         pills.append({
             u'label': camel_case_to_string(filter_field),
             u'field': filter_field,
-            u'value': u' '.join(filter_value),
-            u'href': href
+            # if the filter isn't a special one, just use the value
+            u'value': u' '.join(
+                special.get(filter_field, lambda value: value)(filter_value)),
+            u'href': href,
             })
 
     return pills
 
 
 def resource_view_get_filterable_fields(resource):
-    '''
+    """
+    Retrieves the fields that can be filtered on.
 
-    :param resource: 
-
-    '''
-
-    filterable_field_types = [u'int', u'text', u'numeric']
-
-    if not resource.get(u'datastore_active'):
+    @return: a list of sorted fields
+    """
+    # if this isn't a datastore resource, return an empty list
+    if not resource.get('datastore_active'):
         return []
 
+    # otherwise, query the datastore for the fields
     data = {
-        u'resource_id': resource[u'id'],
-        u'limit': 0,
-        # As these are for the filters, only get the indexed fields
-        u'indexed_only': True
+        'resource_id': resource['id'],
+        'limit': 0,
         }
+    fields = toolkit.get_action('datastore_search')({}, data).get('fields', [])
 
-    result = toolkit.get_action(u'datastore_search')({}, data)
-
-    fields = [f[u'id'] for f in result.get(u'fields', []) if
-              f[u'type'] in filterable_field_types]
-    return sorted(fields)
+    # sort and filter the fields ensuring we only return string type fields and don't
+    # return the id
+    # field
+    return sorted(f['id'] for f in fields if f['type'] == 'string' and f['id'] != '_id')
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
     '''
 
-    :param resource: 
+    :param resource:
     :param allow_empty:  (optional, default: True)
 
     '''
@@ -1118,43 +1120,69 @@ def form_select_datastore_field_options(resource, allow_empty=True):
     return list_to_form_options(fields, allow_empty)
 
 
-def get_last_resource_update_for_package(pkg_dict, date_format=None):
+def _get_latest_update(package_or_resource_dicts):
     '''
-    Returns the most recent update datetime across all resources in this
-    package. If there is no update time found then 'unknown' is returned. If
-    there is datetime found then it is rendered using the standard ckan helper.
+    Given a sequence of package and/or resource dicts, returns the most recent update
+    datetime
+    available from them, or None if there is no update datetime found.
+
+    :param package_or_resource_dicts: a sequence of the package or resource dicts
+    :return: a 2-tuple containing the latest datetime and the dict from which it came,
+    if no times
+             are found then (None, None) is returned
+    '''
+    # a list of fields on the resource that should contain update dates
+    fields = [u'last_modified', u'revision_timestamp', u'Created']
+
+    latest_dict = None
+    latest_date = None
+    for package_or_resource_dict in package_or_resource_dicts:
+        for field in fields:
+            date = toolkit.h._datestamp_to_datetime(package_or_resource_dict.get(field, None))
+            if date is not None and (latest_date is None or date > latest_date):
+                latest_date = date
+                latest_dict = package_or_resource_dict
+
+    return latest_date, latest_dict
+
+
+def get_latest_update_for_package(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime (formatted as a string) for the package
+    and its
+    resources. If there is no update time found then 'unknown' is returned. If there
+    is datetime
+    found then it is rendered using the standard ckan helper.
+
     :param pkg_dict:        the package dict
     :param date_format:     date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime and the
-    resource name
+    :return: 'unknown' or a string containing the rendered datetime
     '''
+    latest_date, _ = _get_latest_update(
+        itertools.chain([pkg_dict], pkg_dict.get(u'resources', [])))
+    if latest_date is not None:
+        return toolkit.h.render_datetime(latest_date, date_format=date_format)
+    else:
+        return _(u'unknown')
 
-    def get_resource_last_update(resource):
-        '''
-        Given a resource dict, return the most recent update time available from
-        it, or None if there is no update time.
-        :param resource:    the resource dict
-        :return: a datetime or None
-        '''
-        # a list of fields on the resource that should contain update dates
-        fields = [u'last_modified', u'revision_timestamp', u'Created']
-        # find the available update dates on the resource and filter out Nones
-        update_dates = filter(None,
-                              [_datestamp_to_datetime(resource.get(field, None)) for
-                               field in fields])
-        # return the latest non-None value, or None
-        return max(update_dates) if update_dates else None
 
-    # find the latest update date for each resource using the above function and
-    # then filter out the ones that don't have an update date available
-    dates_and_names = filter(lambda x: x[0],
-                             [(get_resource_last_update(r), r[u'name']) for r in
-                              pkg_dict[u'resources']])
-    if dates_and_names:
-        # find the most recent date and name combo
-        date, name = max(dates_and_names, key=lambda x: x[0])
+def get_latest_update_for_package_resources(pkg_dict, date_format=None):
+    '''
+    Returns the most recent update datetime (formatted as a string) across all
+    resources in this
+    package. If there is no update time found then 'unknown' is returned. If there is
+    datetime found
+    then it is rendered using the standard ckan helper.
+
+    :param pkg_dict:        the package dict
+    :param date_format:     date format for the return datetime
+    :return: 'unknown' or a string containing the rendered datetime and the resource name
+    '''
+    latest_date, latest_resource = _get_latest_update(pkg_dict.get(u'resources', []))
+    if latest_date is not None:
+        name = latest_resource[u'name']
         return u'{} ({})'.format(
-            toolkit.h.render_datetime(date, date_format=date_format), name)
+            toolkit.h.render_datetime(latest_date, date_format=date_format), name)
     # there is no available update so we return 'unknown'
     return toolkit._(u'unknown')
 
@@ -1176,3 +1204,88 @@ def get_external_links(record):
             [(rank, link.format(rank)) for rank in ranks.values()]))
                 for name, icon, link in sites]
     return []
+
+
+def render_epoch(epoch_timestamp, in_milliseconds=True,
+                 date_format=u'%Y-%m-%d %H:%M:%S (UTC)'):
+    '''
+    Renders an epoch timestamp in the given date format. The timestamp is rendered in
+    UTC.
+
+    :param epoch_timestamp: the timestamp, represented as the number of seconds (or
+    milliseconds if
+                            in_milliseconds is True) since the UNIX epoch
+    :param in_milliseconds: whether the timestamp is in milliseconds or seconds. By
+    default this is
+                            True and therefore the timestamp is expected to be in
+                            milliseconds
+    :param date_format: the output format. This will be passed straight to datetime's
+    strftime
+                        function and therefore uses its keywords etc. Defaults to:
+                        %Y-%m-%d %H:%M:%S (UTC)
+    :return: a string rendering of the timestamp using the
+    '''
+    if in_milliseconds:
+        epoch_timestamp = epoch_timestamp / 1000
+    return datetime.utcfromtimestamp(epoch_timestamp).strftime(date_format)
+
+
+def get_object_url(resource_id, guid, version=None):
+    '''
+    Retrieves the object url for the given guid in the given resource with the given
+    version. If the
+    version is None then the latest version of the resource is used.
+
+    The version passed (if one is passed) is not used verbatim, a call to the
+    versioned search
+    extension is put in to retrieve the rounded version of the resource so that the
+    object url we
+    create is always correct.
+
+    :param resource_id: the resource id
+    :param guid: the guid of the object
+    :param version: the version (optional, default is None which means latest version)
+    :return: the object url
+    '''
+    rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
+        u'resource_id': resource_id,
+        u'version': version,
+        })
+    return toolkit.url_for(u'object_view_versioned', action=u'view', uuid=guid,
+                   version=rounded_version,
+                   qualified=True)
+
+
+def build_specimen_nav_items(package_name, resource_id, record_id, version=None):
+    '''
+    Creates the specimen nav items allowing the user to navigate to different views of
+    the specimen
+    record data. A list of nav items is returned.
+
+    :param package_name: the package name (or id)
+    :param resource_id: the resource id
+    :param record_id: the record id
+    :param version: the version of the record, or None if no version is present
+    :return: a list of nav items
+    '''
+    link_definitions = [
+        (u'record', toolkit._(u'Normal view')),
+        (u'dwc', toolkit._(u'Darwin Core view')),
+        ]
+    links = []
+    for route_name, link_text in link_definitions:
+        kwargs = {
+            u'package_name': package_name,
+            u'resource_id': resource_id,
+            u'record_id': record_id,
+            }
+        # if there's a version, alter the target of our nav item (the name of the
+        # route) and add the
+        # version to kwargs we're going to pass to the nav builder helper function
+        if version is not None:
+            route_name = u'{}_versioned'.format(route_name)
+            kwargs[u'version'] = version
+        # build the nav and add it to the list
+        links.append(toolkit.h.build_nav_icon(route_name, link_text, **kwargs))
+
+    return links

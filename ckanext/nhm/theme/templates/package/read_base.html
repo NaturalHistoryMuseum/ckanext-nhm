@@ -23,6 +23,10 @@
 
   {% block secondary_help_content %}{% endblock %}
 
+{% block recent_dois %}
+{% snippet "query_dois/snippets/recent_dois_sidebar.html", package_id=pkg['id'], number=3 %}
+{% endblock %}
+
 {# Pass package into social share links #}
 {% block package_social %}
     {% snippet "snippets/social.html", pkg_dict=g.pkg_dict %}

@@ -88,8 +88,12 @@ class NHMDCATProfile(RDFProfile):
         :return: context dict
 
         '''
-        user = toolkit.get_action(u'get_site_user')({u'ignore_auth': True}, {})
-        context = {u'user': user[u'name']}
+        user = toolkit.get_action(u'get_site_user')({
+                                                        u'ignore_auth': True
+                                                        }, {})
+        context = {
+            u'user': user[u'name']
+            }
         return context
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
@@ -418,10 +422,10 @@ class NHMDCATProfile(RDFProfile):
             g.add((object_uri, OWL.sameAs, URIRef(gbif_uri)))
             # If we have a GBIF country code, add it
             # Annoyingly, this seems to be the only geographic element on GBIF with URI
-            country_code = gbif_record.get(u'gbifCountryCode')
+            country_code = gbif_record.get(u'countryCode')
             if country_code:
                 g.add((object_uri, DWC.countryCode, URIRef(
-                        os.path.join(u'http://www.gbif.org/country', country_code))))
+                    os.path.join(u'http://www.gbif.org/country', country_code))))
 
         # Now, create the specimen object
         # Remove nulls and hidden fields from record_dict
@@ -439,28 +443,24 @@ class NHMDCATProfile(RDFProfile):
                 pass
 
         # Adding images as JSON is rubbish! So lets try and do it properly
-        try:
-            associated_media = record_dict.pop(u'associatedMedia')
-        except KeyError:
-            pass
-        else:
-            images = json.loads(associated_media)
-            for image in images:
-                image_uri = URIRef(image[u'identifier'])
-                g.set((image_uri, RDF.type, FOAF.Image))
-                title = image.get(u'title', None)
-                if title:
-                    g.set((image_uri, DC.title, Literal(title)))
-                g.set((image_uri, CC.license, URIRef(image[u'license'])))
-                g.set((image_uri, DC.RightsStatement, Literal(image[u'rightsHolder'])))
-                g.set((image_uri, DC.Format, Literal(image[u'format'])))
-                # Add link from image to object...
-                g.set((image_uri, FOAF.depicts, object_uri))
-                # And object to image
-                g.add((object_uri, FOAF.depiction, image_uri))
+        for image in record_dict.pop('associatedMedia', []):
+            image_uri = URIRef(image['identifier'])
+            g.set((image_uri, RDF.type, FOAF.Image))
+            title = image.get('title', None)
+            if title:
+                g.set((image_uri, DC.title, Literal(title)))
+            g.set((image_uri, CC.license, URIRef(image['license'])))
+            g.set((image_uri, DC.RightsStatement, Literal(image['rightsHolder'])))
+            g.set((image_uri, DC.Format, Literal(image['format'])))
+            # Add link from image to object...
+            g.set((image_uri, FOAF.depicts, object_uri))
+            # And object to image
+            g.add((object_uri, FOAF.depiction, image_uri))
 
         # This record belongs in X dataset
-        dataset_ref = URIRef(dataset_uri({u'id': package_id}) + u'#dataset')
+        dataset_ref = URIRef(dataset_uri({
+                                             u'id': package_id
+                                             }) + u'#dataset')
         g.add((object_uri, VOID.inDataset, dataset_ref))
 
         dwc_terms_dict = dwc_terms(record_dict.keys())
@@ -471,16 +471,12 @@ class NHMDCATProfile(RDFProfile):
         for group, terms in dwc_terms_dict.items():
             for uri, term in terms.items():
                 # Do we have a GBIF key value?
-                # Uppercase first letter of term and convert to
-                # GBIF key format => gbifGenusKey
-                uc_term = term[0].upper() + term[1:]
-                gbif_term_key = u'gbif%sKey' % uc_term
-                gbif_key = gbif_record.get(gbif_term_key)
+                gbif_key = gbif_record.get(term)
 
                 # Do we have a GBIF key value? If we do, we can provide a URI to GBIF
                 if gbif_key:
                     gbif_uri = URIRef(
-                            os.path.join(u'http://www.gbif.org/species', gbif_key))
+                        os.path.join(u'http://www.gbif.org/species', gbif_key))
                     # Add the GBIF species URI with label
                     g.add((gbif_uri, RDFS.label, Literal(record_dict.get(term))))
                     # And associated our specimen object's DWC term with the GBIF URI

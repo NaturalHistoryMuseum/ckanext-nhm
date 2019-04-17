@@ -7,6 +7,7 @@
 import logging
 from collections import OrderedDict
 
+from ckanext.nhm.lib.filter_options import has_image
 from ckanext.nhm.views.default import DefaultView
 
 from ckan.plugins import toolkit
@@ -19,16 +20,16 @@ class IndexLotView(DefaultView):
 
     resource_id = toolkit.config.get(u'ckanext.nhm.indexlot_resource_id')
 
-    field_facets = [u'family', u'type', u'taxonRank', u'imageCategory',
-                    u'kindOfMaterial']
+    field_facets = [
+        'family',
+        'type',
+        'taxonRank',
+        'associatedMedia.category',
+        'kindOfMaterial'
+        ]
 
     # Additional search filter options
-    filter_options = {
-        u'_has_image': {
-            u'label': u'Has images',
-            u'solr': u'_has_multimedia:true'
-            },
-        }
+    filter_options = [has_image]
 
     field_groups = OrderedDict(
         [(u'Classification', OrderedDict(
