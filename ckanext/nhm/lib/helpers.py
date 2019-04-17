@@ -273,7 +273,7 @@ def get_artefact_resource_id():
     return toolkit.config.get(u'ckanext.nhm.artefact_resource_id')
 
 
-@cache_region('permanent', 'collection_stats')
+@cache_region(u'permanent', u'collection_stats')
 def collection_stats():
     '''Get collection stats, grouped by Collection code.'''
     resource_id = get_specimen_resource_id()
@@ -288,7 +288,7 @@ def collection_stats():
         )
 
     result = toolkit.get_action(u'datastore_search')({}, search_params)
-    for collection_code, num in result[u'facets'][u'collectionCode']['values'].items():
+    for collection_code, num in result[u'facets'][u'collectionCode'][u'values'].items():
         collections[collection_code] = num
         total += num
 
@@ -382,8 +382,8 @@ def filter_and_format_resource_items(resource):
     :return: a list of made up of 2-tuples containing formatted keys and values from
     the resource
     '''
-    blacklist = {'_image_field', '_title_field', 'datastore_active', 'has_views',
-                 'on_same_domain', 'resource_group_id', 'revision_id', 'url_type'}
+    blacklist = {u'_image_field', u'_title_field', u'datastore_active', u'has_views',
+                 u'on_same_domain', u'resource_group_id', u'revision_id', u'url_type'}
     items = []
     for key, value in resource.items():
         if key not in blacklist:
@@ -541,7 +541,7 @@ def get_resource_filter_options(resource, resource_view):
         if option.hide:
             continue
         result[option.name] = option.as_dict()
-        result[option.name]['checked'] = option.name in filters and 'true' in filters[
+        result[option.name][u'checked'] = option.name in filters and u'true' in filters[
             option.name]
     return result
 
@@ -814,7 +814,7 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     gravatar_literal = toolkit.h.gravatar(email_hash, size, default)
     if userobj is not None:
         grav_xml = etree.fromstring(gravatar_literal)
-        grav_xml.attrib['alt'] = userobj.name
+        grav_xml.attrib[u'alt'] = userobj.name
         gravatar_literal = literal(etree.tostring(grav_xml))
 
     return gravatar_literal
@@ -885,17 +885,17 @@ def get_resource_facets(resource):
     # Convert filters to a dictionary as this won't happen automatically
     # as we're retrieving raw get parameters from get_query_params
     filters = defaultdict(list)
-    if query_params.get('filters'):
-        for f in query_params.get('filters').split('|'):
-            filter_field, filter_value = f.split(':', 1)
+    if query_params.get(u'filters'):
+        for f in query_params.get(u'filters').split(u'|'):
+            filter_field, filter_value = f.split(u':', 1)
             filters[filter_field].append(filter_value)
 
     search_params = dict(
-        resource_id=resource.get('id'),
+        resource_id=resource.get(u'id'),
         # use limit 0 as we're not interested in getting any results, just the facets
         limit=0,
         facets=resource_view.field_facets,
-        q=query_params.get('q', None),
+        q=query_params.get(u'q', None),
         filters=filters,
         )
 
@@ -922,28 +922,28 @@ def get_resource_facets(resource):
     # doesn't have a
     # formatter defined then the value is just used as is
     facet_field_label_formatters = defaultdict(lambda: (lambda v: v.capitalize()), **{
-        'collectionCode': get_department
+        u'collectionCode': get_department
         })
 
     # Loop through original facets to ensure order is preserved
     for field_name in resource_view.field_facets:
         # parse the facets into a list of dictionary values
         facets.append({
-            'name': field_name,
-            'label': facet_label_formatters[field_name](field_name),
-            'active': field_name in filters,
-            'has_more': search['facets'][field_name]['details'][
-                            'sum_other_doc_count'] > 0,
-            'facet_values': [
+            u'name': field_name,
+            u'label': facet_label_formatters[field_name](field_name),
+            u'active': field_name in filters,
+            u'has_more': search[u'facets'][field_name][u'details'][
+                            u'sum_other_doc_count'] > 0,
+            u'facet_values': [
                 {
-                    'name': value,
-                    'label': facet_field_label_formatters[field_name](value),
-                    'count': count,
-                    'active': field_name in filters and value in filters[field_name],
+                    u'name': value,
+                    u'label': facet_field_label_formatters[field_name](value),
+                    u'count': count,
+                    u'active': field_name in filters and value in filters[field_name],
                     # loop over the top values, sorted by count desc so that the top
                     # value is first
                     } for value, count in
-                sorted(search['facets'][field_name]['values'].items(),
+                sorted(search[u'facets'][field_name][u'values'].items(),
                        key=itemgetter(1), reverse=True)
                 ]
             })
@@ -1007,9 +1007,9 @@ def add_url_filter(field, value, extras=None):
     :param value:
     '''
 
-    params = {k: v for k, v in toolkit.request.params.items() if k != 'page'}
+    params = {k: v for k, v in toolkit.request.params.items() if k != u'page'}
     url_filter = u'%s:%s' % (field, value)
-    filters = u'|'.join(params.get(u'filters', u'').split('|') + [url_filter])
+    filters = u'|'.join(params.get(u'filters', u'').split(u'|') + [url_filter])
     params[u'filters'] = filters
     return toolkit.h._url_with_params(toolkit.request.base_url, params.items())
 
@@ -1055,7 +1055,7 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     # their values formatted differently to normal filter values
     special = {
         # display a human readable timestamp
-        u'__version__': lambda value: [time.strftime('%Y/%m/%d, %H:%M:%S',
+        u'__version__': lambda value: [time.strftime(u'%Y/%m/%d, %H:%M:%S',
                                                      time.localtime(int(v) / 1000)) for v
                                        in value],
         # display the type of the GeoJSON filter
@@ -1093,20 +1093,20 @@ def resource_view_get_filterable_fields(resource):
     @return: a list of sorted fields
     """
     # if this isn't a datastore resource, return an empty list
-    if not resource.get('datastore_active'):
+    if not resource.get(u'datastore_active'):
         return []
 
     # otherwise, query the datastore for the fields
     data = {
-        'resource_id': resource['id'],
-        'limit': 0,
+        u'resource_id': resource[u'id'],
+        u'limit': 0,
         }
-    fields = toolkit.get_action('datastore_search')({}, data).get('fields', [])
+    fields = toolkit.get_action(u'datastore_search')({}, data).get(u'fields', [])
 
     # sort and filter the fields ensuring we only return string type fields and don't
     # return the id
     # field
-    return sorted(f['id'] for f in fields if f['type'] == 'string' and f['id'] != '_id')
+    return sorted(f[u'id'] for f in fields if f[u'type'] == u'string' and f[u'id'] != u'_id')
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):

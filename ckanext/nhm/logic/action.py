@@ -42,16 +42,16 @@ def record_show(context, data_dict):
     record_id = toolkit.get_or_bust(data_dict, u'record_id')
 
     # Retrieve datastore record
-    record_data_dict = {'resource_id': resource_id, 'filters': {'_id': record_id}}
-    if 'version' in data_dict:
-        record_data_dict['version'] = data_dict['version']
-    search_result = get_action('datastore_search')(context, record_data_dict)
+    record_data_dict = {u'resource_id': resource_id, u'filters': {u'_id': record_id}}
+    if u'version' in data_dict:
+        record_data_dict[u'version'] = data_dict[u'version']
+    search_result = get_action(u'datastore_search')(context, record_data_dict)
 
     try:
         record = {
-            'data': search_result['records'][0],
-            'fields': search_result['fields'],
-            'resource_id': resource_id
+            u'data': search_result[u'records'][0],
+            u'fields': search_result[u'fields'],
+            u'resource_id': resource_id
         }
     except IndexError:
         # If we don't have a result, raise not found
@@ -134,7 +134,7 @@ def object_rdf(context, data_dict):
 
     # get the record
     version = data_dict.get(u'version', None)
-    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'], version)
+    record_dict, resource_dict = get_record_by_uuid(data_dict[u'uuid'], version)
     if record_dict:
         record_dict[u'uuid'] = data_dict[u'uuid']
         serializer = RDFSerializer()
@@ -157,7 +157,7 @@ def _image_exists_on_record(resource, record, asset_id):
 
     # Check the asset ID belongs to the record
     for image in record[image_field]:
-        url = image.get('identifier', None)
+        url = image.get(u'identifier', None)
         if asset_id in url:
             return True
     return False

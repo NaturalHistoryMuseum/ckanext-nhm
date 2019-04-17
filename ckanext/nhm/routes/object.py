@@ -82,7 +82,7 @@ def _context():
 
 
 @blueprint.route(u'/object/<uuid>.<_format>', defaults={
-    'version': None
+    u'version': None
     })
 @blueprint.route(u'/object/<uuid>/<int:version>.<_format>')
 def rdf(uuid, _format, version):
@@ -111,7 +111,7 @@ def rdf(uuid, _format, version):
 
 
 @blueprint.route(u'/object/<uuid>', defaults={
-    'version': None
+    u'version': None
     })
 @blueprint.route(u'/object/<uuid>/<int:version>')
 def view(uuid, version):

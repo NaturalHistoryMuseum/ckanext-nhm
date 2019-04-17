@@ -100,95 +100,95 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         '''
 
         # Add view record
-        _map.connect('record_versioned',
+        _map.connect(u'record_versioned',
                      '/dataset/{package_name}/resource/{resource_id}/record/{'
-                     'record_id}/{version}',
-                     controller='ckanext.nhm.controllers.record:RecordController',
-                     action='view', requirements={
-                'version': '\d+'
+                     u'record_id}/{version}',
+                     controller=u'ckanext.nhm.controllers.record:RecordController',
+                     action=u'view', requirements={
+                u'version': u'\d+'
                 })
-        _map.connect('record',
+        _map.connect(u'record',
                      '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                     controller='ckanext.nhm.controllers.record:RecordController',
-                     action='view')
+                     controller=u'ckanext.nhm.controllers.record:RecordController',
+                     action=u'view')
 
         # Add dwc view
-        _map.connect('dwc_versioned',
+        _map.connect(u'dwc_versioned',
                      '/dataset/{package_name}/resource/{resource_id}/record/{'
-                     'record_id}/dwc/{version}',
-                     controller='ckanext.nhm.controllers.record:RecordController',
-                     action='dwc', requirements={
-                'version': '\d+'
+                     u'record_id}/dwc/{version}',
+                     controller=u'ckanext.nhm.controllers.record:RecordController',
+                     action=u'dwc', requirements={
+                u'version': u'\d+'
                 })
-        _map.connect('dwc',
+        _map.connect(u'dwc',
                      '/dataset/{package_name}/resource/{resource_id}/record/{'
-                     'record_id}/dwc',
-                     controller='ckanext.nhm.controllers.record:RecordController',
-                     action='dwc')
+                     u'record_id}/dwc',
+                     controller=u'ckanext.nhm.controllers.record:RecordController',
+                     action=u'dwc')
 
         # About pages
-        _map.connect('about_citation', '/about/citation',
-                     controller='ckanext.nhm.controllers.about:AboutController',
-                     action='citation')
-        _map.connect('about_download', '/about/download',
-                     controller='ckanext.nhm.controllers.about:AboutController',
-                     action='download')
-        _map.connect('about_licensing', '/about/licensing',
-                     controller='ckanext.nhm.controllers.about:AboutController',
-                     action='licensing')
-        _map.connect('about_credits', '/about/credits',
-                     controller='ckanext.nhm.controllers.about:AboutController',
-                     action='credits')
+        _map.connect(u'about_citation', '/about/citation',
+                     controller=u'ckanext.nhm.controllers.about:AboutController',
+                     action=u'citation')
+        _map.connect(u'about_download', '/about/download',
+                     controller=u'ckanext.nhm.controllers.about:AboutController',
+                     action=u'download')
+        _map.connect(u'about_licensing', '/about/licensing',
+                     controller=u'ckanext.nhm.controllers.about:AboutController',
+                     action=u'licensing')
+        _map.connect(u'about_credits', '/about/credits',
+                     controller=u'ckanext.nhm.controllers.about:AboutController',
+                     action=u'credits')
 
         # Legal pages
-        _map.connect('legal_privacy', '/privacy',
-                     controller='ckanext.nhm.controllers.legal:LegalController',
-                     action='privacy')
-        _map.connect('legal_terms', '/terms-conditions',
-                     controller='ckanext.nhm.controllers.legal:LegalController',
-                     action='terms')
+        _map.connect(u'legal_privacy', '/privacy',
+                     controller=u'ckanext.nhm.controllers.legal:LegalController',
+                     action=u'privacy')
+        _map.connect(u'legal_terms', '/terms-conditions',
+                     controller=u'ckanext.nhm.controllers.legal:LegalController',
+                     action=u'terms')
 
         # About stats pages
-        _map.connect('stats_resources', '/about/statistics/resources',
-                     controller='ckanext.nhm.controllers.stats:StatsController',
-                     action='resources', ckan_icon='bar-chart')
-        _map.connect('stats_contributors', '/about/statistics/contributors',
-                     controller='ckanext.nhm.controllers.stats:StatsController',
-                     action='contributors', ckan_icon='user')
-        _map.connect('stats_records', '/about/statistics/records',
-                     controller='ckanext.nhm.controllers.stats:StatsController',
-                     action='records', ckan_icon='file-text')
+        _map.connect(u'stats_resources', '/about/statistics/resources',
+                     controller=u'ckanext.nhm.controllers.stats:StatsController',
+                     action=u'resources', ckan_icon=u'bar-chart')
+        _map.connect(u'stats_contributors', '/about/statistics/contributors',
+                     controller=u'ckanext.nhm.controllers.stats:StatsController',
+                     action=u'contributors', ckan_icon=u'user')
+        _map.connect(u'stats_records', '/about/statistics/records',
+                     controller=u'ckanext.nhm.controllers.stats:StatsController',
+                     action=u'records', ckan_icon=u'file-text')
 
         # Dataset metrics
-        _map.connect('dataset_metrics', '/dataset/metrics/{id}',
-                     controller='ckanext.nhm.controllers.stats:StatsController',
-                     action='dataset_metrics', ckan_icon='bar-chart')
+        _map.connect(u'dataset_metrics', '/dataset/metrics/{id}',
+                     controller=u'ckanext.nhm.controllers.stats:StatsController',
+                     action=u'dataset_metrics', ckan_icon=u'bar-chart')
         # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
-        object_controller = 'ckanext.nhm.controllers.object:ObjectController'
+        object_controller = u'ckanext.nhm.controllers.object:ObjectController'
 
-        _map.connect('object_rdf_versioned', '/object/{uuid}/{version}.{_format}',
-                     controller=object_controller, action='rdf',
+        _map.connect(u'object_rdf_versioned', '/object/{uuid}/{version}.{_format}',
+                     controller=object_controller, action=u'rdf',
                      requirements={
-                         '_format': 'xml|rdf|n3|ttl|jsonld',
-                         'version': '\d+'
+                         u'_format': u'xml|rdf|n3|ttl|jsonld',
+                         u'version': u'\d+'
                          })
 
-        _map.connect('object_rdf', '/object/{uuid}.{_format}',
-                     controller=object_controller, action='rdf',
+        _map.connect(u'object_rdf', '/object/{uuid}.{_format}',
+                     controller=object_controller, action=u'rdf',
                      requirements={
-                         '_format': 'xml|rdf|n3|ttl|jsonld'
+                         u'_format': u'xml|rdf|n3|ttl|jsonld'
                          })
 
         # Permalink for specimens - needs to come after the DCAT format dependent
-        _map.connect('object_view_versioned', '/object/{uuid}/{version}',
+        _map.connect(u'object_view_versioned', '/object/{uuid}/{version}',
                      controller=object_controller,
-                     action='view', requirements={
-                'version': '\d+'
+                     action=u'view', requirements={
+                u'version': u'\d+'
                 })
-        _map.connect('object_view', '/object/{uuid}',
+        _map.connect(u'object_view', '/object/{uuid}',
                      controller=object_controller,
-                     action='view')
+                     action=u'view')
 
         # Redirect the old specimen url to the object
         _map.redirect(u'/specimen/{url:.*}', u'/object/{url}')
@@ -488,9 +488,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         '''
         return {
-            'title': 'DwC associated media',
-            'resource_type': ['dwc', 'csv', 'tsv'],
-            'field_type': ['json']
+            u'title': u'DwC associated media',
+            u'resource_type': [u'dwc', u'csv', u'tsv'],
+            u'field_type': [u'json']
             }
 
     ## IGalleryImage
@@ -499,32 +499,32 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
         '''
         images = []
-        title_field = data_dict['resource_view'].get('image_title', None)
+        title_field = data_dict[u'resource_view'].get(u'image_title', None)
         for image in raw_images:
             title = []
             if title_field and title_field in record:
                 title.append(record[title_field])
-            title.append(image.get('title', str(image['_id'])))
+            title.append(image.get(u'title', str(image[u'_id'])))
 
-            copyright = '%s<br />&copy; %s' % (
-                h.link_to(image['license'], image['license'], target='_blank'),
-                image['rightsHolder']
+            copyright = u'%s<br />&copy; %s' % (
+                h.link_to(image[u'license'], image[u'license'], target=u'_blank'),
+                image[u'rightsHolder']
                 )
             images.append({
-                'href': image['identifier'],
-                'thumbnail': image['identifier'].replace('preview', 'thumbnail'),
-                'link': h.url_for(
-                    controller='ckanext.nhm.controllers.record:RecordController',
-                    action='view',
-                    package_name=data_dict['package']['name'],
-                    resource_id=data_dict['resource']['id'],
-                    record_id=record['_id']
+                u'href': image[u'identifier'],
+                u'thumbnail': image[u'identifier'].replace(u'preview', u'thumbnail'),
+                u'link': h.url_for(
+                    controller=u'ckanext.nhm.controllers.record:RecordController',
+                    action=u'view',
+                    package_name=data_dict[u'package'][u'name'],
+                    resource_id=data_dict[u'resource'][u'id'],
+                    record_id=record[u'_id']
                     ),
-                'copyright': copyright,
+                u'copyright': copyright,
                 # Description of image in gallery view
-                'description': literal(''.join(['<span>%s</span>' % t for t in title])),
-                'title': ' - '.join(title),
-                'record_id': record['_id']
+                u'description': literal(u''.join([u'<span>%s</span>' % t for t in title])),
+                u'title': u' - '.join(title),
+                u'record_id': record[u'_id']
                 })
         return images
 
@@ -606,10 +606,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         if u'sort' not in data_dict:
             # by default sort the EMu resources by modified so that the latest records
             # are first
-            if data_dict['resource_id'] in {helpers.get_specimen_resource_id(),
+            if data_dict[u'resource_id'] in {helpers.get_specimen_resource_id(),
                                             helpers.get_artefact_resource_id(),
                                             helpers.get_indexlot_resource_id()}:
-                data_dict['sort'] = ['modified desc']
+                data_dict[u'sort'] = [u'modified desc']
 
         return data_dict
 
@@ -671,9 +671,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                            helpers.get_artefact_resource_id(),
                            helpers.get_indexlot_resource_id()}:
             for field_def in fields:
-                if field_def['id'] == 'associatedMedia':
-                    field_def['type'] = 'array'
-                    field_def['sortable'] = False
+                if field_def[u'id'] == u'associatedMedia':
+                    field_def[u'type'] = u'array'
+                    field_def[u'sortable'] = False
         return fields
 
     # IVersionedDatastore

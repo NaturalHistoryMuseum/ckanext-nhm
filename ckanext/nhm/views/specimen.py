@@ -26,12 +26,12 @@ class SpecimenView(DefaultView):
     grid_column_widths = DarwinCoreView.grid_column_widths
 
     field_facets = [
-        'collectionCode',
-        'typeStatus',
-        'family',
-        'genus',
-        'associatedMedia.category',
-        'gbifIssue'
+        u'collectionCode',
+        u'typeStatus',
+        u'family',
+        u'genus',
+        u'associatedMedia.category',
+        u'gbifIssue'
         ]
 
     # Additional search filter options
@@ -269,7 +269,7 @@ class SpecimenView(DefaultView):
                 value = []
             elif not isinstance(value, list):
                 value = [value]
-            c.record_dict['determinations'][label] = value
+            c.record_dict[u'determinations'][label] = value
 
         c.record_dict[u'determinations'][u'_len'] = max(
             [len(l) for l in c.record_dict[u'determinations'].values()])

@@ -30,9 +30,9 @@ UPDATE_FREQUENCIES = [(u'', u'None'), (u'daily', u'Daily'), (u'weekly', u'Weekly
 def record_show_schema():
     ''' '''
     schema = {
-        'resource_id': [not_missing, unicode, resource_id_exists],
-        'record_id': [not_missing, int_validator],
-        'version': [ignore_missing, int_validator],
+        u'resource_id': [not_missing, unicode, resource_id_exists],
+        u'record_id': [not_missing, int_validator],
+        u'version': [ignore_missing, int_validator],
     }
     return schema
 
@@ -40,9 +40,9 @@ def record_show_schema():
 def object_rdf_schema():
     ''' '''
     schema = {
-        'uuid': [not_missing, unicode],
-        'format': [not_missing],
-        'version': [ignore_missing, int_validator],
+        u'uuid': [not_missing, unicode],
+        u'format': [not_missing],
+        u'version': [ignore_missing, int_validator],
     }
     return schema
 

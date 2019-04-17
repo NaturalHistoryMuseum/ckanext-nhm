@@ -21,11 +21,11 @@ class IndexLotView(DefaultView):
     resource_id = toolkit.config.get(u'ckanext.nhm.indexlot_resource_id')
 
     field_facets = [
-        'family',
-        'type',
-        'taxonRank',
-        'associatedMedia.category',
-        'kindOfMaterial'
+        u'family',
+        u'type',
+        u'taxonRank',
+        u'associatedMedia.category',
+        u'kindOfMaterial'
         ]
 
     # Additional search filter options

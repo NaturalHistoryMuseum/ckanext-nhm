@@ -443,15 +443,15 @@ class NHMDCATProfile(RDFProfile):
                 pass
 
         # Adding images as JSON is rubbish! So lets try and do it properly
-        for image in record_dict.pop('associatedMedia', []):
-            image_uri = URIRef(image['identifier'])
+        for image in record_dict.pop(u'associatedMedia', []):
+            image_uri = URIRef(image[u'identifier'])
             g.set((image_uri, RDF.type, FOAF.Image))
-            title = image.get('title', None)
+            title = image.get(u'title', None)
             if title:
                 g.set((image_uri, DC.title, Literal(title)))
-            g.set((image_uri, CC.license, URIRef(image['license'])))
-            g.set((image_uri, DC.RightsStatement, Literal(image['rightsHolder'])))
-            g.set((image_uri, DC.Format, Literal(image['format'])))
+            g.set((image_uri, CC.license, URIRef(image[u'license'])))
+            g.set((image_uri, DC.RightsStatement, Literal(image[u'rightsHolder'])))
+            g.set((image_uri, DC.Format, Literal(image[u'format'])))
             # Add link from image to object...
             g.set((image_uri, FOAF.depicts, object_uri))
             # And object to image
