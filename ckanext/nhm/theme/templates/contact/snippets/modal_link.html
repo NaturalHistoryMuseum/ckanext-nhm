@@ -1,11 +1,16 @@
+{% ckan_extends %}
+
 {% block modal_link %}
 
-    {% set params = h.get_contact_form_params(pkg=pkg, res=res, rec=rec) %}
-
-    <a class="btn btn-primary" data-module="modal-contact" data-module-template="{{ h.get_contact_form_template_url(params) }}" href="{{ h.url_for('contact_form', **params) }}" title="{{ _('Contact') }}">
+    <a class="btn btn-primary" title="{{ _('Contact') }}" data-module="modal-contact"
+       data-module-template="contact_form.html"
+       {% if pkg %} data-module-package_id="{{ pkg.id }}" {% endif %}
+       {% if res %} data-module-resource_id="{{ res.id }}" {% endif %}
+       {% if rec %} data-module-record_id="{{ rec._id }}" {% endif %}
+       data-module-action="{{ recaptcha_v3_action }}"
+       data-module-key="{{ recaptcha_v3_key }}">
         <i class="icon-envelope"></i>{{ link_text if link_text else _('Contact dataset curator') }}
     </a>
 
     {% resource 'ckanext-contact/main' %}
-
 {% endblock %}
