@@ -1010,7 +1010,8 @@ def add_url_filter(field, value, extras=None):
 
     params = {k: v for k, v in toolkit.request.params.items() if k != u'page'}
     url_filter = u'%s:%s' % (field, value)
-    filters = u'|'.join(params.get(u'filters', u'').split(u'|') + [url_filter])
+    filters = [f for f in params.get(u'filters', u'').split(u'|') + [url_filter] if f != u'']
+    filters = u'|'.join(filters)
     params[u'filters'] = filters
     return core_helpers._url_with_params(toolkit.request.base_url, params.items())
 
