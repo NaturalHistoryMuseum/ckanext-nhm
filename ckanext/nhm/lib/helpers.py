@@ -30,6 +30,7 @@ from webhelpers.html import literal
 
 from ckan import model
 from ckan.plugins import toolkit
+from ckan.lib import helpers as core_helpers
 
 log = logging.getLogger(__name__)
 
@@ -570,7 +571,7 @@ def get_allowed_view_types(resource, package):
 
     '''
 
-    view_types = toolkit.h.core_get_allowed_view_types(resource, package)
+    view_types = core_helpers.get_allowed_view_types(resource, package)
     blacklisted_types = [u'image']
 
     filtered_types = []
@@ -1011,7 +1012,7 @@ def add_url_filter(field, value, extras=None):
     url_filter = u'%s:%s' % (field, value)
     filters = u'|'.join(params.get(u'filters', u'').split(u'|') + [url_filter])
     params[u'filters'] = filters
-    return toolkit.h._url_with_params(toolkit.request.base_url, params.items())
+    return core_helpers._url_with_params(toolkit.request.base_url, params.items())
 
 
 def parse_request_filters():
@@ -1138,7 +1139,7 @@ def _get_latest_update(package_or_resource_dicts):
     latest_date = None
     for package_or_resource_dict in package_or_resource_dicts:
         for field in fields:
-            date = toolkit.h._datestamp_to_datetime(package_or_resource_dict.get(field, None))
+            date = core_helpers._datestamp_to_datetime(package_or_resource_dict.get(field, None))
             if date is not None and (latest_date is None or date > latest_date):
                 latest_date = date
                 latest_dict = package_or_resource_dict
