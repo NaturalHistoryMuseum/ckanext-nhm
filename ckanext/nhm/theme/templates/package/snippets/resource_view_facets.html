@@ -6,29 +6,48 @@
 <div class="col-md-3 resource-view-facets">
 
     <div class="resource-view-filter-options" data-module="resource-view-filter-options"
-            data-module-resource-id="{{ resource['id'] }}"
-            data-module-filter-options="{{ h.dump_json(h.get_resource_filter_options(resource, resource_view)) }}"></div>
+        data-module-resource-id="{{ resource['id'] }}"
+        data-module-filter-options="{{ h.dump_json(h.get_resource_filter_options(resource, resource_view)) }}"></div>
 
-  {% for facet in facets %}
-      <section class="module module-narrow module-shallow no-margin">
-      <h2 class="module-heading">
-        <i class="icon-medium icon-filter"></i>
-        {{ facet.label }}
-      </h2>
-      {% if facet.facet_values %}
-        <nav>
-          <ul class="unstyled nav nav-simple nav-facet">
-            {% for item in facet.facet_values %}
-               {% set href = h.remove_url_filter(facet.name, item.name, extras=extras) if item.active else h.add_url_filter(facet.name, item.name, extras=extras) %}
-                <li class="nav-item{% if item.active %} active{% endif %}">
-                    <a href="{{ href }}" title="{{ item.label }}">
-                        <span>{{ item.label|title }} ({{ item.count }})</span>
-                    </a>
-                </li>
-            {% endfor %}
-          </ul>
+    {% for facet in facets %}
+        <nav class="module module-narrow module-shallow no-margin">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                data-target="#{{ facet.name }}-nav" aria-expanded="false">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <h2 class="module-heading">
+                <i class="fas fa-filter"></i> {{ facet.label }}
+            </h2>
+            {% if facet.facet_values %}
+                <ul class="list-unstyled nav nav-simple nav-facet navbar-collapse collapse"
+                    id="{{ facet.name }}-nav">
+                    {% for item in facet.facet_values %}
+                        {% set label_truncated = h.truncate(item.label, 28 - ((item.count|string|length) + 5)) %}
+                        {% set href = h.remove_url_filter(facet.name, item.name, extras=extras) if item.active else h.add_url_filter(facet.name, item.name, extras=extras) %}
+                        <li class="nav-item{% if item.active %} active{% endif %}">
+                            <a href="{{ href }}" title="{{ item.label }}">
+                                <span>{{ label_truncated|title }} ({{ item.count }})</span> </a>
+                        </li>
+                    {% endfor %}
+                    {% if not facet.active %}
+                        <li class="module-footer">
+                            {% if h.get_param_int('_%s_limit' % facet.name) %}
+                                {% if facet.has_more %}
+                                    <a href="{{ h.remove_url_param('_%s_limit' % facet.name, replace=0, extras=extras) }}"
+                                        class="read-more">Show more <i
+                                        class="fas fa-plus-circle"></i></a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ h.remove_url_param('_%s_limit' % facet.name, extras=extras) }}"
+                                    class="read-more">Show fewer <i class="fas fa-minus-circle"></i></a>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <p class="module-content empty">{{ _('There are no {facet_type} terms that match this search').format(facet_type=facet.label) }}</p>
+            {% endif %}
         </nav>
-      {% endif %}
     {% endfor %}
 </div>
 
