@@ -604,50 +604,6 @@ def field_is_link(value):
     return False
 
 
-def get_contact_form_params(pkg=None, res=None, rec=None):
-    """
-    Get a list of IDS
-
-    @param pkg:
-    @param res:
-    @param rec:
-    @return:
-    """
-
-    params = {}
-
-    if pkg:
-        params['package_id'] = pkg.get('id')
-
-    if res:
-        params['resource_id'] = res.get('id')
-
-    if rec:
-        params['record_id'] = rec.get('_id')
-
-    return params
-
-
-def get_contact_form_template_url(params):
-    """
-    Build a URL suitable for linking to the contact form snippet
-
-    For example: /api/1/util/snippet/contact_form.html?resource_id=123&record_id456
-
-    Can be parsed output from get_contact_form_params
-
-    @param params:
-    @return:
-    """
-
-    url = '/api/1/util/snippet/contact_form.html'
-
-    if params:
-        url += '?%s' % urllib.urlencode(params)
-
-    return url
-
-
 def get_contact_form_department_options():
     """
     Contact form category

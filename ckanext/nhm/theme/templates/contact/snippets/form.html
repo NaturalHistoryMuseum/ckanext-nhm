@@ -10,10 +10,7 @@
 
      {# Add resource name and ID hidden field#}
 
-    {% set package_id = h.get_request_param('package_id', None) %}
-
     {% if package_id %}
-
         {% set package = h.get_package(package_id) %}
 
         {# If this is the collections dataset, still add the department select #}
@@ -40,8 +37,6 @@
 
     {# Add resource name and ID hidden field#}
 
-    {% set resource_id = h.get_request_param('resource_id', None) %}
-
     {% if resource_id %}
 
         {% set resource = h.get_resource(resource_id) %}
@@ -58,8 +53,6 @@
     {% endif %}
 
     {# Add record name and record ID hidden field#}
-
-    {% set record_id = h.get_request_param('record_id', None) %}
 
     {% if record_id and resource %}
 
