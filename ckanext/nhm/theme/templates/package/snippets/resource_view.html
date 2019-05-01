@@ -13,7 +13,7 @@
 
       {% if facets %}
         {% snippet 'package/snippets/resource_view_facets.html', resource=resource, resource_view=resource_view, resource=resource, package=package, facets=facets %}
-       <div class="col-md-9">
+       <div class="col-md-9 minimal-padding">
           {% snippet 'package/snippets/resource_view_rendered.html', resource_view=resource_view, resource=resource, package=package %}
         </div>
       {% else %}

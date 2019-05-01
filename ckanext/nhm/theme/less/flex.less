@@ -1,6 +1,6 @@
 @import "variables";
 
-.flex-container {
+.mixin-flex-container() {
   display: flex;
   flex-direction: row;
 
@@ -9,11 +9,11 @@
   }
 }
 
-.flex-reverse {
+.mixin-flex-reverse() {
   flex-direction: row-reverse;
 }
 
-.flex-top {
+.mixin-flex-top() {
   align-items: flex-start;
 
   & > * {
@@ -21,7 +21,7 @@
   }
 }
 
-.flex-stretch-first {
+.mixin-flex-stretch-first() {
   &:not(.flex-reverse) > *:first-child {
     flex-grow: 1;
   }
@@ -31,11 +31,11 @@
   }
 }
 
-.flex-wrap {
+.mixin-flex-wrap() {
   flex-wrap: wrap;
 }
 
-.flex-nowrap {
+.mixin-flex-nowrap() {
   @media (max-width: @sm - 1) {
     flex-wrap: wrap;
   }
@@ -45,7 +45,7 @@
 }
 
 
-.flex-equal {
+.mixin-flex-equal() {
   & > * {
     // evenly spaces on large screens, stacks on smaller ones
     @media (max-width: @lg - 1) {
@@ -67,15 +67,15 @@
 }
 
 
-.flex-between {
+.mixin-flex-between() {
   justify-content: space-between;
 }
 
-.flex-around {
+.mixin-flex-around() {
   justify-content: space-around;
 }
 
-.flex-right {
+.mixin-flex-right() {
   justify-content: flex-end;
   @media (max-width: @sm) {
     justify-content: space-around;

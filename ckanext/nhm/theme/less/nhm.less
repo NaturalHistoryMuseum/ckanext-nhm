@@ -2,6 +2,8 @@
 @import "mixins";
 @import "flex";
 
+.load-fonts();
+
 // BASICS
 
 h1, h2, h3, h4, h5, h6 {
@@ -139,6 +141,50 @@ body {
     background: @grey9;
     color: @grey2;
   }
+}
+
+// FLEX
+
+.flex-container {
+  .mixin-flex-container();
+}
+
+.flex-reverse {
+  .mixin-flex-reverse()
+}
+
+.flex-top {
+  .mixin-flex-top()
+}
+
+.flex-stretch-first {
+  .mixin-flex-stretch-first()
+}
+
+.flex-wrap {
+  .mixin-flex-wrap()
+}
+
+.flex-nowrap {
+  .mixin-flex-nowrap()
+}
+
+
+.flex-equal {
+  .mixin-flex-equal()
+}
+
+
+.flex-between {
+  .mixin-flex-between()
+}
+
+.flex-around {
+  .mixin-flex-around()
+}
+
+.flex-right {
+  .mixin-flex-right();
 }
 
 // LAYOUT/CONTAINERS ---------------------------------------------------------------------
@@ -1278,7 +1324,7 @@ select, .select2-choice {
 
 .resource-view-filter-form {
   background-color: @grey9;
-  padding: @min-pad;
+  padding: @min-pad @min-pad @min-pad/2;
 
   & .filter-options {
     text-align: center;
@@ -1319,15 +1365,19 @@ select, .select2-choice {
 }
 
 .resource-view-filter-options {
-  // FIXME: cannot test this because js is broken
   label {
     font-weight: normal;
     display: inline-block;
     margin: 2px 15px 4px 15px;
 
     input {
-      top: 0;
+      top: 3px;
       margin-right: 4px;
+      position: relative;
+    }
+
+    &::after {
+      content: none;
     }
   }
 
@@ -1377,7 +1427,7 @@ select, .select2-choice {
     font-size: @font-size-body-m;
     line-height: 14px;
     position: relative;
-    top: 0px;
+    top: 0;
     left: 5px;
     margin-right: 5px;
     content: "\f0b0";
@@ -1386,21 +1436,21 @@ select, .select2-choice {
 
 .display-filter {
   & .resource-view-filters-wrapper {
-    .flex-container;
-    .flex-equal;
-    .flex-between;
-    .flex-nowrap;
+    .mixin-flex-container();
+    .mixin-flex-equal();
+    .mixin-flex-between();
+    .mixin-flex-nowrap();
   }
 }
 
 .resource-view-filters-wrapper {
-  @media (min-width: @lg) {
+  @media (min-width: @md) {
     position: absolute;
     right: 15px;
     top: 120%;
-    width: 50vw;
+    width: 45vw;
   }
-  @media (max-width: @lg - 1) {
+  @media (max-width: @md - 1) {
     width: 100%;
   }
   background: @grey8;
