@@ -105,10 +105,13 @@ class ObjectController(base.BaseController):
                 if record:
                     package_id = resource.get_package_id()
                     package = get_action('package_show')(self.context, {'id': package_id})
-                    # redirect to the object record
-                    h.redirect_to(controller='ckanext.nhm.controllers.record:RecordController',
-                                  action='view', package_name=package['name'],
-                                  resource_id=resource.id, record_id=record['_id'], version=version)
+
+                    url = h.url_for(controller='ckanext.nhm.controllers.record:RecordController',
+                                    action='view', package_name=package['name'],
+                                    resource_id=resource.id, record_id=record['_id'],
+                                    version=version)
+                    # redirect to the object record using a 303 (as recommended by CETAF)
+                    base.redirect(url, code=303)
 
         abort(404, _('Record not found'))
 
