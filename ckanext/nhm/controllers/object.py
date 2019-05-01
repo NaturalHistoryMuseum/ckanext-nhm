@@ -90,28 +90,43 @@ class ObjectController(base.BaseController):
         if uuid in ABYSSLINE_UUIDS:
             self.abyssline_object_redirect(uuid, version)
 
-        # is the request for a particular format
-        _format = check_access_header()
-
-        if _format:
-            return self.rdf(uuid, _format)
+        try:
+            # get the record at the given version
+            record, resource = get_record_by_uuid(uuid, version)
+        except TypeError:
+            pass
         else:
-            try:
-                # get the record at the given version
-                record, resource = get_record_by_uuid(uuid, version)
-            except TypeError:
-                pass
-            else:
-                if record:
+            if record:
+                # is the request for a particular format
+                requested_format = check_access_header()
+
+                if requested_format:
+                    # if so provide the kwargs necessary to build the object rdf url
+                    url_kwargs = dict(
+                        controller='ckanext.nhm.controllers.object:ObjectController',
+                        action='rdf',
+                        uuid=uuid,
+                        _format=requested_format,
+                    )
+                else:
+                    # otherwise, the user wants html so provide the kwargs necessary to build the
+                    # record page
                     package_id = resource.get_package_id()
                     package = get_action('package_show')(self.context, {'id': package_id})
+                    url_kwargs = dict(
+                        controller='ckanext.nhm.controllers.record:RecordController',
+                        action='view',
+                        package_name=package['name'],
+                        resource_id=resource.id,
+                        record_id=record['_id'],
+                    )
 
-                    url = h.url_for(controller='ckanext.nhm.controllers.record:RecordController',
-                                    action='view', package_name=package['name'],
-                                    resource_id=resource.id, record_id=record['_id'],
-                                    version=version)
-                    # redirect to the object record using a 303 (as recommended by CETAF)
-                    base.redirect(url, code=303)
+                # add the version if we have one
+                if version is not None:
+                    url_kwargs['version'] = version
+
+                # redirect using a 303 (as recommended by CETAF)
+                base.redirect(h.url_for(**url_kwargs), code=303)
 
         abort(404, _('Record not found'))
 
