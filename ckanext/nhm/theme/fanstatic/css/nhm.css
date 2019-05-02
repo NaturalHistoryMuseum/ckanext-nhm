@@ -949,6 +949,22 @@ tr.empty {
 .gravatar {
   margin: 7px 5px 10px;
 }
+.pagination {
+  border: none !important;
+}
+.pagination a {
+  border: none !important;
+  border-radius: 20px !important;
+  color: #188100 !important;
+  float: none !important;
+  padding: 4px 9px !important;
+}
+.pagination .active a,
+.pagination a:hover,
+.pagination a:focus {
+  background-color: #188100 !important;
+  color: #FFFFFF !important;
+}
 .select2-choice {
   background-image: none !important;
   border: 1px solid #C3C3C3 !important;
@@ -1551,29 +1567,6 @@ select,
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .disabled,
 .dataset-map-expanded #dataset-map #dataset-map-edit-buttons .disabled:hover {
   color: #656565;
-}
-.pagination {
-  border-top: none !important;
-}
-.pagination a {
-  border: none;
-  border-radius: 16px !important;
-  -webkit-border-radius: 16px !important;
-  padding: 0 3px !important;
-  margin: 0 2px !important;
-  min-width: 17px;
-  line-height: 22px;
-  height: 23px;
-  display: inline-block;
-}
-.pagination a:hover,
-.pagination a:focus,
-.active > .pagination a {
-  background-color: #188100;
-  color: #FFFFFF;
-}
-.pagination li {
-  height: 14px;
 }
 .facet,
 .filter {

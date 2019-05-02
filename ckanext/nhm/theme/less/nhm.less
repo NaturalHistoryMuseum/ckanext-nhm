@@ -932,6 +932,26 @@ tr.empty {
   margin: 7px 5px 10px;
 }
 
+.pagination {
+  // this is for the numbered blobs at the bottom of, e.g. the datasets list, not the list view one
+  border: none !important;
+  @size: 26px;
+
+  & a {
+    border: none !important;
+    border-radius: 20px !important;
+    color: @primary3 !important;
+    float: none !important;
+    // this will need to be changed if the font size is changed and yes I know it's ugly
+    padding: (@size - 18)/2 (@size - 8)/2 !important;
+  }
+
+  & .active a, & a:hover, & a:focus {
+    background-color: @primary3 !important;
+    color: @grey10 !important;
+  }
+}
+
 // SELECT2
 
 .select2-choice {
@@ -1579,31 +1599,6 @@ select, .select2-choice {
         color: @grey4;
       }
     }
-  }
-}
-
-.pagination {
-  border-top: none !important;
-
-  a {
-    border: none;
-    border-radius: 16px !important;
-    -webkit-border-radius: 16px !important;
-    padding: 0 3px !important;
-    margin: 0 2px !important;
-    min-width: 17px;
-    line-height: 22px;
-    height: 23px;
-    display: inline-block;
-
-    &:hover, &:focus, .active > & {
-      background-color: @primary3;
-      color: @grey10;
-    }
-  }
-
-  li {
-    height: 14px;
   }
 }
 
