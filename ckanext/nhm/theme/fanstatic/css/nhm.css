@@ -740,6 +740,9 @@ body .default-text a:focus {
 .search {
   padding: 5px;
 }
+.form-horizontal .form-group {
+  margin: 0 !important;
+}
 .btn-danger {
   background: #890022;
 }
