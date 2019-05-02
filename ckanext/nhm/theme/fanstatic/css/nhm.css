@@ -764,7 +764,7 @@ body .default-text a:focus {
 .btn.hover,
 .btn.active {
   background: #0E4609;
-  color: #FFFFFF;
+  color: #FFFFFF !important;
 }
 @media (max-width: 767px) {
   .btn {
@@ -780,6 +780,10 @@ body .default-text a:focus {
 }
 .btn i {
   font-size: initial;
+}
+.btn .fas:last-child,
+.btn .fa:last-child {
+  margin-right: 10px !important;
 }
 .btn-mini {
   padding: 2px 6px;

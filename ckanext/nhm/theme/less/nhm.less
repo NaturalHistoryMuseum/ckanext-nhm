@@ -734,7 +734,7 @@ body {
 
   &:hover, &.hover, &.active {
     background: @primary1;
-    color: @grey10;
+    color: @grey10 !important;
   }
 
   @media (max-width: @md - 1) {
@@ -749,6 +749,10 @@ body {
 
   & i {
     font-size: initial;
+  }
+
+  .fas:last-child, .fa:last-child {
+    margin-right: 10px !important;
   }
 }
 
