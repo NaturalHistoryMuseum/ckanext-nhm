@@ -27,6 +27,7 @@ from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree
 from webhelpers.html import literal
+import bs4
 
 from ckan import model
 from ckan.plugins import toolkit
@@ -1291,3 +1292,17 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
         links.append(toolkit.h.build_nav_icon(route_name, link_text, **kwargs))
 
     return links
+
+
+def build_nav_main(*args):
+    '''
+    Build a set of menu items. Overrides core CKAN method to add "nav-item" class to li elements.
+
+    :param args: tuples of (menu type, title) eg ('login', _('Login'))
+    :return: literal - <li class="nav-item"><a href="...">title</a></li>
+    '''
+    from_core = core_helpers.build_nav_main(*args)
+    list_items = bs4.BeautifulSoup(from_core, 'lxml').find_all('li')
+    for li in list_items:
+        li['class'] = li.get('class', []) + ['nav-item']
+    return literal('\n'.join([str(li) for li in list_items]))

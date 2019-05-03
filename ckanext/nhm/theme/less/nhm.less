@@ -582,15 +582,27 @@ body {
   }
 }
 
+.nav-pills {
+  & .nav-item {
+    background: none !important;
+    & a {
+      margin: 0 !important;
+    &:before {
+      content: none !important;
+    }
+    }
+  }
+}
+
 .nav-tabs {
   border-bottom: none;
   .no-spacing !important;
   float: none !important;
-  .margin-right(li, 5px);
 
   & li {
     background-color: lighten(@grey9, 2%);
     border-radius: @rounding;
+    margin-bottom: 0 !important;
 
     & a, & a:hover {
       border: none !important;
@@ -826,12 +838,14 @@ body {
     }
   }
 
-  & i {
-    font-size: initial;
+  @media (min-width: @md) {
+    & .fas:last-child, & .fa:last-child {
+      margin-right: 10px !important;
+    }
   }
 
-  .fas:last-child, .fa:last-child {
-    margin-right: 10px !important;
+  & i {
+    font-size: initial;
   }
 }
 
@@ -1154,6 +1168,29 @@ select, .select2-choice {
 }
 
 
+// ABOUT -------------------------------------------------------------------------------------------
+
+.about-doi {
+  padding: 20px;
+  background: @grey9;
+  display: inline-block;
+}
+
+// FIXME: hmmmmm
+#datacite {
+  margin: 50px 20px 0 0;
+}
+
+ol#credits {
+  list-style: none;
+  margin-left: 20px;
+
+  & li {
+    margin: 5px 0;
+  }
+}
+
+
 // DATASET LIST ------------------------------------------------------------------------------------
 
 .label { // format label for datasets
@@ -1285,68 +1322,68 @@ select, .select2-choice {
   }
 
   & .resource-view-facets {
-  @cellheight: 36px;
-  background-color: @grey9;
-  border-right: (ceil(@cellheight / 2) + 5) solid @grey9;
-  padding: 0;
-
-  .nav-item {
-    height: @cellheight;
-    white-space: nowrap;
-    border-bottom: 1px solid @grey10;
+    @cellheight: 36px;
+    background-color: @grey9;
+    border-right: (ceil(@cellheight / 2) + 5) solid @grey9;
     padding: 0;
 
-    &.active {
+    .nav-item {
+      height: @cellheight;
+      white-space: nowrap;
+      border-bottom: 1px solid @grey10;
+      padding: 0;
+
+      &.active {
+        & a {
+          background-color: @grey4;
+
+          &:before {
+            content: '';
+            position: absolute;
+            border-width: @cellheight / 2;
+            border-style: solid;
+            border-color: transparent;
+            right: 0 - @cellheight;
+            top: 0;
+            border-left-color: @grey4;
+          }
+
+          &:after {
+            background: none !important;
+            content: '\f057';
+            .mixin-font-symbol(normal);
+            width: auto;
+            height: auto;
+            right: 5px;
+            top: auto;
+            margin: 0;
+          }
+        }
+      }
+
       & a {
-        background-color: @grey4;
-
-        &:before {
-          content: '';
-          position: absolute;
-          border-width: @cellheight / 2;
-          border-style: solid;
-          border-color: transparent;
-          right: 0 - @cellheight;
-          top: 0;
-          border-left-color: @grey4;
-        }
-
-        &:after {
-          background: none !important;
-          content: '\f057';
-          .mixin-font-symbol(normal);
-          width: auto;
-          height: auto;
-          right: 5px;
-          top: auto;
-          margin: 0;
-        }
+        margin: 0;
+        padding: ceil(@min-pad / 2) @min-pad;
       }
     }
 
-    & a {
-      margin: 0;
-      padding: ceil(@min-pad / 2) @min-pad;
+    .module-heading {
+      background: @grey8;
     }
-  }
 
-  .module-heading {
-    background: @grey8;
-  }
+    .module-footer {
+      padding: 0;
+      border-top-style: none;
+      background: @grey9;
 
-  .module-footer {
-    padding: 0;
-    border-top-style: none;
-    background: @grey9;
-
-    a {
-      padding: 5px 10px 5px 15px;
-      display: block;
-      border-bottom: 1px solid @grey10;
+      a {
+        padding: 5px 10px 5px 15px;
+        display: block;
+        border-bottom: 1px solid @grey10;
+      }
     }
-  }
 
-}
+  }
 }
 
 .dataset-heading {
@@ -1618,30 +1655,6 @@ select, .select2-choice {
 
 // CHAOS BEGINS ====================================================================================
 
-/* About page */
-
-.nav-aside li a i {
-  display: none;
-}
-
-.about-doi {
-  padding: 20px;
-  background: @grey8;
-  display: inline-block;
-}
-
-#datacite {
-  margin: 50px 20px 0 0;
-}
-
-ol#credits {
-  list-style: none;
-  margin-left: 20px;
-}
-
-ol#credits li {
-  margin: 5px 0;
-}
 
 // Determination table
 

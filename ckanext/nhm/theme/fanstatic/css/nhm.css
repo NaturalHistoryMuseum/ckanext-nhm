@@ -638,6 +638,15 @@ body .default-text a:focus {
     display: none;
   }
 }
+.nav-pills .nav-item {
+  background: none !important;
+}
+.nav-pills .nav-item a {
+  margin: 0 !important;
+}
+.nav-pills .nav-item a:before {
+  content: none !important;
+}
 .nav-tabs {
   border-bottom: none;
   padding: 0 !important;
@@ -645,14 +654,9 @@ body .default-text a:focus {
   float: none !important;
 }
 .nav-tabs li {
-  margin-right: 5px;
-}
-.nav-tabs li:last-child {
-  margin-right: 0;
-}
-.nav-tabs li {
   background-color: #f7f7f7;
   border-radius: 2px;
+  margin-bottom: 0 !important;
 }
 .nav-tabs li a,
 .nav-tabs li a:hover {
@@ -848,12 +852,14 @@ body .default-text a:focus {
     font-size: 17px;
   }
 }
+@media (min-width: 768px) {
+  .btn .fas:last-child,
+  .btn .fa:last-child {
+    margin-right: 10px !important;
+  }
+}
 .btn i {
   font-size: initial;
-}
-.btn .fas:last-child,
-.btn .fa:last-child {
-  margin-right: 10px !important;
 }
 .btn-danger {
   background: #890022;
@@ -1167,6 +1173,21 @@ select,
 }
 .specimen-collection .module:last-child {
   margin-bottom: 0;
+}
+.about-doi {
+  padding: 20px;
+  background: #F2F2F2;
+  display: inline-block;
+}
+#datacite {
+  margin: 50px 20px 0 0;
+}
+ol#credits {
+  list-style: none;
+  margin-left: 20px;
+}
+ol#credits li {
+  margin: 5px 0;
 }
 .label[data-format=dwc],
 .label[data-format*=dwc] {
@@ -1574,25 +1595,6 @@ select,
 }
 .activity {
   margin-top: 30px;
-}
-/* About page */
-.nav-aside li a i {
-  display: none;
-}
-.about-doi {
-  padding: 20px;
-  background: #DDDDDD;
-  display: inline-block;
-}
-#datacite {
-  margin: 50px 20px 0 0;
-}
-ol#credits {
-  list-style: none;
-  margin-left: 20px;
-}
-ol#credits li {
-  margin: 5px 0;
 }
 .record-content table#determinations tbody tr th.name {
   width: 50%;
