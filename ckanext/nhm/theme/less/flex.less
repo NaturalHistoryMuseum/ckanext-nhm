@@ -6,6 +6,8 @@
 
   & > * {
     align-self: center;
+    padding-left: 5px;
+    padding-right: 5px;
   }
 }
 
@@ -27,6 +29,16 @@
   }
 
   &.flex-reverse > *:last-child {
+    flex-grow: 1;
+  }
+}
+
+.mixin-flex-stretch-last() {
+  &:not(.flex-reverse) > *:last-child {
+    flex-grow: 1;
+  }
+
+  &.flex-reverse > *:first-child {
     flex-grow: 1;
   }
 }

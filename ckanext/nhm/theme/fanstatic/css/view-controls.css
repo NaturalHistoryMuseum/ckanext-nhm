@@ -44,6 +44,8 @@
 }
 .list-view .controls > * {
   align-self: center;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 @media (max-width: 991px) {
   .list-view .controls > * {

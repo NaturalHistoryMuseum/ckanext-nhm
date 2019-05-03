@@ -127,6 +127,10 @@ body {
   .mixin-flex-stretch-first()
 }
 
+.flex-stretch-last {
+  .mixin-flex-stretch-last()
+}
+
 .flex-wrap {
   .mixin-flex-wrap()
 }
@@ -155,7 +159,7 @@ body {
 // UTILITY -----------------------------------------------------------------------------------------
 
 .inline-icon-left {
-  padding-right: 5px;
+  padding-right: 10px;
 }
 
 .inline-icon-right {
@@ -224,6 +228,19 @@ body {
 
 .search {
   padding: 5px;
+}
+
+.pad-children-h > * {
+  padding-left: 5px;
+  padding-right: 5px;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
 }
 
 
@@ -571,6 +588,8 @@ body {
 .navbar-collapse {
   overflow-y: visible !important;
   height: auto !important; // the bootstrap js sets the height to 1px
+  padding-left: 0;
+  padding-right: 0;
 
   &.collapse:not(.in) {
     @media (max-width: @collapse-width) {
@@ -582,14 +601,46 @@ body {
   }
 }
 
+.nav-item.active > a:before, .nav-aside li.active a:before {
+  @arrow-size: 8px;
+  content: ' ';
+  height: 0;
+  width: 0;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  border: @arrow-size solid transparent;
+  border-left-color: @grey3;
+  margin-top: 0 - @arrow-size;
+}
+
 .nav-pills {
   & .nav-item {
     background: none !important;
+
     & a {
       margin: 0 !important;
-    &:before {
-      content: none !important;
+
+      &:before {
+        content: none !important;
+      }
     }
+  }
+}
+
+.nav-simple {
+  font-size: @font-size-body-s !important;
+
+  & a {
+    font-size: @font-size-body-s !important;
+  }
+
+  & > li {
+    padding: 0 !important;
+
+    & > * {
+      padding: 10px 15px;
+      margin: 0;
     }
   }
 }
@@ -639,10 +690,19 @@ body {
 .navbar-toggle {
   z-index: 1;
   padding: 0 10px;
-  color: @grey6;
+  height: 100%;
 
   @media (max-width: @collapse-width) {
     display: block;
+  }
+
+  &:after {
+    .mixin-font-symbol(normal);
+    content: '\f0d8';
+  }
+
+  &.collapsed:after {
+    content: '\f0d7';
   }
 }
 
@@ -830,7 +890,6 @@ body {
 
   @media (max-width: @md - 1) {
     font-size: 0;
-    height: 36px;
     & .fa, & .fas {
       margin: 0 !important;
       line-height: 1em;

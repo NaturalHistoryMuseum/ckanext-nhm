@@ -5,7 +5,7 @@
         {% if items %}
             <nav>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-{{ name }}" aria-expanded="false">
-                    <i class="fas fa-ellipsis-h"></i>
+                    <span class="sr-only">expand</span>
                 </button>
 
                 <ul class="{{ nav_class or 'list-unstyled nav nav-simple nav-facet' }} navbar-collapse collapse" id="nav-{{ name }}">
