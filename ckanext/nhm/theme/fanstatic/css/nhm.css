@@ -658,17 +658,19 @@ body .default-text a:focus {
     display: none;
   }
 }
-.nav-item.active > a:before,
-.nav-aside li.active a:before {
-  content: ' ';
-  height: 0;
-  width: 0;
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  border: 8px solid transparent;
-  border-left-color: #5B5B5B;
-  margin-top: -8px;
+@media (min-width: 768px) {
+  .nav-item.active > a:before,
+  .nav-aside li.active a:before {
+    content: ' ';
+    height: 0;
+    width: 0;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    border: 8px solid transparent;
+    border-left-color: #5B5B5B;
+    margin-top: -8px;
+  }
 }
 .nav-pills .nav-item {
   background: none !important;

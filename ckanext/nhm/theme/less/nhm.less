@@ -602,16 +602,18 @@ body {
 }
 
 .nav-item.active > a:before, .nav-aside li.active a:before {
-  @arrow-size: 8px;
-  content: ' ';
-  height: 0;
-  width: 0;
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  border: @arrow-size solid transparent;
-  border-left-color: @grey3;
-  margin-top: 0 - @arrow-size;
+  @media (min-width: @md) {
+    @arrow-size: 8px;
+    content: ' ';
+    height: 0;
+    width: 0;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    border: @arrow-size solid transparent;
+    border-left-color: @grey3;
+    margin-top: 0 - @arrow-size;
+  }
 }
 
 .nav-pills {
