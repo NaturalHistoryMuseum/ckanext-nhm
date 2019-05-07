@@ -1289,9 +1289,30 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
             route_name = u'{}_versioned'.format(route_name)
             kwargs[u'version'] = version
         # build the nav and add it to the list
-        links.append(toolkit.h.build_nav_icon(route_name, link_text, **kwargs))
+        links.append(_add_nav_item_class(toolkit.h.build_nav_icon(route_name, link_text, **kwargs),
+                                         [], role='presentation'))
 
     return links
+
+
+def _add_nav_item_class(html_string, classes=None, **kwargs):
+    '''
+    Add classes to list items in an HTML string.
+    :param html_string: a literal or string of HTML code
+    :param classes: CSS classes to add to each item
+    :param kwargs: other attributes to add to each item
+    :return: a literal of HTML code where all the <li> nodes have "nav-item" added to their classes
+    '''
+    if classes is None:
+        classes = ['nav-item']
+    soup = bs4.BeautifulSoup(html_string, 'lxml')
+    list_items = soup.find_all('li')
+    for li in list_items:
+        if len(classes) > 0:
+            li['class'] = li.get('class', []) + classes
+        for k, v in kwargs.items():
+            li[k] = v
+    return literal('\n'.join([str(el) for el in soup.body.contents]))
 
 
 def build_nav_main(*args):
@@ -1302,7 +1323,4 @@ def build_nav_main(*args):
     :return: literal - <li class="nav-item"><a href="...">title</a></li>
     '''
     from_core = core_helpers.build_nav_main(*args)
-    list_items = bs4.BeautifulSoup(from_core, 'lxml').find_all('li')
-    for li in list_items:
-        li['class'] = li.get('class', []) + ['nav-item']
-    return literal('\n'.join([str(li) for li in list_items]))
+    return _add_nav_item_class(from_core)

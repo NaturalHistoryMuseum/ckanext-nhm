@@ -2,7 +2,7 @@
 
 {% block content_primary_nav %}
     {% if g.additional_view %}
-        {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, g.version) %}
+        {% for nav in h.build_specimen_nav_items(g.pkg.name, res.id, rec._id, g.version) %}
             {{ nav }}
         {% endfor %}
     {% endif %}

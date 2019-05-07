@@ -24,10 +24,7 @@ def record_show(context, data_dict):
     :param data_dict: 
 
     '''
-    # Validate the data (TODO: do we need to redefine context here?)
-    context = {
-        u'user': toolkit.c.user or toolkit.c.author
-        }
+    context[u'user'] = toolkit.c.user or toolkit.c.author
     schema = context.get(u'schema', nhm_schema.record_show_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
 

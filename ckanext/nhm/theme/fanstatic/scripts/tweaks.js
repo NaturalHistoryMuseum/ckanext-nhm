@@ -15,4 +15,13 @@ $(document).ready(function() {
 
     // fix some fontawesome references
     $('.fa-cloud-upload').removeClass('fa-cloud-upload').addClass('fa-cloud-upload-alt');
+
+    // fix the tabs problem
+    var currentUrl = window.location.href;
+    $('.nav-tabs li').map((i, el) => {
+        var element = $(el);
+        if (element.find('a').filter((j, a) => a.href === currentUrl).length > 0) {
+            element.addClass('active');
+        }
+    })
 });
