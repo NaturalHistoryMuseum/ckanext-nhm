@@ -369,6 +369,8 @@ body {
   &:before, &:after {
     display: none; // to fix something ckan did
   }
+
+  border: none;
 }
 
 .module-narrow {
@@ -602,7 +604,7 @@ body {
 }
 
 .nav-item.active > a:before, .nav-aside li.active a:before {
-  @media (min-width: @md) {
+  @media (min-width: @lg) {
     @arrow-size: 8px;
     content: ' ';
     height: 0;
@@ -613,6 +615,9 @@ body {
     border: @arrow-size solid transparent;
     border-left-color: @grey3;
     margin-top: 0 - @arrow-size;
+  }
+  @media (max-width: @lg - 1) {
+    border: none;
   }
 }
 
@@ -631,11 +636,7 @@ body {
 }
 
 .nav-simple {
-  font-size: @font-size-body-s !important;
-
-  & a {
-    font-size: @font-size-body-s !important;
-  }
+  font-size: @font-size-body-m !important;
 
   & > li {
     padding: 0 !important;
@@ -643,8 +644,16 @@ body {
     & > * {
       padding: 10px 15px;
       margin: 0;
+      font-size: @font-size-body-m !important;
+      line-height: 1.5em;
     }
   }
+}
+
+.nav-simple-heading {
+  background-color: @grey7;
+  border-top: 1px solid @grey9;
+  border-bottom: 1px solid @grey9;
 }
 
 .nav-tabs {
@@ -1385,7 +1394,9 @@ ol#credits {
   & .resource-view-facets {
     @cellheight: 36px;
     background-color: @grey9;
-    border-right: (ceil(@cellheight / 2) + 5) solid @grey9;
+    @media (min-width: @lg) {
+      border-right: 15px solid @grey9;
+    }
     padding: 0;
 
     .nav-item {
@@ -1399,13 +1410,6 @@ ol#credits {
           background-color: @grey4;
 
           &:before {
-            content: '';
-            position: absolute;
-            border-width: @cellheight / 2;
-            border-style: solid;
-            border-color: transparent;
-            right: 0 - @cellheight;
-            top: 0;
             border-left-color: @grey4;
           }
 

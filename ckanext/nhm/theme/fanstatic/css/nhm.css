@@ -438,6 +438,9 @@ body .default-text a:focus {
 .module-content {
   padding: 0;
 }
+.module-heading {
+  border: none;
+}
 .module-heading:before,
 .module-heading:after {
   display: none;
@@ -658,7 +661,7 @@ body .default-text a:focus {
     display: none;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .nav-item.active > a:before,
   .nav-aside li.active a:before {
     content: ' ';
@@ -672,6 +675,12 @@ body .default-text a:focus {
     margin-top: -8px;
   }
 }
+@media (max-width: 991px) {
+  .nav-item.active > a:before,
+  .nav-aside li.active a:before {
+    border: none;
+  }
+}
 .nav-pills .nav-item {
   background: none !important;
 }
@@ -682,10 +691,7 @@ body .default-text a:focus {
   content: none !important;
 }
 .nav-simple {
-  font-size: 12px !important;
-}
-.nav-simple a {
-  font-size: 12px !important;
+  font-size: 14px !important;
 }
 .nav-simple > li {
   padding: 0 !important;
@@ -693,6 +699,13 @@ body .default-text a:focus {
 .nav-simple > li > * {
   padding: 10px 15px;
   margin: 0;
+  font-size: 14px !important;
+  line-height: 1.5em;
+}
+.nav-simple-heading {
+  background-color: #C3C3C3;
+  border-top: 1px solid #F2F2F2;
+  border-bottom: 1px solid #F2F2F2;
 }
 .nav-tabs {
   border-bottom: none;
@@ -1344,8 +1357,12 @@ ol#credits li {
 }
 .ckanext-datapreview-faceted .resource-view-facets {
   background-color: #F2F2F2;
-  border-right: 23px solid #F2F2F2;
   padding: 0;
+}
+@media (min-width: 992px) {
+  .ckanext-datapreview-faceted .resource-view-facets {
+    border-right: 15px solid #F2F2F2;
+  }
 }
 .ckanext-datapreview-faceted .resource-view-facets .nav-item {
   height: 36px;
@@ -1357,13 +1374,6 @@ ol#credits li {
   background-color: #656565;
 }
 .ckanext-datapreview-faceted .resource-view-facets .nav-item.active a:before {
-  content: '';
-  position: absolute;
-  border-width: 18px;
-  border-style: solid;
-  border-color: transparent;
-  right: -36px;
-  top: 0;
   border-left-color: #656565;
 }
 .ckanext-datapreview-faceted .resource-view-facets .nav-item.active a:after {
