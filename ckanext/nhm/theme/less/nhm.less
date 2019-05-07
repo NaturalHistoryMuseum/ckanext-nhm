@@ -894,7 +894,7 @@ body {
     .no-box-shadow;
   }
 
-  &:hover, &.hover, &.active {
+  &:hover, &.hover, &.active, &:focus, &:active {
     background: @primary1;
     color: @grey10 !important;
   }
@@ -1681,11 +1681,6 @@ ol#credits {
 
 .module-record {
   margin-top: 0;
-}
-
-.toggle-empty-rows {
-  float: right;
-  margin: -10px 0 0 0;
 }
 
 .external-links {

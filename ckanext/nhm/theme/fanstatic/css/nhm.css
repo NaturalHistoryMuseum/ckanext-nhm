@@ -907,7 +907,9 @@ body .default-text a:focus {
 }
 .btn:hover,
 .btn.hover,
-.btn.active {
+.btn.active,
+.btn:focus,
+.btn:active {
   background: #0E4609;
   color: #FFFFFF !important;
 }
@@ -1635,10 +1637,6 @@ ol#credits li {
 }
 .module-record {
   margin-top: 0;
-}
-.toggle-empty-rows {
-  float: right;
-  margin: -10px 0 0 0;
 }
 .external-links {
   margin-bottom: 15px;
