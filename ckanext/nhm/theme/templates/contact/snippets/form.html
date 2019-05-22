@@ -84,7 +84,10 @@
 
     {% endif %}
 
-    {{ form.markdown('content', label=_('Your request'), id='field-content', value=data.content, error=errors.content, is_required=true) }}
+    {# using a max length of of 1500 on the text box as the WAF has a 1500 character limit on #}
+    {# this parameter and will block requests that exceed it #}
+    {{ form.markdown('content', label=_('Your request'), id='field-content', value=data.content,
+                     error=errors.content, is_required=true, attrs={'maxlength': 1500}) }}
 
 {% endblock %}
 
