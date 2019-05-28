@@ -1683,21 +1683,17 @@ ol#credits li {
 .activity {
   margin-top: 30px;
 }
+[data-module="dashboard"] {
+  margin-top: 20px;
+}
+#followee-filter li.active a {
+  background: #BBEDA9;
+  color: #343434;
+}
 /* Create dataset */
 .stages {
   margin-left: 0;
   margin-right: 0;
-}
-/* Dashboard */
-[data-module="dashboard"] {
-  margin-top: 20px;
-}
-#followee-filter ul li a i {
-  display: none;
-}
-#followee-filter ul li.active a {
-  background: #BBEDA9;
-  color: #343434;
 }
 .recline-query-editor {
   display: none !important;
