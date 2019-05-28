@@ -387,6 +387,9 @@ span.caret {
     width: 90%;
   }
 }
+.list-inline > li {
+  vertical-align: bottom;
+}
 [role=main],
 .main {
   background: transparent;
@@ -1556,6 +1559,9 @@ ol#credits li {
 .notes p:last-child {
   margin-bottom: 25px;
 }
+.recline-query-editor {
+  display: none !important;
+}
 .resource-view {
   margin: 0 0 20px 0;
 }
@@ -1712,7 +1718,4 @@ ol#credits li {
 #followee-filter li.active a {
   background: #BBEDA9;
   color: #343434;
-}
-.recline-query-editor {
-  display: none !important;
 }
