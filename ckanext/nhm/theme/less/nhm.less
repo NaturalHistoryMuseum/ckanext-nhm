@@ -155,6 +155,9 @@ body {
   .mixin-flex-right();
 }
 
+.flex-child-grow {
+  flex-grow: 1;
+}
 
 // UTILITY -----------------------------------------------------------------------------------------
 
@@ -435,9 +438,22 @@ span.caret {
     padding-bottom: @min-pad;
   }
 
-  & .nav-tabs > li {
-    @media (min-width: @md) {
-      float: left;
+  & .nav-tabs {
+    & > li {
+      @media (min-width: @md) {
+        float: left;
+      }
+    }
+
+    @media (min-width: @lg) {
+      flex-grow: 1;
+    }
+
+    @media (max-width: @md - 1) {
+      flex-grow: 1;
+      & + * {
+        flex-grow: 0;
+      }
     }
   }
 }
@@ -703,7 +719,7 @@ span.caret {
 
 .nav-tabs {
   border-bottom: none;
-  .no-spacing !important;
+  margin: 0 !important;
   float: none !important;
 
   & li {
@@ -749,6 +765,7 @@ span.caret {
   z-index: 1;
   padding: 0 10px;
   height: 100%;
+  text-align: left;
 
   @media (max-width: @collapse-width) {
     display: block;
@@ -761,6 +778,20 @@ span.caret {
 
   &.collapsed:after {
     content: '\f0d7';
+  }
+
+  &.side-toggle {
+    &:after {
+      content: '\f0d9';
+    }
+
+    &.collapsed:after {
+      content: '\f0da';
+    }
+
+    & + * {
+      padding-left: 0;
+    }
   }
 }
 
@@ -952,6 +983,7 @@ span.caret {
       margin: 0 !important;
       line-height: 1em;
       font-size: @font-size-body-l;
+      vertical-align: middle;
     }
   }
 
@@ -1363,6 +1395,7 @@ ol#credits {
 
 .resource-item {
   border-top: 1px solid @grey8;
+  padding: 10px;
 
   &:last-child {
     border-bottom: 1px solid @grey8;
@@ -1380,6 +1413,13 @@ ol#credits {
 
   & .btn-group {
     display: inherit;
+  }
+
+  & .format-label {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-right: 10px;
   }
 }
 
