@@ -234,6 +234,9 @@ body .default-text a:focus {
     justify-content: space-around;
   }
 }
+.gravatar {
+  margin: 7px 5px 10px;
+}
 .handle i {
   position: relative;
   top: -1px;
@@ -250,6 +253,55 @@ body .default-text a:focus {
 }
 .inline-list-pad li:last-child {
   padding-right: 0;
+}
+.pad-children-h > * {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.pad-children-h > *:first-child {
+  padding-left: 0;
+}
+.pad-children-h > *:last-child {
+  padding-right: 0;
+}
+.pagination-wrapper .pagination {
+  border: none !important;
+}
+.pagination-wrapper .pagination a {
+  border: none !important;
+  border-radius: 20px !important;
+  color: #188100 !important;
+  float: none !important;
+  padding: 4px 9px !important;
+}
+.pagination-wrapper .pagination .active a,
+.pagination-wrapper .pagination a:hover,
+.pagination-wrapper .pagination a:focus {
+  background-color: #188100 !important;
+  color: #FFFFFF !important;
+}
+.search {
+  padding: 5px;
+}
+span.caret {
+  margin-left: 10px !important;
+}
+.stages {
+  margin-left: 0;
+  margin-right: 0;
+}
+.stages .highlight {
+  text-indent: 0 !important;
+}
+.stages .active:after {
+  border-top-color: #71C85B;
+  border-bottom-color: #71C85B;
+}
+.stages .active:before {
+  color: #71C85B;
+}
+.stages .active .highlight {
+  background: #71C85B;
 }
 .stats {
   text-align: right;
@@ -284,41 +336,6 @@ body .default-text a:focus {
   font-size: 17px;
   display: block;
   color: #0E4609;
-}
-.gravatar {
-  margin: 7px 5px 10px;
-}
-.pagination-wrapper .pagination {
-  border: none !important;
-}
-.pagination-wrapper .pagination a {
-  border: none !important;
-  border-radius: 20px !important;
-  color: #188100 !important;
-  float: none !important;
-  padding: 4px 9px !important;
-}
-.pagination-wrapper .pagination .active a,
-.pagination-wrapper .pagination a:hover,
-.pagination-wrapper .pagination a:focus {
-  background-color: #188100 !important;
-  color: #FFFFFF !important;
-}
-.search {
-  padding: 5px;
-}
-.pad-children-h > * {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-.pad-children-h > *:first-child {
-  padding-left: 0;
-}
-.pad-children-h > *:last-child {
-  padding-right: 0;
-}
-span.caret {
-  margin-left: 10px !important;
 }
 .box {
   background: #F2F2F2;
@@ -1689,11 +1706,6 @@ ol#credits li {
 #followee-filter li.active a {
   background: #BBEDA9;
   color: #343434;
-}
-/* Create dataset */
-.stages {
-  margin-left: 0;
-  margin-right: 0;
 }
 .recline-query-editor {
   display: none !important;

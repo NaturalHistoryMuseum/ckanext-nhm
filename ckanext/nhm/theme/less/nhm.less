@@ -158,6 +158,10 @@ body {
 
 // UTILITY -----------------------------------------------------------------------------------------
 
+.gravatar {
+  margin: 7px 5px 10px;
+}
+
 .handle i {
   position: relative;
   top: -1px;
@@ -174,6 +178,71 @@ body {
 
 .inline-list-pad {
   .pad-right(li, 5px)
+}
+
+.pad-children-h > * {
+  padding-left: 5px;
+  padding-right: 5px;
+
+  &:first-child {
+    padding-left: 0;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.pagination-wrapper .pagination {
+  // this is for the numbered blobs at the bottom of, e.g. the datasets list, not the list view one
+  border: none !important;
+  @size: 26px;
+
+  & a {
+    border: none !important;
+    border-radius: 20px !important;
+    color: @primary3 !important;
+    float: none !important;
+    // this will need to be changed if the font size is changed and yes I know it's ugly
+    padding: (@size - 18)/2 (@size - 8)/2 !important;
+  }
+
+  & .active a, & a:hover, & a:focus {
+    background-color: @primary3 !important;
+    color: @grey10 !important;
+  }
+}
+
+.search {
+  padding: 5px;
+}
+
+span.caret {
+  margin-left: 10px !important;
+}
+
+.stages {
+  margin-left: 0;
+  margin-right: 0;
+
+  & .highlight {
+    text-indent: 0 !important;
+  }
+
+  & .active {
+    &:after {
+      border-top-color: @primary5;
+      border-bottom-color: @primary5;
+    }
+
+    &:before {
+      color: @primary5;
+    }
+
+    & .highlight {
+      background: @primary5;
+    }
+  }
 }
 
 .stats {
@@ -206,51 +275,6 @@ body {
       color: @primary1;
     }
   }
-}
-
-.gravatar {
-  margin: 7px 5px 10px;
-}
-
-.pagination-wrapper .pagination {
-  // this is for the numbered blobs at the bottom of, e.g. the datasets list, not the list view one
-  border: none !important;
-  @size: 26px;
-
-  & a {
-    border: none !important;
-    border-radius: 20px !important;
-    color: @primary3 !important;
-    float: none !important;
-    // this will need to be changed if the font size is changed and yes I know it's ugly
-    padding: (@size - 18)/2 (@size - 8)/2 !important;
-  }
-
-  & .active a, & a:hover, & a:focus {
-    background-color: @primary3 !important;
-    color: @grey10 !important;
-  }
-}
-
-.search {
-  padding: 5px;
-}
-
-.pad-children-h > * {
-  padding-left: 5px;
-  padding-right: 5px;
-
-  &:first-child {
-    padding-left: 0;
-  }
-
-  &:last-child {
-    padding-right: 0;
-  }
-}
-
-span.caret {
-  margin-left: 10px !important;
 }
 
 
@@ -1742,17 +1766,12 @@ ol#credits {
 
 #followee-filter {
   & li.active a {
-      background: @primary6;
-      color: @grey1
-    }
+    background: @primary6;
+    color: @grey1
+  }
 }
 
 // CHAOS BEGINS ====================================================================================
-/* Create dataset */
-.stages {
-  margin-left: 0;
-  margin-right: 0;
-}
 
 // From here down needs tidying up (YA THINK??)
 
