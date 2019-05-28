@@ -836,7 +836,7 @@ span.caret {
   margin: 4px 0 0 0;
 }
 .ckanpackager-form {
-  padding: 10px;
+  padding: 10px !important;
   background: #DDDDDD;
   position: relative;
   left: 10px;
@@ -1715,9 +1715,4 @@ ol#credits li {
 }
 .recline-query-editor {
   display: none !important;
-}
-.ckanpackager-tab {
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
 }
