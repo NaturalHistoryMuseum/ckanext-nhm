@@ -1,3 +1,6 @@
+.fa-arrows:before {
+  content: '\f338' !important;
+}
 /* Theme the controls */
 .controls {
   background: #F7F7F7;
@@ -9,6 +12,7 @@
 }
 .controls .recline-pager .pagination {
   margin: 10px 0;
+  white-space: nowrap;
 }
 .controls .recline-pager .pagination .page-range {
   border: none !important;
@@ -31,43 +35,43 @@
   border: none;
   padding-left: 5px;
   padding-right: 5px;
+  padding-top: 0;
   line-height: 1em;
   height: auto;
 }
-.controls .recline-record-count {
-  margin-left: 40px;
+.controls .recline-pager .pagination ul > li > a:hover,
+.controls .recline-pager .pagination ul > li > span:hover {
+  color: #343434 !important;
 }
-.list-view .controls {
+.controls .expand {
+  padding-left: 5% !important;
+}
+.list-view .controls,
+.recline-data-explorer .controls {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  padding: 0 10%;
 }
-.list-view .controls > * {
+.list-view .controls > *,
+.recline-data-explorer .controls > * {
   align-self: center;
   padding-left: 5px;
   padding-right: 5px;
 }
-@media (max-width: 991px) {
-  .list-view .controls > * {
-    flex: 0 1 auto;
-    width: 100%;
-  }
+.list-view .controls:not(.flex-reverse) > *:first-child,
+.recline-data-explorer .controls:not(.flex-reverse) > *:first-child {
+  flex-grow: 1;
 }
-@media (min-width: 992px) {
-  .list-view .controls > * {
-    flex: 1 1 0;
-  }
-  .list-view .controls > *:first-child {
-    margin-left: 0;
-  }
-  .list-view .controls > *:last-child {
-    margin-right: 0;
-  }
+.list-view .controls.flex-reverse > *:last-child,
+.recline-data-explorer .controls.flex-reverse > *:last-child {
+  flex-grow: 1;
 }
-.list-view .controls .recline-pager {
+.list-view .controls .recline-pager,
+.recline-data-explorer .controls .recline-pager {
   float: none;
 }
-.list-view .controls .pagination {
+.list-view .controls .pagination,
+.recline-data-explorer .controls .pagination {
   width: 100%;
-  text-align: right;
 }

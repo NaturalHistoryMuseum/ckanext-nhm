@@ -14,7 +14,11 @@ $(document).ready(function() {
     });
 
     // fix some fontawesome references
-    $('.fa-cloud-upload').removeClass('fa-cloud-upload').addClass('fa-cloud-upload-alt');
+    function replaceClass(oldClass, newClass) {
+        $('.' + oldClass).removeClass(oldClass).addClass(newClass);
+    }
+    replaceClass('fa-cloud-upload', 'fa-cloud-upload-alt');
+    replaceClass('fa-arrows', 'fa-arrows-alt-v');
 
     // fix the tabs problem
     var currentUrl = window.location.href;

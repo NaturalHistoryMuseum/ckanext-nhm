@@ -1,3 +1,6 @@
+.fa-arrows:before {
+  content: '\f338' !important;
+}
 .no-box-shadow {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -231,6 +234,11 @@ body .default-text a:focus {
     justify-content: space-around;
   }
 }
+.handle i {
+  position: relative;
+  top: -1px;
+  left: 3px;
+}
 .inline-icon-left {
   padding-right: 10px;
 }
@@ -280,19 +288,19 @@ body .default-text a:focus {
 .gravatar {
   margin: 7px 5px 10px;
 }
-.pagination {
+.pagination-wrapper .pagination {
   border: none !important;
 }
-.pagination a {
+.pagination-wrapper .pagination a {
   border: none !important;
   border-radius: 20px !important;
   color: #188100 !important;
   float: none !important;
   padding: 4px 9px !important;
 }
-.pagination .active a,
-.pagination a:hover,
-.pagination a:focus {
+.pagination-wrapper .pagination .active a,
+.pagination-wrapper .pagination a:hover,
+.pagination-wrapper .pagination a:focus {
   background-color: #188100 !important;
   color: #FFFFFF !important;
 }
@@ -308,6 +316,9 @@ body .default-text a:focus {
 }
 .pad-children-h > *:last-child {
   padding-right: 0;
+}
+span.caret {
+  margin-left: 10px !important;
 }
 .box {
   background: #F2F2F2;
@@ -504,7 +515,6 @@ body .default-text a:focus {
   border-left-color: #656565 !important;
 }
 .secondary .read-more {
-  color: #188100;
   display: block;
   text-align: right;
   font-size: 12px;
@@ -656,7 +666,9 @@ body .default-text a:focus {
   .navbar-collapse.collapse:not(.in) {
     display: block !important;
   }
-  .navbar-collapse.collapse:not(.in).nav-tabs > li + li,
+  .navbar-collapse.collapse:not(.in).nav-simple > li + li {
+    display: none;
+  }
   .navbar-collapse.collapse:not(.in) > li:not(.active) {
     display: none;
   }
@@ -714,9 +726,10 @@ body .default-text a:focus {
   float: none !important;
 }
 .nav-tabs li {
-  background-color: #f7f7f7;
+  background-color: #F2F2F2;
   border-radius: 2px;
   margin-bottom: 0 !important;
+  margin-right: 5px;
 }
 .nav-tabs li a,
 .nav-tabs li a:hover {
@@ -743,6 +756,7 @@ body .default-text a:focus {
     border: 8px solid transparent;
     border-top-color: #5B5B5B;
     margin-left: -8px;
+    z-index: 999;
   }
 }
 .navbar-toggle {
@@ -925,8 +939,8 @@ body .default-text a:focus {
   }
 }
 @media (min-width: 768px) {
-  .btn .fas:last-child,
-  .btn .fa:last-child {
+  .btn .fas:first-child,
+  .btn .fa:first-child {
     margin-right: 10px !important;
   }
 }
@@ -939,7 +953,8 @@ body .default-text a:focus {
 .btn-danger:hover {
   background: #6E001B;
 }
-.btn-group {
+.btn-group,
+.btn-group + .btn {
   margin-top: 5px;
 }
 .btn-group.open .btn-primary.dropdown-toggle {
@@ -1008,12 +1023,17 @@ body .default-text a:focus {
 }
 .table-record .sub-table {
   margin: 0;
+  background-color: #F2F2F2;
 }
 .table-record .sub-table td {
   padding-right: 10px;
 }
 .table-record .sub-table td:last-child {
   padding-right: 0;
+}
+.table-record .sub-table thead th {
+  background-color: #DDDDDD;
+  font-size: 14px;
 }
 @media (max-width: 575px) {
   .table-record {
@@ -1031,14 +1051,14 @@ body .default-text a:focus {
     display: block;
     height: 30px;
   }
-  .table-record tbody > tr {
+  .table-record > tbody > tr {
     flex-flow: row wrap;
     display: flex;
   }
-  .table-record tbody > tr > td {
+  .table-record > tbody > tr > td {
     flex: 1 100%;
   }
-  .table-record tbody > tr > td.filterable {
+  .table-record > tbody > tr > td.filterable {
     margin-top: -24px;
   }
 }
@@ -1663,10 +1683,6 @@ ol#credits li {
 .activity {
   margin-top: 30px;
 }
-.record-content table#determinations tbody tr th.name {
-  width: 50%;
-}
-/* Admin */
 /* Create dataset */
 .stages {
   margin-left: 0;

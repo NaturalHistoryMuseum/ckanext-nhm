@@ -1,3 +1,6 @@
+.fa-arrows:before {
+  content: '\f338' !important;
+}
 /* Leaflet controls */
 .leaflet-container .leaflet-bar {
   border: none;
