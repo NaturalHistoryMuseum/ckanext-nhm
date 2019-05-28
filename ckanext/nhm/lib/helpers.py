@@ -1272,8 +1272,8 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
     :return: a list of nav items
     '''
     link_definitions = [
-        (u'record', toolkit._(u'Normal view')),
-        (u'dwc', toolkit._(u'Darwin Core view')),
+        (u'record.view', toolkit._(u'Normal view')),
+        (u'record.dwc', toolkit._(u'Darwin Core view')),
         ]
     links = []
     for route_name, link_text in link_definitions:
