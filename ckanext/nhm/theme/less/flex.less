@@ -23,6 +23,15 @@
   }
 }
 
+.mixin-flex-stretch-height() {
+  align-items: stretch;
+
+  & > * {
+    align-self: stretch;
+    height: auto !important;
+  }
+}
+
 .mixin-flex-stretch-first() {
   &:not(.flex-reverse) > *:first-child {
     flex-grow: 1;

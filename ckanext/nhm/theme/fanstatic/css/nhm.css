@@ -178,6 +178,13 @@ body .default-text a:focus {
 .flex-top > * {
   align-self: flex-start;
 }
+.flex-stretch-height {
+  align-items: stretch;
+}
+.flex-stretch-height > * {
+  align-self: stretch;
+  height: auto !important;
+}
 .flex-stretch-first:not(.flex-reverse) > *:first-child {
   flex-grow: 1;
 }
@@ -357,6 +364,8 @@ span.caret {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
+  margin: 10px;
+  height: 100%;
 }
 .box a {
   color: #188100;
@@ -367,10 +376,21 @@ span.caret {
   text-decoration: none !important;
 }
 .box .module-content {
-  padding: 20px;
+  padding: 15px;
   margin: 0;
 }
-.box h4 {
+@media (min-width: 768px) {
+  .box .module-content {
+    max-width: 50%;
+  }
+}
+@media (min-width: 992px) {
+  .box .module-content {
+    max-width: 100%;
+  }
+}
+.box h4,
+.box h5 {
   margin-top: 0;
 }
 .box p {
@@ -1288,11 +1308,33 @@ select,
   color: #BBEDA9;
   text-decoration: none !important;
 }
+.featured {
+  height: 100%;
+}
+.featured .box-text {
+  margin-bottom: 2em;
+}
+.featured .text-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
 .homepage [role=main] {
   padding: 0;
 }
 .homepage .flash-messages div:first-child {
   margin-top: 40px;
+}
+.homepage .media-image {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 15px !important;
+  max-width: 100%;
+}
+.homepage .media-image img {
+  min-width: unset;
+  max-width: 100%;
+  height: auto;
 }
 .specimen-collection .module-content {
   background: #F2F2F2;

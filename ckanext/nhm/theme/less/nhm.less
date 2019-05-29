@@ -123,6 +123,10 @@ body {
   .mixin-flex-top()
 }
 
+.flex-stretch-height {
+  .mixin-flex-stretch-height()
+}
+
 .flex-stretch-first {
   .mixin-flex-stretch-first()
 }
@@ -158,6 +162,7 @@ body {
 .flex-child-grow {
   flex-grow: 1;
 }
+
 
 // UTILITY -----------------------------------------------------------------------------------------
 
@@ -291,13 +296,21 @@ span.caret {
   .palette-sidebar(normal);
   .no-box-shadow;
   .no-border-radius;
+  margin: 10px;
+  height: 100%;
 
   & .module-content {
-    padding: 20px;
+    padding: @min-pad;
     margin: 0;
+    @media (min-width: @md) {
+      max-width: 50%;
+    }
+    @media (min-width: @lg) {
+      max-width: 100%;
+    }
   }
 
-  h4 {
+  & h4, & h5 {
     margin-top: 0;
   }
 
@@ -1292,6 +1305,20 @@ select, .select2-choice {
   background-size: 100%;
 }
 
+.featured {
+  height: 100%;
+
+  .box-text {
+    margin-bottom: 2em;
+  }
+
+  .text-right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
+
 .homepage {
   & [role=main] {
     padding: 0;
@@ -1299,6 +1326,19 @@ select, .select2-choice {
 
   & .flash-messages div:first-child {
     margin-top: 40px;
+  }
+
+  .media-image {
+    flex-shrink: 0;
+    text-align: center;
+    padding: @min-pad !important;
+    max-width: 100%;
+
+    img {
+      min-width: unset;
+      max-width: 100%;
+      height: auto;
+    }
   }
 }
 
