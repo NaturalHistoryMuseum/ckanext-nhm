@@ -1,49 +1,35 @@
-
-import json
-
-import os
 import rdflib
-from datetime import datetime
 from pylons import request
 from rdflib import OWL
 from rdflib import URIRef, BNode, Literal
 from rdflib.namespace import FOAF, SKOS
-from rdflib.namespace import Namespace, RDF, XSD, RDFS
+from rdflib.namespace import Namespace, RDF, XSD
 
-import ckan.lib.base as base
-import ckan.logic as logic
-from ckan.lib.helpers import url_for
 from ckan.plugins import toolkit
 from ckanext.dcat.profiles import RDFProfile
-from ckanext.dcat.utils import resource_uri, dataset_uri, catalog_uri
-from ckanext.nhm.lib.dwc import dwc_terms
-from ckanext.nhm.lib.helpers import get_department
+from ckanext.dcat.utils import resource_uri, catalog_uri
 
-abort = base.abort
-NotFound = logic.NotFound
-
+# define the available namespaces
+ADMS = Namespace("http://www.w3.org/ns/adms#")
+AIISO = Namespace('http://purl.org/vocab/aiiso/schema#')
+CC = Namespace('http://creativecommons.org/ns#')
 DC = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
-ADMS = Namespace("http://www.w3.org/ns/adms#")
-VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
-SCHEMA = Namespace('http://schema.org/')
-TIME = Namespace('http://www.w3.org/2006/time')
+DQV = Namespace('http://www.w3.org/ns/dqv#')
+DWC = Namespace('http://rs.tdwg.org/dwc/terms/')
 LOCN = Namespace('http://www.w3.org/ns/locn#')
 GSP = Namespace('http://www.opengis.net/ont/geosparql#')
-SDMX_CODE = Namespace("http://purl.org/linked-data/sdmx/2009/code#")
-TDWGI = Namespace('http://rs.tdwg.org/ontology/voc/Institution#')
-AIISO = Namespace('http://purl.org/vocab/aiiso/schema#')
 MADS = Namespace('http://www.loc.gov/mads/rdf/v1#')
-VOID = Namespace('http://rdfs.org/ns/void#')
-CC = Namespace('http://creativecommons.org/ns#')
 ORG = Namespace('http://www.w3.org/TR/vocab-org/#')
-# Darwin core
-DWC = Namespace('http://rs.tdwg.org/dwc/terms/')
+SCHEMA = Namespace('http://schema.org/')
+SDMX_CODE = Namespace("http://purl.org/linked-data/sdmx/2009/code#")
 SDWC = Namespace('http://rs.tdwg.org/dwc/xsd/simpledarwincore#')
-# Data quality indicators
-DQV = Namespace('http://www.w3.org/ns/dqv#')
+TDWGI = Namespace('http://rs.tdwg.org/ontology/voc/Institution#')
+TIME = Namespace('http://www.w3.org/2006/time')
+VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+VOID = Namespace('http://rdfs.org/ns/void#')
 
-# All metadata licence under CC0
+# all metadata is licenced under CC0
 METADATA_LICENCE = 'http://creativecommons.org/publicdomain/zero/1.0/'
 
 
@@ -308,163 +294,3 @@ class NHMDCATProfile(RDFProfile):
                 except (ValueError, TypeError):
                     g.add((distribution, DCAT.byteSize,
                            Literal(resource_dict['size'])))
-
-    def graph_from_record(self, record_dict, resource, record_ref):
-        """
-        RDF for an individual record - currently this is a specimen record
-
-        Similar approach to: curl -L -H "Accept: application/rdf+ttl" http://data.rbge.org.uk/herb/E00321910
-
-        :param record_dict:
-        :param resource:
-        :param record_ref:
-        :return:
-        """
-        context = self.get_context()
-        namespaces = {
-            'dc': DC,
-            'dcat': DCAT,
-            'dwc': DWC,
-            'sdwc': SDWC,
-            'void': VOID,
-            'cc': CC,
-            'foaf': FOAF,
-            'dqv': DQV,
-            'aiiso': AIISO,
-            'tdwgi': TDWGI,
-            'owl': OWL
-        }
-
-        g = self.g
-
-        # Add some more namespaces
-        for prefix, namespace in namespaces.iteritems():
-            g.bind(prefix, namespace)
-
-        package_id = resource.get_package_id()
-
-        # Create licences metadata for record
-        object_uri = URIRef(record_ref + '#object')
-
-        # Add publisher - as per BBC we don't need the full org description here
-        nhm_uri = URIRef('http://nhm.ac.uk')
-
-        # Add object description - the metadata and license
-        g.add((record_ref, RDF.type, FOAF.Document))
-        g.add((record_ref, CC.license, URIRef(METADATA_LICENCE)))
-        # This metadata describes #dataset
-        g.add((record_ref, FOAF.primaryTopic, object_uri))
-        # Add the de-referenced link to record
-        record_link = url_for('record', action='view', package_name=package_id, resource_id=resource.id, record_id=record_dict['_id'], qualified=True)
-        g.add((record_ref, DC.hasVersion, URIRef(record_link)))
-        # Add institution properties
-        g.add((record_ref, FOAF.organization, nhm_uri))
-        g.add((record_ref, AIISO.Department, Literal(get_department(record_dict['collectionCode']))))
-
-        try:
-            sub_dept = record_dict.pop('subDepartment')
-        except KeyError:
-            pass
-        else:
-            g.add((record_ref, AIISO.Division, Literal(sub_dept)))
-
-        # Created and modified belong to the metadata record, not the specimen
-        for term in ['created', 'modified']:
-            try:
-                value = record_dict.get(term)
-            except KeyError:
-                pass
-            else:
-                # Parse into data format, and add as dates
-                _date = datetime.fromtimestamp(value / 1000.0)
-                g.add((record_ref, getattr(DWC, term), Literal(_date.isoformat(), datatype=XSD.dateTime)))
-
-        try:
-            gbif_record = toolkit.get_action(u'gbif_record_show')(context, {
-                u'gbif_id': record_dict.get(u'gbif', {}).get(u'id')
-            })
-        except NotFound:
-            gbif_record = {}
-        else:
-            # Assert equivalence with the GBIF record
-            gbif_uri = os.path.join(u'http://www.gbif.org/occurrence', gbif_record[u'gbifID'])
-            g.add((object_uri, OWL.sameAs, URIRef(gbif_uri)))
-            # If we have a GBIF country code, add it
-            # Annoyingly, this seems to be the only geographic element on GBIF with URI
-            country_code = gbif_record.get(u'countryCode')
-            if country_code:
-                g.add((object_uri, DWC.countryCode, URIRef(os.path.join(u'http://www.gbif.org/country', country_code))))
-
-        # Now, create the specimen object
-        # Remove nulls and hidden fields from record_dict
-        record_dict = dict((k, v) for k, v in record_dict.iteritems() if v)
-
-        # Now add the actual specimen object
-        g.add((object_uri, RDF.type, FOAF.Document))
-        g.add((object_uri, RDF.type, SDWC.SimpleDarwinRecordSet))
-
-        # Make sure decimal latitude and longitude are strings
-        for d in ['decimalLatitude', 'decimalLongitude']:
-            try:
-                record_dict[d] = str(record_dict[d])
-            except KeyError:
-                pass
-
-        # Adding images as JSON is rubbish! So lets try and do it properly
-        for image in record_dict.pop('associatedMedia', []):
-            image_uri = URIRef(image['identifier'])
-            g.set((image_uri, RDF.type, FOAF.Image))
-            title = image.get('title', None)
-            if title:
-                g.set((image_uri, DC.title, Literal(title)))
-            g.set((image_uri, CC.license, URIRef(image['license'])))
-            g.set((image_uri, DC.RightsStatement, Literal(image['rightsHolder'])))
-            g.set((image_uri, DC.Format, Literal(image['mime'])))
-            # Add link from image to object...
-            g.set((image_uri, FOAF.depicts, object_uri))
-            # And object to image
-            g.add((object_uri, FOAF.depiction, image_uri))
-
-        # This record belongs in X dataset
-        dataset_ref = URIRef(dataset_uri({'id': package_id}) + '#dataset')
-        g.add((object_uri, VOID.inDataset, dataset_ref))
-
-        dwc_terms_dict = dwc_terms(record_dict.keys())
-
-        # Handle dynamic properties separately
-        dynamic_properties = dwc_terms_dict.pop('dynamicProperties')
-
-        for group, terms in dwc_terms_dict.items():
-            for uri, term in terms.items():
-                # Do we have a GBIF key value?
-                gbif_key = gbif_record.get(term)
-
-                # Do we have a GBIF key value? If we do, we can provide a URI to GBIF
-                if gbif_key:
-                    gbif_uri = URIRef(os.path.join('http://www.gbif.org/species', gbif_key))
-                    # Add the GBIF species URI with label
-                    g.add((gbif_uri, RDFS.label, Literal(record_dict.get(term))))
-                    # And associated our specimen object's DWC term with the GBIF URI
-                    g.add((object_uri, getattr(DWC, term), gbif_uri))
-                else:
-                    # We do not have a GBIF key, so no URI: Add the term value as a literal
-                    g.add((object_uri, getattr(DWC, term), Literal(record_dict.get(term))))
-
-        g.add((object_uri, DC.identifier, Literal(record_dict.get('uuid'))))
-
-        dynamic_properties_dict = {}
-        for properties in dynamic_properties.values():
-            for property in properties:
-                dynamic_properties_dict[property] = record_dict.get(property)
-        if dynamic_properties_dict:
-            g.add((object_uri, DWC.dynamicProperties, Literal(json.dumps(dynamic_properties_dict))))
-
-        # try:
-        #     dqi = record_dict.pop('dqi')
-        # except KeyError:
-        #     pass
-        # else:
-        #     pass
-        #     # TODO: Add DQV. Currently there are none in use
-        #     # if dqi != 'Unknown':
-        #     #     n = BNode()

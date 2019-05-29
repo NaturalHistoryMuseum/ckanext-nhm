@@ -1,4 +1,3 @@
-import json
 import logging
 import ckan.plugins as p
 import ckan.lib.navl.dictization_functions
@@ -7,7 +6,7 @@ import ckan.logic as logic
 import ckan.model as model
 from ckan.common import c
 from ckanext.nhm.lib.mam import mam_media_request
-from ckanext.nhm.dcat.processors import RDFSerializer
+from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib.record import get_record_by_uuid
 
 NotFound = logic.NotFound
@@ -121,10 +120,9 @@ def object_rdf(context, data_dict):
     version = data_dict.get(u'version', None)
     record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'], version)
     if record_dict:
-        record_dict['uuid'] = data_dict['uuid']
-        serializer = RDFSerializer()
-        output = serializer.serialize_record(record_dict, resource_dict,
-                                             _format=data_dict.get('format'))
+        serializer = ObjectSerializer()
+        output = serializer.serialize_record(record_dict, resource_dict, data_dict.get(u'format'),
+                                             version)
         return output
     raise NotFound
 
