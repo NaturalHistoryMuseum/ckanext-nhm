@@ -302,6 +302,9 @@ span.caret {
   & .module-content {
     padding: @min-pad;
     margin: 0;
+  }
+
+  & .media-image + .module-content {
     @media (min-width: @md) {
       max-width: 50%;
     }
@@ -314,16 +317,23 @@ span.caret {
     margin-top: 0;
   }
 
-  p {
+  & p {
     margin: 0;
   }
 
   .box-text {
     min-height: 90px;
+    position: relative;
+
+    & p {
+      margin-bottom: 10px;
+    }
   }
 
-  .box-text p {
-    margin-bottom: 10px;
+  & .text-right.text-bottom {
+    position: absolute;
+    bottom: 0;
+    right: 0;
   }
 }
 
@@ -1223,27 +1233,10 @@ select, .select2-choice {
 .action-box {
   .palette-header();
   .palette-header-txt();
-  margin: 10px;
-
-  & .module-content {
-    display: flex;
-    flex-direction: row;
-  }
-
-  & .content {
-    flex-grow: 1;
-  }
 
   & i.large {
-    flex-grow: 0;
-    margin-right: 20px;
-    width: 30px;
-    height: 30px;
     font-size: @font-size-head-xl;
-  }
-
-  & .text-right {
-    margin-top: 20px;
+    padding: @min-pad 0 @min-pad @min-pad;
   }
 }
 
@@ -1310,12 +1303,6 @@ select, .select2-choice {
 
   .box-text {
     margin-bottom: 2em;
-  }
-
-  .text-right {
-    position: absolute;
-    bottom: 0;
-    right: 0;
   }
 }
 
