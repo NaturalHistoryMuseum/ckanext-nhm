@@ -77,28 +77,6 @@ a {
   }
 }
 
-i {
-  &.botany {
-    background-image: url('@{icons}/leaf-icon.png');
-  }
-
-  &.entomology {
-    background-image: url('@{icons}/fly-icon.png');
-  }
-
-  &.zoology {
-    background-image: url('@{icons}/gecko-icon.png');
-  }
-
-  &.palaeontology {
-    background-image: url('@{icons}/nauti-icon.png');
-  }
-
-  &.mineralogy {
-    background-image: url('@{icons}/earth-icon.png');
-  }
-}
-
 body {
   .palette-base();
 
@@ -113,10 +91,22 @@ body {
 
 .flex-container {
   .mixin-flex-container();
+  .mixin-flex-row();
+}
+
+.flex-column {
+  .mixin-flex-container();
+  .mixin-flex-column();
 }
 
 .flex-reverse {
-  .mixin-flex-reverse()
+  &.flex-container {
+    flex-direction: row-reverse;
+  }
+
+  &.flex-column {
+    flex-direction: column-reverse;
+  }
 }
 
 .flex-top {
@@ -153,6 +143,10 @@ body {
 
 .flex-around {
   .mixin-flex-around()
+}
+
+.flex-center {
+  .mixin-flex-center();
 }
 
 .flex-right {
@@ -982,6 +976,24 @@ span.caret {
   top: floor(@min-pad / 3);
 }
 
+.collapse-to-icon {
+  @media (max-width: @md - 1) {
+    font-size: 0;
+    & .fa, & .fas {
+      margin: 0 !important;
+      line-height: 1em;
+      font-size: @font-size-body-l;
+      vertical-align: middle;
+    }
+  }
+
+  @media (min-width: @md) {
+    & .fas:first-child, & .fa:first-child {
+      margin-right: 10px !important;
+    }
+  }
+}
+
 .btn {
   border: none;
   border-radius: @rounding !important;
@@ -1000,21 +1012,7 @@ span.caret {
     color: @grey10 !important;
   }
 
-  @media (max-width: @md - 1) {
-    font-size: 0;
-    & .fa, & .fas {
-      margin: 0 !important;
-      line-height: 1em;
-      font-size: @font-size-body-l;
-      vertical-align: middle;
-    }
-  }
-
-  @media (min-width: @md) {
-    & .fas:first-child, & .fa:first-child {
-      margin-right: 10px !important;
-    }
-  }
+  .collapse-to-icon;
 
   & i {
     font-size: initial;
@@ -1243,14 +1241,15 @@ select, .select2-choice {
 .collection-search-form {
   @pad-search: 80px;
 
-  // FIXME: get a better resolution image
-  background: url('@{images}/search_map_bg.jpg') no-repeat center center !important;
+  background: url('@{images}/mapHeat.png') no-repeat center center !important;
+  background-size: cover !important;
   border: none;
   @media (max-width: @xl - 1) {
     padding: @pad-search (@pad-search / 2) (@pad-search - @margin-search) !important;
   }
   @media (min-width: @xl) {
     padding: @pad-search (@pad-search * 2) (@pad-search - @margin-search) !important;
+    margin: 20px @min-pad 0 !important;
   }
 
   & .search-input input {
@@ -1265,21 +1264,93 @@ select, .select2-choice {
   }
 
   & .collection-icon {
-    width: 30px;
-    height: 30px;
-    background-repeat: no-repeat;
-    background-position: center center;
-    float: left;
-    position: relative;
-    top: -2px;
-  }
+    @iconsize: 40px;
+    width: @iconsize;
+    height: @iconsize;
+    @media (min-width: @xl) {
+      width: @iconsize * 1.2;
+      height: @iconsize * 1.2;
+    }
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    margin-right: 5px;
+    mask-size: contain;
+    background-color: @primary3;
 
-  & a {
-    font-size: @font-size-head-l;
+    &.botany {
+      mask-image: url('@{icons}/bot.svg');
+      -webkit-mask-image: url('@{icons}/bot.svg');
+    }
+
+    &.entomology {
+      mask-image: url('@{icons}/ent.svg');
+      -webkit-mask-image: url('@{icons}/ent.svg');
+    }
+
+    &.zoology {
+      mask-image: url('@{icons}/zoo.svg');
+      -webkit-mask-image: url('@{icons}/zoo.svg');
+    }
+
+    &.palaeontology {
+      mask-image: url('@{icons}/pal.svg');
+      -webkit-mask-image: url('@{icons}/pal.svg');
+    }
+
+    &.mineralogy {
+      mask-image: url('@{icons}/min.svg');
+      -webkit-mask-image: url('@{icons}/min.svg');
+    }
   }
 
   & i {
     margin-right: 5px;
+  }
+
+  & .collection-block {
+    .mixin-flex-container();
+    @media (min-width: @lg) {
+      .mixin-flex-row();
+      & .collection-count {
+        position: relative;
+        left: -1px; // it just doesn't look aligned otherwise
+      }
+
+      & .collection-code {
+        font-size: 0 !important;
+        margin: 0;
+        padding: 0;
+      }
+
+      & .collection-block-text {
+        .mixin-flex-top();
+      }
+    }
+    @media (max-width: @lg - 1) {
+      .mixin-flex-column();
+      & .default-text {
+        font-size: 0;
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    & .collection-block-text {
+      text-align: center;
+    }
+
+    & .collection-count {
+      font-size: @font-size-head-l;
+
+      @media (max-width: @md - 1) {
+        font-size: @font-size-head-xs;
+      }
+    }
+
+    & .collection-code {
+      color: @baseTextColor;
+      font-size: @font-size-body-s;
+    }
   }
 }
 

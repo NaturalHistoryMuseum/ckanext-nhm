@@ -56,7 +56,13 @@
 .list-view .controls > *,
 .recline-data-explorer .controls > * {
   align-self: center;
+}
+.list-view .controls > *:not(:first-child),
+.recline-data-explorer .controls > *:not(:first-child) {
   padding-left: 5px;
+}
+.list-view .controls > *:not(:last-child),
+.recline-data-explorer .controls > *:not(:last-child) {
   padding-right: 5px;
 }
 .list-view .controls:not(.flex-reverse) > *:first-child,

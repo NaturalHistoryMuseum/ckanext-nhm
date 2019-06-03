@@ -126,21 +126,6 @@ a.external:after {
 a.external:after:hover {
   text-decoration: none;
 }
-i.botany {
-  background-image: url('/images/icons/leaf-icon.png');
-}
-i.entomology {
-  background-image: url('/images/icons/fly-icon.png');
-}
-i.zoology {
-  background-image: url('/images/icons/gecko-icon.png');
-}
-i.palaeontology {
-  background-image: url('/images/icons/nauti-icon.png');
-}
-i.mineralogy {
-  background-image: url('/images/icons/earth-icon.png');
-}
 body {
   background: #FFFFFF;
 }
@@ -166,11 +151,25 @@ body .default-text a:focus {
 }
 .flex-container > * {
   align-self: center;
+}
+.flex-container > *:not(:first-child) {
   padding-left: 5px;
+}
+.flex-container > *:not(:last-child) {
   padding-right: 5px;
 }
-.flex-reverse {
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+.flex-column > * {
+  vertical-align: center;
+}
+.flex-reverse.flex-container {
   flex-direction: row-reverse;
+}
+.flex-reverse.flex-column {
+  flex-direction: column-reverse;
 }
 .flex-top {
   align-items: flex-start;
@@ -237,6 +236,9 @@ body .default-text a:focus {
 }
 .flex-around {
   justify-content: space-around;
+}
+.flex-center {
+  justify-content: center;
 }
 .flex-right {
   justify-content: flex-end;
@@ -984,6 +986,24 @@ span.caret {
 .actions {
   top: 5px;
 }
+@media (max-width: 767px) {
+  .collapse-to-icon {
+    font-size: 0;
+  }
+  .collapse-to-icon .fa,
+  .collapse-to-icon .fas {
+    margin: 0 !important;
+    line-height: 1em;
+    font-size: 17px;
+    vertical-align: middle;
+  }
+}
+@media (min-width: 768px) {
+  .collapse-to-icon .fas:first-child,
+  .collapse-to-icon .fa:first-child {
+    margin-right: 10px !important;
+  }
+}
 .btn {
   border: none;
   border-radius: 2px !important;
@@ -1232,7 +1252,8 @@ select,
   padding: 15px 0 15px 15px;
 }
 .collection-search-form {
-  background: url('/images/search_map_bg.jpg') no-repeat center center !important;
+  background: url('/images/mapHeat.png') no-repeat center center !important;
+  background-size: cover !important;
   border: none;
 }
 @media (max-width: 1199px) {
@@ -1243,6 +1264,7 @@ select,
 @media (min-width: 1200px) {
   .collection-search-form {
     padding: 80px 160px 60px !important;
+    margin: 20px 15px 0 !important;
   }
 }
 .collection-search-form .search-input input {
@@ -1263,19 +1285,102 @@ select,
   text-decoration: none !important;
 }
 .collection-stats .collection-icon {
-  width: 30px;
-  height: 30px;
-  background-repeat: no-repeat;
-  background-position: center center;
-  float: left;
-  position: relative;
-  top: -2px;
+  width: 40px;
+  height: 40px;
+  mask-repeat: no-repeat;
+  mask-position: center center;
+  margin-right: 5px;
+  mask-size: contain;
+  background-color: #188100;
 }
-.collection-stats a {
-  font-size: 28px;
+@media (min-width: 1200px) {
+  .collection-stats .collection-icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+.collection-stats .collection-icon.botany {
+  mask-image: url('/images/icons/bot.svg');
+  -webkit-mask-image: url('/images/icons/bot.svg');
+}
+.collection-stats .collection-icon.entomology {
+  mask-image: url('/images/icons/ent.svg');
+  -webkit-mask-image: url('/images/icons/ent.svg');
+}
+.collection-stats .collection-icon.zoology {
+  mask-image: url('/images/icons/zoo.svg');
+  -webkit-mask-image: url('/images/icons/zoo.svg');
+}
+.collection-stats .collection-icon.palaeontology {
+  mask-image: url('/images/icons/pal.svg');
+  -webkit-mask-image: url('/images/icons/pal.svg');
+}
+.collection-stats .collection-icon.mineralogy {
+  mask-image: url('/images/icons/min.svg');
+  -webkit-mask-image: url('/images/icons/min.svg');
 }
 .collection-stats i {
   margin-right: 5px;
+}
+.collection-stats .collection-block {
+  display: flex;
+}
+@media (min-width: 992px) {
+  .collection-stats .collection-block {
+    flex-direction: row;
+  }
+  .collection-stats .collection-block > * {
+    align-self: center;
+  }
+  .collection-stats .collection-block > *:not(:first-child) {
+    padding-left: 5px;
+  }
+  .collection-stats .collection-block > *:not(:last-child) {
+    padding-right: 5px;
+  }
+  .collection-stats .collection-block .collection-count {
+    position: relative;
+    left: -1px;
+  }
+  .collection-stats .collection-block .collection-code {
+    font-size: 0 !important;
+    margin: 0;
+    padding: 0;
+  }
+  .collection-stats .collection-block .collection-block-text {
+    align-items: flex-start;
+  }
+  .collection-stats .collection-block .collection-block-text > * {
+    align-self: flex-start;
+  }
+}
+@media (max-width: 991px) {
+  .collection-stats .collection-block {
+    flex-direction: column;
+  }
+  .collection-stats .collection-block > * {
+    vertical-align: center;
+  }
+  .collection-stats .collection-block .default-text {
+    font-size: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+.collection-stats .collection-block .collection-block-text {
+  text-align: center;
+}
+.collection-stats .collection-block .collection-count {
+  font-size: 28px;
+}
+@media (max-width: 767px) {
+  .collection-stats .collection-block .collection-count {
+    font-size: 22px;
+  }
+}
+.collection-stats .collection-block .collection-code {
+  color: #343434;
+  font-size: 12px;
 }
 .extended-masthead .masthead {
   background: none !important;
@@ -1568,13 +1673,7 @@ ol#credits li {
 }
 .display-filter .resource-view-filters-wrapper {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
-}
-.display-filter .resource-view-filters-wrapper > * {
-  align-self: center;
-  padding-left: 5px;
-  padding-right: 5px;
 }
 @media (max-width: 991px) {
   .display-filter .resource-view-filters-wrapper > * {
