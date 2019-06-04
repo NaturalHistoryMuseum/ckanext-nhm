@@ -160,6 +160,24 @@ body {
 
 // UTILITY -----------------------------------------------------------------------------------------
 
+.collapse-to-icon {
+  @media (max-width: @md - 1) {
+    font-size: 0;
+    & .fa, & .fas {
+      margin: 0 !important;
+      line-height: 1em;
+      font-size: @font-size-body-l;
+      vertical-align: middle;
+    }
+  }
+
+  @media (min-width: @md) {
+    & .fas:first-child, & .fa:first-child {
+      margin-right: 10px !important;
+    }
+  }
+}
+
 .gravatar {
   margin: 7px 5px 10px;
 }
@@ -972,26 +990,19 @@ span.caret {
 
 // BUTTONS -----------------------------------------------------------------------------------------
 
-.actions {
-  top: floor(@min-pad / 3);
+.action .btn {
+  @media (max-width: @lg - 1) and  (min-width: @md){
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: max-content;
+  }
 }
 
-.collapse-to-icon {
-  @media (max-width: @md - 1) {
-    font-size: 0;
-    & .fa, & .fas {
-      margin: 0 !important;
-      line-height: 1em;
-      font-size: @font-size-body-l;
-      vertical-align: middle;
-    }
-  }
-
-  @media (min-width: @md) {
-    & .fas:first-child, & .fa:first-child {
-      margin-right: 10px !important;
-    }
-  }
+.actions {
+  top: floor(@min-pad / 3);
 }
 
 .btn {
@@ -1011,8 +1022,6 @@ span.caret {
     background: @primary1;
     color: @grey10 !important;
   }
-
-  .collapse-to-icon;
 
   & i {
     font-size: initial;

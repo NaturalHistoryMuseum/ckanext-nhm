@@ -13,6 +13,11 @@ $(document).ready(function() {
         element.html(html);
     });
 
+    // add the collapse-to-icon class to every button with an icon
+    $('.btn > i, button > i').map((i, btnicon) => {
+        return btnicon.parentNode;
+    }).addClass('collapse-to-icon');
+
     // fix some fontawesome references
     function replaceClass(oldClass, newClass) {
         $('.' + oldClass).removeClass(oldClass).addClass(newClass);
