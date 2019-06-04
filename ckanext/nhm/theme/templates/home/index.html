@@ -68,20 +68,23 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="module-content">
-                    <ul class="list-unstyled list-inline flex-container">
+                    <ul class="list-unstyled list-inline flex-container flex-nowrap flex-around flex-top">
                         {% for collection_code, count in
                         collection_stats['collections'].items() %} {% if collection_code
                         %} {% set dept = h.get_department(collection_code) %}
                         <li>
-                            <div>
-                                <a href="{{ h.url_for_collection_view(filters={'collectionCode': collection_code}) }}">
-                                    <div style="height:100%;"><i
-                                            class="{{ dept|lower }} collection-icon"></i>
-                                    </div>
-                                    <div class="block-inline"><span> {{ h.delimit_number(count) }}</span>
-                                        <span class="default-text">{{ dept }}</span></div>
-                                </a>
+                        <a href="{{ h.url_for_collection_view(filters={'collectionCode': collection_code}) }}">
+                            <div class="collection-block">
+                                <div class="flex-container flex-nowrap flex-center">
+                                    <svg class="{{ dept|lower }} collection-icon"></svg>
+                                    <span class="collection-code">{{ collection_code|replace('bmnh(e)','ent')|upper }}</span>
+                                </div>
+                                <div class="flex-column collection-block-text">
+                                    <span class="collection-count"> {{ h.delimit_number(count) }}</span>
+                                    <span class="collection-name default-text">{{ dept }}</span>
+                                </div>
                             </div>
+                        </a>
                         </li>
                         {% endif %} {% endfor %}
                     </ul>
@@ -99,7 +102,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <h3>Featured datasets</h3>
-                    <div class="flex-container flex-equal flex-wrap flex-between">
+                    <div class="flex-container flex-equal flex-wrap flex-between flex-stretch-height">
                         {% snippet 'home/snippets/featured/dataset1.html' %} {% snippet
                         'home/snippets/featured/dataset2.html' %} {% snippet
                         'home/snippets/featured/dataset3.html' %}
@@ -114,12 +117,10 @@
             <div class="row">
                 <div class="col-md-12">
                     <h3>Use the data</h3>
-                    <div class="flex-container flex-equal flex-wrap flex-between">
-
+                    <div class="flex-container flex-equal flex-wrap flex-between flex-stretch-height">
                         {% snippet 'home/snippets/actions/explore.html' %} {% snippet
                         'home/snippets/actions/download.html' %} {% snippet
                         'home/snippets/actions/cite.html' %}
-
                     </div>
                 </div>
             </div>

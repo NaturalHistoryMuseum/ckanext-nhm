@@ -28,6 +28,15 @@
   margin: 0;
 }
 
+.minimal-padding {
+  @media (max-width: @lg - 1) {
+    padding: 1px 0;
+  }
+  @media (min-width: @lg) {
+    padding: 1px;
+  }
+}
+
 .block-inline {
   display: inline-block;
 }

@@ -9,22 +9,24 @@ Example:
 #}{% block package_info %}{% if g.pkg %}
 
 <section class="module module-narrow module-shallow">
-    <div class="flex-container flex-between flex-stretch-first">
-        <h2 class="module-heading"><i class="fas fa-eye inline-icon-left"></i> {{
+    <div class="flex-container flex-between flex-stretch-first nav-simple-heading">
+        <h2 class="module-heading"><i class="fas fa-bell inline-icon-left"></i>{{
                                                                                _('Update
                                                                                alerts') }}
         </h2>
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                 data-target="#nav-alerts" aria-expanded="false">
-            <i class="fas fa-ellipsis-h"></i>
+            <span class="sr-only">expand</span>
         </button>
     </div>
 
 
-    <div class="module-content nav nav-simple navbar-collapse collapse" id="nav-alerts">
-        <p>Follow <a target="_blank" href="https://twitter.com/nhm_data">@NHM_DATA</a> to
+    <ul class="nav nav-simple navbar-collapse collapse" id="nav-alerts">
+        <li class="nav-item">
+            <p>Follow <a target="_blank" href="https://twitter.com/nhm_data">@NHM_Data</a> to
            receive alerts when this dataset is updated.</p>
-    </div>
+        </li>
+    </ul>
 
 </section>
 

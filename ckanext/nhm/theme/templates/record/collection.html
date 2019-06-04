@@ -1,98 +1,106 @@
 {% extends "record/view.html" %}{% block record_data %}
 
-<table class="table-record table-responsive">
-    <colgroup>
-        <col span="2" id="col-data"/>
-        <col id="col-filter"/>
-    </colgroup>
+    <table class="table-record table-responsive">
+        <colgroup>
+            <col span="2" id="col-data"/>
+            <col id="col-filter"/>
+        </colgroup>
 
-    {% for group, fields in g.field_groups.items() %}
+        {% for group, fields in g.field_groups.items() %}
 
-    {% if h.group_fields_have_data(g.record_dict, fields.keys()) %}
+            {% if h.group_fields_have_data(g.record_dict, fields.keys()) %}
 
-    <thead>
-    <tr>
-        <th colspan="2">{{ group }}</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    {% for field, label in fields.items() %}
-
-    {% if g.record_dict[field] %}
-
-    <tr>
-
-        <td><strong>{{ label }}:</strong></td>
-        <td>
-
-            {% if field == 'determinations' %} {% if g.record_dict['determinations'] %}
-            <table id="determinations" class="sub-table">
-
+                <thead>
                 <tr>
-                    {% for label in g.record_dict['determination_labels'] %}
-                    <th class="{{ label|lower }}">{{ label }}</th>
-                    {% endfor %}
+                    <th colspan="2">{{ group }}</th>
                 </tr>
+                </thead>
 
-                {% for i in range(0, g.record_dict['determinations']['_len']) %}
-                <tr>
-                    {% for label in g.record_dict['determination_labels'] %}
-                    <td>{% if g.record_dict['determinations'][label][i] %} {% taxonomy
-                        'determinations' + label, g.record_dict['collectionCode'],
+                <tbody>
+                {% for field, label in fields.items() %}
+
+                    {% if g.record_dict[field] %}
+
+                        <tr>
+
+                            <td><strong>{{ label }}:</strong></td>
+                            <td>
+
+                                {% if field == 'determinations' %}
+                                    {% if g.record_dict['determinations'] %}
+                                        <table id="determinations"
+                                            class="sub-table table table-responsive">
+                                            <thead>
+                                            <tr>
+                                                {% for label in g.record_dict['determination_labels'] %}
+                                                    <th class="{{ label|lower }}">{{ label }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for i in range(0, g.record_dict['determinations']['_len']) %}
+                                                <tr>
+                                                    {% for label in g.record_dict['determination_labels'] %}
+                                                        <td>
+                                                            {% if g.record_dict['determinations'][label][i] %}
+                                                                {% taxonomy'determinations' + label, g.record_dict['collectionCode'],
                         g.record_dict %} {{ g.record_dict['determinations'][label][i] }}
-                        {% endtaxonomy %} {% endif %}
-                    </td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
+                                                                {% endtaxonomy %} {% endif %}
+                                                        </td>
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
 
-            </table>
-
-            {% endif %}
-
-                                    {% elif field == 'collectionCode' %}
-                                        {{ g.record_dict[field] }} ({{ h.get_department(g.record_dict[field]) }})
-                                    {% elif field == 'created' or field == 'modified' %}
-                                        {{ h.render_epoch(g.record_dict[field]) }}
-                                    {% else %}
-                                        {% taxonomy field, g.record_dict['collectionCode'], g.record_dict %}
-                                            {{ g.record_dict[field] }}
-                                        {% endtaxonomy %}
                                     {% endif %}
 
-        </td>
+                                {% elif field == 'collectionCode' %}
+                                    {{ g.record_dict[field] }} (
+                                    {{ h.get_department(g.record_dict[field]) }})
+                                {% elif field == 'created' or field == 'modified' %}
+                                    {{ h.render_epoch(g.record_dict[field]) }}
+                                {% else %}
+                                    {% taxonomy field, g.record_dict['collectionCode'], g.record_dict %}
+                                        {{ g.record_dict[field] }}
+                                    {% endtaxonomy %}
+                                {% endif %}
 
-        <td class="filterable">
+                            </td>
 
-            {% if field in g.custom_filters %} {% set filter = g.custom_filters[field] %}
-            {% else %} {% set filter = '%s:%s' % (field, g.record_dict[field]) %} {% endif
-            %}
+                            <td class="filterable">
 
-            {% if filter and field in filterable_fields %}
+                                {% if field in g.custom_filters %}
+                                    {% set filter = g.custom_filters[field] %}
+                                {% else %}
+                                    {% set filter = '%s:%s' % (field, g.record_dict[field]) %} {% endif %}
 
-            <a title="View all records where {{ filter }}"
-               href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id, filters=filter) }}">
-                <i class="fas fa-filter"></i> </a>
+                                {% if filter and field in filterable_fields %}
+
+                                    <a title="View all records where {{ filter }}"
+                                        href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id, filters=filter) }}">
+                                        <i class="fas fa-filter"></i> </a>
+
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                {% endfor %}
+                </tbody>
 
             {% endif %}
-        </td>
-    </tr>
 
-    {% endif %}
+        {% endfor %}
 
-    {% endfor %}
-    </tbody>
-
-    {% endif %}
-
-    {% endfor %}
-
-</table>
+    </table>
 
 {% endblock %}
 
-{% block record_additional_information_inner %}{% snippet "record/snippets/external_links.html", pkg_dict=g.pkg_dict, res=res, record=g.record_dict %}{{ super() }}{% endblock %}
+{% block record_additional_information_inner %}
+    {% snippet "record/snippets/external_links.html", pkg_dict=g.pkg_dict, res=res, record=g.record_dict %}
+    {{ super() }}{% endblock %}
 
 {% block record_additional_information_rows %}
     <tr>

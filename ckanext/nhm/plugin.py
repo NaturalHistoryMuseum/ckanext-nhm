@@ -96,66 +96,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         :param _map:
         '''
 
-        # Add view record
-        _map.connect(u'record_versioned',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{'
-                     u'record_id}/{version}',
-                     controller=u'ckanext.nhm.controllers.record:RecordController',
-                     action=u'view', requirements={
-                u'version': u'\d+'
-                })
-        _map.connect(u'record',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}',
-                     controller=u'ckanext.nhm.controllers.record:RecordController',
-                     action=u'view')
-
-        # Add dwc view
-        _map.connect(u'dwc_versioned',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{'
-                     u'record_id}/dwc/{version}',
-                     controller=u'ckanext.nhm.controllers.record:RecordController',
-                     action=u'dwc', requirements={
-                u'version': u'\d+'
-                })
-        _map.connect(u'dwc',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{'
-                     u'record_id}/dwc',
-                     controller=u'ckanext.nhm.controllers.record:RecordController',
-                     action=u'dwc')
-
-        # About pages
-        _map.connect(u'about_citation', '/about/citation',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'citation')
-        _map.connect(u'about_download', '/about/download',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'download')
-        _map.connect(u'about_licensing', '/about/licensing',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'licensing')
-        _map.connect(u'about_credits', '/about/credits',
-                     controller=u'ckanext.nhm.controllers.about:AboutController',
-                     action=u'credits')
-
-        # Legal pages
-        _map.connect(u'legal_privacy', '/privacy',
-                     controller=u'ckanext.nhm.controllers.legal:LegalController',
-                     action=u'privacy')
-        _map.connect(u'legal_terms', '/terms-conditions',
-                     controller=u'ckanext.nhm.controllers.legal:LegalController',
-                     action=u'terms')
-
-        # About stats pages
-        _map.connect(u'stats_resources', '/about/statistics/resources',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'resources', ckan_icon=u'bar-chart')
-        _map.connect(u'stats_contributors', '/about/statistics/contributors',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'contributors', ckan_icon=u'user')
-        _map.connect(u'stats_records', '/about/statistics/records',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'records', ckan_icon=u'file-text')
-
         # Dataset metrics
         _map.connect(u'dataset_metrics', '/dataset/metrics/{id}',
                      controller=u'ckanext.nhm.controllers.stats:StatsController',

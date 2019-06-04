@@ -24,17 +24,9 @@
 
         {% block page_header %}
         <header class="page-header">
-            <div class="row">
+            <div class="row flex-container flex-wrap flex-between flex-stretch-first flex-reverse">
                 <div class="col-md-6">
-                    {% if self.content_primary_nav() | trim %}
-                    <ul class="nav nav-tabs">
-                        {% block content_primary_nav %}{% endblock %}
-                    </ul>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-6">
-                    <ul class="list-unstyled flex-container flex-wrap flex-right inline-list-pad">
+                    <ul class="list-unstyled flex-container flex-nowrap flex-right inline-list-pad">
                         <li>
                             <a data-module="back-button" class="btn btn-primary"
                                href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id) }}">
@@ -62,6 +54,15 @@
                             res=res, rec=rec, link_text="Contact record curator" %}
                         </li>
                     </ul>
+                </div>
+                <div class="col-md-6">
+                    {% if self.content_primary_nav() | trim %}
+                        <nav>
+                            <ul class="nav nav-tabs" id="record-view-menu">
+                                {% block content_primary_nav %}{% endblock %}
+                            </ul>
+                        </nav>
+                    {% endif %}
                 </div>
             </div>
         </header>

@@ -27,6 +27,7 @@ from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree
 from webhelpers.html import literal
+import bs4
 
 from ckan import model
 from ckan.plugins import toolkit
@@ -1010,7 +1011,8 @@ def add_url_filter(field, value, extras=None):
 
     params = {k: v for k, v in toolkit.request.params.items() if k != u'page'}
     url_filter = u'%s:%s' % (field, value)
-    filters = u'|'.join(params.get(u'filters', u'').split(u'|') + [url_filter])
+    filters = [f for f in params.get(u'filters', u'').split(u'|') + [url_filter] if f != u'']
+    filters = u'|'.join(filters)
     params[u'filters'] = filters
     return core_helpers._url_with_params(toolkit.request.base_url, params.items())
 
@@ -1270,8 +1272,8 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
     :return: a list of nav items
     '''
     link_definitions = [
-        (u'record', toolkit._(u'Normal view')),
-        (u'dwc', toolkit._(u'Darwin Core view')),
+        (u'record.view', toolkit._(u'Normal view')),
+        (u'record.dwc', toolkit._(u'Darwin Core view')),
         ]
     links = []
     for route_name, link_text in link_definitions:
@@ -1287,6 +1289,38 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
             route_name = u'{}_versioned'.format(route_name)
             kwargs[u'version'] = version
         # build the nav and add it to the list
-        links.append(toolkit.h.build_nav_icon(route_name, link_text, **kwargs))
+        links.append(_add_nav_item_class(toolkit.h.build_nav_icon(route_name, link_text, **kwargs),
+                                         [], role='presentation'))
 
     return links
+
+
+def _add_nav_item_class(html_string, classes=None, **kwargs):
+    '''
+    Add classes to list items in an HTML string.
+    :param html_string: a literal or string of HTML code
+    :param classes: CSS classes to add to each item
+    :param kwargs: other attributes to add to each item
+    :return: a literal of HTML code where all the <li> nodes have "nav-item" added to their classes
+    '''
+    if classes is None:
+        classes = ['nav-item']
+    soup = bs4.BeautifulSoup(html_string, 'lxml')
+    list_items = soup.find_all('li')
+    for li in list_items:
+        if len(classes) > 0:
+            li['class'] = li.get('class', []) + classes
+        for k, v in kwargs.items():
+            li[k] = v
+    return literal('\n'.join([str(el) for el in soup.body.contents]))
+
+
+def build_nav_main(*args):
+    '''
+    Build a set of menu items. Overrides core CKAN method to add "nav-item" class to li elements.
+
+    :param args: tuples of (menu type, title) eg ('login', _('Login'))
+    :return: literal - <li class="nav-item"><a href="...">title</a></li>
+    '''
+    from_core = core_helpers.build_nav_main(*args)
+    return _add_nav_item_class(from_core)

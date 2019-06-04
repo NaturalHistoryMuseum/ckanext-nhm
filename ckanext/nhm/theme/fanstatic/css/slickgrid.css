@@ -20,20 +20,10 @@ ul.slick-contextmenu{
 
 .controls a.expand {
     display: block;
-    float: right;
-    margin-right: 6px;
-    margin-top: 6px;
-    width: 26px;
-    height: 26px;
     line-height: 26px;
     text-align: center;
     color: #228900;
     border-radius: 15px;
-}
-
-.controls a.expand:hover {
-    color: #000;
-    text-decoration: none;
 }
 
 /* Fullscreen mode */

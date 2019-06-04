@@ -2,19 +2,23 @@
 
 
 // FONT FACES
-@font-face {
-  font-family: 'nhm_ingrid_lightregular';
-  src: url('@{fonts}/nhmingligreg-webfont.eot');
-  src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-  font-style: normal;
+
+.load-fonts() {
+  @font-face {
+    font-family: 'nhm_ingrid_lightregular';
+    src: url('@{fonts}/nhmingligreg-webfont.eot');
+    src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'nhm_ingridregular';
+    src: url('@{fonts}/nhmingreg-webfont.eot');
+    src: url('@{fonts}/nhmingreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    font-style: normal;
+  }
 }
 
-@font-face {
-  font-family: 'nhm_ingridregular';
-  src: url('@{fonts}/nhmingreg-webfont.eot');
-  src: url('@{fonts}/nhmingreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
-  font-style: normal;
-}
 
 @font-title: 'nhm_ingridregular', 'Open Sans', sans-serif;
 
@@ -26,7 +30,7 @@
   font-weight: @weight;
 }
 
-.mixin-font-body {
+.mixin-font-body() {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -46,3 +50,10 @@
 @font-size-head-xl: @font-size-head-m + 4;
 @font-size-head-xxl: @font-size-head-m + 6;
 
+
+// FONTAWESOME FIXES
+// try to avoid using these - just for overriding CKAN
+.fa-arrows:before {
+  // now fa-arrows-alt-v
+  content: '\f338' !important;
+}

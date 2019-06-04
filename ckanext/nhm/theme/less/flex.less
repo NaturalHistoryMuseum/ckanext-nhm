@@ -1,19 +1,32 @@
 @import "variables";
 
-.flex-container {
+.mixin-flex-container() {
   display: flex;
+}
+
+.mixin-flex-row() {
   flex-direction: row;
 
   & > * {
     align-self: center;
+    &:not(:first-child) {
+      padding-left: 5px;
+    }
+    &:not(:last-child) {
+      padding-right: 5px;
+    }
   }
 }
 
-.flex-reverse {
-  flex-direction: row-reverse;
+.mixin-flex-column() {
+  flex-direction: column;
+
+  & > * {
+    vertical-align: center;
+  }
 }
 
-.flex-top {
+.mixin-flex-top() {
   align-items: flex-start;
 
   & > * {
@@ -21,47 +34,90 @@
   }
 }
 
-.flex-stretch-first {
+.mixin-flex-stretch-height() {
+  align-items: stretch;
+
+  & > * {
+    align-self: stretch;
+    height: auto !important;
+  }
+}
+
+.mixin-flex-stretch-first() {
   &:not(.flex-reverse) > *:first-child {
     flex-grow: 1;
   }
+
   &.flex-reverse > *:last-child {
     flex-grow: 1;
   }
 }
 
-.flex-wrap {
+.mixin-flex-stretch-last() {
+  &:not(.flex-reverse) > *:last-child {
+    flex-grow: 1;
+  }
+
+  &.flex-reverse > *:first-child {
+    flex-grow: 1;
+  }
+}
+
+.mixin-flex-wrap() {
   flex-wrap: wrap;
-}
 
-.flex-equal > * {
-  // evenly spaces on large screens, stacks on smaller ones
-  @media (max-width: @lg - 1) {
-    flex: 0 1 auto;
-    width: 100%;
-  }
-
-  @media (min-width: @lg) {
-    flex: 1 1 0;
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
+  & > * {
+    text-align: left;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
   }
 }
 
-.flex-between {
+.mixin-flex-nowrap() {
+  @media (max-width: @sm - 1) {
+    flex-wrap: wrap;
+  }
+  @media (min-width: @sm) {
+    flex-wrap: nowrap;
+  }
+}
+
+
+.mixin-flex-equal() {
+  & > * {
+    // evenly spaces on large screens, stacks on smaller ones
+    @media (max-width: @lg - 1) {
+      flex: 0 1 auto;
+      width: 100%;
+    }
+
+    @media (min-width: @lg) {
+      flex: 1 1 0;
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+
+.mixin-flex-between() {
   justify-content: space-between;
 }
 
-.flex-around {
+.mixin-flex-around() {
   justify-content: space-around;
 }
 
-.flex-right {
+.mixin-flex-center() {
+  justify-content: center;
+}
+
+.mixin-flex-right() {
   justify-content: flex-end;
   @media (max-width: @sm) {
     justify-content: space-around;

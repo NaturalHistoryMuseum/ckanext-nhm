@@ -8,7 +8,7 @@
 
 {% block breadcrumb_content %}
   {# Remove user from breadcrumb {{ h.build_nav('user_index', _('Users')) }} #}
-  {{ h.build_nav('user_datasets', user.display_name|truncate(35), id=user.name) }}
+  {{ h.build_nav('user.read', user.display_name|truncate(35), id=user.name) }}
 {% endblock %}
 
 {% block user_info %}

@@ -1,13 +1,13 @@
 {% ckan_extends %}
 
 {% block social_title %}
-<div class="flex-container flex-between flex-stretch-first">
-    <h2 class="module-heading"><i class="fas fa-share-alt inline-icon-left"></i> {{
+<div class="flex-container flex-between flex-stretch-first nav-simple-heading">
+    <h2 class="module-heading"><i class="fas fa-share-alt inline-icon-left"></i>{{
                                                                                  _('Social')
                                                                                  }} </h2>
     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
             data-target="#nav-social" aria-expanded="false">
-        <i class="fas fa-ellipsis-h"></i>
+        <span class="sr-only">expand</span>
     </button>
 </div>{% endblock %}
 
@@ -18,10 +18,10 @@
     <li class="nav-item"><a
             href="https://twitter.com/share?url={{ current_url }}&amp;text={{ text }}"
             target="_blank" title="Share on Twitter"><i
-            class="fab fa-twitter inline-icon-left"></i> Twitter</a></li>
+            class="fab fa-twitter inline-icon-left"></i>Twitter</a></li>
     <li class="nav-item"><a href="https://www.facebook.com/sharer.php?u={{ current_url }}"
-                            target="_blank" title="Share on Facebook+"><i
-            class="fab fa-facebook-f inline-icon-left"></i> Facebook</a></li>
+                            target="_blank" title="Share on Facebook"><i
+            class="fab fa-facebook-square inline-icon-left"></i>Facebook</a></li>
 </ul>
 
 {% resource 'ckanext-nhm/social' %}
