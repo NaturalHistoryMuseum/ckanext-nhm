@@ -18,9 +18,9 @@
                   {% if query_params['filters'] %}
                       <input type="hidden" name="filters" value="{{ query_params['filters'] }}" />
                   {% endif %}
-                  <button type="submit">
+                  <button class="no-collapse" type="submit">
                     <i class="fas fa-search"></i>
-                    <span>{{ _('Search') }}</span>
+                    <span class="sr-only">{{ _('Search') }}</span>
                   </button>
                 </div>
              </div>

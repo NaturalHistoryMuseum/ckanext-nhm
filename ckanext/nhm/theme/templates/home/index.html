@@ -2,131 +2,123 @@
 
 {% block subtitle %}{{ _("Welcome") }}{% endblock %}
 
-{% block maintag %}{% endblock %}{% block toolbar %}{% endblock %}
+{% block toolbar %}{% endblock %}
 
 {% block styles %}{{ super() }}
-<link rel="alternate" type="text/n3"
-      href="{{ h.url_for('dcat_catalog', _format='n3', qualified=True) }}"/>
-<link rel="alternate" type="text/ttl"
-      href="{{ h.url_for('dcat_catalog', _format='ttl', qualified=True) }}"/>
-<link rel="alternate" type="application/rdf+xml"
-      href="{{ h.url_for('dcat_catalog', _format='xml', qualified=True) }}"/>
-<link rel="alternate" type="application/rdf+xml"
-      href="{{ h.url_for('dcat_catalog', _format='rdf', qualified=True) }}"/>{% endblock -%}
+    <link rel="alternate" type="text/n3"
+        href="{{ h.url_for('dcat_catalog', _format='n3', qualified=True) }}"/>
+    <link rel="alternate" type="text/ttl"
+        href="{{ h.url_for('dcat_catalog', _format='ttl', qualified=True) }}"/>
+    <link rel="alternate" type="application/rdf+xml"
+        href="{{ h.url_for('dcat_catalog', _format='xml', qualified=True) }}"/>
+    <link rel="alternate" type="application/rdf+xml"
+        href="{{ h.url_for('dcat_catalog', _format='rdf', qualified=True) }}"/>{% endblock -%}
 
 {% set collection_stats = h.collection_stats() %}
 
 {% block header %}
+    <div class="extended-masthead" id="content">
 
-<div class="extended-masthead" id="content">
+        {{ super() }}
 
-    {{ super() }}
-
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-7 col-md-8 col-sm-10 col-xs-12">
-                <header>
-                    <h2 class="welcome">Explore and download the Natural History Museum’s
-                                        research and collections data.</h2>
-                </header>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                {% block stats %} {% snippet 'home/snippets/stats.html' %} {% endblock %}
-            </div>
-        </div>
-    </div>
-
-    <div class="container specimen-collection default-text-color">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="module-content">
-                    <h1>Search the Natural History Museum Specimen Collection</h1>
-                    <h3><a href="{{ h.url_for_collection_view() }}">{{
-                                                                    h.delimit_number(collection_stats['total'])
-                                                                    }}</a> of the Museum's
-                                                                           80 million
-                                                                           specimens are
-                                                                           now available
-                                                                           online.</h3>
-                    {% block search %} {% snippet 'home/snippets/search.html' %} {%
-                    endblock %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>{% endblock %}
-
-{% block content %}
-<div class="homepage">
-
-    {% block primary_content %}
-
-    <div class="container collection-stats">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="module-content">
-                    <ul class="list-unstyled list-inline flex-container flex-nowrap flex-around flex-top">
-                        {% for collection_code, count in
-                        collection_stats['collections'].items() %} {% if collection_code
-                        %} {% set dept = h.get_department(collection_code) %}
-                        <li>
-                        <a href="{{ h.url_for_collection_view(filters={'collectionCode': collection_code}) }}">
-                            <div class="collection-block">
-                                <div class="flex-container flex-nowrap flex-center">
-                                    <svg class="{{ dept|lower }} collection-icon"></svg>
-                                    <span class="collection-code">{{ collection_code|replace('bmnh(e)','ent')|upper }}</span>
-                                </div>
-                                <div class="flex-column collection-block-text">
-                                    <span class="collection-count"> {{ h.delimit_number(count) }}</span>
-                                    <span class="collection-name default-text">{{ dept }}</span>
-                                </div>
-                            </div>
-                        </a>
-                        </li>
-                        {% endif %} {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        {{ self.flash() }}
-    </div>
-
-    <div role="main">
         <div class="container">
             <div class="row">
+                <div class="col-lg-7 col-md-8 col-sm-10 col-xs-12">
+                    <header>
+                        <h2 class="welcome">Explore and download the Natural History Museum’s
+                                            research and collections data.</h2>
+                    </header>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-md-12">
-                    <h3>Featured datasets</h3>
-                    <div class="flex-container flex-equal flex-wrap flex-between flex-stretch-height">
-                        {% snippet 'home/snippets/featured/dataset1.html' %} {% snippet
-                        'home/snippets/featured/dataset2.html' %} {% snippet
-                        'home/snippets/featured/dataset3.html' %}
+                    {% block stats %} {% snippet 'home/snippets/stats.html' %} {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <div class="container specimen-collection default-text-color">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="module-content">
+                        <h1>Search the Natural History Museum Specimen Collection</h1>
+                        <h3><a
+                            href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a>
+                            of the Museum's 80 million specimens are now available online.</h3>
+                        {% block search %} {% snippet 'home/snippets/search.html' %} {% endblock %}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div role="main">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>Use the data</h3>
-                    <div class="flex-container flex-equal flex-wrap flex-between flex-stretch-height">
-                        {% snippet 'home/snippets/actions/explore.html' %} {% snippet
-                        'home/snippets/actions/download.html' %} {% snippet
-                        'home/snippets/actions/cite.html' %}
+    </div>
+{% endblock %}
+
+{% block main_content %}
+    <div class="homepage">
+
+        {% block primary_content %}
+            <div class="container collection-stats full-width">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="module-content">
+                            <ul class="list-unstyled list-inline flex-container flex-nowrap flex-around flex-top">
+                                {% for collection_code, count in
+                        collection_stats['collections'].items() %} {% if collection_code %}
+                                    {% set dept = h.get_department(collection_code) %}
+                                    <li>
+                                        <a href="{{ h.url_for_collection_view(filters={'collectionCode': collection_code}) }}">
+                                            <div class="collection-block">
+                                                <div class="flex-container flex-nowrap flex-center">
+                                                    <svg
+                                                        class="{{ dept|lower }} collection-icon"></svg>
+                                                    <span
+                                                        class="collection-code">{{ collection_code|replace('bmnh(e)','ent')|upper }}</span>
+                                                </div>
+                                                <div class="flex-column collection-block-text">
+                                                    <span
+                                                        class="collection-count"> {{ h.delimit_number(count) }}</span>
+                                                    <span
+                                                        class="collection-name default-text">{{ dept }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                {% endif %} {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="container full-width">
+                {{ self.flash() }}
+            </div>
+
+            <div class="container full-width">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3>Featured datasets</h3>
+                        <div
+                            class="flex-container flex-equal flex-wrap flex-between flex-stretch-height">
+                            {% snippet 'home/snippets/featured/dataset1.html' %} {% snippet'home/snippets/featured/dataset2.html' %} {% snippet'home/snippets/featured/dataset3.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container full-width">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3>Use the data</h3>
+                        <div
+                            class="flex-container flex-equal flex-wrap flex-between flex-stretch-height">
+                            {% snippet 'home/snippets/actions/explore.html' %} {% snippet'home/snippets/actions/download.html' %} {% snippet'home/snippets/actions/cite.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+
     </div>
-
-    {% endblock %}
-
-</div>{% endblock %}
+{% endblock %}

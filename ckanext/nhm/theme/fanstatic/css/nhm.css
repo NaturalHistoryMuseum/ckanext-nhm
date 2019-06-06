@@ -127,6 +127,8 @@ a.external:after:hover {
   text-decoration: none;
 }
 body {
+  min-height: 100vh;
+  position: relative;
   background: #FFFFFF;
 }
 body,
@@ -448,6 +450,11 @@ span.caret {
     width: 90%;
   }
 }
+.full-width {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
 .list-inline > li {
   vertical-align: bottom;
 }
@@ -455,6 +462,12 @@ span.caret {
 .main {
   background: transparent;
   padding-top: 40px;
+  position: relative;
+  min-height: 100%;
+}
+[role=main] > *:last-child,
+.main > *:last-child {
+  padding-bottom: 300px;
 }
 .masthead {
   padding: 3px 0;
@@ -634,8 +647,10 @@ span.caret {
   min-height: 300px;
   background: #343434;
   color: #9A9A9A;
-  margin-top: 40px;
   padding: 0 0 30px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 .site-footer a {
   color: #FFFFFF;
@@ -1286,11 +1301,14 @@ select,
 .collection-stats .collection-icon {
   width: 40px;
   height: 40px;
+  margin-right: 5px;
+  background-color: #188100;
   mask-repeat: no-repeat;
   mask-position: center center;
-  margin-right: 5px;
   mask-size: contain;
-  background-color: #188100;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center center;
+  -webkit-mask-size: contain;
 }
 @media (min-width: 1200px) {
   .collection-stats .collection-icon {
