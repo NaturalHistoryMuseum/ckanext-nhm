@@ -1047,6 +1047,9 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     '''
 
+    if not isinstance(package, dict):
+        package = package.as_dict()
+
     filter_dict = parse_request_filters()
     extras = {
         u'id': package[u'id'],
