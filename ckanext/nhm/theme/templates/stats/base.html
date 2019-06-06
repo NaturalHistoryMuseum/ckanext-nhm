@@ -12,14 +12,8 @@
   {{ h.build_nav_icon('statistics.records', _('Records'), icon='file-text') }}
 {% endblock %}
 
-{% block secondary %}
-
-  <aside class="secondary">
-    {% block secondary_content %}
-        {% snippet 'about/snippets/menu.html' %}
-    {% endblock %}
-  </aside>
-
+{% block secondary_content %}
+    {% snippet 'about/snippets/menu.html' %}
 {% endblock %}
 
 {% block primary_content_inner %}
@@ -28,7 +22,6 @@
 
     {% endblock %}
 
-{% resource "vendor/block_html5_shim" %}
 {% resource "ckanext_stats/stats" %}
 
 {% endblock %}

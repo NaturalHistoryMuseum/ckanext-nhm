@@ -14,7 +14,7 @@ $(document).ready(function() {
     });
 
     // add the collapse-to-icon class to every button with an icon
-    $('.btn > i, button > i').map((i, btnicon) => {
+    $('.btn:not(.no-collapse) > i, button:not(.no-collapse) > i').map((i, btnicon) => {
         return btnicon.parentNode;
     }).addClass('collapse-to-icon');
 

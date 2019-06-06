@@ -78,6 +78,8 @@ a {
 }
 
 body {
+  min-height: 100vh;
+  position: relative;
   .palette-base();
 
   &, .default-text {
@@ -363,6 +365,12 @@ span.caret {
   }
 }
 
+.full-width {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .list-inline > li {
   vertical-align: bottom;
 }
@@ -370,6 +378,11 @@ span.caret {
 [role=main], .main {
   background: transparent;
   padding-top: 40px;
+  position: relative;
+  min-height: 100%;
+  & > *:last-child {
+    padding-bottom: @footer-size;
+  }
 }
 
 .masthead {
@@ -567,10 +580,12 @@ span.caret {
 
 .site-footer {
   @margin: 40px;
-  min-height: 300px;
+  min-height: @footer-size;
   .palette-footer();
-  margin-top: @margin;
   padding: 0 0 30px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 
   .nav {
     margin: 20px 0;
@@ -995,7 +1010,7 @@ span.caret {
 // BUTTONS -----------------------------------------------------------------------------------------
 
 .action .btn {
-  @media (max-width: @lg - 1) and  (min-width: @md){
+  @media (max-width: @lg - 1) and  (min-width: @md) {
     position: absolute;
     left: 0;
     right: 0;
@@ -1284,11 +1299,14 @@ select, .select2-choice {
       width: @iconsize * 1.2;
       height: @iconsize * 1.2;
     }
+    margin-right: 5px;
+    background-color: @primary3;
     mask-repeat: no-repeat;
     mask-position: center center;
-    margin-right: 5px;
     mask-size: contain;
-    background-color: @primary3;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-size: contain;
 
     &.botany {
       mask-image: url('@{icons}/bot.svg');
