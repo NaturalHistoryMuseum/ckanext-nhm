@@ -8,7 +8,7 @@
 <form class="search-form{% if no_bottom_border %} no-bottom-border{% endif %}" method="get" data-module="select-switch">
 
   {% block search_input %}
-    <div class="search-input control-group {{ search_class }}">
+    <div class="search-input control-group no-collapse {{ search_class }}">
       <label for="q" class="sr-only">Search</label>
       <input type="text" class="search" name="q" id="q" value="{{ query }}" autocomplete="off" placeholder="{{ placeholder }}">
       {% block search_input_button %}

@@ -2,7 +2,7 @@
 
 {% block subtitle %}{{ _("Welcome") }}{% endblock %}
 
-{% block toolbar %}{% endblock %}
+{% block maintag %}<div role="main" class="homepage">{% endblock %}{% block toolbar %}{% endblock %}
 
 {% block styles %}{{ super() }}
     <link rel="alternate" type="text/n3"
@@ -55,8 +55,6 @@
 {% endblock %}
 
 {% block main_content %}
-    <div class="homepage">
-
         {% block primary_content %}
             <div class="container collection-stats full-width">
                 <div class="row">
@@ -119,6 +117,4 @@
                 </div>
             </div>
         {% endblock %}
-
-    </div>
 {% endblock %}

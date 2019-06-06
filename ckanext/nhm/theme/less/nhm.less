@@ -380,6 +380,7 @@ span.caret {
   padding-top: 40px;
   position: relative;
   min-height: 100%;
+
   & > *:last-child {
     padding-bottom: @footer-size;
   }
@@ -941,6 +942,7 @@ span.caret {
 .search-form {
   border-bottom: none;
   margin-bottom: 0;
+  min-height: 20vw;
 
   & .search-input {
     @button-pad: 5px;
@@ -988,7 +990,7 @@ span.caret {
         width: @button-size !important;
         height: @button-size !important;
         margin-top: 0 - (@button-size / 2) !important;
-        right: @button-pad;
+        right: @button-pad + 5px;
 
         & i {
           font-size: @font-size-head-xs;
@@ -1001,8 +1003,6 @@ span.caret {
         line-height: inherit;
       }
     }
-
-
   }
 }
 
@@ -1409,9 +1409,8 @@ select, .select2-choice {
 }
 
 .homepage {
-  & [role=main] {
-    padding: 0;
-  }
+  padding-top: 0;
+  padding-bottom: 50px;
 
   & .flash-messages div:first-child {
     margin-top: 40px;

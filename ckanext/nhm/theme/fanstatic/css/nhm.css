@@ -153,11 +153,7 @@ body .default-text a:focus {
 }
 .flex-container > * {
   align-self: center;
-}
-.flex-container > *:not(:first-child) {
   padding-left: 5px;
-}
-.flex-container > *:not(:last-child) {
   padding-right: 5px;
 }
 .flex-column {
@@ -975,6 +971,7 @@ span.caret {
 .search-form {
   border-bottom: none;
   margin-bottom: 0;
+  min-height: 20vw;
 }
 .search-form .search-input {
   margin-bottom: 15px;
@@ -1013,7 +1010,7 @@ span.caret {
   width: 40px !important;
   height: 40px !important;
   margin-top: -20px !important;
-  right: 5px;
+  right: 10px;
 }
 .search-form .search-input.search-giant button i {
   font-size: 22px;
@@ -1348,11 +1345,7 @@ select,
   }
   .collection-stats .collection-block > * {
     align-self: center;
-  }
-  .collection-stats .collection-block > *:not(:first-child) {
     padding-left: 5px;
-  }
-  .collection-stats .collection-block > *:not(:last-child) {
     padding-right: 5px;
   }
   .collection-stats .collection-block .collection-count {
@@ -1428,8 +1421,9 @@ select,
 .featured .box-text {
   margin-bottom: 2em;
 }
-.homepage [role=main] {
-  padding: 0;
+.homepage {
+  padding-top: 0;
+  padding-bottom: 50px;
 }
 .homepage .flash-messages div:first-child {
   margin-top: 40px;
