@@ -971,7 +971,6 @@ span.caret {
 .search-form {
   border-bottom: none;
   margin-bottom: 0;
-  min-height: 20vw;
 }
 .search-form .search-input {
   margin-bottom: 15px;
@@ -1263,6 +1262,7 @@ select,
   padding: 15px 0 15px 15px;
 }
 .collection-search-form {
+  min-height: 20vw;
   background: url('/images/mapHeat.png') no-repeat center center !important;
   background-size: cover !important;
   border: none;
