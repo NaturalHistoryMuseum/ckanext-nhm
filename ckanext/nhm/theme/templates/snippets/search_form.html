@@ -72,7 +72,7 @@
         {%- endif %}
       </div>
       <div class="pill-remove">
-        <a href="{{ facets.remove_field(field, value) }}" class="remove" title="{{ _('Remove') }}"><i
+        <a href="/{{ facets.remove_field(field, value) }}" class="remove {{ field }}" title="{{ _('Remove') }}"><i
                 class="fas fa-times"></i></a>
       </div>
     </div>
