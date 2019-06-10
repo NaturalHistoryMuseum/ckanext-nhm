@@ -918,6 +918,9 @@ span.caret {
   color: #AFAFAF;
   text-decoration: none;
 }
+.control-group {
+  margin: 5px 0 10px;
+}
 .control-group.error .control-label,
 .control-group.error .help-block,
 .control-group.error .help-inline {
