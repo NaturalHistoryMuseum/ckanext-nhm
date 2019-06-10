@@ -980,7 +980,7 @@ span.caret {
 }
 .search-form .search-input input {
   border: none;
-  background: #FFFFFF;
+  background: #F2F2F2;
   -webkit-box-shadow: none;
   box-shadow: none;
   border-radius: 5px;
