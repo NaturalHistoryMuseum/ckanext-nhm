@@ -1022,6 +1022,11 @@ span.caret {
   height: 50px;
   line-height: inherit;
 }
+select {
+  background-color: #FFFFFF;
+  border: 1px solid #C3C3C3;
+  border-radius: 2px;
+}
 @media (max-width: 991px) and (min-width: 768px) {
   .action .btn {
     position: absolute;
@@ -1233,6 +1238,7 @@ select,
   height: 35px !important;
   line-height: 35px !important;
   top: 0 !important;
+  border-radius: 2px !important;
 }
 .select2-chosen {
   padding-left: 10px;
