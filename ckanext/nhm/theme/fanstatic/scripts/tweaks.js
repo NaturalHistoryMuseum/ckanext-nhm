@@ -13,10 +13,15 @@ $(document).ready(function() {
         element.html(html);
     });
 
-    // add the collapse-to-icon class to every button with an icon
-    $('.btn:not(.no-collapse) > i, button:not(.no-collapse) > i').map((i, btnicon) => {
-        return btnicon.parentNode;
-    }).addClass('collapse-to-icon');
+    // add the .no-collapse class to every button with no text or no icon
+    $('.btn:not(.no-collapse), button:not(.no-collapse)').filter((i, b) => {
+        let btn = $(b);
+        let innerText = $(b.childNodes).filter((i,el) => !$(el).hasClass('sr-only')).text().trim();
+        if (btn.has('i').length === 0){
+            return true;
+        }
+        else return innerText === '';
+    }).addClass('no-collapse');
 
     // fix some fontawesome references
     function replaceClass(oldClass, newClass) {

@@ -1,6 +1,9 @@
 .fa-arrows:before {
   content: '\f338' !important;
 }
+.fa-cloud-upload:before {
+  content: '\f382' !important;
+}
 .no-box-shadow {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -1090,6 +1093,24 @@ select {
 }
 .btn i {
   font-size: initial;
+}
+@media (max-width: 767px) {
+  .btn:not(.no-collapse) {
+    font-size: 0;
+  }
+  .btn:not(.no-collapse) .fa,
+  .btn:not(.no-collapse) .fas {
+    margin: 0 !important;
+    line-height: 1em;
+    font-size: 17px;
+    vertical-align: middle;
+  }
+}
+@media (min-width: 768px) {
+  .btn:not(.no-collapse) .fas:first-child,
+  .btn:not(.no-collapse) .fa:first-child {
+    margin-right: 10px !important;
+  }
 }
 .btn-danger {
   background: #890022;
