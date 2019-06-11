@@ -836,13 +836,16 @@ span.caret {
   }
 
   &.side-toggle {
-    &:after {
-      content: '\f0d9';
+    @media (min-width: @md) {
+      &:after {
+        content: '\f0d9';
+      }
+
+      &.collapsed:after {
+        content: '\f0da';
+      }
     }
 
-    &.collapsed:after {
-      content: '\f0da';
-    }
 
     & + * {
       padding-left: 0;
@@ -880,6 +883,7 @@ span.caret {
 
 .control-group {
   margin: 5px 0 10px;
+
   &.error {
     & .control-label, & .help-block, & .help-inline {
       color: @warning2;
@@ -937,7 +941,8 @@ span.caret {
 }
 
 .form-horizontal .form-group {
-  margin: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .search-form {
@@ -1012,6 +1017,37 @@ select {
   border-radius: @rounding;
 }
 
+
+// MODALS ------------------------------------------------------------------------------------------
+
+.modal {
+  background-color: @grey10;
+  top: 10%;
+  left: 10%;
+  right: 10%;
+  bottom: 10%;
+  border-radius: @rounding;
+  padding: @min-pad !important;
+
+  & .form-actions .btn.save {
+    float: right;
+    margin: 0;
+  }
+
+  & .control-required-message {
+    margin: 0;
+    font-size: @font-size-body-s;
+    &::first-letter {
+      font-size: @font-size-body-l;
+    }
+  }
+}
+
+.modal-header {
+  & h3 {
+    margin-top: 0;
+  }
+}
 
 // BUTTONS -----------------------------------------------------------------------------------------
 
