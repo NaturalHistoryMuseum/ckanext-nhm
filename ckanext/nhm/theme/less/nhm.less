@@ -882,8 +882,6 @@ span.caret {
 // FORMS -------------------------------------------------------------------------------------------
 
 .control-group {
-  margin: 5px 0 10px;
-
   &.error {
     & .control-label, & .help-block, & .help-inline {
       color: @warning2;
@@ -893,9 +891,27 @@ span.caret {
       border-color: @warning2;
     }
   }
+}
 
-  & .controls p {
-    margin: 4px 0 0 0;
+.contact-form {
+  .mixin-flex-container();
+  .mixin-flex-column();
+
+  & .form-group, & .control-group {
+    margin-bottom: @min-pad;
+    .mixin-flex-container();
+    .mixin-flex-row();
+    .mixin-flex-wrap();
+    .mixin-flex-stretch-height();
+
+    & > *:first-child {
+      width: 10em;
+      text-align: right !important;
+    }
+
+    & > *:not(:first-child) {
+      flex-grow: 1;
+    }
   }
 }
 
@@ -1037,6 +1053,7 @@ select {
   & .control-required-message {
     margin: 0;
     font-size: @font-size-body-s;
+
     &::first-letter {
       font-size: @font-size-body-l;
     }

@@ -923,9 +923,6 @@ span.caret {
   color: #AFAFAF;
   text-decoration: none;
 }
-.control-group {
-  margin: 5px 0 10px;
-}
 .control-group.error .control-label,
 .control-group.error .help-block,
 .control-group.error .help-inline {
@@ -937,8 +934,46 @@ span.caret {
 .control-group.error .add-on {
   border-color: #890022;
 }
-.control-group .controls p {
-  margin: 4px 0 0 0;
+.contact-form {
+  display: flex;
+  flex-direction: column;
+}
+.contact-form > * {
+  vertical-align: center;
+}
+.contact-form .form-group,
+.contact-form .control-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.contact-form .form-group > *,
+.contact-form .control-group > * {
+  align-self: center;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.contact-form .form-group > *,
+.contact-form .control-group > * {
+  text-align: left;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+.contact-form .form-group > *,
+.contact-form .control-group > * {
+  align-self: stretch;
+  height: auto !important;
+}
+.contact-form .form-group > *:first-child,
+.contact-form .control-group > *:first-child {
+  width: 10em;
+  text-align: right !important;
+}
+.contact-form .form-group > *:not(:first-child),
+.contact-form .control-group > *:not(:first-child) {
+  flex-grow: 1;
 }
 .ckanpackager-form {
   padding: 10px !important;
