@@ -324,8 +324,66 @@ img#beta{
 
 /* Toolbar */
 
+@-webkit-keyframes rainbow {
+  0% {
+    background-position: 0% 82%
+  }
+  50% {
+    background-position: 100% 19%
+  }
+  100% {
+    background-position: 0% 82%
+  }
+}
+
+@-moz-keyframes rainbow {
+  0% {
+    background-position: 0% 82%
+  }
+  50% {
+    background-position: 100% 19%
+  }
+  100% {
+    background-position: 0% 82%
+  }
+}
+
+@-o-keyframes rainbow {
+  0% {
+    background-position: 0% 82%
+  }
+  50% {
+    background-position: 100% 19%
+  }
+  100% {
+    background-position: 0% 82%
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 82%
+  }
+  50% {
+    background-position: 100% 19%
+  }
+  100% {
+    background-position: 0% 82%
+  }
+}
+
+.pride(@bg){
+  background: linear-gradient(124deg, @bg, spin(@bg, 60), spin(@bg, 120), spin(@bg, 180), spin(@bg, 240), spin(@bg, 300));
+  background-size: 1800% 1800%;
+
+  -webkit-animation: rainbow 18s ease infinite;
+  -z-animation: rainbow 18s ease infinite;
+  -o-animation: rainbow 18s ease infinite;
+  animation: rainbow 18s ease infinite;
+}
+
 .toolbar {
-  background: @toolbarBackgroundColor;
+  .pride(@toolbarBackgroundColor);
   padding: 0;
   margin: 0;
 
