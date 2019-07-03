@@ -1317,7 +1317,7 @@ tr.empty {
 }
 select,
 .select2-choice {
-  height: 35px !important;
+  min-height: 35px !important;
   line-height: 35px !important;
   top: 0 !important;
   border-radius: 2px !important;
