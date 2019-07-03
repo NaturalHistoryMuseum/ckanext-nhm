@@ -676,7 +676,7 @@ def get_contact_form_params(pkg=None, res=None, rec=None):
     params = {}
 
     if pkg:
-        params[u'package_id'] = pkg.get(u'id')
+        params[u'package_id'] = pkg.get(u'id') if isinstance(pkg, dict) else pkg.id
 
     if res:
         params[u'resource_id'] = res.get(u'id')
