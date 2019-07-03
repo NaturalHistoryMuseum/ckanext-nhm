@@ -1,6 +1,6 @@
 {# BS 20140721: Removed description #}
 
-{% set action = 'edit' if is_edit else 'read' %}
+{% set action = 'edit_view' if is_edit else 'read' %}
 {% set query_params = h.get_query_params() %}
 {% set url = h.url_for(controller='resource', action=action,
         id=g.pkg.name,resource_id=view.resource_id, view_id=view.id,**query_params) %}
