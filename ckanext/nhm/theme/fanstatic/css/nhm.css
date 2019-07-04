@@ -923,6 +923,31 @@ span.caret {
   color: #AFAFAF;
   text-decoration: none;
 }
+.checkbox-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.checkbox-group > * {
+  align-self: center;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.checkbox-group > * {
+  align-self: flex-start;
+}
+.checkbox-group > :first-child {
+  flex: 0 0 25%;
+}
+.checkbox-group > :not(:first-child) {
+  flex: 1 1 auto;
+}
+.checkbox-group .checkbox {
+  margin-top: -5px;
+}
+.checkbox-group .checkbox input[type=checkbox] {
+  top: 3px;
+}
 .control-group.error .control-label,
 .control-group.error .help-block,
 .control-group.error .help-inline {
@@ -1011,6 +1036,10 @@ span.caret {
 .form-horizontal .form-group {
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+.info-block {
+  color: #5B5B5B;
+  font-size: 12px;
 }
 .search-form {
   border-bottom: none;
