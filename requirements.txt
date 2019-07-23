@@ -9,7 +9,6 @@ celery==3.1.7
 -e git+https://github.com/ckan/ckanext-pdfview.git#egg=ckanext_pdfview
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-contact.git@ckan-upgrade-2.8.0a#egg=ckanext-contact
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-doi.git@ckan-upgrade-2.8.0a#egg=ckanext-doi
--e git+https://github.com/NaturalHistoryMuseum/ckanext-ga-report.git@ckan-upgrade-2.8.0a#egg=ckanext-ga-report
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-gallery.git@ckan-upgrade-2.8.0a#egg=ckanext-gallery
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-userdatasets.git@ckan-upgrade-2.8.0a#egg=ckanext-userdatasets
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-ldap.git@ckan-upgrade-2.8.0a#egg=ckanext-ldap
