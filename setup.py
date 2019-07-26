@@ -14,7 +14,7 @@ with open(u'README.md', u'r') as f:
 setup(
     name=u'ckanext-nhm',
     version=__version__,
-    description=u'A CKAN extension for the Natural History Museum's Data Portal.',
+    description=u'A CKAN extension for the Natural History Museum\'s Data Portal.',
     long_description=__long_description__,
     classifiers=[
         u'Development Status :: 3 - Alpha',
