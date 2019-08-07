@@ -389,6 +389,43 @@ def resource_view_get_field_groups(resource):
     return view_cls.get_field_groups(resource)
 
 
+def get_resource_fields(resource, version=None, use_request_version=False):
+    '''
+    Retrieves the fields for the given resource. This is done using the datastore_search action. By
+    default, the field names from the latest version of the resource are returned. However, this can
+    be altered by either passing a version (must be an integer) or by having a version filter in the
+    request and then passing use_request_version=True. The version is extracted from the __version__
+    filter as defined by the versioned-datastore plugin. If we can start passing the version as a
+    parameter in its own right rather than as part of the filters then we can change this code.
+
+    If the resource isn't a datastore resource then an empty list is returned.
+
+    Because the versioned_datastore plugin guarantees that the fields returned in its
+    datastore_search responses will be in the order they were when they were ingested or sorted
+    alphabetically if no ingestion ordering is available, no field sorting occurs in this function.
+
+    :param resource: the resource dict
+    :param version: the version to request (default: None)
+    :param use_request_version: whether to look in the request parameters to find a version in the
+                                filters (default: False)
+    :return: a list of field names
+    '''
+    if not resource.get(u'datastore_active'):
+        return []
+
+    data = {u'resource_id': resource[u'id'], u'limit': 0}
+
+    if version is not None:
+        data[u'version'] = version
+    elif use_request_version:
+        filters = parse_request_filters()
+        if u'__version__' in filters:
+            data[u'version'] = int(filters[u'__version__'][0])
+
+    result = logic.get_action(u'datastore_search')({}, data)
+    return [field[u'id'] for field in result.get(u'fields', [])]
+
+
 # Resource view and filters
 def resource_view_state(resource_view_json, resource_json):
     """
@@ -406,7 +443,7 @@ def resource_view_state(resource_view_json, resource_json):
     # To decide whether or not to turn on fitColumns
     # Messy, but better than trying to hack around with slickgrid
 
-    fields = h.resource_view_get_fields(resource)
+    fields = get_resource_fields(resource, use_request_version=True)
 
     num_fields = len(fields)
 
