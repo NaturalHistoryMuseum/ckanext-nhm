@@ -436,27 +436,20 @@ def resource_view_state(resource_view_json, resource_json):
     resource_view = json.loads(resource_view_json)
     resource = json.loads(resource_json)
 
-    # There is an annoying feature/bug in slickgrid, that if fitColumns=True
-    # And grid is wider than available viewport, slickgrid columns cannot
-    # Be resized until fitColumns is deactivated
-    # So to fix, we're going to work out how many columns are in the dataset
-    # To decide whether or not to turn on fitColumns
-    # Messy, but better than trying to hack around with slickgrid
-
     fields = get_resource_fields(resource, use_request_version=True)
-
-    num_fields = len(fields)
-
-    viewport_max_width = 920
-    col_width = 100
-    fit_columns = (num_fields * col_width) < viewport_max_width
 
     # Initiate the resource view
     view = resource_view_get_view(resource)
-
     # And get the state
     resource_view['state'] = view.get_slickgrid_state()
 
+    # there is an annoying feature/bug in slickgrid that if fitColumns=True and grid is wider than
+    # available viewport, slickgrid columns cannot be resized until fitColumns is deactivated. So to
+    # fix, we're going to work out how many columns are in the dataset to decide whether or not to
+    # turn on fitColumns. Messy, but better than trying to hack around with slickgrid
+    viewport_max_width = 920
+    col_width = 100
+    fit_columns = (len(fields) * col_width) < viewport_max_width
     # TODO: This can be merged into get_slickgrid_state
     resource_view['state']['fitColumns'] = fit_columns
 
