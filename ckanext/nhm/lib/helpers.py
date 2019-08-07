@@ -468,6 +468,21 @@ def resource_view_state(resource_view_json, resource_json):
     columns_order += [f for f in fields if f not in columns_order]
     resource_view['state']['columnsOrder'] = list(columns_order)
 
+    # this is a bit of a hack but not the worst thing that's ever happened. This code is here to
+    # solve a specific problem whereby if a user is viewing an old version of the data and in newer
+    # versions of the data new columns have been added, the user will see these new columns in the
+    # slick grid header row (no data will be shown for them because the column doesn't exist in the
+    # old records). This happens because when slick is setting up it requests the data and the
+    # column headers in separate datastore_search requests, this is inefficient but also problematic
+    # because the column headers request doesn't include any of the filters or query parameters that
+    # the data request does. This means that we lose the version information and will return the
+    # headers in the latest version even if the user is actually looking at older data. By
+    # retrieving the current fields for the resource here and then using this list to generate a
+    # list of hidden columns to pass to slick we can make sure these columns don't appear. If we
+    # stop using slick or slick is fixed we can stop doing this.
+    latest_fields = get_resource_fields(resource, use_request_version=False)
+    resource_view[u'state'][u'hiddenColumns'] = [f for f in latest_fields if f not in fields]
+
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
             resource_view['state']['columnsWidth'].append(
