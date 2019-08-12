@@ -1,4 +1,4 @@
-{% set url=h.url_for(controller='package', action='read', id=id) %}
+{% set url = url | default(h.url_for(controller='package', action='read', id=id)) %}
 
 <div class="span4 box">
     <a class="media-image" href="{{ url }}">
