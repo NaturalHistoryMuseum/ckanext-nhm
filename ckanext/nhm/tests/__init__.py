@@ -4,10 +4,11 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
+try:
+    import pkg_resources
 
-def main():
-    pass
+    pkg_resources.declare_namespace(__name__)
+except ImportError:
+    import pkgutil
 
-
-if __name__ == u'__main__':
-    main()
+    __path__ = pkgutil.extend_path(__path__, __name__)
