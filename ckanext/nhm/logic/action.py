@@ -9,6 +9,7 @@ import logging
 import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.nhm.dcat.processors import RDFSerializer
 from ckanext.nhm.lib.mam import mam_media_request
+from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib.record import get_record_by_uuid
 
 from ckan.logic import ActionError
@@ -134,10 +135,9 @@ def object_rdf(context, data_dict):
     version = data_dict.get(u'version', None)
     record_dict, resource_dict = get_record_by_uuid(data_dict[u'uuid'], version)
     if record_dict:
-        record_dict[u'uuid'] = data_dict[u'uuid']
-        serializer = RDFSerializer()
-        output = serializer.serialize_record(record_dict, resource_dict,
-                                             _format=data_dict.get(u'format'))
+        serializer = ObjectSerializer()
+        output = serializer.serialize_record(record_dict, resource_dict, data_dict.get(u'format'),
+                                             version)
         return output
     raise toolkit.ObjectNotFound
 

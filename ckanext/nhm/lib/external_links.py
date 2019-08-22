@@ -12,11 +12,14 @@ Site = namedtuple(u'Site', [u'name', u'icon', u'link'])
 BHL = Site(name=u'Biodiversity Heritage Library',
            icon=u'https://www.biodiversitylibrary.org/favicon.ico',
            link=u'https://www.biodiversitylibrary.org/name/{}')
-CoL = Site(name=u'Catalogue of Life', icon=u'http://www.catalogueoflife.org/favicon.ico',
+CoL = Site(name=u'Catalogue of Life',
+           icon=u'https://www.catalogueoflife.org/sites/default/files/favicon.gif',
            link=u'http://www.catalogueoflife.org/col/search/all/key/{}')
-PBDB = Site(name=u'Paleobiology Database', icon=u'https://paleobiodb.org/favicon.ico',
+PBDB = Site(name=u'Paleobiology Database',
+            icon=u'https://paleobiodb.org/favicon.ico',
             link=u'https://paleobiodb.org/classic/checkTaxonInfo?taxon_name={}')
-Mindat = Site(name=u'Mindat', icon=u'https://www.mindat.org/favicon.ico',
+Mindat = Site(name=u'Mindat',
+              icon=u'https://www.mindat.org/favicon.ico',
               link=u'https://www.mindat.org/search.php?search={}')
 
 SITES = {

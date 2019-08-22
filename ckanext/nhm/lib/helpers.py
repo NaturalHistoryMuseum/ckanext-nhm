@@ -269,9 +269,9 @@ def get_indexlot_resource_id():
 
 
 def get_artefact_resource_id():
-    """
+    '''
     @return:  ID for artefact resource
-    """
+    '''
     return toolkit.config.get(u'ckanext.nhm.artefact_resource_id')
 
 
@@ -434,6 +434,43 @@ def resource_view_get_field_groups(resource):
     return view_cls.get_field_groups(resource)
 
 
+def get_resource_fields(resource, version=None, use_request_version=False):
+    '''
+    Retrieves the fields for the given resource. This is done using the datastore_search action. By
+    default, the field names from the latest version of the resource are returned. However, this can
+    be altered by either passing a version (must be an integer) or by having a version filter in the
+    request and then passing use_request_version=True. The version is extracted from the __version__
+    filter as defined by the versioned-datastore plugin. If we can start passing the version as a
+    parameter in its own right rather than as part of the filters then we can change this code.
+
+    If the resource isn't a datastore resource then an empty list is returned.
+
+    Because the versioned_datastore plugin guarantees that the fields returned in its
+    datastore_search responses will be in the order they were when they were ingested or sorted
+    alphabetically if no ingestion ordering is available, no field sorting occurs in this function.
+
+    :param resource: the resource dict
+    :param version: the version to request (default: None)
+    :param use_request_version: whether to look in the request parameters to find a version in the
+                                filters (default: False)
+    :return: a list of field names
+    '''
+    if not resource.get(u'datastore_active'):
+        return []
+
+    data = {u'resource_id': resource[u'id'], u'limit': 0}
+
+    if version is not None:
+        data[u'version'] = version
+    elif use_request_version:
+        filters = parse_request_filters()
+        if u'__version__' in filters:
+            data[u'version'] = int(filters[u'__version__'][0])
+
+    result = logic.get_action(u'datastore_search')({}, data)
+    return [field[u'id'] for field in result.get(u'fields', [])]
+
+
 # Resource view and filters
 def resource_view_state(resource_view_json, resource_json):
     '''Alter the recline view resource, adding in state info
@@ -445,27 +482,20 @@ def resource_view_state(resource_view_json, resource_json):
     resource_view = json.loads(resource_view_json)
     resource = json.loads(resource_json)
 
-    # There is an annoying feature/bug in slickgrid, that if fitColumns=True
-    # And grid is wider than available viewport, slickgrid columns cannot
-    # Be resized until fitColumns is deactivated
-    # So to fix, we're going to work out how many columns are in the dataset
-    # To decide whether or not to turn on fitColumns
-    # Messy, but better than trying to hack around with slickgrid
-
-    fields = toolkit.h.resource_view_get_fields(resource)
-
-    num_fields = len(fields)
-
-    viewport_max_width = 920
-    col_width = 100
-    fit_columns = (num_fields * col_width) < viewport_max_width
+    fields = get_resource_fields(resource, use_request_version=True)
 
     # Initiate the resource view
     view = resource_view_get_view(resource)
-
     # And get the state
     resource_view[u'state'] = view.get_slickgrid_state()
 
+    # there is an annoying feature/bug in slickgrid that if fitColumns=True and grid is wider than
+    # available viewport, slickgrid columns cannot be resized until fitColumns is deactivated. So to
+    # fix, we're going to work out how many columns are in the dataset to decide whether or not to
+    # turn on fitColumns. Messy, but better than trying to hack around with slickgrid
+    viewport_max_width = 920
+    col_width = 100
+    fit_columns = (len(fields) * col_width) < viewport_max_width
     # TODO: This can be merged into get_slickgrid_state
     resource_view[u'state'][u'fitColumns'] = fit_columns
 
@@ -476,6 +506,21 @@ def resource_view_state(resource_view_json, resource_json):
     # Add the rest of the columns to the columns order
     columns_order += [f for f in fields if f not in columns_order]
     resource_view[u'state'][u'columnsOrder'] = list(columns_order)
+
+    # this is a bit of a hack but not the worst thing that's ever happened. This code is here to
+    # solve a specific problem whereby if a user is viewing an old version of the data and in newer
+    # versions of the data new columns have been added, the user will see these new columns in the
+    # slick grid header row (no data will be shown for them because the column doesn't exist in the
+    # old records). This happens because when slick is setting up it requests the data and the
+    # column headers in separate datastore_search requests, this is inefficient but also problematic
+    # because the column headers request doesn't include any of the filters or query parameters that
+    # the data request does. This means that we lose the version information and will return the
+    # headers in the latest version even if the user is actually looking at older data. By
+    # retrieving the current fields for the resource here and then using this list to generate a
+    # list of hidden columns to pass to slick we can make sure these columns don't appear. If we
+    # stop using slick or slick is fixed we can stop doing this.
+    latest_fields = get_resource_fields(resource, use_request_version=False)
+    resource_view[u'state'][u'hiddenColumns'] = [f for f in latest_fields if f not in fields]
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
@@ -664,48 +709,6 @@ def field_is_link(value):
     return False
 
 
-def get_contact_form_params(pkg=None, res=None, rec=None):
-    '''Get a list of IDS
-
-    :param pkg: (optional, default: None)
-    :param rec: (optional, default: None)
-    :param res: (optional, default: None)
-
-    '''
-
-    params = {}
-
-    if pkg:
-        params[u'package_id'] = pkg.get(u'id') if isinstance(pkg, dict) else pkg.id
-
-    if res:
-        params[u'resource_id'] = res.get(u'id')
-
-    if rec:
-        params[u'record_id'] = rec.get(u'_id')
-
-    return params
-
-
-def get_contact_form_template_url(params):
-    '''Build a URL suitable for linking to the contact form snippet
-    
-    For example: /api/1/util/snippet/contact_form.html?resource_id=123&record_id456
-    
-    Can be parsed output from get_contact_form_params
-
-    :param params: return:
-
-    '''
-
-    url = u'/api/1/util/snippet/contact_form.html'
-
-    if params:
-        url += u'?%s' % urllib.urlencode(params)
-
-    return url
-
-
 def get_contact_form_department_options():
     '''Contact form category'''
     return list_to_form_options(COLLECTION_CONTACTS.keys())
@@ -776,11 +779,11 @@ def get_image_licence_options():
 
 
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
-    """
+    '''
     Generate social share text for a package
     @param pkg_dict:
     @return:
-    """
+    '''
     text = []
     if rec_dict:
         title_field = res_dict.get(u'_title_field', None)
@@ -1093,11 +1096,11 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
 
 def resource_view_get_filterable_fields(resource):
-    """
+    '''
     Retrieves the fields that can be filtered on.
 
     @return: a list of sorted fields
-    """
+    '''
     # if this isn't a datastore resource, return an empty list
     if not resource.get(u'datastore_active'):
         return []
@@ -1293,7 +1296,7 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
             kwargs[u'version'] = version
         # build the nav and add it to the list
         links.append(_add_nav_item_class(toolkit.h.build_nav_icon(route_name, link_text, **kwargs),
-                                         [], role='presentation'))
+                                         [], role=u'presentation'))
 
     return links
 
@@ -1307,15 +1310,15 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     :return: a literal of HTML code where all the <li> nodes have "nav-item" added to their classes
     '''
     if classes is None:
-        classes = ['nav-item']
-    soup = bs4.BeautifulSoup(html_string, 'lxml')
-    list_items = soup.find_all('li')
+        classes = [u'nav-item']
+    soup = bs4.BeautifulSoup(html_string, u'lxml')
+    list_items = soup.find_all(u'li')
     for li in list_items:
         if len(classes) > 0:
-            li['class'] = li.get('class', []) + classes
+            li[u'class'] = li.get(u'class', []) + classes
         for k, v in kwargs.items():
             li[k] = v
-    return literal('\n'.join([str(el) for el in soup.body.contents]))
+    return literal(u'\n'.join([str(el) for el in soup.body.contents]))
 
 
 def build_nav_main(*args):

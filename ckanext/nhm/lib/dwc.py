@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
 #
 # This file is part of ckanext-nhm
@@ -8,6 +8,13 @@ from collections import OrderedDict
 
 import os
 from lxml import etree
+
+# even though we use simple DwC terms, we use this XSD as it allows us to group terms into events
+# etc., on record display
+path = os.path.join(os.path.dirname(os.path.dirname(__file__)), u'src/tdwg_dwcterms.xsd')
+with open(path, u'r') as xml_f:
+    data = etree.parse(xml_f, etree.XMLParser())
+    DWC_XSD = data.getroot()
 
 
 def dwc_terms(fields):
@@ -20,19 +27,12 @@ def dwc_terms(fields):
     :returns: dict, keyed by groups
 
     '''
-
-    f = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                     u'src/tdwg_dwcterms.xsd')
-
-    data = etree.parse(open(f), etree.XMLParser())
-    root = data.getroot()
-
     dynamic_properties_uri = None
     terms = OrderedDict()
-    for group in root.iterfind(u'xs:group', namespaces=root.nsmap):
-        for element in group.iterfind(u'xs:sequence/xs:element', namespaces=root.nsmap):
+    for group in DWC_XSD.iterfind(u'xs:group', namespaces=DWC_XSD.nsmap):
+        for element in group.iterfind(u'xs:sequence/xs:element', namespaces=DWC_XSD.nsmap):
             ns, name = element.get(u'ref').split(u':')
-            uri = u'{ns}{name}'.format(ns=root.nsmap[ns], name=name)
+            uri = u'{ns}{name}'.format(ns=DWC_XSD.nsmap[ns], name=name)
             if name == u'dynamicProperties':
                 # Keep a references to the dynamic properties uri, we
                 # will need this later on
@@ -53,8 +53,8 @@ def dwc_terms(fields):
     # Add created - not actually in DwC
     terms[u'RecordLevelTerms'][u'http://purl.org/dc/terms/created'] = u'created'
 
-    # Dynamic properties are actually part of RecordLevelTerms, but we
-    # treat it slightly differently - filter out all hidden fields (starting with _)
+    # dynamic properties are actually part of RecordLevelTerms, but we treat it slightly differently
+    # - filter out all hidden fields (starting with _)
     terms[u'dynamicProperties'] = {
         dynamic_properties_uri: [f for f in fields if not f.startswith(u'_')]
         }

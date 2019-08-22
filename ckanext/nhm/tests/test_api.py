@@ -39,7 +39,7 @@ class TestAPI(TestBase):
         params = {
             u'id': self.pkg_dict[u'name']
             }
-        response = self.api_request('package_show', params=params)
+        response = self.api_request(u'package_show', params=params)
 
         nose.tools.assert_true(response[u'success'])
         nose.tools.assert_dict_equal(response[u'result'],
@@ -54,7 +54,7 @@ class TestAPI(TestBase):
             u'title': name,
             u'notes': u'what exciting notes'
             }
-        response = self.api_request('package_create', params=params, method='post')
+        response = self.api_request(u'package_create', params=params, method=u'post')
 
         pkg_dict = toolkit.get_action(u'package_show')({}, {
             u'id': name
@@ -68,7 +68,7 @@ class TestAPI(TestBase):
         params = {
             u'id': self.res_dict[u'id']
             }
-        response = self.api_request('resource_show', params=params)
+        response = self.api_request(u'resource_show', params=params)
         nose.tools.assert_true(response[u'success'])
         nose.tools.assert_equal(response[u'result'][u'id'], self.res_dict[u'id'])
 
@@ -78,7 +78,7 @@ class TestAPI(TestBase):
             u'url': u'http://placekitten.com/500/500',
             u'name': u'test_api_create_resource'
             }
-        response = self.api_request('resource_create', params=params, method='post')
+        response = self.api_request(u'resource_create', params=params, method=u'post')
         nose.tools.assert_true(response[u'success'])
 
     def test_create_group(self):
