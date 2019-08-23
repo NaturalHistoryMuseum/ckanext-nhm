@@ -41,11 +41,11 @@ setup(
     zip_safe=False,
     install_requires=[
                          'PyYAML==3.10',
-                         'amqp==1.4.0',
+                         'amqp==1.4.9',
                          'anyjson==0.3.3',
                          'billiard==3.3.0.13',
                          'celery==3.1.7',
-                         'pytz==2013.9',
+                         'pytz==2018.4',
                          'python-memcached==1.53',
                          'lxml>=3.4.4',
                          'Shapely<1.3',
