@@ -11,15 +11,6 @@ __version__ = u'1.0.0-alpha'
 with open(u'README.md', u'r') as f:
     __long_description__ = f.read()
 
-# for listing in the requirements as 'ckanext-NAME'
-ckan_extensions = ['spatial', 'viewhelpers', 'dcat', 'pdfview', 'contact', 'doi', 'gallery',
-                   'userdatasets', 'ldap', 'graph', 'ckanpackager', 'video', 'gbif', 'statistics',
-                   'list', 'status', 'twitter', 'sketchfab', 'versioned_datastore',
-                   'versioned_tiledmap', 'query_dois', ]
-
-# to avoid repeating this URL near 20 times
-nhm_git = 'git+https://github.com/NaturalHistoryMuseum/'
-
 setup(
     name=u'ckanext-nhm',
     version=__version__,
@@ -40,40 +31,17 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-                         'PyYAML==3.10',
-                         'amqp==1.4.9',
-                         'anyjson==0.3.3',
-                         'billiard==3.3.0.13',
-                         'celery==3.1.7',
-                         'pytz==2018.4',
-                         'python-memcached==1.53',
-                         'lxml>=3.4.4',
-                         'Shapely<1.3',
-                         'raven==6.0.0',
-                         'elasticsearch-dsl',
-                         ] + ['ckanext-' + ext for ext in ckan_extensions],
-    dependency_links=[
-        'git+https://github.com/ckan/ckanext-spatial.git#egg=ckanext-spatial',
-        'git+https://github.com/ckan/ckanext-viewhelpers.git#egg=ckanext_viewhelpers',
-        'git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext_dcat',
-        'git+https://github.com/ckan/ckanext-pdfview.git#egg=ckanext_pdfview',
-        nhm_git + 'ckanext-contact.git#egg=ckanext-contact',
-        nhm_git + 'ckanext-doi.git#egg=ckanext-doi',
-        nhm_git + 'ckanext-gallery.git#egg=ckanext-gallery',
-        nhm_git + 'ckanext-userdatasets.git#egg=ckanext-userdatasets',
-        nhm_git + 'ckanext-ldap.git#egg=ckanext-ldap',
-        nhm_git + 'ckanext-graph.git#egg=ckanext-graph',
-        nhm_git + 'ckanext-ckanpackager.git#egg=ckanext-ckanpackager',
-        nhm_git + 'ckanext-video.git#egg=ckanext_video',
-        nhm_git + 'ckanext-gbif.git#egg=ckanext_gbif',
-        nhm_git + 'ckanext-statistics.git#egg=ckanext_statistics',
-        nhm_git + 'ckanext-list.git#egg=ckanext_list',
-        nhm_git + 'ckanext-status.git#egg=ckanext_status',
-        nhm_git + 'ckanext-twitter.git#egg=ckanext_twitter',
-        nhm_git + 'ckanext-sketchfab.git#egg=ckanext_sketchfab',
-        nhm_git + 'ckanext-versioned-datastore.git#egg=ckanext_versioned_datastore',
-        nhm_git + 'ckanext-versioned-tiledmap.git#egg=ckanext_versioned_tiledmap',
-        nhm_git + 'ckanext-query-dois.git#egg=ckanext_query_dois',
+        'PyYAML==3.10',
+        'amqp==1.4.9',
+        'anyjson==0.3.3',
+        'billiard==3.3.0.13',
+        'celery==3.1.7',
+        'pytz==2018.4',
+        'python-memcached==1.53',
+        'lxml>=3.4.4',
+        'Shapely<1.3',
+        'raven==6.0.0',
+        'elasticsearch-dsl==6.2.1',
         ],
     entry_points= \
         u'''
