@@ -37,4 +37,4 @@ pip install -r requirements.txt
 
 pip install -r $HOME/virtualenv/python2.7/src/ckanext-dcat/requirements.txt
 
-paster --plugin=ckanext-versioned-datastore vds initdb -c ckanext/versioned_datastore/tests/bin/test.ini
+paster --plugin=ckanext-versioned-datastore vds initdb -c ckanext/nhm/tests/bin/test.ini
