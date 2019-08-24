@@ -7,7 +7,6 @@
 import logging
 
 import ckanext.nhm.logic.schema as nhm_schema
-from ckanext.nhm.dcat.processors import RDFSerializer
 from ckanext.nhm.lib.mam import mam_media_request
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib.record import get_record_by_uuid
@@ -22,7 +21,7 @@ def record_show(context, data_dict):
     '''Retrieve an individual record
 
     :param context:
-    :param data_dict: 
+    :param data_dict:
 
     '''
     context[u'user'] = toolkit.c.user or toolkit.c.author
@@ -67,7 +66,7 @@ def download_original_image(context, data_dict):
         - And the image exists on that record
 
     :param context:
-    :param data_dict: 
+    :param data_dict:
 
     '''
 
@@ -117,7 +116,7 @@ def object_rdf(context, data_dict):
     '''Get record RDF
 
     :param context:
-    :param data_dict: 
+    :param data_dict:
 
     '''
 
@@ -147,7 +146,7 @@ def _image_exists_on_record(resource, record, asset_id):
 
     :param resource:
     :param asset_id:
-    :param record: 
+    :param record:
 
     '''
     # FIXME - If no image field use gallery
