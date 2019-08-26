@@ -196,18 +196,29 @@ class SpecimenView(DefaultView):
         ])),
     ])
 
+    @staticmethod
+    def choose_title(record_dict):
+        occurrence_id = record_dict.get('occurrenceID')
+        catalog_number = record_dict.get('catalogNumber', None)
+        sub_department = record_dict.get('subDepartment', None)
+
+        if catalog_number:
+            if sub_department:
+                return u'{}:{}'.format(sub_department, catalog_number)
+            else:
+                return catalog_number
+        else:
+            return occurrence_id
+
     def render_record(self, c):
         """
         Render a record
         Called from record controller, when viewing a record page
         @return: html
         """
+        log.info('Viewing record %s', c.record_dict.get('occurrenceID'))
 
-        occurrence_id = c.record_dict.get('occurrenceID')
-
-        log.info('Viewing record %s', occurrence_id)
-
-        c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
+        c.record_title = self.choose_title(c.record_dict)
 
         # Act on a deep copy of field groups, so deleting element will not have any impact
         c.field_groups = deepcopy(self.field_groups)
