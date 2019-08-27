@@ -5,9 +5,7 @@
     <li>{% link_for _('Data'), named_route='dataset.search' %}</li>
     <li>{% link_for dataset|truncate(30), named_route='dataset.read', id=g.pkg.name %}</li>
     {# Added actual URL as IE9 doesn't like empty hrefs & we want to remove the filters #}
-    <li class="active">
-        <a href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id) }}">{{ h.resource_display_name(res)|truncate(30) }}</a>
-    </li>
+    <li class="active"><a href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id) }}">{{ h.resource_display_name(res)|truncate(30) }}</a></li>
 {% endblock %}
 
 {% block resource_inner %}

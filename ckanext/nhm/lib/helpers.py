@@ -79,7 +79,7 @@ def _get_action(action, params):
     '''Call basic get_action from template.
 
     :param action:
-    :param params: 
+    :param params:
 
     '''
     context = {
@@ -352,8 +352,8 @@ def persistent_follow_button(obj_type, obj_id):
     For anon users this function outputs a follow button which links through to the
     login page
 
-    :param obj_type: 
-    :param obj_id: 
+    :param obj_type:
+    :param obj_id:
     :returns:
 
     '''
@@ -467,7 +467,7 @@ def get_resource_fields(resource, version=None, use_request_version=False):
         if u'__version__' in filters:
             data[u'version'] = int(filters[u'__version__'][0])
 
-    result = logic.get_action(u'datastore_search')({}, data)
+    result = toolkit.get_action(u'datastore_search')({}, data)
     return [field[u'id'] for field in result.get(u'fields', [])]
 
 
@@ -476,7 +476,7 @@ def resource_view_state(resource_view_json, resource_json):
     '''Alter the recline view resource, adding in state info
 
     :param resource_view_json: return:
-    :param resource_json: 
+    :param resource_json:
 
     '''
     resource_view = json.loads(resource_view_json)
@@ -547,7 +547,7 @@ def resource_is_dwc(resource):
 def camel_case_to_string(camel_case_string):
     '''
 
-    :param camel_case_string: 
+    :param camel_case_string:
 
     '''
     s = u' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
@@ -558,7 +558,7 @@ def get_resource_filter_options(resource, resource_view):
     '''Return the available filter options for the given resource
 
     :param resource: Dictionary representing a resource
-    :param resource_view: 
+    :param resource_view:
     :returns: A dictionary associating each option's name to a dict defining:
                 - label: The label to display to users;
                 - checked: True if the option is currently applied.
@@ -613,7 +613,7 @@ def get_allowed_view_types(resource, package):
     We want to edit some of the options - remove Image and change Tiled Map to Map
 
     :param resource: param package:
-    :param package: 
+    :param package:
 
     '''
 
@@ -654,8 +654,8 @@ def get_facet_label_function(facet_name, multi=False):
         def filter_facets(facet, filter_value):
             '''
 
-            :param facet: 
-            :param filter_value: 
+            :param facet:
+            :param filter_value:
 
             '''
             for f in facet:
@@ -686,7 +686,7 @@ def get_creator_id_facet_label(facet):
 def field_name_label(field_name):
     '''Convert a field name into a label - replacing _s and upper casing first character
 
-    :param field_name: 
+    :param field_name:
     :returns: str label
 
     '''
@@ -735,7 +735,7 @@ def record_display_field(field_name, value):
     Evaluates whether a field has value
 
     :param field_name:
-    :param value: 
+    :param value:
     :returns: bool - true to display field; false not to
 
     '''
@@ -837,7 +837,7 @@ def dataset_author_truncate(author_str):
     def _truncate(author_str, separator=None):
         '''
 
-        :param author_str: 
+        :param author_str:
         :param separator:  (optional, default: None)
 
         '''
