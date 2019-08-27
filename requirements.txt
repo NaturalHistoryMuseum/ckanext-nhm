@@ -23,4 +23,3 @@
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore.git@upgrade/main#egg=ckanext_versioned_datastore
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-tiledmap.git@upgrade/main#egg=ckanext_versioned_tiledmap
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-query-dois.git@upgrade/main#egg=ckanext_query_dois
--e git+https://github.com/NaturalHistoryMuseum/eevee.git@v1.0.2#egg=eevee
