@@ -60,7 +60,7 @@ setup(
         'anyjson==0.3.3',
         'billiard==3.3.0.13',
         'celery==3.1.7',
-        'pytz==2018.4',
+        'pytz>=2016.7',
         'python-memcached==1.53',
         'lxml>=3.4.4',
         'Shapely<1.3',
