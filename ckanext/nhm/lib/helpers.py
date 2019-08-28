@@ -25,13 +25,12 @@ from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from datetime import datetime
 from jinja2.filters import do_truncate
-from lxml import etree
+from lxml import etree, html
 from webhelpers.html import literal
-import bs4
 
 from ckan import model
-from ckan.plugins import toolkit
 from ckan.lib import helpers as core_helpers
+from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
 
@@ -458,7 +457,10 @@ def get_resource_fields(resource, version=None, use_request_version=False):
     if not resource.get(u'datastore_active'):
         return []
 
-    data = {u'resource_id': resource[u'id'], u'limit': 0}
+    data = {
+        u'resource_id': resource[u'id'],
+        u'limit': 0
+        }
 
     if version is not None:
         data[u'version'] = version
@@ -938,7 +940,7 @@ def get_resource_facets(resource):
             u'label': facet_label_formatters[field_name](field_name),
             u'active': field_name in filters,
             u'has_more': search[u'facets'][field_name][u'details'][
-                            u'sum_other_doc_count'] > 0,
+                             u'sum_other_doc_count'] > 0,
             u'facet_values': [
                 {
                     u'name': value,
@@ -1261,8 +1263,8 @@ def get_object_url(resource_id, guid, version=None):
         u'version': version,
         })
     return toolkit.url_for(u'object_view_versioned', action=u'view', uuid=guid,
-                   version=rounded_version,
-                   qualified=True)
+                           version=rounded_version,
+                           qualified=True)
 
 
 def build_specimen_nav_items(package_name, resource_id, record_id, version=None):
@@ -1311,14 +1313,14 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     '''
     if classes is None:
         classes = [u'nav-item']
-    soup = bs4.BeautifulSoup(html_string, u'lxml')
-    list_items = soup.find_all(u'li')
+    tree = html.fromstring(html_string)
+    list_items = [i for i in tree.getchildren() if i.tag == u'li']
     for li in list_items:
-        if len(classes) > 0:
-            li[u'class'] = li.get(u'class', []) + classes
+        for c in classes:
+            li.classes.add(c)
         for k, v in kwargs.items():
-            li[k] = v
-    return literal(u'\n'.join([str(el) for el in soup.body.contents]))
+            li.attrib[k] = v
+    return literal(u'\n'.join([str(el) for el in tree.getchildren()]))
 
 
 def build_nav_main(*args):
