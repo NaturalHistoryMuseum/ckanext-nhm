@@ -1098,15 +1098,20 @@ select {
   border-radius: 2px;
 }
 .modal {
-  background-color: #FFFFFF;
-  top: 10%;
+  top: 10% !important;
   left: 10%;
   right: 10%;
   bottom: 10%;
   border-radius: 2px;
   padding: 15px !important;
+  margin-top: 0 !important;
 }
-.modal .form-actions .btn.save {
+.modal > .modal-header,
+.modal > .modal-body {
+  background-color: #FFFFFF;
+}
+.modal .form-actions .btn.save,
+.modal .form-actions .btn.cancel {
   float: right;
   margin: 0;
 }

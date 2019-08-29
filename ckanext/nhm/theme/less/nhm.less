@@ -1064,15 +1064,19 @@ select {
 // MODALS ------------------------------------------------------------------------------------------
 
 .modal {
-  background-color: @grey10;
-  top: 10%;
+  top: 10% !important;
   left: 10%;
   right: 10%;
   bottom: 10%;
   border-radius: @rounding;
   padding: @min-pad !important;
+  margin-top: 0 !important;
 
-  & .form-actions .btn.save {
+  & > .modal-header, & > .modal-body {
+    background-color: @grey10;
+  }
+
+  & .form-actions .btn.save, & .form-actions .btn.cancel {
     float: right;
     margin: 0;
   }
