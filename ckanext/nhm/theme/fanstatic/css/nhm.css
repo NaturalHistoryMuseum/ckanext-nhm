@@ -464,10 +464,6 @@ span.caret {
   position: relative;
   min-height: 100%;
 }
-[role=main] > *:last-child,
-.main > *:last-child {
-  padding-bottom: 300px;
-}
 .masthead {
   padding: 3px 0;
   background: #188100;
@@ -647,7 +643,7 @@ span.caret {
   background: #343434;
   color: #9A9A9A;
   padding: 0 0 30px;
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
 }
