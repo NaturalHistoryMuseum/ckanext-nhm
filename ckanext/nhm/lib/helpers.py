@@ -1174,7 +1174,7 @@ def get_latest_update_for_package(pkg_dict, date_format=None):
     if latest_date is not None:
         return toolkit.h.render_datetime(latest_date, date_format=date_format)
     else:
-        return _(u'unknown')
+        return toolkit._(u'unknown')
 
 
 def get_latest_update_for_package_resources(pkg_dict, date_format=None):
