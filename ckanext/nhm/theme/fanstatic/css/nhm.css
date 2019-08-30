@@ -1038,6 +1038,9 @@ span.caret {
   float: none;
   margin: 0 0 20px 0;
 }
+.form-actions.flex-container {
+  text-align: unset;
+}
 .form-horizontal .form-group {
   margin-left: 0 !important;
   margin-right: 0 !important;
