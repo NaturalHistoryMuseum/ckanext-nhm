@@ -180,10 +180,6 @@ body {
   }
 }
 
-.gravatar {
-  margin: 7px 5px 10px;
-}
-
 .handle i {
   position: relative;
   top: -1px;
@@ -451,6 +447,10 @@ span.caret {
     & li {
       display: inline-block;
     }
+  }
+
+  & .gravatar {
+  margin: 7px 5px 10px;
   }
 }
 
@@ -2056,5 +2056,24 @@ ol#credits {
   & li.active a {
     background: @primary6;
     color: @grey1
+  }
+}
+
+// USER PAGE ---------------------------------------------------------------------------------------
+
+.context-info {
+  h1.heading {
+    text-align: center;
+    font-weight: bold;
+    font-size: @font-size-head-s;
+    background: @grey9;
+    padding-bottom: 5px;
+  }
+
+  .image {
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
   }
 }

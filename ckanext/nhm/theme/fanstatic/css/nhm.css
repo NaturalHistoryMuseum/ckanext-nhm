@@ -270,9 +270,6 @@ body .default-text a:focus {
     margin-right: 10px !important;
   }
 }
-.gravatar {
-  margin: 7px 5px 10px;
-}
 .handle i {
   position: relative;
   top: -1px;
@@ -536,6 +533,9 @@ span.caret {
 }
 .masthead .account li {
   display: inline-block;
+}
+.masthead .gravatar {
+  margin: 7px 5px 10px;
 }
 .module {
   padding: 0 15px 15px 15px !important;
@@ -2025,4 +2025,17 @@ ol#credits li {
 #followee-filter li.active a {
   background: #BBEDA9;
   color: #343434;
+}
+.context-info h1.heading {
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  background: #F2F2F2;
+  padding-bottom: 5px;
+}
+.context-info .image {
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
 }

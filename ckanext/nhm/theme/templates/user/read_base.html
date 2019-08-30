@@ -1,14 +1,19 @@
 {% ckan_extends %}
 
 {% block user_about %}
-  {% if g.about_formatted %}
-    {{ g.about_formatted }}
+  {% if about_formatted %}
+    {{ about_formatted }}
   {% endif %}
 {% endblock %}
 
 {% block breadcrumb_content %}
   {# Remove user from breadcrumb {{ h.build_nav('user_index', _('Users')) }} #}
   {{ h.build_nav('user.read', user.display_name|truncate(35), id=user.name) }}
+{% endblock %}
+
+{% block user_image %}
+  {% set gravatar_size = 190 %}
+    <div class="image" style="max-width: {{ gravatar_size }}px">{{ h.linked_gravatar(user.email_hash, gravatar_size) }}</div>
 {% endblock %}
 
 {% block user_info %}
