@@ -450,7 +450,7 @@ span.caret {
   }
 
   & .gravatar {
-  margin: 7px 5px 10px;
+    margin: 7px 5px 10px;
   }
 }
 
@@ -1566,18 +1566,33 @@ select, .select2-choice {
   display: inline-block;
 }
 
-// FIXME: hmmmmm
-#datacite {
-  margin: 50px 20px 0 0;
+.credits-header {
+  background-color: @grey9;
+  text-transform: capitalize;
+  font-weight: bold;
+  font-size: @font-size-body-l;
+  padding: 10px !important;
+  white-space: nowrap;
 }
 
-ol#credits {
-  list-style: none;
-  margin-left: 20px;
-
-  & li {
-    margin: 5px 0;
+.credits-cell {
+  .mixin-flex-container();
+  .mixin-flex-column();
+  .mixin-flex-top();
+  .mixin-flex-center();
+  padding: 10px !important;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  border: 1px solid @grey9;
+  border-radius: @rounding;
+  color: @grey1;
+  &:hover {
+    background-color: @grey9;
   }
+}
+
+#datacite {
+  margin: 50px 20px 0 0;
 }
 
 
