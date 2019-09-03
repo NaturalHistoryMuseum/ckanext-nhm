@@ -6,9 +6,9 @@
 
 {% block breadcrumb_content %}
     <li>{% link_for _('Data'), named_route='dataset.search' %}</li>
-  {% if g.pkg %}
-    {% set dataset = g.pkg.title or g.pkg.name %}
-    <li{{ self.breadcrumb_content_selected() }}>{% link_for dataset|truncate(30), named_route='dataset.read', id=g.pkg.name %}</li>
+  {% if pkg %}
+    {% set dataset = pkg.title or pkg.name %}
+    <li{{ self.breadcrumb_content_selected() }}>{% link_for dataset|truncate(30), named_route='dataset.read', id=pkg.name %}</li>
   {% else %}
     <li class="active"><a href="">{{ _('Create Dataset') }}</a></li>
   {% endif %}
