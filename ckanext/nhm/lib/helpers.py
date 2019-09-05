@@ -1320,7 +1320,7 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
             li.classes.add(c)
         for k, v in kwargs.items():
             li.attrib[k] = v
-    return literal(u'\n'.join([str(el) for el in tree.getchildren()]))
+    return literal(u'\n'.join([html.tostring(el) for el in tree.getchildren()]))
 
 
 def build_nav_main(*args):
