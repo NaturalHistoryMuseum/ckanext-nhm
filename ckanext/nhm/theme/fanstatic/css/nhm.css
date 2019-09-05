@@ -270,6 +270,10 @@ body .default-text a:focus {
     margin-right: 10px !important;
   }
 }
+.no-collapse .fas:first-child,
+.no-collapse .fa:first-child {
+  margin-right: 10px !important;
+}
 .handle i {
   position: relative;
   top: -1px;

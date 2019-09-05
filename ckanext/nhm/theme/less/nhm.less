@@ -162,6 +162,12 @@ body {
 
 // UTILITY -----------------------------------------------------------------------------------------
 
+.icon-pad() {
+  & .fas:first-child, & .fa:first-child {
+    margin-right: 10px !important;
+  }
+}
+
 .collapse-to-icon {
   @media (max-width: @md - 1) {
     font-size: 0;
@@ -174,10 +180,12 @@ body {
   }
 
   @media (min-width: @md) {
-    & .fas:first-child, & .fa:first-child {
-      margin-right: 10px !important;
-    }
+    .icon-pad();
   }
+}
+
+.no-collapse {
+  .icon-pad();
 }
 
 .handle i {
@@ -1590,6 +1598,7 @@ select, .select2-choice {
   border: 1px solid @grey9;
   border-radius: @rounding;
   color: @grey1;
+
   &:hover {
     background-color: @grey9;
   }
