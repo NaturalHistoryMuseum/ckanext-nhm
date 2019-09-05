@@ -527,12 +527,19 @@ span.caret {
   background: transparent;
   padding: 0 0 @min-pad !important;
 
-  & .module ul {
-    background-color: @grey9;
+  & .module {
+    margin-bottom: 15px;
+    border: 1px solid @grey8;
+    & ul {
+      background-color: @grey9;
+    }
+    & .nav-simple-heading {
+      border: none;
+    }
   }
 
   & .module-heading {
-    background: @grey7;
+    background: @grey8;
   }
 
   & .nav > li > a {
@@ -548,7 +555,9 @@ span.caret {
 
   & .nav-simple > li,
   & .nav-aside > li {
-    border-bottom: 1px solid @grey10;
+    &:not(:last-child) {
+      border-bottom: 2px solid @grey10;
+    }
   }
 
   & .active a {

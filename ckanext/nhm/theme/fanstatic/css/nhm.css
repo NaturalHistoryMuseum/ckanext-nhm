@@ -600,11 +600,18 @@ span.caret {
   background: transparent;
   padding: 0 0 15px !important;
 }
+.secondary .module {
+  margin-bottom: 15px;
+  border: 1px solid #DDDDDD;
+}
 .secondary .module ul {
   background-color: #F2F2F2;
 }
+.secondary .module .nav-simple-heading {
+  border: none;
+}
 .secondary .module-heading {
-  background: #C3C3C3;
+  background: #DDDDDD;
 }
 .secondary .nav > li > a:hover,
 .secondary .nav > li > a:focus {
@@ -614,9 +621,9 @@ span.caret {
   border-top: none;
   border-bottom: none;
 }
-.secondary .nav-simple > li,
-.secondary .nav-aside > li {
-  border-bottom: 1px solid #FFFFFF;
+.secondary .nav-simple > li:not(:last-child),
+.secondary .nav-aside > li:not(:last-child) {
+  border-bottom: 2px solid #FFFFFF;
 }
 .secondary .active a,
 .secondary .active a:hover,
