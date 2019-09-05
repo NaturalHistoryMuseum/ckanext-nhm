@@ -530,9 +530,11 @@ span.caret {
   & .module {
     margin-bottom: 15px;
     border: 1px solid @grey8;
+
     & ul {
       background-color: @grey9;
     }
+
     & .nav-simple-heading {
       border: none;
     }
@@ -959,7 +961,21 @@ span.caret {
     & > *:not(:first-child) {
       flex-grow: 1;
     }
+
+    &.control-select .form-control {
+      width: auto;
+      max-width: 100%;
+    }
+
+    &.control-medium .form-control {
+      @media (min-width: @lg) {
+        width: auto !important;
+        min-width: 30em;
+      }
+    }
   }
+
+
 }
 
 .ckanpackager-form {

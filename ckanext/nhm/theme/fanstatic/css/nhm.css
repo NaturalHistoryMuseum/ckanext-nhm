@@ -1016,6 +1016,18 @@ span.caret {
 .contact-form .control-group > *:not(:first-child) {
   flex-grow: 1;
 }
+.contact-form .form-group.control-select .form-control,
+.contact-form .control-group.control-select .form-control {
+  width: auto;
+  max-width: 100%;
+}
+@media (min-width: 992px) {
+  .contact-form .form-group.control-medium .form-control,
+  .contact-form .control-group.control-medium .form-control {
+    width: auto !important;
+    min-width: 30em;
+  }
+}
 .ckanpackager-form {
   padding: 10px !important;
   background: #DDDDDD;
