@@ -81,28 +81,28 @@ def _context():
         }
 
 
-@blueprint.route(u'/object/<uuid>.<_format>', defaults={
+@blueprint.route(u'/object/<uuid>.<format_>', defaults={
     u'version': None
     })
-@blueprint.route(u'/object/<uuid>/<int:version>.<_format>')
-def rdf(uuid, _format, version):
-    '''Return RDF view of object.
+@blueprint.route(u'/object/<uuid>/<int:version>.<format_>')
+def rdf(uuid, format_, version):
+    '''
+    Return RDF view of object.
 
     :param uuid: the object's uuid
-    :param _format: the format requested
+    :param format_: the format requested
     :param version: the version of the record to retrieve, or None if the current
-    version is desired
+                    version is desired
     :return: the data to display
-
     '''
     data_dict = {
         u'uuid': uuid,
-        u'format': _format,
+        u'format': format_,
         u'version': version,
     }
     try:
         result = toolkit.get_action(u'object_rdf')(_context(), data_dict)
-        return Response(result, mimetype=CONTENT_TYPES[_format])
+        return Response(result, mimetype=CONTENT_TYPES[format_])
     except toolkit.ValidationError, e:
         toolkit.abort(409, str(e))
 
@@ -123,10 +123,10 @@ def view(uuid, version):
         abyssline_object_redirect(uuid, version)
 
     # is the request for a particular format
-    _format = check_access_header()
+    format_ = check_access_header()
 
-    if _format:
-        return rdf(uuid, _format)
+    if format_:
+        return rdf(uuid, format_)
     else:
         try:
             # get the record at the given version
