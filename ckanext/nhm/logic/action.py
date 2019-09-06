@@ -125,7 +125,7 @@ def object_rdf(context, data_dict):
         u'user': toolkit.c.user or toolkit.c.author
         }
     schema = context.get(u'schema', nhm_schema.object_rdf_schema())
-    data_dict, errors = toolkit.validate(data_dict, schema, context)
+    data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
     # Raise any validation errors
     if errors:
         raise toolkit.ValidationError(errors)

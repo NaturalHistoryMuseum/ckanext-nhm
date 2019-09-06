@@ -1262,9 +1262,7 @@ def get_object_url(resource_id, guid, version=None):
         u'resource_id': resource_id,
         u'version': version,
         })
-    return toolkit.url_for(u'object_view_versioned', action=u'view', uuid=guid,
-                           version=rounded_version,
-                           qualified=True)
+    return toolkit.url_for(u'object.view', uuid=guid, qualified=True, version=rounded_version)
 
 
 def build_specimen_nav_items(package_name, resource_id, record_id, version=None):
@@ -1282,23 +1280,13 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
     link_definitions = [
         (u'record.view', toolkit._(u'Normal view')),
         (u'record.dwc', toolkit._(u'Darwin Core view')),
-        ]
+    ]
     links = []
     for route_name, link_text in link_definitions:
-        kwargs = {
-            u'package_name': package_name,
-            u'resource_id': resource_id,
-            u'record_id': record_id,
-            }
-        # if there's a version, alter the target of our nav item (the name of the
-        # route) and add the
-        # version to kwargs we're going to pass to the nav builder helper function
-        if version is not None:
-            route_name = u'{}_versioned'.format(route_name)
-            kwargs[u'version'] = version
-        # build the nav and add it to the list
-        links.append(_add_nav_item_class(toolkit.h.build_nav_icon(route_name, link_text, **kwargs),
-                                         [], role=u'presentation'))
+        nav_item = toolkit.h.build_nav_icon(route_name, link_text, package_name=package_name,
+                                            resource_id=resource_id, record_id=record_id,
+                                            version=version)
+        links.append(_add_nav_item_class(nav_item, classes=[], role=u'presentation'))
 
     return links
 

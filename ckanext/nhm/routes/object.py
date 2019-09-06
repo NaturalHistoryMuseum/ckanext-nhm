@@ -29,7 +29,7 @@ import logging
 from ckanext.dcat.controllers import check_access_header
 from ckanext.dcat.utils import CONTENT_TYPES
 from ckanext.nhm.lib.record import get_record_by_uuid
-from flask import Blueprint
+from flask import Blueprint, Response
 
 from ckan.plugins import toolkit
 
@@ -81,31 +81,28 @@ def _context():
         }
 
 
-@blueprint.route(u'/object/<uuid>.<_format>', defaults={
+@blueprint.route(u'/object/<uuid>.<format_>', defaults={
     u'version': None
     })
-@blueprint.route(u'/object/<uuid>/<int:version>.<_format>')
-def rdf(uuid, _format, version):
-    '''Return RDF view of object.
+@blueprint.route(u'/object/<uuid>/<int:version>.<format_>')
+def rdf(uuid, format_, version):
+    '''
+    Return RDF view of object.
 
     :param uuid: the object's uuid
-    :param _format: the format requested
+    :param format_: the format requested
     :param version: the version of the record to retrieve, or None if the current
-    version is desired
+                    version is desired
     :return: the data to display
-
     '''
     data_dict = {
         u'uuid': uuid,
-        u'format': _format,
+        u'format': format_,
         u'version': version,
-        }
-
-    toolkit.response.headers.update({
-        u'Content-type': CONTENT_TYPES[_format]
-        })
+    }
     try:
-        return toolkit.get_action(u'object_rdf')(_context(), data_dict)
+        result = toolkit.get_action(u'object_rdf')(_context(), data_dict)
+        return Response(result, mimetype=CONTENT_TYPES[format_])
     except toolkit.ValidationError, e:
         toolkit.abort(409, str(e))
 
@@ -126,10 +123,10 @@ def view(uuid, version):
         abyssline_object_redirect(uuid, version)
 
     # is the request for a particular format
-    _format = check_access_header()
+    format_ = check_access_header()
 
-    if _format:
-        return rdf(uuid, _format)
+    if format_:
+        return rdf(uuid, format_)
     else:
         try:
             # get the record at the given version
@@ -144,9 +141,9 @@ def view(uuid, version):
                                                                   u'id': package_id
                                                                   })
                 # redirect to the object record
-                toolkit.redirect_to(u'record.view', package_name=package[u'name'],
-                                    resource_id=resource.id, record_id=record[u'_id'],
-                                    version=version)
+                return toolkit.redirect_to(u'record.view', package_name=package[u'name'],
+                                           resource_id=resource.id, record_id=record[u'_id'],
+                                           version=version)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
 

@@ -102,34 +102,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                      action=u'dataset_metrics', ckan_icon=u'bar-chart')
         # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
-        object_controller = u'ckanext.nhm.controllers.object:ObjectController'
-
-        _map.connect(u'object_rdf_versioned', '/object/{uuid}/{version}.{_format}',
-                     controller=object_controller, action=u'rdf',
-                     requirements={
-                         u'_format': u'xml|rdf|n3|ttl|jsonld',
-                         u'version': u'\d+'
-                         })
-
-        _map.connect(u'object_rdf', '/object/{uuid}.{_format}',
-                     controller=object_controller, action=u'rdf',
-                     requirements={
-                         u'_format': u'xml|rdf|n3|ttl|jsonld'
-                         })
-
-        # Permalink for specimens - needs to come after the DCAT format dependent
-        _map.connect(u'object_view_versioned', '/object/{uuid}/{version}',
-                     controller=object_controller,
-                     action=u'view', requirements={
-                u'version': u'\d+'
-                })
-        _map.connect(u'object_view', '/object/{uuid}',
-                     controller=object_controller,
-                     action=u'view')
-
-        # Redirect the old specimen url to the object
-        _map.redirect(u'/specimen/{url:.*}', u'/object/{url}')
-
         # The DCAT plugin breaks these links if enable content negotiation is enabled
         # because it maps to /dataset/{_id} without excluding these actions
         # So we re=add them here to make sure it's working

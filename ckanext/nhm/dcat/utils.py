@@ -16,11 +16,7 @@ def object_uri(uuid, version=None):
     Returns an URI for an object
     :return:
     '''
-    if version is None:
-        return toolkit.url_for(u'object_view', action=u'view', uuid=uuid, qualified=True)
-    else:
-        return toolkit.url_for(u'object_view_versioned', action=u'view', uuid=uuid, version=version,
-                               qualified=True)
+    return toolkit.url_for(u'object.view', uuid=uuid, version=version, qualified=True)
 
 
 def rdf_resources():
