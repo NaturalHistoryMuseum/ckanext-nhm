@@ -1257,6 +1257,13 @@ select {
   text-align: left;
   padding: 2px;
 }
+.table-record td:first-child {
+  padding-right: 5px;
+  min-width: 15em;
+}
+.table-record td:first-child > * {
+  word-wrap: break-spaces !important;
+}
 .table-record tbody {
   font-weight: normal;
 }

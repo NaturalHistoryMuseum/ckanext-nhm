@@ -1249,6 +1249,14 @@ select {
     padding: 2px;
   }
 
+  & td:first-child {
+    padding-right: 5px;
+    min-width: 15em;
+    & > * {
+      word-wrap: break-spaces !important;
+    }
+  }
+
   & tbody {
     font-weight: normal;
   }
