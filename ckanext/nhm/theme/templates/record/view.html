@@ -133,16 +133,8 @@
     {% block record_additional_information_inner %}
     <div class="module module-content">
         <h3>{{ _('Additional Information') }}</h3>
-        <table class="table table-striped table-bordered table-condensed"
-               data-module="table-toggle-more">
-            <thead>
-            <tr>
-                <th scope="col">{{ _('Field') }}</th>
-                <th scope="col">{{ _('Value') }}</th>
-            </tr>
-            </thead>
+        <table class="table table-condensed" data-module="table-toggle-more">
             <tbody>
-
             {% block record_additional_information_rows %}
             <tr>
                 <th scope="row">{{ _('Format') }}</th>
