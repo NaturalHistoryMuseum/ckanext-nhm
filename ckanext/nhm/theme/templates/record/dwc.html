@@ -3,7 +3,9 @@
 {% block content_primary_nav %}
     {% if g.additional_view %}
         {% for nav in h.build_specimen_nav_items(g.pkg.name, res.id, rec._id, g.version) %}
-            {{ nav }}
+            <li>
+                {{ nav }}
+            </li>
         {% endfor %}
     {% endif %}
 {% endblock %}
@@ -23,9 +25,9 @@
         <th>
 
             {% if uri %}
-                <a href="{{ uri }}" target="_blank" title="{{ uri }}">{{term}}</a>
+                <a href="{{ uri }}" target="_blank" title="{{ uri }}">{{ term }}</a>
             {% else %}
-                {{term}}
+                {{ term }}
             {% endif %}
 
         </th>
@@ -39,28 +41,28 @@
 
     <table class="toggle-empty-rows table-responsive table-record" data-module="toggle-empty-rows">
 
-    {% for group, terms in g.dwc_terms.items() %}
+        {% for group, terms in g.dwc_terms.items() %}
 
-        <thead>
+            <thead>
             <tr>
                 <th colspan="2">{{ group }}</th>
             </tr>
-        </thead>
+            </thead>
 
-        <tbody>
+            <tbody>
 
             {% for uri, term in terms.items() %}
-                 {{ dwc_row(term, uri) }}
+                {{ dwc_row(term, uri) }}
             {% endfor %}
 
-        </tbody>
+            </tbody>
 
-    {% endfor %}
+        {% endfor %}
 
         <thead>
-            <tr>
-                <th colspan="2">Dynamic properties</th>
-            </tr>
+        <tr>
+            <th colspan="2">Dynamic properties</th>
+        </tr>
         </thead>
 
         {% for uri, properties in g.dynamic_properties.items() %}

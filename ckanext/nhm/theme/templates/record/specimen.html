@@ -10,7 +10,9 @@
 
 {% block content_primary_nav %}
     {% for nav in h.build_specimen_nav_items(g.pkg.name, res.id, rec._id, g.version) %}
-        {{ nav }}
+        <li>
+            {{ nav }}
+        </li>
     {% endfor %}
 {% endblock %}
 
