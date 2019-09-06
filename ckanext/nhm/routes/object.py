@@ -29,7 +29,7 @@ import logging
 from ckanext.dcat.controllers import check_access_header
 from ckanext.dcat.utils import CONTENT_TYPES
 from ckanext.nhm.lib.record import get_record_by_uuid
-from flask import Blueprint
+from flask import Blueprint, Response
 
 from ckan.plugins import toolkit
 
@@ -99,13 +99,10 @@ def rdf(uuid, _format, version):
         u'uuid': uuid,
         u'format': _format,
         u'version': version,
-        }
-
-    toolkit.response.headers.update({
-        u'Content-type': CONTENT_TYPES[_format]
-        })
+    }
     try:
-        return toolkit.get_action(u'object_rdf')(_context(), data_dict)
+        result = toolkit.get_action(u'object_rdf')(_context(), data_dict)
+        return Response(result, mimetype=CONTENT_TYPES[_format])
     except toolkit.ValidationError, e:
         toolkit.abort(409, str(e))
 
