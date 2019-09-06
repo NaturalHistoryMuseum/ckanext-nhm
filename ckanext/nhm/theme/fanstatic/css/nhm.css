@@ -270,10 +270,6 @@ body .default-text a:focus {
     margin-right: 10px !important;
   }
 }
-.no-collapse .fas:first-child,
-.no-collapse .fa:first-child {
-  margin-right: 10px !important;
-}
 .handle i {
   position: relative;
   top: -1px;
@@ -1195,11 +1191,11 @@ select {
   font-size: initial;
 }
 @media (max-width: 767px) {
-  .btn:not(.no-collapse) {
+  .btn:not(.no-icon) {
     font-size: 0;
   }
-  .btn:not(.no-collapse) .fa,
-  .btn:not(.no-collapse) .fas {
+  .btn:not(.no-icon) .fa,
+  .btn:not(.no-icon) .fas {
     margin: 0 !important;
     line-height: 1em;
     font-size: 17px;
@@ -1207,8 +1203,8 @@ select {
   }
 }
 @media (min-width: 768px) {
-  .btn:not(.no-collapse) .fas:first-child,
-  .btn:not(.no-collapse) .fa:first-child {
+  .btn:not(.no-icon) .fas:first-child,
+  .btn:not(.no-icon) .fa:first-child {
     margin-right: 10px !important;
   }
 }

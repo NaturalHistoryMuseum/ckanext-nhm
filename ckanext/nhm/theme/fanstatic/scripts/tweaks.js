@@ -13,15 +13,17 @@ $(document).ready(function() {
         element.html(html);
     });
 
-    // add the .no-collapse class to every button with no text or no icon
-    $('.btn:not(.no-collapse), button:not(.no-collapse)').filter((i, b) => {
-        let btn = $(b);
+    // add the .no-txt class to every button with no text
+    $('.btn:not(.no-txt), button:not(.no-txt)').filter((i, b) => {
         let innerText = $(b.childNodes).filter((i,el) => !$(el).hasClass('sr-only')).text().trim();
-        if (btn.has('i').length === 0){
-            return true;
-        }
-        else return innerText === '';
-    }).addClass('no-collapse');
+        return innerText === '';
+    }).addClass('no-txt');
+
+    // add the .no-icon class to every button with no icon
+    $('.btn:not(.no-icon), button:not(.no-icon)').filter((i, b) => {
+        let btn = $(b);
+        return btn.has('i').length === 0;
+    }).addClass('no-icon');
 
     // fix some fontawesome references
     function replaceClass(oldClass, newClass) {
