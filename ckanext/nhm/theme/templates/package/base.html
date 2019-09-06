@@ -6,6 +6,9 @@
 
 {% block breadcrumb_content %}
     <li>{% link_for _('Data'), named_route='dataset.search' %}</li>
+  {% if pkg is not defined and g.pkg is defined %}
+    {% set pkg = g.pkg %}
+  {% endif %}
   {% if pkg %}
     {% set dataset = pkg.title or pkg.name %}
     <li{{ self.breadcrumb_content_selected() }}>{% link_for dataset|truncate(30), named_route='dataset.read', id=pkg.name %}</li>
