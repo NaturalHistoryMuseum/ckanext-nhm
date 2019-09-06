@@ -144,9 +144,9 @@ def view(uuid, version):
                                                                   u'id': package_id
                                                                   })
                 # redirect to the object record
-                toolkit.redirect_to(u'record.view', package_name=package[u'name'],
-                                    resource_id=resource.id, record_id=record[u'_id'],
-                                    version=version)
+                return toolkit.redirect_to(u'record.view', package_name=package[u'name'],
+                                           resource_id=resource.id, record_id=record[u'_id'],
+                                           version=version)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
 
