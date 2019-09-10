@@ -169,6 +169,16 @@ def _load_data(package_name, resource_id, record_id, version=None):
                 })
 
 
+@blueprint.before_app_first_request
+def init_jinja_extensions():
+    '''
+    This hook is called before the first request is received by the app and therefore allows us to
+    ensure that the taxonomy extension is loaded into jinja2 before it's used.
+    '''
+    # Load the taxonomy formatter
+    common.current_app.jinja_env.add_extension(TaxonomyFormatExtension)
+
+
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>', defaults={u'version': None})
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/<int:version>')
 def view(package_name, resource_id, record_id, version):
