@@ -551,6 +551,9 @@ span.caret {
 .module-heading:after {
   display: none;
 }
+.module-footer {
+  border: none;
+}
 .module-narrow {
   padding: 0 !important;
 }
@@ -598,7 +601,6 @@ span.caret {
 }
 .secondary .module {
   margin-bottom: 15px;
-  border: 1px solid #DDDDDD;
 }
 .secondary .module ul {
   background-color: #F2F2F2;
