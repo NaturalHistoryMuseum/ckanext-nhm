@@ -20,7 +20,6 @@ from flask import Blueprint
 from ckan import common, model
 from ckan.plugins import toolkit
 
-# from ckanext.nhm.views import DarwinCoreView
 
 log = logging.getLogger(__name__)
 
@@ -191,12 +190,7 @@ def view(package_name, resource_id, record_id, version):
 
     '''
     _load_data(package_name, resource_id, record_id, version)
-
     view_cls = resource_view_get_view(toolkit.c.resource)
-
-    # Load the taxonomy formatter
-    common.current_app.jinja_env.add_extension(TaxonomyFormatExtension)
-
     return view_cls.render_record(toolkit.c)
 
 
@@ -211,12 +205,10 @@ def dwc(package_name, resource_id, record_id, version):
     :param version:
 
     '''
-
     _load_data(package_name, resource_id, record_id, version)
 
     # Is this a DwC view of an additional dataset?
     # In which case, provide links back to the original record view
     toolkit.c.additional_view = True
 
-    view = DarwinCoreView()
-    return view.render_record(toolkit.c)
+    return DarwinCoreView().render_record(toolkit.c)
