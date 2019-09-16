@@ -424,12 +424,11 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 u'href': image[u'identifier'],
                 u'thumbnail': image[u'identifier'].replace(u'preview', u'thumbnail'),
                 u'link': toolkit.url_for(
-                    controller=u'ckanext.nhm.controllers.record:RecordController',
-                    action=u'view',
+                    u'record.view',
                     package_name=data_dict[u'package'][u'name'],
                     resource_id=data_dict[u'resource'][u'id'],
                     record_id=record[u'_id']
-                    ),
+                ),
                 u'copyright': copyright,
                 # Description of image in gallery view
                 u'description': literal(
