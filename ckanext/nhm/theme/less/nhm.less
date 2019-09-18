@@ -50,7 +50,7 @@ h4 {
     color: @grey8;
     display: none;
 
-    @media(max-width: @lg - 1) {
+    @media (max-width: @lg - 1) {
       font-size: @font-size-body-l;
     }
 
@@ -340,34 +340,64 @@ span.caret {
 }
 
 .stats {
-  text-align: right;
-  @media (max-width: @lg) {
-    margin-top: 20px;
+  padding-bottom: 5px;
+  margin-left: 15px;
+  .mixin-flex-container();
+
+  & .stat-text {
+    color: @grey2;
   }
 
-  .vertical-borders(1px, rgba(100, 100, 100, .4));
+  @media (min-width: @md) {
+    .vertical-borders(1px, rgba(100, 100, 100, .4));
+    .mixin-flex-row();
+    .mixin-flex-nowrap();
 
-  & .stat-item {
-    padding: 0 20px 5px;
+    & .stat-item {
+      padding: 0 10px;
+      text-align: center;
 
-    @media (max-width: @sm) {
-      padding: 0 10px 10px;
-    }
+      &:last-child {
+        padding-right: 0;
+      }
 
-    &:last-child {
-      padding-right: 0;
-    }
-
-    & a {
-      font-size: @font-size-head-l;
-      padding-bottom: 6px;
+      & a {
+        font-size: @font-size-head-m;
+        padding-bottom: 6px;
+      }
     }
 
     & .stat-text {
-      font-size: @font-size-body-l;
       display: block;
-      color: @primary1;
+      font-size: @font-size-body-l;
     }
+  }
+
+  @media (max-width: @md - 1) {
+    .mixin-flex-column();
+
+    & .stat-item {
+      padding: 5px 0 0;
+      text-align: right;
+
+      & a {
+        font-size: @font-size-body-l;
+        font-weight: bold;
+      }
+    }
+
+    & .stat-text {
+      display: inline;
+      font-size: @font-size-body-l;
+      font-weight: normal;
+    }
+  }
+}
+
+.stats-container {
+  @media (max-width: @md - 1) {
+    .flex-child-grow;
+    flex-shrink: 0;
   }
 }
 
@@ -453,7 +483,7 @@ span.caret {
   .palette-header-txt();
   .no-hover();
 
-  @media(max-width: @lg - 1){
+  @media (max-width: @lg - 1) {
     padding-top: 20px;
   }
 
@@ -464,10 +494,10 @@ span.caret {
 
     img {
       .extended-masthead & {
-        @media (max-width: @lg - 1){
+        @media (max-width: @lg - 1) {
           height: 80px !important;
         }
-        @media(min-width: @lg){
+        @media (min-width: @lg) {
           height: 85px !important;
         }
         max-height: unset;
@@ -477,6 +507,7 @@ span.caret {
 
   & .navigation {
     margin-left: 20px;
+    margin-bottom: -7px;
 
     & .nav {
       display: flex;
@@ -1678,11 +1709,11 @@ select, .select2-choice {
   }
 
   & h3 {
-    margin: 5px 0;
+    margin: 0;
+    padding: 5px 10px 10px 0;
   }
 
   & .module {
-    margin-top: 10px;
 
     &:last-child {
       margin-bottom: 0;

@@ -408,38 +408,80 @@ span.caret {
   background: #71C85B;
 }
 .stats {
-  text-align: right;
+  padding-bottom: 5px;
+  margin-left: 15px;
+  display: flex;
 }
-@media (max-width: 992px) {
+.stats .stat-text {
+  color: #434343;
+}
+@media (min-width: 768px) {
   .stats {
-    margin-top: 20px;
+    flex-direction: row;
   }
-}
-.stats > * {
-  border-right: 1px solid rgba(100, 100, 100, 0.4);
-}
-.stats > *:last-child {
-  border-right: none;
-}
-.stats .stat-item {
-  padding: 0 20px 5px;
-}
-@media (max-width: 576px) {
+  .stats > * {
+    border-right: 1px solid rgba(100, 100, 100, 0.4);
+  }
+  .stats > *:last-child {
+    border-right: none;
+  }
+  .stats > * {
+    align-self: center;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
   .stats .stat-item {
-    padding: 0 10px 10px;
+    padding: 0 10px;
+    text-align: center;
+  }
+  .stats .stat-item:last-child {
+    padding-right: 0;
+  }
+  .stats .stat-item a {
+    font-size: 26px;
+    padding-bottom: 6px;
+  }
+  .stats .stat-text {
+    display: block;
+    font-size: 17px;
   }
 }
-.stats .stat-item:last-child {
-  padding-right: 0;
+@media (min-width: 768px) and (max-width: 575px) {
+  .stats {
+    flex-wrap: wrap;
+  }
 }
-.stats .stat-item a {
-  font-size: 28px;
-  padding-bottom: 6px;
+@media (min-width: 768px) and (min-width: 576px) {
+  .stats {
+    flex-wrap: nowrap;
+  }
 }
-.stats .stat-item .stat-text {
-  font-size: 17px;
-  display: block;
-  color: #0E4609;
+@media (max-width: 767px) {
+  .stats {
+    flex-direction: column;
+  }
+  .stats > * {
+    vertical-align: center;
+  }
+  .stats .stat-item {
+    padding: 5px 0 0;
+    text-align: right;
+  }
+  .stats .stat-item a {
+    font-size: 17px;
+    font-weight: bold;
+  }
+  .stats .stat-text {
+    display: inline;
+    font-size: 17px;
+    font-weight: normal;
+  }
+}
+@media (max-width: 767px) {
+  .stats-container {
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
 }
 .box {
   background: #F2F2F2;
@@ -563,6 +605,7 @@ span.caret {
 }
 .masthead .navigation {
   margin-left: 20px;
+  margin-bottom: -7px;
 }
 .masthead .navigation .nav {
   display: flex;
@@ -1701,10 +1744,8 @@ select,
   margin: 10px 0 15px 0;
 }
 .specimen-collection h3 {
-  margin: 5px 0;
-}
-.specimen-collection .module {
-  margin-top: 10px;
+  margin: 0;
+  padding: 5px 10px 10px 0;
 }
 .specimen-collection .module:last-child {
   margin-bottom: 0;
