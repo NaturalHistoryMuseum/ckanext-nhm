@@ -1,11 +1,11 @@
 {% set tags = h.get_facet_items_dict('tags', limit=3) %}
-{% set placeholder = _('E.g. Mollusca') %}
+{% set placeholder = [_('Mollusca'),_('Homo sapiens'),_('Papilinoidea'),_('Diplodocus')]|random %}
 
 <div class="module module-search module-narrow module-shallow">
   <form class="module-content search-form collection-search-form flex-container flex-equal" method="get" action="{{ h.url_for_collection_view() }}">
     <div class="search-input control-group search-giant">
       <label for="q" class="sr-only">Search</label>
-      <input type="text" class="search" name="q" id="q" value="" autocomplete="off" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
+      <input type="text" class="search" name="q" id="q" value="" autocomplete="off" placeholder="{% block search_placeholder %}e.g. {{ placeholder }}{% endblock %}" />
       <button type="submit">
         <i class="fas fa-search"></i>
         <span class="sr-only">{{ _('Search') }}</span>

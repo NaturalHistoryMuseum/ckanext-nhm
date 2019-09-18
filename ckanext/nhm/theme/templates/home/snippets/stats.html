@@ -1,6 +1,6 @@
 {% set stats = h.get_site_statistics() %}
 
-<div class="stats flex-container flex-wrap flex-right">
+<div class="stats flex-container flex-nowrap flex-right">
   <div class="stat-item">
     <a href="{{ h.url_for('statistics.records') }}">
       {{ h.SI_number_span(stats.record_count) }}
@@ -12,13 +12,6 @@
     <a href="{{ h.url_for('dataset.search') }}">
       {{ h.SI_number_span(stats.dataset_count) }}
       <span class="stat-text">{{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}</span>
-    </a>
-  </div>
-
-  <div class="stat-item">
-    <a href="{{ h.url_for('statistics.contributors') }}">
-      {{ h.SI_number_span(stats.contributor_count) }}
-      <span class="stat-text">{{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}</span>
     </a>
   </div>
 </div>

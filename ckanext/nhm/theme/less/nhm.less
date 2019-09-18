@@ -25,7 +25,7 @@ h1 {
   &.site-title {
     font-weight: normal;
     font-family: @font-title;
-    margin: 18px 0 0 0;
+    margin: 0 0 0 0;
     font-size: @font-size-head-title;
     letter-spacing: 1px;
   }
@@ -33,20 +33,31 @@ h1 {
 
 h2 {
   font-size: @font-size-head-xl;
-
-  &.welcome {
-    margin: 30px 0 0 0;
-    line-height: 1.3;
-    text-shadow: 1px 1px @grey1;
-  }
 }
 
 h3 {
   font-size: @font-size-head-s;
+
+
 }
 
 h4 {
-  font-size: @font-size-head-m;
+  font-size: @font-size-head-xxs;
+
+  &.welcome {
+    margin: 0 !important;
+    line-height: 1.2;
+    color: @grey8;
+    display: none;
+
+    @media(max-width: @lg - 1) {
+      font-size: @font-size-body-l;
+    }
+
+    .extended-masthead & {
+      display: block;
+    }
+  }
 }
 
 h5 {
@@ -80,6 +91,7 @@ a {
 body {
   min-height: 100vh;
   position: relative;
+  line-height: 1.2;
   .palette-base();
 
   &, .default-text {
@@ -113,6 +125,10 @@ body {
 
 .flex-top {
   .mixin-flex-top()
+}
+
+.flex-bottom {
+  .mixin-flex-bottom()
 }
 
 .flex-stretch-height {
@@ -155,12 +171,56 @@ body {
   .mixin-flex-right();
 }
 
+.flex-left {
+  .mixin-flex-left();
+}
+
 .flex-child-grow {
   flex-grow: 1;
 }
 
 
 // UTILITY -----------------------------------------------------------------------------------------
+
+.account-icons {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+
+
+  & a {
+    color: @grey10;
+  }
+
+  & .account {
+    margin-bottom: 10px;
+    text-align: right;
+
+    &.not-authed > ul {
+      // because there's no gravatar
+      padding-top: 9px;
+    }
+
+    & li {
+      display: inline-block;
+    }
+  }
+
+  & .activity-count {
+    font-size: @font-size-body-s;
+    position: absolute;
+    top: 0;
+    background: @warning2;
+    padding: 0 2px;
+    border-radius: 5px;
+    margin-left: 1.5em;
+  }
+
+  & .notifications {
+    padding-right: 10px;
+  }
+}
 
 .icon-pad() {
   & .fas:first-child, & .fa:first-child {
@@ -285,10 +345,10 @@ span.caret {
     margin-top: 20px;
   }
 
-  .vertical-borders(1px, rgba(255, 255, 255, .4));
+  .vertical-borders(1px, rgba(100, 100, 100, .4));
 
   & .stat-item {
-    padding: 0 20px 15px;
+    padding: 0 20px 5px;
 
     @media (max-width: @sm) {
       padding: 0 10px 10px;
@@ -388,23 +448,35 @@ span.caret {
 
 .masthead {
   @margin: 25px;
-  padding: 3px 0;
+  padding: 10px 0 10px;
   .palette-header();
   .palette-header-txt();
   .no-hover();
 
+  @media(max-width: @lg - 1){
+    padding-top: 20px;
+  }
+
   & .logo {
-    float: left;
-    margin: 10px 25px 14px 0;
+    padding-left: 0;
+    margin-right: 15px;
+    margin-bottom: 5px;
+
+    img {
+      .extended-masthead & {
+        @media (max-width: @lg - 1){
+          height: 80px !important;
+        }
+        @media(min-width: @lg){
+          height: 85px !important;
+        }
+        max-height: unset;
+      }
+    }
   }
 
   & .navigation {
-    @media (min-width: 768px) {
-      float: right !important;
-    }
-    @media (max-width: 767px) {
-      float: left !important;
-    }
+    margin-left: 20px;
 
     & .nav {
       display: flex;
@@ -414,16 +486,22 @@ span.caret {
 
     & .nav-pills {
       @pad: 7px;
-      margin-top: @margin;
 
       & li {
-        margin: 0 5px;
+        margin: 0 2px;
+
+        &:first-child {
+          margin-left: 0;
+        }
+
+        &:last-child {
+          margin-right: 0;
+        }
 
         & a {
           .trans(.5s);
           padding-top: @pad;
           padding-bottom: @pad;
-          text-transform: uppercase;
           font-weight: normal;
         }
 
@@ -436,25 +514,6 @@ span.caret {
         }
       }
     }
-  }
-
-  .account {
-    margin-top: @margin;
-    margin-bottom: floor(@margin / 2);
-    text-align: right;
-
-    &.not-authed > ul {
-      // because there's no gravatar
-      padding-top: 9px;
-    }
-
-    & li {
-      display: inline-block;
-    }
-  }
-
-  & .gravatar {
-    margin: 7px 5px 10px;
   }
 }
 
@@ -481,6 +540,11 @@ span.caret {
 
 .module-narrow {
   padding: 0 !important;
+}
+
+.no-pad-h {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .page-header {
@@ -724,6 +788,11 @@ span.caret {
 // NAVS --------------------------------------------------------------------------------------------
 
 @collapse-width: @lg - 1;
+
+.nav > li > a {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 
 .navbar-collapse {
   overflow-y: visible !important;
@@ -1056,7 +1125,7 @@ span.caret {
       height: @button-size !important;
       margin-top: 0 - (@button-size / 2) !important;
       background: @primary3;
-      border-radius: 20px;
+      border-radius: @button-size;
       right: @button-pad;
       padding: 0;
 
@@ -1076,7 +1145,7 @@ span.caret {
     }
 
     &.search-giant {
-      @button-size: 40px;
+      @button-size: 50px;
 
       & button {
         width: @button-size !important;
@@ -1255,6 +1324,7 @@ select {
   & td:first-child {
     padding-right: 5px;
     min-width: 15em;
+
     & > * {
       word-wrap: break-spaces !important;
     }
@@ -1415,28 +1485,40 @@ select, .select2-choice {
 
 .collection-search-form {
   @pad-search: 80px;
-  min-height: 20vw;
-
-  background: url('@{images}/mapHeat.png') no-repeat center center !important;
-  background-size: cover !important;
+  min-height: 15vw;
   border: none;
+  position: relative;
   @media (max-width: @xl - 1) {
     padding: @pad-search (@pad-search / 2) (@pad-search - @margin-search) !important;
   }
   @media (min-width: @xl) {
     padding: @pad-search (@pad-search * 2) (@pad-search - @margin-search) !important;
-    margin: 20px @min-pad 0 !important;
+    margin: 0 !important;
   }
 
   & .search-input input {
     background: @grey10;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('@{images}/mapHeat.png') no-repeat center center !important;
+    background-size: cover !important;
+    @filter: opacity(60%);
+    -webkit-filter: @filter;
+    filter: @filter;
   }
 }
 
 .collection-stats {
   & .module-content {
     .palette-sidebar(fade);
-    padding: 25px 30px 30px 30px;
+    padding: 15px 30px 20px 30px;
   }
 
   & .collection-icon {
@@ -1556,6 +1638,13 @@ select, .select2-choice {
   }
 }
 
+.featured-image {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  padding-top: 70%;
+}
+
 .homepage {
   padding-top: 0;
   padding-bottom: 50px;
@@ -1571,7 +1660,7 @@ select, .select2-choice {
     max-width: 100%;
 
     img {
-      min-width: unset;
+      width: 100%;
       max-width: 100%;
       height: auto;
     }
@@ -1581,7 +1670,7 @@ select, .select2-choice {
 .specimen-collection {
   & .module-content {
     .palette-sidebar(fade);
-    padding: 20px 30px 0 30px;
+    padding: 10px 30px 0 30px;
   }
 
   & h1 {

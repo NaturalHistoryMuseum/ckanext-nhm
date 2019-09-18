@@ -30,6 +30,14 @@
   }
 }
 
+.mixin-flex-bottom() {
+  align-items: flex-end;
+
+  & > * {
+    align-self: flex-end;
+  }
+}
+
 .mixin-flex-stretch-height() {
   align-items: stretch;
 
@@ -117,5 +125,16 @@
   justify-content: flex-end;
   @media (max-width: @sm) {
     justify-content: space-around;
+  }
+}
+
+.mixin-flex-left() {
+  justify-content: flex-start;
+  @media (max-width: @sm) {
+    justify-content: space-around;
+  }
+
+  & > * {
+    align-self: flex-start;
   }
 }

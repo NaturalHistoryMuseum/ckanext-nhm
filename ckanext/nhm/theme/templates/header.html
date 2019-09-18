@@ -2,104 +2,122 @@
 
 {# This is the header_site_navigation_tabs block copy-pasted from core, butwith the Organizations link removed #}
 {% block header_site_navigation_tabs %}
-    {{ h.build_nav_main(('home.index', _('Home')),('dataset.search', _('Data')),('home.about', _('About'))) }}
+    {{ h.build_nav_main(('home.index', _('Home')),('dataset.search', _('Data')),('contact.form', _('Contact')),('home.about', _('About'))) }}
 {% endblock %}
 
 {# We do not want a search #}{% block header_site_search %}{% endblock %}
 
 {% block header_wrapper %}
-<header class="masthead">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-5 col-sm-6 col-xs-12">
+    <header class="masthead">
+        <div class="container flex-container flex-wrap flex-stretch-first flex-bottom flex-right">
+            <div class="flex-container flex-nowrap flex-bottom no-pad-h">
                 {% block header_logo %}
 
-                {% if g.site_logo %} <a class="logo" href="{{ h.url_for('home.index') }}"><img
-                    src="{{ h.url_for_static_or_external(g.site_logo) }}"
-                    alt="{{ g.site_title }}" title="{{ g.site_title }}"/></a> {% endif %}
-
-                <h1 class="site-title">
-                    <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
-                </h1>
-
+                    {% if g.site_logo %}
+                        <a class="logo" href="{{ h.url_for('home.index') }}"><img
+                                src="/images/nhm_logo.svg"
+                                alt="{{ g.site_title }}" title="{{ g.site_title }}"/></a>
+                    {% endif %}
                 {% endblock %}
 
+                <div class="flex-container flex-left flex-column flex-stretch-last no-pad-h">
+                    <h1 class="site-title no-pad-h">
+                        <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+                    </h1>
+                    <header class="no-pad-h">
+                        <h4 class="welcome">Explore and download the
+                                            Museum’s research and collections data.</h4>
+                    </header>
+                </div>
             </div>
 
-            <div class="col-md-4 col-sm-4 col-xs-8 no-padding">
+            <div class="no-pad-h">
                 {% block header_site_navigation %} {{ super() }} {% endblock %}
             </div>
 
-            <div class="col-md-3 col-sm-2 col-xs-4">
 
-                {# Accessibility fix - links need to have text #} {% block
+        </div>
+    </header>
+
+    <div class="account-icons container">
+
+        {# Accessibility fix - links need to have text #} {% block
                 header_account_container_content %} {% if g.userobj %}
 
-                <div class="account avatar authed" data-module="me"
-                     data-me="{{ g.userobj.id }}">
-                    {% block header_account_logged %}
-                    <div>
-                        <a href="{{ h.url_for('user.read', id=g.userobj.name) }}"
-                           class="image" title="{{ _('View profile') }}"> <span
-                                class="username">{{ g.userobj.display_name }}</span>
-                            <span>{{ h.accessible_gravatar((g.userobj.email_hash if g and
-                                 g.userobj else ''), size=22, userobj=g.userobj) }}
-                            </span> </a>
-                    </div>
-                    <div>
-                        <ul class="list-unstyled list-inline">
-                            {% if g.userobj.sysadmin %}
-                            <li>
-                                <a href="{{ h.url_for('admin.index') }}"
-                                   title="{{ _('Sysadmin settings') }}"> <span
-                                        class="sr-only">{{ _('Sysadmin settings') }}</span><i
-                                        class="fas fa-tools fa-lg"></i></a>
-                            </li>
-                            {% endif %} {% set new_activities = h.new_activities() %} {%
-                            set notifications_tooltip = ngettext('Dashboard (%(num)d new
+        <div class="account avatar authed flex-container flex-right flex-nowrap" data-module="me"
+                data-me="{{ g.userobj.id }}">
+            {% block header_account_logged %}
+                {% set new_activities = h.new_activities() %} {% set notifications_tooltip = ngettext('Dashboard (%(num)d new
                             item)', 'Dashboard (%(num)d new items)', new_activities) %}
-                            <li class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
-                                <a href="{{ h.url_for('dashboard.index', id=g.userobj.name) }}"
-                                   title="{{ notifications_tooltip }}"> <span
-                                        class="sr-only">{{ notifications_tooltip }}</span>
-                                    <i class="fas fa-tachometer-alt fa-lg"></i> <span>{{ new_activities }}</span>
-                                </a>
-                            </li>
-                            {% block header_account_settings_link %} {% if not
-                            h.is_ldap_user() %}
-                            <li>
-                                <a href="{{ h.url_for('user.edit', id=g.userobj.name) }}"
-                                   title="{{ _('Edit settings') }}"> <span
-                                        class="sr-only">{{ _('Edit settings') }}</span> <i
-                                        class="fas fa-cog fa-lg"></i> </a>
-                            </li>
-                            {% endif %} {% endblock %} {% block
-                            header_account_log_out_link %}
-                            <li>
-                                <a href="{{ h.url_for('user.logout') }}"
-                                   title="{{ _('Log out') }}"> <span class="sr-only">{{ _('Log out') }}</span>
-                                    <i class="fas fa-sign-out-alt fa-lg"></i> </a>
-                            </li>
-                            {% endblock %} {{ self.contact_link() }}
-                        </ul>
-                    </div>
-                    {% endblock %}
-                </div>
-                {% else %}
-                <div class="account not-authed">
-                    {% block header_account_notlogged %}
-                        <ul class="list-unstyled list-inline">
-                            <li><a href="{{ h.url_for('user.login') }}"
-                                   title="{{ _('Log in') }}"> <span class="sr-only">{{ _('Log in') }}</span>
-                                <i class="fas fa-sign-in-alt fa-lg"></i> </a></li>
-                            {{ self.contact_link() }}
-                        </ul>
-                    {% endblock %}
-                </div>
-                {% endif %} {% endblock %}
 
-            </div>
+                {# Username and avatar #}
+                <div>
+                    <a href="{{ h.url_for('user.read', id=g.userobj.name) }}"
+                            class="image flex-container no-pad-h" title="{{ _('View profile') }}">
+                        <span class="username">{{ g.userobj.display_name }}</span>
+                        <span>
+                            {{ h.accessible_gravatar((g.userobj.email_hash if g and
+                                 g.userobj else ''), size=22, userobj=g.userobj) }}
+                        </span>
+                    </a>
+                </div>
+
+                {# Notifications #}
+                <div class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+                    <a href="{{ h.url_for('dashboard.index', id=g.userobj.name) }}"
+                            title="{{ notifications_tooltip }}">
+                        <span class="sr-only">{{ notifications_tooltip }}</span>
+                        <span class="activity-count">{{ new_activities }}</span>
+                        <i class="fas fa-tachometer-alt fa-lg"></i>
+                    </a>
+                </div>
+
+                {# Account settings #}
+                {% block header_account_settings_link %}
+                    {% if not h.is_ldap_user() %}
+                        <div>
+                            <a href="{{ h.url_for('user.edit', id=g.userobj.name) }}"
+                                    title="{{ _('Edit settings') }}"> <span
+                                    class="sr-only">{{ _('Edit settings') }}</span>
+                                <i class="fas fa-cog fa-lg"></i> </a>
+                        </div>
+                    {% endif %}
+                {% endblock %}
+
+                {# Sysadmin settings #}
+                {% if g.userobj.sysadmin %}
+                    <div>
+                        <a href="{{ h.url_for('admin.index') }}"
+                                title="{{ _('Sysadmin settings') }}">
+                            <span class="sr-only">{{ _('Sysadmin settings') }}</span>
+                            <i class="fas fa-tools fa-lg"></i>
+                        </a>
+                    </div>
+                {% endif %}
+
+                {# Logout #}
+                {% block header_account_log_out_link %}
+                    <a href="{{ h.url_for('user.logout') }}"
+                            title="{{ _('Log out') }}"> <span
+                            class="sr-only">{{ _('Log out') }}</span>
+                        <i class="fas fa-sign-out-alt fa-lg"></i> </a>
+                {% endblock %}
+            {% endblock %}
         </div>
+    {% else %}
+        <div class="account not-authed">
+            {% block header_account_notlogged %}
+                <ul class="list-unstyled list-inline">
+                    <li><a href="{{ h.url_for('user.login') }}"
+                            title="{{ _('Log in') }}"> <span
+                            class="sr-only">{{ _('Log in') }}</span>
+                        <i class="fas fa-sign-in-alt fa-lg"></i> </a></li>
+                    {{ self.contact_link() }}
+                </ul>
+            {% endblock %}
+        </div>
+    {% endif %} {% endblock %}
 
     </div>
-</header>{% endblock %}
+{% endblock %}
+

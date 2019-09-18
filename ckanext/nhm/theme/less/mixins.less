@@ -104,3 +104,22 @@
     }
   }
 }
+
+.breakpoints(@prop) {
+  // for debugging bootstrap width breakpoints
+
+  @{prop}: red;
+
+  @media (min-width: @sm) {
+    @{prop}: darkorange;
+  }
+  @media (min-width: @md) {
+    @{prop}: yellow;
+  }
+  @media (min-width: @lg) {
+    @{prop}: blue;
+  }
+  @media (min-width: @xl) {
+    @{prop}: purple;
+  }
+}
