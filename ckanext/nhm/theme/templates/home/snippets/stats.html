@@ -3,7 +3,7 @@
 <div class="stats">
     <div class="stat-item">
         <a href="{{ h.url_for('statistics.records') }}">
-            {{ h.SI_number_span(stats.record_count) }}
+            <div class="stat-number">{{ h.SI_number_span(stats.record_count) }}</div>
             <span class="stat-text">
                 {{ _('record') if stats.record_count == 1 else _('records') }}
             </span>
@@ -12,7 +12,7 @@
 
     <div class="stat-item">
         <a href="{{ h.url_for('dataset.search') }}">
-            {{ h.SI_number_span(stats.dataset_count) }}
+            <div class="stat-number">{{ h.SI_number_span(stats.dataset_count) }}</div>
             <span class="stat-text">
                 {{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}
             </span>

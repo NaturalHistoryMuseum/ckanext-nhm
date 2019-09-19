@@ -106,15 +106,14 @@
             {% endblock %}
         </div>
     {% else %}
-        <div class="account not-authed">
+        <div class="account not-authed flex-container flex-right flex-nowrap">
             {% block header_account_notlogged %}
-                <ul class="list-unstyled list-inline">
-                    <li><a href="{{ h.url_for('user.login') }}"
+                <div>
+                    <a href="{{ h.url_for('user.login') }}"
                             title="{{ _('Log in') }}"> <span
                             class="sr-only">{{ _('Log in') }}</span>
-                        <i class="fas fa-sign-in-alt fa-lg"></i> </a></li>
-                    {{ self.contact_link() }}
-                </ul>
+                        <i class="fas fa-sign-in-alt fa-lg"></i> </a>
+                </div>
             {% endblock %}
         </div>
     {% endif %} {% endblock %}
