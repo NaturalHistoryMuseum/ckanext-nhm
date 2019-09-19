@@ -1,18 +1,19 @@
 {% set url = url | default(h.url_for('dataset.read', id=id)) %}
 
 <div class="col-md-4 box flex-container flex-between flex-stretch-first flex-top flex-stretch-height flex-wrap">
+    <h5 class="featured-title"><a href="{{ url }}">{{ title }}</a></h5>
     <a class="media-image" href="{{ url }}">
-      {% block image %}{% endblock %}
+        {% block image %}{% endblock %}
     </a>
     <div class="module-content">
-      <section class="featured media-overlay">
-          <h5><a href="{{ url }}">{{ title }}</a></h5>
+        <section class="featured media-overlay">
+            <div class="box-text">
+                <p>{% block description %}{% endblock %}</p>
+            </div>
 
-          <div class="box-text">
-            <p>{% block description %}{% endblock %}</p>
-          </div>
-
-          <p class="text-right text-bottom"><a class="no-underline" href="{{ url }}" title="View dataset">View dataset <i class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
+            <p class="text-right text-bottom"><a class="no-underline" href="{{ url }}"
+                    title="View dataset">View dataset <i
+                    class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
         </section>
     </div>
 </div>

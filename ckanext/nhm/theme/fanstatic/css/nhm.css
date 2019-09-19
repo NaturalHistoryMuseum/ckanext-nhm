@@ -96,7 +96,7 @@ h4 {
 h4.welcome {
   margin: 0 !important;
   line-height: 1.2;
-  color: #DDDDDD;
+  color: #F2F2F2;
   display: none;
 }
 @media (max-width: 991px) {
@@ -109,6 +109,10 @@ h4.welcome {
 }
 h5 {
   font-size: 22px;
+}
+h5.featured-title {
+  text-align: center;
+  margin-bottom: 0;
 }
 h6 {
   font-size: 20px;
@@ -1718,8 +1722,8 @@ select,
 .homepage .media-image {
   flex-shrink: 0;
   text-align: center;
-  padding: 15px !important;
-  max-width: 100%;
+  padding: 5px 15px 15px !important;
+  width: 100%;
 }
 .homepage .media-image img {
   width: 100%;

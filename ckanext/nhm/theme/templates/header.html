@@ -8,7 +8,7 @@
 {# We do not want a search #}{% block header_site_search %}{% endblock %}
 
 {% block header_wrapper %}
-    <header class="masthead">
+    <header class="masthead" role="heading">
         <div class="container flex-container flex-wrap flex-stretch-first flex-bottom flex-right">
             <div class="flex-container flex-nowrap flex-bottom no-pad-h">
                 {% block header_logo %}
@@ -16,7 +16,8 @@
                     {% if g.site_logo %}
                         <a class="logo" href="{{ h.url_for('home.index') }}"><img
                                 src="/images/nhm_logo.svg"
-                                alt="{{ g.site_title }}" title="{{ g.site_title }}"/></a>
+                                alt="{{ g.site_title }}" title="{{ g.site_title }}"
+                                role="button" aria-label="Home"/></a>
                     {% endif %}
                 {% endblock %}
 
@@ -31,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="no-pad-h">
+            <div class="no-pad-h" role="navigation">
                 {% block header_site_navigation %} {{ super() }} {% endblock %}
             </div>
 
