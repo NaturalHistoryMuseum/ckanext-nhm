@@ -1,0 +1,19 @@
+name: Compile less and push updated css
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: NaturalHistoryMuseum/compile-frontend-actions/less@v1.0.0
+        id: less
+        with:
+          target: 'ckanext/nhm/theme/less/*.less'
+          destination: 'ckanext/nhm/theme/fanstatic/css/'
+
+      - uses: NaturalHistoryMuseum/compile-frontend-actions/commit@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          message: '[auto] Update css with updated less'
+          modified: ${{ steps.less.outputs.modified }}
