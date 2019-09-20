@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - upgrade/main
-      - test-actions
+      - josh/test-actions
 jobs:
   build:
     runs-on: ubuntu-latest
