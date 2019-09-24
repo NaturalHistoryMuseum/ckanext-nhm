@@ -2,7 +2,7 @@ name: Compile less -> css
 on:
   push:
     branches:
-      - josh/add-actions
+      - upgrade/main
 
 jobs:
   build:
@@ -26,5 +26,5 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git checkout `echo $GITHUB_REF | cut -d'/' -f3-`
           git add `echo $MODIFIED | jq -r 'join(" ")'`
-          git commit -m "[bot] Update production frontend files"
+          git commit -m "[bot] Compile less files to css"
           git push "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" `echo $GITHUB_REF | cut -d'/' -f3-`
