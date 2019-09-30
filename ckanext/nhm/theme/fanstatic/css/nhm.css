@@ -41,12 +41,14 @@
   font-family: 'nhm_ingrid_lightregular';
   src: url('/fonts/nhmingligreg-webfont.eot');
   src: url('/fonts/nhmingligreg-webfont.woff') format('woff');
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
   font-style: normal;
 }
 @font-face {
   font-family: 'nhm_ingridregular';
   src: url('/fonts/nhmingreg-webfont.eot');
   src: url('/fonts/nhmingreg-webfont.woff') format('woff');
+  /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
   font-style: normal;
 }
 h1,
@@ -1480,7 +1482,7 @@ select {
     border: none;
   }
   .table-chunky > tbody > tr > td .dataset-heading {
-    font-size: 26px;
+    font-size: 20px;
   }
   .table-chunky > tbody > tr > td .dataset-heading + div {
     font-style: italic;
@@ -1797,6 +1799,7 @@ select,
   .collection-stats .collection-block .collection-count {
     position: relative;
     left: -1px;
+    font-size: 22px;
   }
   .collection-stats .collection-block .collection-code {
     font-size: 0 !important;
@@ -1809,7 +1812,9 @@ select,
   .collection-stats .collection-block .collection-block-text > * {
     align-self: flex-start;
   }
-}
+  .collection-stats .collection-block .collection-name {
+    font-size: 17px;
+  }
 }
 @media (max-width: 991px) and (min-width: 576px) {
   .collection-stats .collection-block {
@@ -1825,7 +1830,7 @@ select,
   }
   .collection-stats .collection-block .collection-count {
     padding-top: 10px;
-    font-size: 26px;
+    font-size: 20px;
   }
 }
 @media (max-width: 575px) {
@@ -1845,7 +1850,6 @@ select,
   }
   .collection-stats .collection-block .collection-count {
     padding-top: 10px;
-    font-size: 14px;
   }
   .collection-stats .collection-block .collection-code {
     font-size: 0 !important;
@@ -1922,7 +1926,7 @@ select,
     width: 100%;
   }
   .pre-search h3 {
-    font-size: 26px;
+    font-size: 20px;
     padding-right: 0;
   }
 }
