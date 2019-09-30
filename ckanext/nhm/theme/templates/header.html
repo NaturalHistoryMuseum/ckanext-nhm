@@ -38,86 +38,88 @@
 
 
         </div>
-    </header>
 
-    <div class="account-icons container">
+        <div class="account-icons container">
 
-        {# Accessibility fix - links need to have text #} {% block
+            {# Accessibility fix - links need to have text #} {% block
                 header_account_container_content %} {% if g.userobj %}
 
-        <div class="account avatar authed flex-container flex-right flex-nowrap" data-module="me"
-                data-me="{{ g.userobj.id }}">
-            {% block header_account_logged %}
-                {% set new_activities = h.new_activities() %} {% set notifications_tooltip = ngettext('Dashboard (%(num)d new
+            <div class="account avatar authed flex-container flex-right flex-smallwrap"
+                    data-module="me"
+                    data-me="{{ g.userobj.id }}">
+                {% block header_account_logged %}
+                    {% set new_activities = h.new_activities() %} {% set notifications_tooltip = ngettext('Dashboard (%(num)d new
                             item)', 'Dashboard (%(num)d new items)', new_activities) %}
 
-                {# Username and avatar #}
-                <div>
-                    <a href="{{ h.url_for('user.read', id=g.userobj.name) }}"
-                            class="image flex-container no-pad-h" title="{{ _('View profile') }}">
-                        <span class="username">{{ g.userobj.display_name }}</span>
-                        <span>
+                    {# Username and avatar #}
+                    <div>
+                        <a href="{{ h.url_for('user.read', id=g.userobj.name) }}"
+                                class="image flex-container no-pad-h"
+                                title="{{ _('View profile') }}">
+                            <span class="username">{{ g.userobj.display_name }}</span>
+                            <span>
                             {{ h.accessible_gravatar((g.userobj.email_hash if g and
                                  g.userobj else ''), size=22, userobj=g.userobj) }}
                         </span>
-                    </a>
-                </div>
-
-                {# Notifications #}
-                <div class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
-                    <a href="{{ h.url_for('dashboard.index', id=g.userobj.name) }}"
-                            title="{{ notifications_tooltip }}">
-                        <span class="sr-only">{{ notifications_tooltip }}</span>
-                        <span class="activity-count">{{ new_activities }}</span>
-                        <i class="fas fa-tachometer-alt fa-lg"></i>
-                    </a>
-                </div>
-
-                {# Account settings #}
-                {% block header_account_settings_link %}
-                    {% if not h.is_ldap_user() %}
-                        <div>
-                            <a href="{{ h.url_for('user.edit', id=g.userobj.name) }}"
-                                    title="{{ _('Edit settings') }}"> <span
-                                    class="sr-only">{{ _('Edit settings') }}</span>
-                                <i class="fas fa-cog fa-lg"></i> </a>
-                        </div>
-                    {% endif %}
-                {% endblock %}
-
-                {# Sysadmin settings #}
-                {% if g.userobj.sysadmin %}
-                    <div>
-                        <a href="{{ h.url_for('admin.index') }}"
-                                title="{{ _('Sysadmin settings') }}">
-                            <span class="sr-only">{{ _('Sysadmin settings') }}</span>
-                            <i class="fas fa-tools fa-lg"></i>
                         </a>
                     </div>
-                {% endif %}
 
-                {# Logout #}
-                {% block header_account_log_out_link %}
-                    <a href="{{ h.url_for('user.logout') }}"
-                            title="{{ _('Log out') }}"> <span
-                            class="sr-only">{{ _('Log out') }}</span>
-                        <i class="fas fa-sign-out-alt fa-lg"></i> </a>
+                    {# Notifications #}
+                    <div class="notifications {% if new_activities > 0 %}notifications-important{% endif %}">
+                        <a href="{{ h.url_for('dashboard.index', id=g.userobj.name) }}"
+                                title="{{ notifications_tooltip }}">
+                            <span class="sr-only">{{ notifications_tooltip }}</span>
+                            <span class="activity-count">{{ new_activities }}</span>
+                            <i class="fas fa-tachometer-alt fa-lg"></i>
+                        </a>
+                    </div>
+
+                    {# Account settings #}
+                    {% block header_account_settings_link %}
+                        {% if not h.is_ldap_user() %}
+                            <div>
+                                <a href="{{ h.url_for('user.edit', id=g.userobj.name) }}"
+                                        title="{{ _('Edit settings') }}"> <span
+                                        class="sr-only">{{ _('Edit settings') }}</span>
+                                    <i class="fas fa-cog fa-lg"></i> </a>
+                            </div>
+                        {% endif %}
+                    {% endblock %}
+
+                    {# Sysadmin settings #}
+                    {% if g.userobj.sysadmin %}
+                        <div>
+                            <a href="{{ h.url_for('admin.index') }}"
+                                    title="{{ _('Sysadmin settings') }}">
+                                <span class="sr-only">{{ _('Sysadmin settings') }}</span>
+                                <i class="fas fa-tools fa-lg"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {# Logout #}
+                    {% block header_account_log_out_link %}
+                        <a href="{{ h.url_for('user.logout') }}"
+                                title="{{ _('Log out') }}"> <span
+                                class="sr-only">{{ _('Log out') }}</span>
+                            <i class="fas fa-sign-out-alt fa-lg"></i> </a>
+                    {% endblock %}
                 {% endblock %}
-            {% endblock %}
-        </div>
-    {% else %}
-        <div class="account not-authed flex-container flex-right flex-nowrap">
-            {% block header_account_notlogged %}
-                <div>
-                    <a href="{{ h.url_for('user.login') }}"
-                            title="{{ _('Log in') }}"> <span
-                            class="sr-only">{{ _('Log in') }}</span>
-                        <i class="fas fa-sign-in-alt fa-lg"></i> </a>
-                </div>
-            {% endblock %}
-        </div>
-    {% endif %} {% endblock %}
+            </div>
+        {% else %}
+            <div class="account not-authed flex-container flex-right flex-smallwrap">
+                {% block header_account_notlogged %}
+                    <div>
+                        <a href="{{ h.url_for('user.login') }}"
+                                title="{{ _('Log in') }}"> <span
+                                class="sr-only">{{ _('Log in') }}</span>
+                            <i class="fas fa-sign-in-alt fa-lg"></i> </a>
+                    </div>
+                {% endblock %}
+            </div>
+        {% endif %} {% endblock %}
 
-    </div>
+        </div>
+    </header>
 {% endblock %}
 

@@ -284,8 +284,8 @@ body .default-text a:focus {
   flex-grow: 1;
 }
 .account-icons {
-  position: absolute;
-  top: 5px;
+  position: absolute !important;
+  top: 10px;
   left: 0;
   right: 0;
 }
@@ -293,7 +293,6 @@ body .default-text a:focus {
   color: #FFFFFF;
 }
 .account-icons .account {
-  margin-bottom: 10px;
   text-align: right;
 }
 .account-icons .account.not-authed > ul {
@@ -569,7 +568,7 @@ span.caret {
   min-height: 100%;
 }
 .masthead {
-  padding: 10px 0 10px;
+  padding: 5px 0 10px !important;
   background: #188100;
   color: #FFFFFF;
 }

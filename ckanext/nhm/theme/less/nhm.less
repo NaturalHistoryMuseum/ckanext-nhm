@@ -188,8 +188,8 @@ body {
 // UTILITY -----------------------------------------------------------------------------------------
 
 .account-icons {
-  position: absolute;
-  top: 5px;
+  position: absolute !important;
+  top: 10px;
   left: 0;
   right: 0;
 
@@ -199,7 +199,6 @@ body {
   }
 
   & .account {
-    margin-bottom: 10px;
     text-align: right;
 
     &.not-authed > ul {
@@ -483,7 +482,7 @@ span.caret {
 
 .masthead {
   @margin: 25px;
-  padding: 10px 0 10px;
+  padding: 5px 0 10px !important;
   .palette-header();
   .palette-header-txt();
   .no-hover();
@@ -1664,6 +1663,7 @@ select, .select2-choice {
   background-repeat: no-repeat;
   background-position: top center;
   background-size: 100%;
+  position: relative;
 }
 
 .featured {
