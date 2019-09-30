@@ -77,7 +77,7 @@
   }
 }
 
-.mixin-flex-nowrap() {
+.mixin-flex-smallwrap() {
   @media (max-width: @sm - 1) {
     flex-wrap: wrap;
   }
@@ -123,16 +123,10 @@
 
 .mixin-flex-right() {
   justify-content: flex-end;
-  @media (max-width: @sm) {
-    justify-content: space-around;
-  }
 }
 
 .mixin-flex-left() {
   justify-content: flex-start;
-  @media (max-width: @sm) {
-    justify-content: space-around;
-  }
 
   & > * {
     align-self: flex-start;
