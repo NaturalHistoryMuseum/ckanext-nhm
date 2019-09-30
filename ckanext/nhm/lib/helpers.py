@@ -54,7 +54,6 @@ def get_site_statistics():
         u'rows': 1
         })[
         u'count']
-    # Get a count of all distinct user IDs
     stats[u'contributor_count'] = get_contributor_count()
     record_count = 0
     try:
@@ -68,10 +67,9 @@ def get_site_statistics():
 
 
 def get_contributor_count():
-    '''Get the total number of contributors to active packages.'''
-    return model.Session.execute(
-        u"select COUNT(distinct creator_user_id) from package where "
-        u"state='active'").scalar()
+    '''Get the total number of authors listed on packages, calculated using Solr facets.'''
+    query = toolkit.get_action(u'package_search')({}, {u'facet.field': [u'author'], u'facet.limit': -1})
+    return len(query.get(u'facets', {}).get(u'author', {}).keys())
 
 
 def _get_action(action, params):
