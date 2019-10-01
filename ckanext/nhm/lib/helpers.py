@@ -85,7 +85,7 @@ def get_record_count():
 
 @cache_region(u'permanent', u'record_stats')
 def get_record_stats():
-    start_version = 1506816000
+    start_version = 1501545600
     end_version = int(time.time())
     count_action = toolkit.get_action(u'datastore_count')
 
