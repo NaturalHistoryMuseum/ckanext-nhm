@@ -1899,6 +1899,8 @@ select, .select2-choice {
   font-size: @font-size-body-l;
   padding: 10px !important;
   white-space: nowrap;
+  text-align: center;
+  vertical-align: top;
 }
 
 .credits-cell {
@@ -1907,14 +1909,21 @@ select, .select2-choice {
   .mixin-flex-top();
   .mixin-flex-center();
   padding: 10px !important;
-  margin-right: 2px;
-  margin-bottom: 2px;
+  margin: 1px 2px 1px 0;
   border: 1px solid @grey9;
   border-radius: @rounding;
   color: @grey1;
 
   &:hover {
     background-color: @grey9;
+  }
+}
+
+.credits-table {
+  border-spacing: 2px 15px;
+  border-collapse: separate;
+  & td {
+    margin: -1px 0;  // to offset the .credits-cell margins
   }
 }
 

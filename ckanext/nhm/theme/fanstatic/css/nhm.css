@@ -1996,6 +1996,8 @@ select,
   font-size: 17px;
   padding: 10px !important;
   white-space: nowrap;
+  text-align: center;
+  vertical-align: top;
 }
 .credits-cell {
   display: flex;
@@ -2003,8 +2005,7 @@ select,
   align-items: flex-start;
   justify-content: center;
   padding: 10px !important;
-  margin-right: 2px;
-  margin-bottom: 2px;
+  margin: 1px 2px 1px 0;
   border: 1px solid #F2F2F2;
   border-radius: 2px;
   color: #343434;
@@ -2017,6 +2018,13 @@ select,
 }
 .credits-cell:hover {
   background-color: #F2F2F2;
+}
+.credits-table {
+  border-spacing: 2px 15px;
+  border-collapse: separate;
+}
+.credits-table td {
+  margin: -1px 0;
 }
 #datacite {
   margin: 50px 20px 0 0;
