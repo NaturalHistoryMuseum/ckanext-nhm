@@ -25,3 +25,5 @@ package-lock.json
 .eggs/
 
 .coverage
+
+ckanext/nhm/theme/public/fonts/

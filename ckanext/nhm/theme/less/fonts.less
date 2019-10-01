@@ -7,20 +7,45 @@
   @font-face {
     font-family: 'nhm_ingrid_lightregular';
     src: url('@{fonts}/nhmingligreg-webfont.eot');
-    src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff');
     font-style: normal;
   }
 
   @font-face {
     font-family: 'nhm_ingridregular';
     src: url('@{fonts}/nhmingreg-webfont.eot');
-    src: url('@{fonts}/nhmingreg-webfont.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    src: url('@{fonts}/nhmingreg-webfont.woff') format('woff');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Elysio Light';
+    src: url('@{fonts}/2CFBF8_0_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_0_0.woff') format('woff');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Elysio Medium';
+    src: url('@{fonts}/2CFBF8_1_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_1_0.woff') format('woff');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Elysio Regular';
+    src: url('@{fonts}/2CFBF8_2_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_2_0.woff') format('woff');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Elysio Thin';
+    src: url('@{fonts}/2CFBF8_3_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_3_0.woff') format('woff');
     font-style: normal;
   }
 }
 
 
-@font-title: 'nhm_ingridregular', 'Open Sans', sans-serif;
+@font-title: 'Elysio Regular', 'Open Sans', sans-serif;
 
 .mixin-font-symbol(@weight) {
   font-family: 'FontAwesome', sans-serif;
@@ -42,10 +67,10 @@
 @font-size-body-l: ceil(@font-size-body-m * 1.2);
 
 @font-size-head-title: @font-size-body-m * 3;
-@font-size-head-m: ceil(@font-size-body-l * 1.5);
+@font-size-head-m: ceil(@font-size-body-l * 2);
 @font-size-head-s: @font-size-head-m - 2;
 @font-size-head-xs: @font-size-head-m - 4;
-@font-size-head-xxs: @font-size-head-m - 6;
+@font-size-head-xxs: @font-size-head-m - 8;
 @font-size-head-l: @font-size-head-m + 2;
 @font-size-head-xl: @font-size-head-m + 4;
 @font-size-head-xxl: @font-size-head-m + 6;

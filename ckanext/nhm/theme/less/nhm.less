@@ -9,6 +9,7 @@
 h1, h2, h3, h4, h5, h6 {
   font-weight: normal;
   line-height: 1.2;
+  font-family: @font-title;
 
   & small {
     font-size: 0.4em;
@@ -25,7 +26,6 @@ h1 {
 
   &.site-title {
     font-weight: normal;
-    font-family: @font-title;
     margin: 0 0 0 0;
     font-size: @font-size-head-title;
     letter-spacing: 1px;
@@ -48,9 +48,11 @@ h4 {
     line-height: 1.2;
     color: @grey9;
     display: none;
+    font-family: 'Elysio Light';
+    font-size: @font-size-head-xxs - 2;
 
     @media (max-width: @lg - 1) {
-      font-size: @font-size-body-l;
+      font-size: @font-size-head-xxs - 4;
     }
 
     .extended-masthead & {
@@ -350,6 +352,7 @@ span.caret {
   padding-bottom: 5px;
   margin-left: 15px;
   .mixin-flex-container();
+  font-family: @font-title;
 
   & .stat-text {
     color: @grey2;
@@ -602,6 +605,7 @@ iframe {
 
   border: none;
 
+  font-size: @font-size-body-l;
 }
 
 .module-footer {
@@ -922,6 +926,8 @@ iframe {
 
     & a {
       margin: 0 !important;
+      font-family: @font-title;
+      font-size: @font-size-body-l;
 
       &:before {
         content: none !important;
@@ -1714,6 +1720,7 @@ select, .select2-choice {
 
   & .collection-block {
     .mixin-flex-container();
+    font-family: @font-title;
 
     @media (min-width: @lg) {
       .vertical-borders(1px, @grey7);
@@ -1765,6 +1772,7 @@ select, .select2-choice {
 
       & .collection-count {
         padding-top: 10px;
+        font-size: @font-size-body-m;
       }
 
       & .collection-code {
@@ -1780,7 +1788,7 @@ select, .select2-choice {
 
     & .collection-code {
       color: @baseTextColor;
-      font-size: @font-size-body-s;
+      font-size: @font-size-body-l;
     }
   }
 }

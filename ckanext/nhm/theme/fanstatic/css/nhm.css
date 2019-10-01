@@ -49,6 +49,30 @@
   src: url('/fonts/nhmingreg-webfont.woff') format('woff');
   font-style: normal;
 }
+@font-face {
+  font-family: 'Elysio Light';
+  src: url('/fonts/2CFBF8_0_0.woff2') format('woff2');
+  src: url('/fonts/2CFBF8_0_0.woff') format('woff');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Elysio Medium';
+  src: url('/fonts/2CFBF8_1_0.woff2') format('woff2');
+  src: url('/fonts/2CFBF8_1_0.woff') format('woff');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Elysio Regular';
+  src: url('/fonts/2CFBF8_2_0.woff2') format('woff2');
+  src: url('/fonts/2CFBF8_2_0.woff') format('woff');
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Elysio Thin';
+  src: url('/fonts/2CFBF8_3_0.woff2') format('woff2');
+  src: url('/fonts/2CFBF8_3_0.woff') format('woff');
+  font-style: normal;
+}
 h1,
 h2,
 h3,
@@ -57,6 +81,7 @@ h5,
 h6 {
   font-weight: normal;
   line-height: 1.2;
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
 }
 h1 small,
 h2 small,
@@ -73,47 +98,48 @@ h4 {
   margin: 20px 0 10px;
 }
 h1 {
-  font-size: 32px;
+  font-size: 40px;
 }
 h1.site-title {
   font-weight: normal;
-  font-family: 'nhm_ingridregular', 'Open Sans', sans-serif;
   margin: 0 0 0 0;
   font-size: 42px;
   letter-spacing: 1px;
 }
 h2 {
-  font-size: 30px;
+  font-size: 38px;
 }
 h3 {
-  font-size: 24px;
+  font-size: 32px;
 }
 h4 {
-  font-size: 20px;
+  font-size: 26px;
 }
 h4.welcome {
   margin: 0 !important;
   line-height: 1.2;
   color: #F2F2F2;
   display: none;
+  font-family: 'Elysio Light';
+  font-size: 24px;
 }
 @media (max-width: 991px) {
   h4.welcome {
-    font-size: 17px;
+    font-size: 22px;
   }
 }
 .extended-masthead h4.welcome {
   display: block;
 }
 h5 {
-  font-size: 22px;
+  font-size: 30px;
 }
 h5.featured-title {
   text-align: center;
   margin-bottom: 0;
 }
 h6 {
-  font-size: 20px;
+  font-size: 26px;
 }
 a {
   -o-transition: 0.2s;
@@ -405,6 +431,7 @@ span.caret {
   padding-bottom: 5px;
   margin-left: 15px;
   display: flex;
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
 }
 .stats .stat-text {
   color: #434343;
@@ -435,7 +462,7 @@ span.caret {
     padding-right: 0;
   }
   .stats .stat-item a {
-    font-size: 26px;
+    font-size: 34px;
     padding-bottom: 6px;
   }
   .stats .stat-text {
@@ -682,6 +709,7 @@ iframe {
 }
 .module-heading {
   border: none;
+  font-size: 17px;
 }
 .module-heading:before,
 .module-heading:after {
@@ -1000,6 +1028,8 @@ iframe {
 }
 .nav-pills .nav-item a {
   margin: 0 !important;
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
+  font-size: 17px;
 }
 .nav-pills .nav-item a:before {
   content: none !important;
@@ -1534,7 +1564,7 @@ select {
 .table-record thead th {
   background: #F2F2F2;
   padding: 8px 2px 8px 5px;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: normal;
   vertical-align: middle;
 }
@@ -1681,7 +1711,7 @@ select,
   text-decoration: none !important;
 }
 .action-box i.large {
-  font-size: 30px;
+  font-size: 38px;
   padding: 15px 0 15px 15px;
 }
 .collection-search-form {
@@ -1778,6 +1808,7 @@ select,
 }
 .collection-stats .collection-block {
   display: flex;
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
 }
 @media (min-width: 992px) {
   .collection-stats .collection-block {
@@ -1797,6 +1828,7 @@ select,
   .collection-stats .collection-block .collection-count {
     position: relative;
     left: -1px;
+    font-size: 30px;
   }
   .collection-stats .collection-block .collection-code {
     font-size: 0 !important;
@@ -1809,7 +1841,9 @@ select,
   .collection-stats .collection-block .collection-block-text > * {
     align-self: flex-start;
   }
-}
+  .collection-stats .collection-block .collection-name {
+    font-size: 17px;
+  }
 }
 @media (max-width: 991px) and (min-width: 576px) {
   .collection-stats .collection-block {
@@ -1858,7 +1892,7 @@ select,
 }
 .collection-stats .collection-block .collection-code {
   color: #343434;
-  font-size: 12px;
+  font-size: 17px;
 }
 .extended-masthead .masthead {
   background: none !important;
@@ -2015,7 +2049,7 @@ select,
   display: none !important;
 }
 .resources h3 {
-  font-size: 20px;
+  font-size: 26px;
   margin-top: 30px;
 }
 .resource-item {
@@ -2429,7 +2463,7 @@ select,
 .context-info h1.heading {
   text-align: center;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 32px;
   background: #F2F2F2;
   padding-bottom: 5px;
 }
