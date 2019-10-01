@@ -5,8 +5,9 @@
 # Created by the Natural History Museum in London, UK
 
 from datetime import datetime, timedelta
+import time
 
-from ckanext.nhm.lib.helpers import get_contributor_count
+from ckanext.nhm.lib.helpers import get_record_stats
 from flask import Blueprint
 from sqlalchemy import func
 
@@ -98,49 +99,14 @@ def resources():
                               })
 
 
-@blueprint.route('/contributors')
-def contributors():
-    '''Render the contributor stats page.'''
-
-    # Get number of contributors
-    toolkit.c.contributors = model.Session.execute(
-        u"SELECT u.id AS user_id, u.name, u.fullname, COUNT(p.id) AS count "
-        u"FROM package p INNER JOIN public.user u ON u.id = p.creator_user_id "
-        u"WHERE u.state='active' AND p.state='active' "
-        u"GROUP BY u.id ORDER BY count DESC").fetchall()
-
-    contributor_count = get_contributor_count()
-
-    toolkit.c.num_contributors = [
-        {
-            u'date': datetime.now() - timedelta(days=7),
-            u'count': 0
-            },
-        {
-            u'date': datetime.now(),
-            u'count': contributor_count
-            }, ]
-
-    return toolkit.render(u'stats/contributors.html',
-                          {
-                              u'title': u'Contributor statistics'
-                              })
-
-
 @blueprint.route('/records')
 def records():
     '''Render the records stats page.'''
 
     toolkit.c.datastore_stats = toolkit.get_action(u'dataset_statistics')(
         _context(), {})
-    toolkit.c.num_records = [
-        {
-            u'date': datetime.now() - timedelta(days=7),
-            u'count': 0
-            }, {
-            u'date': datetime.now(),
-            u'count': toolkit.c.datastore_stats[u'total']
-            }, ]
+
+    toolkit.c.num_records = get_record_stats()
 
     return toolkit.render(u'stats/records.html', {
         u'title': u'Record statistics'

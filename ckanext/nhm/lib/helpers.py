@@ -46,15 +46,33 @@ re_url_validation = re.compile(r'^(?:http)s?://'  # http:// or https://
 AUTHOR_MAX_LENGTH = 100
 
 
-@cache_region(u'permanent', u'collection_stats')
 def get_site_statistics():
     '''Get statistics for the site.'''
     stats = dict()
-    stats[u'dataset_count'] = toolkit.get_action(u'package_search')({}, {
+    stats[u'dataset_count'] = get_dataset_count()
+    stats[u'contributor_count'] = get_contributor_count()
+    stats[u'record_count'] = get_record_count()
+    return stats
+
+
+@cache_region(u'permanent', u'contributor_count')
+def get_contributor_count():
+    '''Get the total number of authors listed on packages, calculated using Solr facets.'''
+    query = toolkit.get_action(u'package_search')({}, {u'facet.field': [u'author'], u'facet.limit': -1})
+    return len(query.get(u'facets', {}).get(u'author', {}).keys())
+
+
+@cache_region(u'permanent', u'dataset_count')
+def get_dataset_count():
+    return toolkit.get_action(u'package_search')({}, {
         u'rows': 1
         })[
         u'count']
-    stats[u'contributor_count'] = get_contributor_count()
+
+
+@cache_region(u'permanent', u'record_count')
+def get_record_count():
+    '''Get the current total number of records in the collections dataset.'''
     record_count = 0
     try:
         dataset_statistics = _get_action(u'dataset_statistics', {})
@@ -62,14 +80,26 @@ def get_site_statistics():
     except Exception as _e:
         # if there was a problem getting the stats return 0 and log an exception
         log.exception(u'Could not gather dataset statistics')
-    stats[u'record_count'] = record_count
-    return stats
+    return record_count
 
 
-def get_contributor_count():
-    '''Get the total number of authors listed on packages, calculated using Solr facets.'''
-    query = toolkit.get_action(u'package_search')({}, {u'facet.field': [u'author'], u'facet.limit': -1})
-    return len(query.get(u'facets', {}).get(u'author', {}).keys())
+@cache_region(u'permanent', u'record_stats')
+def get_record_stats():
+    start_version = 1506816000
+    end_version = int(time.time())
+    count_action = toolkit.get_action(u'datastore_count')
+
+    record_stats = []
+
+    for v in range(start_version, end_version, 604800):
+        record_stats.append({
+            u'date': datetime.fromtimestamp(v),
+            u'count': count_action({}, {
+                u'version': v * 1000
+                })
+            })
+
+    return record_stats
 
 
 def _get_action(action, params):
