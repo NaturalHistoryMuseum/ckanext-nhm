@@ -96,13 +96,17 @@
 {% endblock %}
 
 {% block record_additional_information_rows %}
+    {% if 'created' in c.record_dict %}
     <tr>
         <th scope="row">{{ _('Created') }}</th>
         <td>{{ h.render_epoch(c.record_dict['created']) }}</td>
     </tr>
+    {% endif %}
+    {% if 'modified' in c.record_dict %}
     <tr>
         <th scope="row">{{ _('Last updated') }}</th>
         <td>{{ h.render_epoch(c.record_dict['modified']) }}</td>
     </tr>
+    {% endif %}
     {{ super() }}
 {% endblock %}
