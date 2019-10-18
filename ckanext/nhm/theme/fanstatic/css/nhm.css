@@ -135,8 +135,8 @@ h5 {
   font-size: 30px;
 }
 h5.featured-title {
-  text-align: center;
-  margin-bottom: 0;
+  text-align: left;
+  margin-bottom: 5px;
 }
 h6 {
   font-size: 26px;
@@ -545,7 +545,7 @@ span.caret {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
-  margin: 10px;
+  margin: 0 5px 10px;
   height: 100%;
 }
 .box a {
@@ -555,6 +555,16 @@ span.caret {
 .box a:focus {
   color: #343434;
   text-decoration: none !important;
+}
+@media (max-width: 1199px) {
+  .box {
+    flex-wrap: wrap;
+  }
+}
+@media (min-width: 1200px) {
+  .box {
+    flex-wrap: nowrap;
+  }
 }
 .box .module-content {
   padding: 15px;
@@ -1940,13 +1950,70 @@ select,
 .homepage .media-image {
   flex-shrink: 0;
   text-align: center;
-  padding: 5px 15px 15px !important;
-  width: 100%;
+}
+@media (max-width: 1199px) {
+  .homepage .media-image {
+    width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  .homepage .media-image {
+    width: 60%;
+  }
 }
 .homepage .media-image img {
   width: 100%;
   max-width: 100%;
   height: auto;
+}
+.homepage-section-header {
+  text-align: center;
+  position: relative;
+  margin: 15px 0 15px;
+}
+.homepage-section-header::before,
+.homepage-section-header::after {
+  border-top: 2px solid #DDDDDD;
+  content: "";
+  position: absolute;
+  z-index: -10;
+  top: 50%;
+}
+@media (max-width: 575px) {
+  .homepage-section-header::before,
+  .homepage-section-header::after {
+    width: 20%;
+  }
+}
+@media (min-width: 576px) {
+  .homepage-section-header::before,
+  .homepage-section-header::after {
+    width: 25%;
+  }
+}
+@media (min-width: 768px) {
+  .homepage-section-header::before,
+  .homepage-section-header::after {
+    width: 30%;
+  }
+}
+@media (min-width: 992px) {
+  .homepage-section-header::before,
+  .homepage-section-header::after {
+    width: 35%;
+  }
+}
+@media (min-width: 1200px) {
+  .homepage-section-header::before,
+  .homepage-section-header::after {
+    width: 40%;
+  }
+}
+.homepage-section-header::before {
+  left: 0;
+}
+.homepage-section-header::after {
+  right: 0;
 }
 @media (max-width: 575px) {
   .pre-search {
