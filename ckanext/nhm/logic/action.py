@@ -1,4 +1,5 @@
 import logging
+
 import ckan.plugins as p
 import ckan.lib.navl.dictization_functions
 import ckanext.nhm.logic.schema as nhm_schema
@@ -163,6 +164,8 @@ def get_permanent_url(context, data_dict):
     :type field: string
     :param value: the value of the field to filter by
     :type value: string
+    :param include_version: whether to include the version in the permanent URL (default: false)
+    :type include_version: boolean
 
     **Results:**
 
@@ -175,6 +178,7 @@ def get_permanent_url(context, data_dict):
     # extract the request parameters
     field = data_dict[u'field']
     value = data_dict[u'value']
+    include_version = data_dict.get(u'include_version', False)
 
     # create a search dict to use with the datastore_search action
     search_dict = {
@@ -198,5 +202,16 @@ def get_permanent_url(context, data_dict):
             u'total': total,
         })
     else:
-        return u'{}{}'.format(config.get(u'ckan.site_url'),
-                              url_for(u'object_view', uuid=records[0][u'occurrenceID']))
+        if include_version:
+            # figure out the latest rounded version of the specimen resource data
+            version = get_action(u'datastore_get_rounded_version')(context, {
+                u'resource_id': helpers.get_specimen_resource_id()
+            })
+            # create a permanent url with the version included
+            return u'{}{}'.format(config.get(u'ckan.site_url'),
+                                  url_for(u'object_view_versioned',
+                                          uuid=records[0][u'occurrenceID'],
+                                          version=version))
+        else:
+            return u'{}{}'.format(config.get(u'ckan.site_url'),
+                                  url_for(u'object_view', uuid=records[0][u'occurrenceID']))

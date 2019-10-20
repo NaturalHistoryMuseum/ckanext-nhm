@@ -113,4 +113,5 @@ def get_permanent_url_schema():
     return {
         u'field': [not_missing, unicode],
         u'value': [not_missing, unicode],
+        u'include_version': [ignore_missing, boolean_validator],
     }
