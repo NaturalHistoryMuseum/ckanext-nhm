@@ -202,16 +202,16 @@ def get_permanent_url(context, data_dict):
             u'total': total,
         })
     else:
+        uuid = records[0][u'occurrenceID']
         if include_version:
             # figure out the latest rounded version of the specimen resource data
             version = get_action(u'datastore_get_rounded_version')(context, {
                 u'resource_id': helpers.get_specimen_resource_id()
             })
-            # create a permanent url with the version included
-            return u'{}{}'.format(config.get(u'ckan.site_url'),
-                                  url_for(u'object_view_versioned',
-                                          uuid=records[0][u'occurrenceID'],
-                                          version=version))
+            # create a path with the version included
+            path = url_for(u'object_view_versioned', uuid=uuid, version=version)
         else:
-            return u'{}{}'.format(config.get(u'ckan.site_url'),
-                                  url_for(u'object_view', uuid=records[0][u'occurrenceID']))
+            path = url_for(u'object_view', uuid=uuid)
+
+        # concatenate the path with the site url and return
+        return u'{}{}'.format(config.get(u'ckan.site_url'), path)
