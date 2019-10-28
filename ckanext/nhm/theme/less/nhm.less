@@ -450,17 +450,8 @@ span.caret {
   }
 
   & .module-content {
-    padding: @min-pad;
+    padding: 5px;
     margin: 0;
-  }
-
-  & .media-image + .module-content {
-    @media (min-width: @md) {
-      max-width: 50%;
-    }
-    @media (min-width: @lg) {
-      max-width: 100%;
-    }
   }
 
   & h4, & h5 {
@@ -1820,14 +1811,15 @@ select, .select2-choice {
   height: 100%;
 
   .box-text {
-    margin-bottom: 2em;
+    .flex-child-grow;
   }
 }
 
 .featured-image {
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: left center;
+  height: 100%;
   padding-top: 70%;
 }
 
@@ -1846,7 +1838,16 @@ select, .select2-choice {
       width: 100%;
     }
     @media (min-width: @xl) {
-      width: 60%;
+      width: 50%;
+    }
+
+    & + .module-content {
+      @media (max-width: @xl - 1) {
+        width: 100%;
+      }
+      @media (min-width: @xl) {
+        width: 50%;
+      }
     }
 
     img {
@@ -1869,19 +1870,19 @@ select, .select2-choice {
     z-index: -10;
     top: 50%;
     @media (max-width: @sm - 1) {
-        width: 20%;
+      width: 20%;
     }
     @media (min-width: @sm) {
-        width: 25%;
+      width: 25%;
     }
     @media (min-width: @md) {
-        width: 30%;
+      width: 30%;
     }
     @media (min-width: @lg) {
-        width: 35%;
+      width: 35%;
     }
     @media (min-width: @xl) {
-        width: 40%;
+      width: 40%;
     }
   }
 

@@ -5,13 +5,13 @@
         {% block image %}{% endblock %}
     </a>
     <div class="module-content">
-        <section class="featured media-overlay">
+        <section class="featured media-overlay flex-container flex-column flex-stretch-height">
             <h5 class="featured-title"><a href="{{ url }}">{{ title }}</a></h5>
             <div class="box-text">
                 <p>{% block description %}{% endblock %}</p>
             </div>
 
-            <p class="text-right text-bottom"><a class="no-underline" href="{{ url }}"
+            <p class="text-right"><a class="no-underline" href="{{ url }}"
                     title="View dataset">View dataset <i
                     class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
         </section>
