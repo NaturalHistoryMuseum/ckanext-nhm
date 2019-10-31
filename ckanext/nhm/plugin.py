@@ -158,7 +158,8 @@ class NHMPlugin(p.SingletonPlugin, p.toolkit.DefaultDatasetForm):
         return {
             'record_show': nhm_action.record_show,
             'object_rdf': nhm_action.object_rdf,
-            'download_image': nhm_action.download_original_image
+            'download_image': nhm_action.download_original_image,
+            u'get_permanent_url': nhm_action.get_permanent_url,
         }
 
     # ITemplateHelpers

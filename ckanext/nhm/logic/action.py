@@ -1,13 +1,17 @@
 import logging
+
 import ckan.plugins as p
 import ckan.lib.navl.dictization_functions
 import ckanext.nhm.logic.schema as nhm_schema
 import ckan.logic as logic
 import ckan.model as model
 from ckan.common import c
+from ckan.lib.helpers import url_for
+from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.mam import mam_media_request
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib.record import get_record_by_uuid
+from pylons import config
 
 NotFound = logic.NotFound
 ActionError = logic.ActionError
@@ -144,3 +148,70 @@ def _image_exists_on_record(resource, record, asset_id):
         if asset_id in url:
             return True
     return False
+
+
+@logic.side_effect_free
+def get_permanent_url(context, data_dict):
+    '''
+    Retrieve the permanent URL of a specimen from the specimen collection using the field and value
+    to filter the results (i.e. field must equal value for the record to match). A URL is returned
+    only if exactly one record is matched by the field and value combination. If more than 1 record
+    is matched or if 0 records are matched then an error is returned.
+
+    **Params:**
+
+    :param field: the name of the field you would like to filter the records on
+    :type field: string
+    :param value: the value of the field to filter by
+    :type value: string
+    :param include_version: whether to include the version in the permanent URL (default: false)
+    :type include_version: boolean
+
+    **Results:**
+
+    :returns: the full URL of the specimen
+    :rtype: string
+    '''
+    schema = context.get(u'schema', nhm_schema.get_permanent_url_schema())
+    data_dict, errors = _validate(data_dict, schema, context)
+
+    # extract the request parameters
+    field = data_dict[u'field']
+    value = data_dict[u'value']
+    include_version = data_dict.get(u'include_version', False)
+
+    # create a search dict to use with the datastore_search action
+    search_dict = {
+        u'resource_id': helpers.get_specimen_resource_id(),
+        u'filters': {
+            field: value
+        },
+        u'limit': 1,
+    }
+    result = get_action(u'datastore_search')(context, search_dict)
+    records = result[u'records']
+    total = result[u'total']
+    if total == 0:
+        raise logic.ValidationError({
+            u'message': u'No records found matching the given criteria',
+            u'total': total,
+        })
+    elif total > 1:
+        raise logic.ValidationError({
+            u'message': u'More than 1 record found matching the given criteria',
+            u'total': total,
+        })
+    else:
+        uuid = records[0][u'occurrenceID']
+        if include_version:
+            # figure out the latest rounded version of the specimen resource data
+            version = get_action(u'datastore_get_rounded_version')(context, {
+                u'resource_id': helpers.get_specimen_resource_id()
+            })
+            # create a path with the version included
+            path = url_for(u'object_view_versioned', uuid=uuid, version=version)
+        else:
+            path = url_for(u'object_view', uuid=uuid)
+
+        # concatenate the path with the site url and return
+        return u'{}{}'.format(config.get(u'ckan.site_url'), path)
