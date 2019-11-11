@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+{% block search_content %}
+    {% resource 'ckanext-nhm/search' %}
+    <div id="searchApp" data-module="multisearch" class="hide-until-loaded">
+        <schema-loader></schema-loader>
+    </div>
+{% endblock %}
