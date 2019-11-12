@@ -173,7 +173,7 @@
                     resource_ids: this.resourceIds
                 };
                 if (page > 0) {
-                    body.after = [this.after[page - 1]];
+                    body.after = this.after[page - 1];
                 }
                 else {
                     this.after = [];
@@ -202,7 +202,7 @@
                     }
                     else {
                         console.error(data);
-                        console.error(body);
+                        console.error(JSON.stringify(body));
                     }
                 });
             },
