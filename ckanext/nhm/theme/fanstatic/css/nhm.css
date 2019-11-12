@@ -1526,7 +1526,7 @@ iframe {
   content: none;
 }
 .multisearch-form .term-editor select {
-  min-width: max-content;
+  width: 200px;
   min-height: unset !important;
   height: unset;
   font-family: monospace;
