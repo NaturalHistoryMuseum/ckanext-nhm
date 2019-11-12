@@ -5,8 +5,8 @@
                 <label for="all" class="sr-only">Search</label>
                 <input type="text" class="search" name="all" id="all"
                     value="" autocomplete="off" placeholder="Search all fields"
-                    v-model="search" @keyup.enter="runSearch"/>
-                <button type="submit" @click="runSearch">
+                    v-model="search" @keyup.enter="runSearch(0)"/>
+                <button type="submit" @click="runSearch(0)">
                     <i class="fas fa-search"></i>
                     <span class="sr-only">Search</span>
                 </button>
@@ -57,7 +57,19 @@
         </transition>
         <pre class="fields" v-if="showQuery">{{ query }}</pre>
         <Results></Results>
-
+        <div class="pagination-wrapper">
+            <ul class="pagination">
+                <li v-if="currentPage > 0">
+                    <a href="#" @click="runSearch(currentPage - 1)">{{ currentPage }}</a>
+                </li>
+                <li class="active">
+                    <a href="#">{{ currentPage + 1 }}</a>
+                </li>
+                <li v-if="after.length > 0">
+                    <a href="#" @click="runSearch(currentPage + 1)">{{ currentPage + 2}}</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -96,7 +108,9 @@
                 showResources: false,
                 showAdvanced:  true,
                 allResources:  true,
-                showQuery:     false
+                showQuery:     false,
+                after:         [],
+                currentPage:   0
             }
         },
         mounted:    function () {
@@ -152,8 +166,19 @@
                     });
                 });
             },
-            runSearch:      function () {
+            runSearch:      function (page) {
                 const vue = this;
+                let body  = {
+                    query:        this.query,
+                    resource_ids: this.resourceIds
+                };
+                if (page > 0) {
+                    body.after = [this.after[page - 1]];
+                }
+                else {
+                    this.after = [];
+                }
+
                 fetch('/api/3/action/datastore_multisearch', {
                     method:      'POST',
                     mode:        'cors',
@@ -164,11 +189,21 @@
                     },
                     redirect:    'follow',
                     referrer:    'no-referrer',
-                    body:        JSON.stringify({query: this.query}),
+                    body:        JSON.stringify(body),
                 }).then(response => {
                     return response.json();
                 }).then(data => {
                     vue.result = data;
+                    if (data.success && data.result.after !== null) {
+                        if (vue.after.indexOf(data.result.after) < 0) {
+                            vue.after.push(data.result.after);
+                            vue.currentPage = page;
+                        }
+                    }
+                    else {
+                        console.error(data);
+                        console.error(body);
+                    }
                 });
             },
             togglePackage:  function (event, pkg) {
@@ -188,11 +223,6 @@
                 let rootGroup = d3.keys(this.filters)[0];
                 this.$delete(this.filters, rootGroup);
                 this.$set(this.filters, 'and', []);
-            }
-        },
-        watch:      {
-            result: function (result) {
-                console.log(result.success);
             }
         }
     }

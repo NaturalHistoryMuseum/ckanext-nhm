@@ -12,7 +12,7 @@
                 <transition name="slidedown">
                     <div v-if="showFields" class="floating">
                             <span class="fields"
-                                v-for="field in termData.fields"
+                                v-for="field in (termData.fields || [])"
                                 v-bind:key="field.id">{{ field }}</span>
                     </div>
                 </transition>
@@ -20,9 +20,8 @@
             <span
                 v-if="fieldComparison === 'range'">{{ termData.less_than_inclusive ? '≤' : '<' }}</span>
             <span v-if="fieldComparison === 'range'">{{ termData.less_than }}</span>
-            <span
-                v-if="fieldComparison !== 'range'">{{ fieldComparison === 'equals' ? '=' : '~' }}</span>
-            <span v-if="fieldComparison !== 'range'">{{ termData.value }}</span>
+            <span v-if="fieldComparison !== 'range' && fieldType !== 'geo'">{{ fieldComparison === 'contains' ? '~' : '=' }}</span>
+            <span v-if="fieldComparison !== 'range' && fieldType !== 'geo'">{{ termData.value }}</span>
         </div>
         <FilterItem
             v-for="(item, i) in terms"
@@ -103,9 +102,12 @@
             termData:          function () {
                 return this.isGroup ? {} : d3.values(this.filterItem)[0];
             },
+            fieldType: function() {
+                return this.isGroup ? '' : d3.keys(this.filterItem)[0].split('_')[0];
+            },
             fieldComparison:   function () {
                 let item      = d3.entries(this.filterItem)[0];
-                return this.isGroup ? '' : item.key.split('_')[1];
+                return this.isGroup ? '' : item.key.slice(item.key.indexOf('_')+1);
             },
             terms:             function () {
                 if (!this.isGroup) {
@@ -133,6 +135,9 @@
                 }[this.groupType];
             },
             fieldsPlaceholder: function () {
+                if (this.fieldType === 'geo') {
+                    return '[GEO]';
+                }
                 let numFields = this.termData.fields.length;
                 if (numFields === 0) {
                     return '*';
@@ -146,7 +151,7 @@
             },
             fieldsClasses:     function () {
                 let fieldsClasses = this.showFields ? ['expanded'] : [];
-                if (this.termData.fields.length > 1) {
+                if (this.termData.fields !== undefined && this.termData.fields.length > 1) {
                     fieldsClasses.push('expandable');
                 }
                 return fieldsClasses

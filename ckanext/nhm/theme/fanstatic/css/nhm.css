@@ -1431,7 +1431,7 @@ iframe {
   border: 2px solid #C3C3C3;
   align-self: stretch;
   height: auto !important;
-  padding-top: 10px;
+  padding-top: 15px;
 }
 .multisearch-form .filter-item.filter-term .filter-fields {
   position: relative;

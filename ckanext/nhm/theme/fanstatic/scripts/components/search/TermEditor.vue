@@ -1,7 +1,7 @@
 <template>
     <div class="term-editor floating flex-container flex-nowrap flex-stretch-height">
         <i class="fas fa-caret-square-left" @click="closeDialog"></i>
-        <div class="term-editor-fields space-children-v">
+        <div class="term-editor-fields space-children-v" v-if="fieldType !== 'geo'">
             <div class="flex-container flex-wrap flex-wrap-spacing">
                             <span class="fields" v-for="(field, index) in newFields"
                                 v-bind:key="field.id">
@@ -45,28 +45,58 @@
                     <label for="queryValueText">
                         <i :class="['fas', comparisonType === 'equals' ? 'fa-equals' : 'fa-search' ]"></i>
                     </label>
-                    <input type="text" v-model="queryValueText" id="queryValueText" size="10">
+                    <input type="text" v-model="values.string.value" id="queryValueText" size="10">
                 </div>
                 <div v-if="fieldType === 'number'" class="flex-container flex-center">
-                    <input type="number" v-if="comparisonType === 'range'" v-model="queryValueInt2">
-                    <input type="checkbox" v-if="comparisonType === 'range'" v-model="queryGTEqual"
+                    <input type="number" v-if="comparisonType === 'range'"
+                        v-model="values.number.greater_than">
+                    <input type="checkbox" v-if="comparisonType === 'range'"
+                        v-model="values.number.greater_than_inclusive"
                         id="greaterThanEq">
                     <label for="greaterThanEq" v-if="comparisonType === 'range'">
-                        <i :class="['fas', 'fa-less-than' + (queryGTEqual ? '-equal' : '')]"></i>
+                        <i :class="['fas', 'fa-less-than' + (values.number.greater_than_inclusive ? '-equal' : '')]"></i>
                     </label>
                     <span class="fields">
                         field
                     </span>
-                    <input type="checkbox" v-if="comparisonType === 'range'" v-model="queryLTEqual"
+                    <input type="checkbox" v-if="comparisonType === 'range'"
+                        v-model="values.number.less_than_inclusive"
                         id="lessThanEq">
                     <label for="lessThanEq" v-if="comparisonType === 'range'">
-                        <i :class="['fas', 'fa-less-than' + (queryLTEqual ? '-equal' : '')]"></i>
+                        <i :class="['fas', 'fa-less-than' + (values.number.less_than_inclusive ? '-equal' : '')]"></i>
                     </label>
                     <label for="queryValueInt1" v-if="comparisonType === 'equals'"><i
                         class="fas fa-equals"></i></label>
-                    <input type="number" v-model="queryValueInt1" id="queryValueInt1">
+                    <input type="number" v-if="comparisonType === 'range'"
+                        v-model="values.number.less_than">
+                    <input type="number" v-if="comparisonType === 'equals'"
+                        v-model="values.number.value" id="queryValueInt1">
                 </div>
-                <div v-if="fieldType === 'geo'" class="flex-container flex-center">
+                <div v-if="fieldType === 'geo'" class="flex-container flex-column flex-center">
+                    <div class="flex-container flex-center" v-if="comparisonType === 'point'">
+                        <label for="queryValueLat">Lat</label>
+                        <input type="text" v-model="values.geo.latitude" id="queryValueLat"
+                            size="5">
+                        <label for="queryValueLon">Lon</label>
+                        <input type="text" v-model="values.geo.longitude" id="queryValueLon"
+                            size="5">
+                        <label for="queryValueInt1"></label>
+                        <input type="number" v-model="values.geo.radius">
+                        <select v-model="values.geo.radius_unit">
+                            <option v-for="unit in geoEnums.radiusUnits" :key="unit.id">{{ unit }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="flex-container flex-center" v-if="comparisonType === 'named_area'">
+                        <label for="geoCategory">Category</label>
+                        <select v-model="geoCategory" id="geoCategory">
+                            <option v-for="(options, cat) in geoEnums.named" :key="cat.id">{{ cat }}</option>
+                        </select>
+                        <select v-model="values.geo[geoCategory]">
+                            <option v-for="area in (geoEnums.named[geoCategory] || [])" :key="area.id">{{ area }}
+                            </option>
+                        </select>
+                    </div>
                     <div class="dataset-map"></div>
                 </div>
             </div>
@@ -86,13 +116,39 @@
                 fieldSearch:        null,
                 newFields:          [],
                 fieldList:          [],
+                geoEnums:           {
+                    radiusUnits: this.schema.raw.definitions.term.properties.geo_point.properties.radius_unit.enum,
+                    named:       d3.nest()
+                                   .key((d) => d.key)
+                                   .rollup((d) => {
+                                       return d[0].value.enum;
+                                   })
+                                   .object(d3.entries(this.schema.raw.definitions.term.properties.geo_named_area.properties))
+                },
+                geoCategory: null,
                 fieldType:          'string',
                 comparisonType:     'equals',
-                queryValueText:     null,
-                queryValueInt1:     null,
-                queryValueInt2:     null,
-                queryLTEqual:       false,
-                queryGTEqual:       false,
+                values:             {
+                    string: {
+                        value: null
+                    },
+                    number: {
+                        greater_than:           null,
+                        less_than:              null,
+                        greater_than_inclusive: null,
+                        less_than_inclusive:    null,
+                        value:                  null
+                    },
+                    geo:    {
+                        latitude:    null,
+                        longitude:   null,
+                        radius:      0,
+                        radius_unit: null,
+                        country: null,
+                        geography: null,
+                        marine: null
+                    },
+                },
                 readableFieldTypes: {
                     string: 'Text',
                     number: 'Number',
@@ -103,23 +159,24 @@
 
             let existing = d3.entries(this.existingTerm || {})[0];
             if (existing !== undefined) {
-                data.newFields = [...existing.value.fields];
-                data.fieldType = existing.key.split('_')[0];
-                data.comparisonType = existing.key.split('_')[1];
+                data.newFields      = [...(existing.value.fields || [])];
+                data.fieldType      = existing.key.split('_')[0];
+                data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
 
-                if (data.fieldType === 'string') {
-                    data.queryValueText = existing.value.value;
-                }
-                else if (data.fieldType === 'number') {
-                    if (data.comparisonType === 'equals') {
-                        data.queryValueInt1 = existing.value.value;
+                if (d3.keys(data.values).includes(data.fieldType)) {
+                    let updatedValues = {};
+
+                    d3.keys(data.values[data.fieldType]).forEach((k) => {
+                        updatedValues[k] = existing.value[k] || null;
+                    });
+
+                    if (existing.key === 'geo_named_area') {
+                        data.geoCategory = d3.keys(existing.value).filter((k) => {
+                            return d3.keys(data.geoEnums.named).includes(k);
+                        })[0];
                     }
-                    else if (data.comparisonType === 'range') {
-                        data.queryValueInt1 = existing.value.less_than;
-                        data.queryValueInt2 = existing.value.greater_than;
-                        data.queryLTEqual = existing.value.less_than_inclusive;
-                        data.queryGTEqual = existing.value.greater_than_inclusive;
-                    }
+
+                    data.values[data.fieldType] = updatedValues;
                 }
             }
 
@@ -137,27 +194,22 @@
             queryType: function () {
                 return this.comparisonType !== '' ? [this.fieldType, this.comparisonType].join('_') : this.fieldType;
             },
-            query: function () {
-                let queryData = {
-                    fields: this.newFields
-                };
+            query:     function () {
+                let queryData = {};
 
-                if (this.fieldType === 'string') {
-                    queryData['value'] = this.queryValueText;
-                }
-                else if (this.fieldType === 'number') {
-                    if (this.comparisonType === 'equals') {
-                        queryData['value'] = this.queryValueInt1;
-                    }
-                    else if (this.comparisonType === 'range') {
-                        queryData['less_than'] = this.queryValueInt1;
-                        queryData['greater_than'] = this.queryValueInt2;
-                        queryData['less_than_inclusive'] = this.queryLTEqual;
-                        queryData['greater_than_inclusive'] = this.queryGTEqual;
-                    }
+                if (this.fieldType !== 'geo') {
+                    queryData.fields = this.newFields;
                 }
 
-                let q = {};
+                if (d3.keys(this.values).includes(this.fieldType)) {
+                    d3.entries(this.values[this.fieldType]).forEach((e) => {
+                        if (e.value !== null) {
+                            queryData[e.key] = e.value;
+                        }
+                    });
+                }
+
+                let q             = {};
                 q[this.queryType] = queryData;
                 return q;
             }
@@ -194,7 +246,7 @@
                     this.fieldList = Object.keys(data.result.fields).sort();
                 });
             },
-            submitTerm: function () {
+            submitTerm:   function () {
                 if (this.existingTerm !== undefined) {
                     this.$parent.filterItem = this.query;
                 }
