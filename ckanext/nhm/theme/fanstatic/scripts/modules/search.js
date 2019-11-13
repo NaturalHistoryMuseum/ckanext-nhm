@@ -9,13 +9,17 @@ ckan.module('multisearch', function () {
                         let groups = Object.keys(data.definitions.group.properties);
                         let terms  = d3.nest()
                                        .key(t => {
-                                           return t.key.split('_')[0];
+                                           if (!t.key.includes('_')){
+                                               return 'other'
+                                           }
+                                           else {
+                                               return t.key.split('_')[0];
+                                           }
                                        })
                                        .rollup(leaves => {
                                            return leaves.map((l) => l.key.slice(l.key.indexOf('_') + 1) || '')
                                        })
                                        .object(d3.entries(data.definitions.term.properties));
-                        console.log(data);
                         return {
                             groups: groups,
                             terms:  terms,

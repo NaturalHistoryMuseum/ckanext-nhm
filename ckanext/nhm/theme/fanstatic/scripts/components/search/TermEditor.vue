@@ -148,19 +148,22 @@
                         geography: null,
                         marine: null
                     },
+                    other: {
+                        value: null
+                    }
                 },
                 readableFieldTypes: {
                     string: 'Text',
                     number: 'Number',
                     geo:    'Geo',
-                    exists: 'Any'
+                    other: 'Any'
                 }
             };
 
             let existing = d3.entries(this.existingTerm || {})[0];
             if (existing !== undefined) {
                 data.newFields      = [...(existing.value.fields || [])];
-                data.fieldType      = existing.key.split('_')[0];
+                data.fieldType      = existing.key.includes('_') ? existing.key.split('_')[0] : 'other';
                 data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
 
                 if (d3.keys(data.values).includes(data.fieldType)) {
@@ -192,7 +195,7 @@
                 return emptyTerms ? [] : schemaTerms;
             },
             queryType: function () {
-                return this.comparisonType !== '' ? [this.fieldType, this.comparisonType].join('_') : this.fieldType;
+                return this.fieldType !== 'other' ? [this.fieldType, this.comparisonType].join('_') : this.comparisonType;
             },
             query:     function () {
                 let queryData = {};
@@ -258,6 +261,9 @@
         },
         watch:    {
             fieldSearch: function () {
+                this.getFieldList();
+            },
+            resourceIds: function () {
                 this.getFieldList();
             }
         }

@@ -1390,7 +1390,7 @@ iframe {
 
     &.filter-group {
       border: @borders;
-      padding-top: 20px;
+      padding-top: 30px;
       min-width: 100px;
 
       & > a.group-type {
@@ -1468,14 +1468,15 @@ iframe {
     left: 100%;
 
     select {
-      width: 200px;
+      width: max-content;
+      max-width: 200px;
       min-height: unset !important;
       height: unset;
       font-family: monospace;
       border: @lighter-borders;
     }
 
-    input[type=text] {
+    input {
       font-family: monospace;
       border: @lighter-borders;
       border-radius: @rounding;
@@ -1508,10 +1509,7 @@ iframe {
 
     input[type=number] {
       width: 65px;
-      font-size: @font-size-body-l;
-      border-radius: @rounding;
-      padding: 0 0 0 5px;
-      border: 1px solid @grey5;
+      padding-right: 0;
     }
 
     & .query-values, & .query-submit {
@@ -1532,11 +1530,21 @@ iframe {
     }
   }
 
+  .info-popup {
+    background-color: @grey10;
+    border: @lighter-borders;
+    border-radius: @rounding;
+    top: 100%;
+    margin: 5px;
+    padding: 5px;
+  }
+
   .filter-buttons {
     position: absolute;
     right: 0;
     top: 0;
     padding: 0;
+
     & > * {
       margin-right: 5px;
     }

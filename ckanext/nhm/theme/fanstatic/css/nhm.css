@@ -1464,7 +1464,7 @@ iframe {
 }
 .multisearch-form .filter-item.filter-group {
   border: 2px solid #9A9A9A;
-  padding-top: 20px;
+  padding-top: 30px;
   min-width: 100px;
 }
 .multisearch-form .filter-item.filter-group > a.group-type {
@@ -1526,13 +1526,14 @@ iframe {
   content: none;
 }
 .multisearch-form .term-editor select {
-  width: 200px;
+  width: max-content;
+  max-width: 200px;
   min-height: unset !important;
   height: unset;
   font-family: monospace;
   border: 2px solid #C3C3C3;
 }
-.multisearch-form .term-editor input[type=text] {
+.multisearch-form .term-editor input {
   font-family: monospace;
   border: 2px solid #C3C3C3;
   border-radius: 5px;
@@ -1558,10 +1559,7 @@ iframe {
 }
 .multisearch-form .term-editor input[type=number] {
   width: 65px;
-  font-size: 17px;
-  border-radius: 5px;
-  padding: 0 0 0 5px;
-  border: 1px solid #9A9A9A;
+  padding-right: 0;
 }
 .multisearch-form .term-editor .query-values,
 .multisearch-form .term-editor .query-submit {
@@ -1576,6 +1574,14 @@ iframe {
   padding: 5px;
   display: block;
   width: max-content;
+}
+.multisearch-form .info-popup {
+  background-color: #FFFFFF;
+  border: 2px solid #C3C3C3;
+  border-radius: 5px;
+  top: 100%;
+  margin: 5px;
+  padding: 5px;
 }
 .multisearch-form .filter-buttons {
   position: absolute;

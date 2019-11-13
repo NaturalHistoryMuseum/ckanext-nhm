@@ -103,7 +103,18 @@
                 return this.isGroup ? {} : d3.values(this.filterItem)[0];
             },
             fieldType: function() {
-                return this.isGroup ? '' : d3.keys(this.filterItem)[0].split('_')[0];
+                if (this.isGroup) {
+                    return '';
+                }
+                else {
+                    let key = d3.keys(this.filterItem)[0];
+                    if (!key.includes('_')) {
+                        return 'other';
+                    }
+                    else {
+                        return key.split('_')[0]
+                    }
+                }
             },
             fieldComparison:   function () {
                 let item      = d3.entries(this.filterItem)[0];

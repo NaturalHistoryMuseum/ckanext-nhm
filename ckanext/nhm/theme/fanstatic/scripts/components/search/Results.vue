@@ -1,6 +1,18 @@
 <template>
     <div id="result">
-        <h3>{{ total }} records</h3>
+        <div class="flex-container flex-left flex-stretch-first">
+            <h3>{{ total }} records</h3>
+            <div style="position: relative;">
+                <transition name="slidedown">
+                    <div class="floating info-popup" v-if="showDownload">
+                        Coming soon!
+                    </div>
+                </transition>
+                <a href="#" v-if="total > 0" @click="downloadResults" class="btn btn-disabled">
+                    <i class="fas fa-cloud-download-alt"></i>Download
+                </a>
+            </div>
+        </div>
         <table class="table table-chunky" style="overflow-x: scroll" v-if="success">
             <thead>
             <tr>
@@ -58,25 +70,26 @@
                 headers:       [],
                 showFields:    false,
                 fieldSearch:   null,
-                fieldList:     []
+                fieldList:     [],
+                showDownload:  false
             }
         },
         mounted:  function () {
             this.getFieldList();
         },
         computed: {
-            result:  function () {
+            result:     function () {
                 return this.$parent.result.result;
             },
-            success: function () {
+            success:    function () {
                 let successful = this.$parent.result.success || false;
                 let noRecords  = successful ? this.result.records.length === 0 : false;
                 return successful && !noRecords;
             },
-            total:   function () {
+            total:      function () {
                 return this.success ? this.result.total : 0;
             },
-            records: function () {
+            records:    function () {
                 return this.success ? this.result.records : [];
             },
             allHeaders: function () {
@@ -84,7 +97,7 @@
             }
         },
         methods:  {
-            getHeaders:   function () {
+            getHeaders:      function () {
                 let fields = [['_id']];
 
                 let getFields = (i) => {
@@ -106,7 +119,7 @@
 
                 this.headers = fields;
             },
-            getFieldList: function () {
+            getFieldList:    function () {
                 const vue       = this;
                 let resourceIds = this.result === undefined ? [] : d3.keys(this.result.resources);
                 fetch('/api/3/action/datastore_field_autocomplete', {
@@ -130,11 +143,17 @@
                     vue.fieldList = Object.keys(data.result.fields).sort();
                 });
             },
-            addNewColumn: function (field) {
+            addNewColumn:    function (field) {
                 this.customHeaders.push(field);
             },
-            deleteHeader: function (index) {
+            deleteHeader:    function (index) {
                 this.$delete(this.customHeaders, index);
+            },
+            downloadResults: function () {
+                this.showDownload = true;
+                setTimeout(() => {
+                    this.showDownload = false;
+                }, 4000);
             }
         },
         watch:    {

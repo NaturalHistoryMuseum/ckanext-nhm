@@ -12,14 +12,20 @@
                 </button>
             </div>
             <transition name="slidedown">
-                <div class="fields resourceid-list floating" v-if="showResources">
-                    <input type="checkbox" id="allresources" v-model="allResources">
-                    <label for="allresources">All resources</label>
+                <div class="fields resourceid-list floating flex-container flex-column flex-left"
+                    v-if="showResources">
+                    <div>
+                        <input type="checkbox" id="allresources" v-model="allResources">
+                        <label for="allresources">All resources</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="toggleAll" v-model="allResourcesToggle" @change="toggleAllResources">
+                        <label for="toggleAll">Select all</label>
+                    </div>
                     <div :class="{ disabled: allResources }">
                         <span v-for="pkg in packageList" v-bind:key="pkg.id">
-                        <input type="checkbox" :id="pkg.id" :value="pkg.id"
-                            @change="togglePackage($event, pkg)" style="display: none;" checked>
-                        <label :for="pkg.id">{{ pkg.name }}</label>
+                        <a href="#" :id="pkg.id" :value="pkg.id"
+                            @click="togglePackage(pkg)">{{ pkg.name }}</a>
                         <div class="fields">
                             <span v-for="resource in pkg.resources" v-bind:key="resource.id">
                                 <input type="checkbox" :id="resource.id" :value="resource.id"
@@ -108,6 +114,7 @@
                 showResources: false,
                 showAdvanced:  true,
                 allResources:  true,
+                allResourcesToggle: true,
                 showQuery:     false,
                 after:         [],
                 currentPage:   0
@@ -138,7 +145,7 @@
             }
         },
         methods:    {
-            getPackageList: function () {
+            getPackageList:     function () {
                 const vue = this;
                 fetch('/api/3/action/current_package_list_with_resources', {
                     method: 'GET'
@@ -166,7 +173,7 @@
                     });
                 });
             },
-            runSearch:      function (page) {
+            runSearch:          function (page) {
                 const vue = this;
                 let body  = {
                     query:        this.query,
@@ -206,23 +213,46 @@
                     }
                 });
             },
-            togglePackage:  function (event, pkg) {
+            togglePackage:      function (pkg) {
                 this.allResources = false;
-                if (event.target.checked) {
+                let isInResources = pkg.resourceIds.some((r) => {
+                    return this.resourceIds.includes(r);
+                });
+                if (isInResources) {
+                    this.resourceIds = this.resourceIds.filter((resourceId) => {
+                        return !pkg.resourceIds.includes(resourceId);
+                    });
+                }
+                else {
                     this.resourceIds = this.resourceIds.concat(pkg.resourceIds.filter((x) => {
                         return !this.resourceIds.includes(x);
                     }));
                 }
-                else {
-                    this.resourceIds = this.resourceIds.filter((resourceId) => {
-                        return !pkg.resourceIds.includes(resourceId);
-                    })
-                }
             },
-            reset:          function () {
+            reset:              function () {
                 let rootGroup = d3.keys(this.filters)[0];
                 this.$delete(this.filters, rootGroup);
                 this.$set(this.filters, 'and', []);
+            },
+            toggleAllResources: function (event) {
+                this.allResources = false;
+                this.resourceIds  = [];
+                if (event.target.checked) {
+                    this.packageList.forEach((pkg) => {
+                        this.resourceIds = this.resourceIds.concat(pkg.resourceIds)
+                    });
+                }
+                else {
+                    this.resourceIds = [];
+                }
+            }
+        },
+        watch: {
+            resourceIds: function (resourceIds, oldResourceIds) {
+                this.allResources = false;
+                if (resourceIds.length < oldResourceIds.length) {
+                    this.allResourcesToggle = false;
+                }
             }
         }
     }
