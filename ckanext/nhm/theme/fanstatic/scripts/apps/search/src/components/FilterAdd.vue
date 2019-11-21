@@ -3,26 +3,28 @@
         <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"></i>
         <transition name="slidedown">
             <div class="filter-add-choice floating" v-if="showChoice">
-                <span v-if="addGroups" @click="newGroup">new group</span>
-                <span v-if="addTerms" @click="newTerm">new term</span>
+                <span v-if="canAddGroups" @click="newGroup">new group</span>
+                <span v-if="canAddTerms" @click="newTerm">new term</span>
             </div>
         </transition>
         <transition name="slideright">
-            <TermEditor v-if="showEditor" v-bind:resource-ids="resourceIds"
-                v-bind:schema="schema"></TermEditor>
+            <TermEditor v-if="showEditor" :parent-id="parentId"></TermEditor>
         </transition>
     </div>
 </template>
 
 <script>
-    import TermEditor from './TermEditor.vue';
+    import Loading from './Loading.vue';
+    import LoadError from './LoadError.vue';
+    const TermEditor = import('./TermEditor.vue');
+    import {mapState, mapGetters, mapMutations} from 'vuex';
 
     export default {
         name:       'FilterAdd',
+        props: ['parentId'],
         components: {
-            TermEditor
+            TermEditor: () => ({component: TermEditor, loading: Loading, error: LoadError}),
         },
-        props:      ['schema', 'isGroup', 'siblings', 'nestLevel', 'resourceIds'],
         data:       function () {
             return {
                 showChoice: false,
@@ -30,20 +32,23 @@
             }
         },
         computed:   {
-            addGroups: function () {
-                return this.isGroup ? this.nestLevel === 0 : false;
+            ...mapGetters('filters', ['getNestLevel']),
+            nestLevel() {
+                return this.getNestLevel(this.parentId);
             },
-            addTerms:  function () {
-                return this.isGroup ? this.siblings.length < 10 : false;
+            canAddGroups: function () {
+                return this.nestLevel === 0;
+            },
+            canAddTerms: function () {
+                return true;
             }
         },
         methods:    {
+            ...mapMutations('filters', ['addGroup']),
             newGroup: function () {
                 this.showChoice = false;
                 this.showEditor = false;
-                this.siblings.push({
-                                       'and': []
-                                   });
+                this.addGroup(this.$parent.filterId);
             },
             newTerm:  function () {
                 this.showChoice = false;

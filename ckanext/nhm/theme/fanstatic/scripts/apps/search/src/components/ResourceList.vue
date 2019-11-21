@@ -1,0 +1,63 @@
+<template>
+    <div class="fields resourceid-list floating flex-container flex-column flex-left">
+        <div>
+            <input type="checkbox" id="toggleAll" v-model="allResourcesToggle"
+                @change="toggleAllResourceSelect">
+            <label for="toggleAll">Select all</label>
+        </div>
+        <span v-for="(pkg, index) in packageList" v-bind:key="pkg.id">
+            <a href="#" :id="pkg.id" :value="pkg.id"
+                @click="togglePackageResources(index)">{{ pkg.name }}</a>
+            <div class="fields">
+                <span v-for="resource in pkg.resources" v-bind:key="resource.id">
+                    <input type="checkbox" :id="resource.id" :value="resource.id"
+                        v-model="resourceIds">
+                    <label :for="resource.id">{{ resource.name }}</label>
+                </span>
+            </div>
+        </span>
+    </div>
+</template>
+
+<script>
+    import {mapMutations, mapState} from 'vuex';
+
+    export default {
+        name:     'ResourceList',
+        data:     function () {
+            return {
+                allResourcesToggle: false
+            }
+        },
+        computed: {
+            ...mapState(['resourceIds']),
+            ...mapState('constants', ['packageList']),
+            resourceIds: {
+                get() {
+                    return this.$store.state.resourceIds;
+                },
+                set(value) {
+                    this.$store.commit('setResourceIds', value);
+                }
+            }
+        },
+        methods:  {
+            ...mapMutations(['togglePackageResources']),
+            toggleAllResourceSelect: function (event) {
+                if (event.target.checked) {
+                    this.$store.commit('selectAllResources');
+                }
+                else {
+                    this.resourceIds = [];
+                }
+            }
+        },
+        watch:    {
+            resourceIds: function (resourceIds, oldResourceIds) {
+                if (resourceIds.length < oldResourceIds.length) {
+                    this.allResourcesToggle = false;
+                }
+            }
+        }
+    }
+</script>

@@ -1309,6 +1309,13 @@ iframe {
     }
   }
 
+  & .field-picker {
+    right: 0;
+    width: 200px;
+    font-family: monospace;
+    font-size: @font-size-body-m;
+  }
+
   & .resourceid-list {
     max-height: 50vh;
     overflow-y: auto;
@@ -1468,12 +1475,12 @@ iframe {
     left: 100%;
 
     select {
-      width: max-content;
-      max-width: 200px;
+      width: 200px;
       min-height: unset !important;
       height: unset;
       font-family: monospace;
       border: @lighter-borders;
+      padding: 1.2px 2px 2px;
     }
 
     input {
@@ -1767,6 +1774,33 @@ select {
         }
       }
     }
+  }
+}
+
+.table-grid {
+  display: grid;
+  justify-content: stretch;
+  overflow-x: auto;
+  overflow-y: visible;
+
+  & .th {
+    font-family: @font-title;
+    font-size: @font-size-body-l;
+    border-bottom: 2px solid @grey3;
+  }
+
+  & .small-column + :not(.small-column) {
+    border-left: 2px solid @grey3;
+    padding-left: 30px;
+    margin-left: 20px;
+  }
+
+  & > * {
+    padding: 10px;
+  }
+
+  & .td {
+    border-bottom: 2px solid @grey7;
   }
 }
 

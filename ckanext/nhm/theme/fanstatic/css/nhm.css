@@ -1389,6 +1389,12 @@ iframe {
 .multisearch-form .fields .delete-field {
   color: #343434;
 }
+.multisearch-form .field-picker {
+  right: 0;
+  width: 200px;
+  font-family: monospace;
+  font-size: 14px;
+}
 .multisearch-form .resourceid-list {
   max-height: 50vh;
   overflow-y: auto;
@@ -1526,12 +1532,12 @@ iframe {
   content: none;
 }
 .multisearch-form .term-editor select {
-  width: max-content;
-  max-width: 200px;
+  width: 200px;
   min-height: unset !important;
   height: unset;
   font-family: monospace;
   border: 2px solid #C3C3C3;
+  padding: 1.2px 2px 2px;
 }
 .multisearch-form .term-editor input {
   font-family: monospace;
@@ -1797,6 +1803,28 @@ select {
   .table-chunky > tbody > tr > td .dataset-resources::before {
     content: "\f15c";
   }
+}
+.table-grid {
+  display: grid;
+  justify-content: stretch;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.table-grid .th {
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
+  font-size: 17px;
+  border-bottom: 2px solid #5B5B5B;
+}
+.table-grid .small-column + :not(.small-column) {
+  border-left: 2px solid #5B5B5B;
+  padding-left: 30px;
+  margin-left: 20px;
+}
+.table-grid > * {
+  padding: 10px;
+}
+.table-grid .td {
+  border-bottom: 2px solid #C3C3C3;
 }
 .table-no-border th,
 .table-no-border td {
