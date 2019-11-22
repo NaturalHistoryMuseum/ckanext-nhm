@@ -6,8 +6,6 @@
 
 from elasticsearch_dsl import Q
 
-from ckanext.versioned_datastore.lib.search import prefix_field
-
 
 class FilterOption(object):
     '''
@@ -43,12 +41,11 @@ class FilterOption(object):
 
 
 # define some simple, common filters
-has_image = FilterOption(u'_has_image', u'Has image',
-                         Q(u'exists', field=prefix_field(u'associatedMedia')))
+has_image = FilterOption(u'_has_image', u'Has image', Q(u'exists', field=u'data.associatedMedia'))
 
 has_lat_long = FilterOption(u'_has_lat_long', u'Has lat/long', Q(u'exists', field=u'meta.geo'))
 
 exclude_mineralogy = FilterOption(u'_exclude_mineralogy', u'Exclude Mineralogy',
                                   # note the ~ which inverts the query
-                                  ~Q(u'term', **{prefix_field(u'collectionCode'): u'min'}),
+                                  ~Q(u'term', **{u'data.collectionCode': u'min'}),
                                   hide=True)
