@@ -10,14 +10,12 @@ Vue.use(Vuex);
 const store = new Vuex.Store(
     {
         state:     {
-            search:       '',
-            resourceIds:  []
+            search:      '',
+            resourceIds: []
         },
         getters:   {
             query: (state, getters) => {
-                let q = {
-                    query_version: 'v1.0.0'
-                };
+                let q = {};
                 if (state.search !== null && state.search !== '') {
                     q.search = state.search;
                 }
@@ -42,8 +40,8 @@ const store = new Vuex.Store(
                 state.resourceIds = resourceIds;
             },
             togglePackageResources(state, packageIx) {
-                let pkg            = state.constants.packageList[packageIx];
-                let isInResources  = pkg.resourceIds.some((r) => {
+                let pkg           = state.constants.packageList[packageIx];
+                let isInResources = pkg.resourceIds.some((r) => {
                     return state.resourceIds.includes(r);
                 });
                 if (isInResources) {
@@ -56,6 +54,42 @@ const store = new Vuex.Store(
                         return !state.resourceIds.includes(x);
                     }));
                 }
+            }
+        },
+        actions:   {
+            resolveSlug(context, slug) {
+                if (slug === undefined || slug === '') {
+                    context.commit('filters/resetFilters');
+                    return;
+                }
+                fetch('/api/3/action/datastore_resolve_slug', {
+                    method:      'POST',
+                    mode:        'cors',
+                    cache:       'no-cache',
+                    credentials: 'same-origin',
+                    headers:     {
+                        'Content-Type': 'application/json'
+                    },
+                    redirect:    'follow',
+                    referrer:    'no-referrer',
+                    body:        JSON.stringify({
+                                                    slug: slug
+                                                }),
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    if (data.success) {
+                        context.commit('setResourceIds', data.result.resource_ids);
+                        if (data.result.query.search !== undefined) {
+                            context.commit('setSearch', data.result.query.search)
+                        }
+                        context.commit('filters/setFromQuery', data.result.query);
+                        context.dispatch('results/runSearch', 0);
+                    }
+                    else {
+                        context.commit('filters/resetFilters');
+                    }
+                });
             }
         },
         modules:   {

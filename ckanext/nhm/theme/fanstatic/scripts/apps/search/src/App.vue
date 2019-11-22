@@ -47,7 +47,7 @@
                 </div>
             </transition>
             <pre class="fields" v-if="showQuery">{{ query }}</pre>
-            <Results v-if="success"></Results>
+            <Results></Results>
         </div>
     </div>
 </template>
@@ -80,7 +80,6 @@
         computed:   {
             ...mapState('constants', ['loading', 'loadError', 'packageList']),
             ...mapGetters(['query']),
-            ...mapGetters('results', ['success']),
             search: {
                 get() {
                     return this.$store.state.search;
@@ -91,7 +90,6 @@
             }
         },
         created:    function () {
-            this.$store.commit('filters/initialiseFilters');
             this.$store.dispatch('constants/getSchema');
             this.$store.dispatch('constants/getPackageList');
         },

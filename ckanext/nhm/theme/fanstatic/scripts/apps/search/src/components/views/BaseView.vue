@@ -22,7 +22,7 @@
         computed: {
             ...mapState('results', ['current']),
             ...mapGetters('constants', ['resourceDetails']),
-            ...mapGetters('results', ['success', 'total', 'records']),
+            ...mapGetters('results', ['total', 'records']),
         },
         methods:  {
             getFieldList() {

@@ -1,6 +1,11 @@
 <template>
     <div id="result">
-        <div class="flex-container flex-left flex-stretch-first">
+        <div class="flex-container flex-center alert-error full-width" v-if="failed">
+            <h3>Something went wrong!</h3>
+            <p>Please check your query and <a href="/contact">contact us</a> if you think you've
+               found a problem.</p>
+        </div>
+        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
             <h3>{{ total }} records</h3>
             <div style="position: relative;">
                 <transition name="slidedown">
@@ -15,11 +20,16 @@
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup" v-if="showShare">
-                        <a :href="`/search/${slug}`">{{ slug }}</a>
+                        <p>Share this search:</p>
+                        <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span></p>
+                        <small class="alert-warning">This link is for social sharing <em>only</em>.
+                                                     If you are intending to reference this search
+                                                     in a publication, <a href="#">use a
+                                                                                   DOI</a>.</small>
                     </div>
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled">
-                    <i class="fas fa-share-alt"></i>Share
+                    <i class="fas" :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
             <div style="position: relative;">
@@ -33,7 +43,7 @@
                 </a>
             </div>
         </div>
-        <component :is="viewType"></component>
+        <component :is="viewType" v-if="hasRecords"></component>
         <div class="pagination-wrapper" v-if="after.length > 0">
             <ul class="pagination">
                 <li v-if="page > 0">
@@ -52,27 +62,27 @@
 
 <script>
     import TableView from './views/TableView.vue';
-    import {mapActions, mapState, mapGetters} from 'vuex'
+    import {mapActions, mapGetters, mapState} from 'vuex'
 
     export default {
         name:       'Results',
         components: {
             TableView
         },
-        data:     function () {
+        data:       function () {
             return {
-                showDownload:    false,
-                showCite: false,
-                showShare: false,
-                viewType: TableView,
-                doi: ''
+                showDownload: false,
+                showCite:     false,
+                showShare:    false,
+                viewType:     TableView,
+                doi:          '',
             }
         },
-        computed: {
-            ...mapState('results', ['page', 'after', 'current', 'slug']),
-            ...mapGetters('results', ['total'])
+        computed:   {
+            ...mapState('results', ['page', 'after', 'current', 'slug', 'failed', 'resultsLoading', 'slugLoading']),
+            ...mapGetters('results', ['total', 'hasResult', 'hasRecords'])
         },
-        methods: {
+        methods:    {
             ...mapActions('results', ['runSearch', 'getSlug']),
             downloadResults() {
                 this.showDownload = true;
@@ -84,8 +94,17 @@
                 this.showCite = !this.showCite;
             },
             shareSearch() {
-                this.getSlug();
-                this.showShare = !this.showShare;
+                if (!this.showShare) {
+                    this.getSlug();
+                }
+                else {
+                    this.showShare = false;
+                }
+            }
+        },
+        watch:      {
+            slug() {
+                this.showShare = this.slug !== null;
             }
         }
     }

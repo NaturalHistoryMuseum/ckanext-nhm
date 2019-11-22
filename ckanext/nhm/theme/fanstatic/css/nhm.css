@@ -348,6 +348,11 @@ body .default-text a:focus {
     margin-right: 10px !important;
   }
 }
+.copyable {
+  font-family: monospace;
+  background-color: #F2F2F2;
+  border: 1px dotted #DDDDDD;
+}
 .handle i {
   position: relative;
   top: -1px;
@@ -374,6 +379,9 @@ body .default-text a:focus {
 }
 .label-dark {
   background-color: #434343;
+}
+.nowrap {
+  white-space: nowrap;
 }
 .pad-children-h > * {
   padding-left: 5px;
@@ -1586,6 +1594,7 @@ iframe {
   border: 2px solid #C3C3C3;
   border-radius: 5px;
   top: 100%;
+  right: 0;
   margin: 5px;
   padding: 5px;
 }

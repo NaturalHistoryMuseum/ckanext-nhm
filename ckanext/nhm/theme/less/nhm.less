@@ -261,6 +261,12 @@ body {
   }
 }
 
+.copyable {
+  font-family: monospace;
+  background-color: @grey9;
+  border: 1px dotted @grey8;
+}
+
 .handle i {
   position: relative;
   top: -1px;
@@ -285,6 +291,10 @@ body {
 
 .label-dark {
   background-color: @grey2;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 .pad-children-h > * {
@@ -1542,6 +1552,7 @@ iframe {
     border: @lighter-borders;
     border-radius: @rounding;
     top: 100%;
+    right: 0;
     margin: 5px;
     padding: 5px;
   }

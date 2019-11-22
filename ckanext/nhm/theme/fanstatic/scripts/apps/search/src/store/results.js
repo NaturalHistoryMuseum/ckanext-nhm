@@ -4,7 +4,10 @@ let results = {
         current: {},
         after:   [],
         page:    0,
-        slug: null
+        slug: null,
+        failed: false,
+        slugLoading: false,
+        resultsLoading: false
     },
     getters:    {
         requestBody: (state, getters, rootState, rootGetters) => {
@@ -17,16 +20,18 @@ let results = {
             }
             return JSON.stringify(body);
         },
-        success:     (state) => {
-            let successful = state.current.success || false;
-            let noRecords  = successful ? state.current.result.records.length === 0 : false;
-            return successful && !noRecords;
+        hasResult: (state) => {
+          return state.current.success || false;
+        },
+        hasRecords:     (state, getters) => {
+            let noRecords  = getters.hasResult ? state.current.result.records.length === 0 : false;
+            return getters.hasResult && !noRecords;
         },
         total:       (state, getters) => {
-            return getters.success ? state.current.result.total : 0;
+            return getters.hasResult ? state.current.result.total : 0;
         },
         records:     (state, getters) => {
-            return getters.success ? state.current.result.records : [];
+            return getters.hasResult ? state.current.result.records : [];
         }
     },
     mutations:  {
@@ -45,6 +50,10 @@ let results = {
     },
     actions:    {
         runSearch(context, page) {
+            context.state.resultsLoading = true;
+            if (page === null || page === 0) {
+                context.state.after = [];
+            }
             context.commit('setPage', page);
             fetch('/api/3/action/datastore_multisearch', {
                 method:      'POST',
@@ -61,17 +70,19 @@ let results = {
                 return response.json();
             }).then(data => {
                 context.state.current = data;
+                context.state.resultsLoading = false;
                 if (data.success && data.result.after !== null) {
-                    context.commit('addPage', {after: data.result.after})
+                    context.commit('addPage', {after: data.result.after});
+                    context.state.failed = false;
                 }
                 else if (!data.success) {
-                    console.error(data);
-                    console.error(context.getters.requestBody);
+                    context.state.failed = true;
                 }
             });
         },
         getSlug(context) {
-            fetch('/api/3/action/datastore_multisearch', {
+            context.state.slugLoading = true;
+            fetch('/api/3/action/datastore_create_slug', {
                 method:      'POST',
                 mode:        'cors',
                 cache:       'no-cache',
@@ -88,7 +99,13 @@ let results = {
             }).then(response => {
                 return response.json();
             }).then(data => {
-                context.state.slug = data.slug;
+                context.state.slugLoading = false;
+                if (data.success){
+                    context.state.slug = data.result.slug;
+                }
+                else {
+                    context.state.slug = null;
+                }
             });
         }
     }
