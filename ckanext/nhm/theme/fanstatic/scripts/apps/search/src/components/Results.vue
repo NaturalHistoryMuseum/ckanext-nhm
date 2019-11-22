@@ -1,5 +1,5 @@
 <template>
-    <div id="result">
+    <div id="result" :class="{disabled: resultsInvalid}">
         <div class="flex-container flex-center alert-error full-width" v-if="failed">
             <h3>Something went wrong!</h3>
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
@@ -29,7 +29,8 @@
                     </div>
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled">
-                    <i class="fas" :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
+                    <i class="fas"
+                        :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
             <div style="position: relative;">
@@ -79,7 +80,8 @@
             }
         },
         computed:   {
-            ...mapState('results', ['page', 'after', 'current', 'slug', 'failed', 'resultsLoading', 'slugLoading']),
+            ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
+                                    'resultsLoading', 'slugLoading', 'resultsInvalid']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords'])
         },
         methods:    {
@@ -94,11 +96,11 @@
                 this.showCite = !this.showCite;
             },
             shareSearch() {
-                if (!this.showShare) {
+                if (!this.showShare && this.slug === null) {
                     this.getSlug();
                 }
                 else {
-                    this.showShare = false;
+                    this.showShare = !this.showShare;
                 }
             }
         },

@@ -1,13 +1,14 @@
 let results = {
     namespaced: true,
     state:      {
-        current: {},
-        after:   [],
-        page:    0,
-        slug: null,
-        failed: false,
-        slugLoading: false,
-        resultsLoading: false
+        current:        {},
+        after:          [],
+        page:           0,
+        slug:           null,
+        failed:         false,
+        slugLoading:    false,
+        resultsLoading: false,
+        resultsInvalid: false
     },
     getters:    {
         requestBody: (state, getters, rootState, rootGetters) => {
@@ -20,11 +21,11 @@ let results = {
             }
             return JSON.stringify(body);
         },
-        hasResult: (state) => {
-          return state.current.success || false;
+        hasResult:   (state) => {
+            return state.current.success || false;
         },
-        hasRecords:     (state, getters) => {
-            let noRecords  = getters.hasResult ? state.current.result.records.length === 0 : false;
+        hasRecords:  (state, getters) => {
+            let noRecords = getters.hasResult ? state.current.result.records.length === 0 : false;
             return getters.hasResult && !noRecords;
         },
         total:       (state, getters) => {
@@ -44,13 +45,15 @@ let results = {
             state.page    = page;
             state.current = {};
         },
-        invalidateSlug(state) {
+        invalidateResults(state) {
             state.slug = null;
+            state.resultsInvalid = true;
         }
     },
     actions:    {
         runSearch(context, page) {
             context.state.resultsLoading = true;
+            context.state.resultsInvalid = false;
             if (page === null || page === 0) {
                 context.state.after = [];
             }
@@ -69,7 +72,7 @@ let results = {
             }).then(response => {
                 return response.json();
             }).then(data => {
-                context.state.current = data;
+                context.state.current        = data;
                 context.state.resultsLoading = false;
                 if (data.success && data.result.after !== null) {
                     context.commit('addPage', {after: data.result.after});
@@ -100,7 +103,7 @@ let results = {
                 return response.json();
             }).then(data => {
                 context.state.slugLoading = false;
-                if (data.success){
+                if (data.success) {
                     context.state.slug = data.result.slug;
                 }
                 else {

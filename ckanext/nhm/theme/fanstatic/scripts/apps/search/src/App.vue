@@ -96,7 +96,7 @@
         methods:    {
             ...mapActions('results', ['runSearch']),
             ...mapMutations('filters', ['resetFilters']),
-            ...mapMutations('results', ['invalidateSlug'])
+            ...mapMutations('results', ['invalidateResults'])
         },
         watch: {
             packageList: function (newList, oldList) {
@@ -105,7 +105,7 @@
                 }
             },
             query: function () {
-                this.invalidateSlug();
+                this.invalidateResults();
             }
         }
     }

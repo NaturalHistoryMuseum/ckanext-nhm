@@ -1375,6 +1375,14 @@ iframe {
 .multisearch-form {
   min-height: 50vh;
 }
+.multisearch-form .disabled {
+  -o-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  opacity: 0.3;
+}
 .multisearch-form .search-input {
   margin-bottom: 0;
 }
