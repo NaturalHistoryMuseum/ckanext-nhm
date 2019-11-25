@@ -63,7 +63,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IDoi)
     implements(IGalleryImage)
     implements(ICkanPackager)
-    implements(IVersionedDatastore)
+    implements(IVersionedDatastore, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -550,11 +550,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return search
 
     # IVersionedDatastore
-    def datastore_modify_result(self, context, original_data_dict, data_dict, result):
-        # we don't do anything to the result currently
-        return result
-
-    # IVersionedDatastore
     def datastore_modify_fields(self, resource_id, mapping, fields):
         '''
         This function allows us to modify the field definitions before they are
@@ -587,10 +582,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return fields
 
     # IVersionedDatastore
-    def datastore_modify_index_doc(self, resource_id, index_doc):
-        return index_doc
-
-    # IVersionedDatastore
     def datastore_is_read_only_resource(self, resource_id):
         # we don't want any of the versioned datastore ingestion and indexing code
         # modifying the
@@ -608,3 +599,11 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             requests.request(u'purge', toolkit.config.get(u'ckan.site_url'), timeout=2)
         except:
             pass
+
+    def datastore_reserve_slugs(self):
+        return {
+            u'collections': dict(resource_ids=[helpers.get_specimen_resource_id(),
+                                               helpers.get_artefact_resource_id(),
+                                               helpers.get_indexlot_resource_id()]),
+            # TODO: research datasets? if so how?
+        }
