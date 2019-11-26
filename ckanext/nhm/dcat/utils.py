@@ -1,28 +1,29 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
+from ckanext.nhm.lib.helpers import get_specimen_resource_id
 from datetime import datetime
 from rdflib import namespace
 
-from ckan.lib.helpers import url_for
-from ckanext.nhm.lib.helpers import get_specimen_resource_id
+from ckan.plugins import toolkit
 
 
 def object_uri(uuid, version=None):
-    """
+    '''
     Returns an URI for an object
-    """
-    if version is None:
-        return url_for(u'object_view', action=u'view', uuid=uuid, qualified=True)
-    else:
-        return url_for(u'object_view_versioned', action=u'view', uuid=uuid, version=version,
-                       qualified=True)
+    :return:
+    '''
+    return toolkit.url_for(u'object.view', uuid=uuid, version=version, qualified=True)
 
 
 def rdf_resources():
-    """
+    '''
     Return list of resource IDs with RDF records
     :return:
-    """
+    '''
     # FIXME - Need to add in indexlots and artefacts
     return [get_specimen_resource_id()]
 
@@ -84,7 +85,7 @@ class Namespaces:
             u'time': namespace.Namespace(u'http://www.w3.org/2006/time'),
             u'vcard': namespace.Namespace(u'http://www.w3.org/2006/vcard/ns#'),
             u'void': namespace.VOID,
-        }
+            }
 
     def __getattr__(self, prefix):
         '''

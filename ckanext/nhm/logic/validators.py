@@ -1,52 +1,51 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
-"""
-Created by 'bens3' on 2013-06-21.
-Copyright (c) 2013 'bens3'. All rights reserved.
-"""
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
 import re
-import ckan.plugins as p
-from ckan.common import _
 
-Invalid = p.toolkit.Invalid
+from ckan.plugins import toolkit
 
 
 def string_max_length(max_length):
-    '''
-    Checks if a string is longer than a certain length
+    '''Checks if a string is longer than a certain length
 
-    :raises: ckan.lib.navl.dictization_functions.Invalid if the string is
-        longer than max length
+    :param max_length: 
+
     '''
+
     def callable(value, context):
+        '''The validation function that checks if a string is longer than the max length.
+
+        :param value: the input string
+        :param context: the context
+
+        '''
 
         if len(value) > max_length:
-            raise Invalid(
-                _('Length must be less than {0} characters')
-                .format(max_length)
-            )
+            raise toolkit.Invalid(
+                    toolkit._(u'Length must be less than {0} characters').format(
+                            max_length))
 
         return value
 
     return callable
 
-uuid_re = re.compile('^[\w]{40}$')
+
+uuid_re = re.compile(u'^[\w]{40}$')
 
 
 def uuid_validator(value, context):
-    """
-    Checks if a UUID is valid (used for MAM asset IDs)
-    We check with a regex as MAM assets ids aren't valid UUID
-
-    :raises: ckan.lib.navl.dictization_functions.Invalid if the string is
-        an invalid UUID
+    '''Checks if a UUID is valid (used for MAM asset IDs). We check with a regex as MAM
+    assets ids aren't valid UUIDs.
 
     :param value:
-    :param context:
-    :return:
-    """
+    :param context: 
+
+    '''
     if uuid_re.match(value):
         return value
     else:
-        raise Invalid(_('Invalid Asset ID'))
+        raise toolkit.Invalid(toolkit._(u'Invalid Asset ID'))

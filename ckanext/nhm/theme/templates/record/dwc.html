@@ -1,16 +1,18 @@
 {% extends "record/specimen.html" %}
 
 {% block content_primary_nav %}
-    {% if c.additional_view %}
-        {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, c.version) %}
-            {{ nav }}
+    {% if g.additional_view %}
+        {% for nav in h.build_specimen_nav_items(g.pkg.name, res.id, rec._id, g.version) %}
+            <li>
+                {{ nav }}
+            </li>
         {% endfor %}
     {% endif %}
 {% endblock %}
 
 {% macro dwc_row(term, uri=None) %}
     {%- set extra_html = caller() if caller -%}
-    {% set value = c.record_dict[term] %}
+    {% set value = g.record_dict[term] %}
 
     {% if not value %}
         {% set cls = 'empty' %}
@@ -23,9 +25,9 @@
         <th>
 
             {% if uri %}
-                <a href="{{ uri }}" target="_blank" title="{{ uri }}">{{term}}</a>
+                <a href="{{ uri }}" target="_blank" title="{{ uri }}">{{ term }}</a>
             {% else %}
-                {{term}}
+                {{ term }}
             {% endif %}
 
         </th>
@@ -37,33 +39,33 @@
 
 {% block record_data %}
 
-    <table class="toggle-empty-rows" data-module="toggle-empty-rows">
+    <table class="toggle-empty-rows table-responsive table-record" data-module="toggle-empty-rows">
 
-    {% for group, terms in c.dwc_terms.items() %}
+        {% for group, terms in g.dwc_terms.items() %}
 
-        <thead>
+            <thead>
             <tr>
                 <th colspan="2">{{ group }}</th>
             </tr>
-        </thead>
+            </thead>
 
-        <tbody>
+            <tbody>
 
             {% for uri, term in terms.items() %}
-                 {{ dwc_row(term, uri) }}
+                {{ dwc_row(term, uri) }}
             {% endfor %}
 
-        </tbody>
+            </tbody>
 
-    {% endfor %}
+        {% endfor %}
 
         <thead>
-            <tr>
-                <th colspan="2">Dynamic properties</th>
-            </tr>
+        <tr>
+            <th colspan="2">Dynamic properties</th>
+        </tr>
         </thead>
 
-        {% for uri, properties in c.dynamic_properties.items() %}
+        {% for uri, properties in g.dynamic_properties.items() %}
             {% for property in properties %}
                 {{ dwc_row(property) }}
             {% endfor %}

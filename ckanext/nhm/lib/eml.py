@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
 
 def generate_eml(package, resource):
@@ -12,17 +17,17 @@ def generate_eml(package, resource):
     # use empty strings as defaults just in case some of these fields don't exist. They should, but we don't want to
     # raise an exception and therefore stop the request from being sent if something is missing
     formatting_data = {
-        'resource_id': resource['id'],
-        'title': resource.get('name', ''),
-        'abstract': resource.get('description', ''),
-        'license': package.get('license_title', 'License not specified'),
-        'package_name': package.get('name', ''),
-        'additional_metadata': ''
+        u'resource_id': resource[u'id'],
+        u'title': resource.get(u'name', u''),
+        u'abstract': resource.get(u'description', u''),
+        u'license': package.get(u'license_title', u'License not specified'),
+        u'package_name': package.get(u'name', u''),
+        u'additional_metadata': u''
     }
 
     # only include DOI data if we have some to provide
-    if 'doi' in package:
-        formatting_data['additional_metadata'] = '''
+    if u'doi' in package:
+        formatting_data[u'additional_metadata'] = u'''
     <additionalMetadata>
       <metadata>
         <gbif>
@@ -33,13 +38,13 @@ def generate_eml(package, resource):
       </metadata>
     </additionalMetadata>
         '''.format(**{
-            'doi': package['doi'],
-            'citation': 'Natural History Museum http://data.nhm.ac.uk ({0}): {1}'.format(
-                package.get('doi_date_published', '')[:4], package.get('title', '')),
+            u'doi': package[u'doi'],
+            u'citation': u'Natural History Museum http://data.nhm.ac.uk ({0}): {1}'.format(
+                package.get(u'doi_date_published', u'')[:4], package.get(u'title', u'')),
         }).strip()
 
     # build the xml string and return it
-    return '''
+    return u'''
 <?xml version="1.0" encoding="UTF-8"?>
 <eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                     packageId="{resource_id}" scope="system" system="http://gbif.org" xml:lang="en"

@@ -1,10 +1,10 @@
-<div class="span4 box action-box">
+<div class="col-md-4 box action-box flex-container flex-between flex-stretch-last flex-nowrap flex-top flex-stretch-height">
+    <i class="{{ icon_class }} large"></i>
     <div class="module-content">
-        <i class="{{ icon_class }} large"></i>
-        <div class="content">
-            <h4><a href="{{ url }}" title="{{ link_text }}">{{ title }}</a></h4>
+        <h4><a href="{{ url }}" title="{{ link_text }}">{{ title }}</a></h4>
+        <div class="box-text">
             <p>{{ text }}</p>
-            <p class="text-right"><a href="{{ url }}" title="{{ link_text }}">{{ link_text }} <i class="icon-circle-arrow-right"></i></a></p>
+            <p class="text-right text-bottom"><a href="{{ url }}" title="{{ link_text }}">{{ link_text }} <i class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
         </div>
     </div>
 </div>

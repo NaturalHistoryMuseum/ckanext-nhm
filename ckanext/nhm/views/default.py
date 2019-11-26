@@ -1,22 +1,16 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
-"""
-Created by 'bens3' on 2013-06-21.
-Copyright (c) 2013 'bens3'. All rights reserved.
-"""
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
-import ckan.plugins as p
 from collections import OrderedDict
-import ckan.logic as logic
 
-
-NotFound = logic.NotFound
+from ckan.plugins import toolkit
 
 
 class DefaultView(object):
-    """
-    A view object, used to define custom views for records and grid view
-    """
+    '''A view object, used to define custom views for records and grid view'''
 
     resource_id = None
 
@@ -35,61 +29,69 @@ class DefaultView(object):
 
     # Default state
     state = {
-        'gridOptions': {
-            'defaultFormatter': 'NHMFormatter',
-            'enableCellRangeSelection': False,
-            'enableTextSelectionOnCells': False,
-            'enableCellNavigation': False,
-            'enableColumnReorder': False,
-            'defaultColumnWidth': 70
-        },
-        'columnsWidth': [
-            {
-                'column': '_id',
-                'width': 45
+        u'gridOptions': {
+            u'defaultFormatter': u'NHMFormatter',
+            u'enableCellRangeSelection': False,
+            u'enableTextSelectionOnCells': False,
+            u'enableCellNavigation': False,
+            u'enableColumnReorder': False,
+            u'defaultColumnWidth': 70
             },
-        ],
-        'columnsTitle': [
-            {
-                'column': '_id',
-                'title': ''  # This is just converted into a link so lets hide the title
-            }
-        ],
-        'columnsToolTip': []
-    }
+        u'columnsWidth': [{
+            u'column': u'_id',
+            u'width': 45
+            }, ],
+        u'columnsTitle': [{
+            u'column': u'_id',
+            u'title': u''
+            # This is just converted into a link so lets hide the title
+            }],
+        u'columnsToolTip': []
+        }
 
     @staticmethod
     def get_ordered_fields(resource_id):
-        """
-        Get fields ordered the same as the uploaded dataset
-        @param resource_id:
-        @return:
-        """
-        data = {'resource_id': resource_id, 'limit': 0}
+        '''Get fields ordered the same as the uploaded dataset
+
+        :param resource_id:
+
+        '''
+        data = {
+            u'resource_id': resource_id,
+            u'limit': 0
+            }
         try:
-            result = p.toolkit.get_action('datastore_search')({}, data)
-        except NotFound:
+            result = toolkit.get_action(u'datastore_search')({}, data)
+        except toolkit.ObjectNotFound:
             return []
         else:
-            return [f['id'] for f in result['fields']]
+            return [f[u'id'] for f in result[u'fields']]
 
     def render_record(self, c):
-        """
-        Render a record
-        """
+        '''Render a record
+
+        :param c: 
+
+        '''
 
         # The record_dict does not have fields in the correct order
         # So load the fields, and create an OrderedDict with field: value
-        c.field_data = OrderedDict()
+        toolkit.c.field_data = OrderedDict()
 
-        for field in self.get_ordered_fields(c.resource['id']):
-            if not field.startswith('_'):
-                c.field_data[field] = c.record_dict.get(field, None)
+        for field in self.get_ordered_fields(toolkit.c.resource[u'id']):
+            if not field.startswith(u'_'):
+                toolkit.c.field_data[field] = toolkit.c.record_dict.get(field, None)
 
-        return p.toolkit.render('record/view.html')
+        return toolkit.render(u'record/view.html')
 
     def get_field_groups(self, resource):
+        '''
+
+        :param resource: 
+
+        '''
         return self.field_groups
 
     def get_slickgrid_state(self):
+        ''' '''
         return self.state

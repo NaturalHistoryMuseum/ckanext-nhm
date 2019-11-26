@@ -11,12 +11,16 @@ this.ckan.module('toggle-empty-rows', function($, _) {
      */
     initialize: function () {
       self = this;
-      $('<a href="#" class="toggle-empty-rows">Toggle empty rows</a>').on('click', self._toggleDisplay).insertBefore(self.el)
+      $('<a href="#" class="btn btn-primary"><i class="fas fa-eye-slash" id="toggle-rows-btn"></i>Toggle empty rows</a>').on('click', self._toggleDisplay).insertBefore(self.el)
     },
 
     _toggleDisplay: function(e) {
       e.preventDefault();
       self.el.toggleClass('table-hide-empty');
+      var btn = $('#toggle-rows-btn');
+      btn.toggleClass('fa-eye-slash');
+      btn.toggleClass('fa-eye')
+
     }
 
   }

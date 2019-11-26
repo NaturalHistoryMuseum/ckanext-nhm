@@ -2,22 +2,24 @@
 
 {% block styles %}
    {{ super() }}
-   <link rel="alternate" type="text/n3" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='n3', qualified=True) }}"/>
-   <link rel="alternate" type="text/ttl" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='ttl', qualified=True) }}"/>
-   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='xml', qualified=True) }}"/>
-   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object_rdf', uuid=c.record_dict['occurrenceID'], _format='rdf', qualified=True) }}"/>
+   <link rel="alternate" type="text/n3" href="{{ h.url_for('object.rdf', uuid=g.record_dict['occurrenceID'], _format='n3', qualified=True) }}"/>
+   <link rel="alternate" type="text/ttl" href="{{ h.url_for('object.rdf', uuid=g.record_dict['occurrenceID'], _format='ttl', qualified=True) }}"/>
+   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object.rdf', uuid=g.record_dict['occurrenceID'], _format='xml', qualified=True) }}"/>
+   <link rel="alternate" type="application/rdf+xml" href="{{ h.url_for('object.rdf', uuid=g.record_dict['occurrenceID'], _format='rdf', qualified=True) }}"/>
 {% endblock -%}
 
 {% block content_primary_nav %}
-    {% for nav in h.build_specimen_nav_items(pkg.name, res.id, rec._id, c.version) %}
-        {{ nav }}
+    {% for nav in h.build_specimen_nav_items(g.pkg.name, res.id, rec._id, g.version) %}
+        <li>
+            {{ nav }}
+        </li>
     {% endfor %}
 {% endblock %}
 
 {% block record_additional_information %}
-    {% if c.record_dict['occurrenceID']%}
-        {% set citation_url = h.get_object_url(res.id, c.record_dict['occurrenceID'], c.version) %}
-        {% snippet "doi/snippets/record_citation.html", pkg_dict=pkg, res=res, citation_url=citation_url %}
+    {% if g.record_dict['occurrenceID']%}
+        {% set citation_url = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version) %}
+        {% snippet "doi/snippets/record_citation.html", pkg_dict=g.pkg, res=res, citation_url=citation_url %}
     {% endif %}
     {{ super() }}
 {% endblock %}

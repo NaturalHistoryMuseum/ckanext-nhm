@@ -3,13 +3,13 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), controller='home', action='about' %}</li>
-  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.about:AboutController', action='download' %}</li>
+  <li>{% link_for _('About'), named_route='home.about' %}</li>
+  <li class="active">{% link_for _(title), named_route='about.download' %}</li>
 {% endblock %}
 
 {% block about_content %}
 
-    {% set api_link = h.link_to(h.url_for(controller='api', action='get_api', ver=3, qualified=True), h.url_for(controller='api', action='get_api', ver=3), target='_blank') %}
+    {% set api_link = h.link_to(h.url_for('api.get_api', ver=3, qualified=True), h.url_for('api.get_api', ver=3), target='_blank') %}
     {% set api_doc_link = h.api_doc_link() %}
 
     <h1 class="page-heading">{{ title }}</h1>

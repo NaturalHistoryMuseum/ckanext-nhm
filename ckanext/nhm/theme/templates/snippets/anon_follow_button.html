@@ -1,10 +1,7 @@
 {% set controller = obj_type %}
-{% if controller == 'dataset' %}
-  {% set controller = 'package' %}
-{% endif %}
 
-  <a href="{{ h.url_for(controller='user', action='login', came_from=h.url_for(controller=controller, action='follow', id=obj_id)) }}" class="{% block unfollowing_class %}btn btn-success{% endblock %}">
-    <i class="icon-plus-sign"></i>
+  <a href="{{ h.url_for('user.login', came_from=h.url_for(controller=controller, action='follow', id=obj_id)) }}" class="{% block unfollowing_class %}btn btn-success{% endblock %}">
+    <i class="fas fa-plus"></i>
     {{ _('Follow') }}
   </a>
 

@@ -1,14 +1,19 @@
 {% ckan_extends %}
 
 {% block user_about %}
-  {% if c.about_formatted %}
-    {{ c.about_formatted }}
+  {% if about_formatted %}
+    {{ about_formatted }}
   {% endif %}
 {% endblock %}
 
 {% block breadcrumb_content %}
   {# Remove user from breadcrumb {{ h.build_nav('user_index', _('Users')) }} #}
-  {{ h.build_nav('user_datasets', user.display_name|truncate(35), id=user.name) }}
+  {{ h.build_nav('user.read', user.display_name|truncate(35), id=user.name) }}
+{% endblock %}
+
+{% block user_image %}
+  {% set gravatar_size = 190 %}
+    <div class="image" style="max-width: {{ gravatar_size }}px">{{ h.linked_gravatar(user.email_hash, gravatar_size) }}</div>
 {% endblock %}
 
 {% block user_info %}
@@ -22,9 +27,9 @@
             <dd>{{ user.name }}</dd>
           {% endif %}
         </dl>
-        {% if c.is_myself %}
+        {% if is_myself %}
           <dl>
-            <dt>{{ _('Email') }} <span class="label" title="{{ _('This means only you can see this') }}">{{ _('Private') }}</span></dt>
+            <dt>{{ _('Email') }} <span class="label label-dark space-left" title="{{ _('This means only you can see this') }}">{{ _('Private') }}</span></dt>
             <dd>{{ user.email }}</dd>
           </dl>
         {% endif %}
@@ -36,9 +41,9 @@
           <dt>{{ _('State') }}</dt>
           <dd>{{ user.state }}</dd>
         </dl>
-        {% if c.is_myself and h.is_ldap_user() %}
+        {% if is_myself and h.is_ldap_user() %}
           <dl>
-            <dt class="key">{{ _('API Key') }} <span class="label" title="{{ _('This means only you can see this') }}">{{ _('Private') }}</span></dt>
+            <dt class="key">{{ _('API Key') }} <span class="label label-dark space-left" title="{{ _('This means only you can see this') }}">{{ _('Private') }}</span></dt>
             <dd class="value"><code>{{ user.apikey }}</code></dd>
           </dl>
         {% endif %}

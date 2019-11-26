@@ -1,15 +1,29 @@
 {% ckan_extends %}
 
+{% block social_title %}
+<div class="flex-container flex-between flex-stretch-first nav-simple-heading">
+    <h2 class="module-heading"><i class="fas fa-share-alt inline-icon-left"></i>{{
+                                                                                 _('Social')
+                                                                                 }} </h2>
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+            data-target="#nav-social" aria-expanded="false">
+        <span class="sr-only">expand</span>
+    </button>
+</div>{% endblock %}
+
 {% block social_nav %}
 
-     {% set text = h.social_share_text(pkg_dict, res_dict, rec_dict) %}
+{% set text = h.social_share_text(g.pkg_dict, res_dict, rec_dict) %}
+<ul class="nav nav-simple navbar-collapse collapse" data-module="social" id="nav-social">
+    <li class="nav-item"><a
+            href="https://twitter.com/share?url={{ current_url }}&amp;text={{ text }}"
+            target="_blank" title="Share on Twitter"><i
+            class="fab fa-twitter inline-icon-left"></i>Twitter</a></li>
+    <li class="nav-item"><a href="https://www.facebook.com/sharer.php?u={{ current_url }}"
+                            target="_blank" title="Share on Facebook"><i
+            class="fab fa-facebook-square inline-icon-left"></i>Facebook</a></li>
+</ul>
 
-      <ul class="nav nav-simple" data-module="social">
-        <li class="nav-item"><a href="https://plus.google.com/share?url={{ current_url }}" target="_blank" title="Share on Google+"><i class="icon-google-plus-sign"></i> Google+</a></li>
-        <li class="nav-item"><a href="https://twitter.com/share?url={{ current_url }}&amp;text={{ text }}" target="_blank" title="Share on Twitter"><i class="icon-twitter-sign"></i> Twitter</a></li>
-        <li class="nav-item"><a href="https://www.facebook.com/sharer.php?u={{ current_url }}" target="_blank" title="Share on Facebook+"><i class="icon-facebook-sign"></i> Facebook</a></li>
-      </ul>
+{% resource 'ckanext-nhm/social' %}
 
-     {% resource 'ckanext-nhm/social' %}
-
-  {% endblock %}
+{% endblock %}

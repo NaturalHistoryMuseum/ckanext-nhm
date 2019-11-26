@@ -1,18 +1,14 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
-"""
-Created by 'bens3' on 2013-06-21.
-Copyright (c) 2013 'bens3'. All rights reserved.
-"""
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
-import sys
-import os
+try:
+    import pkg_resources
 
+    pkg_resources.declare_namespace(__name__)
+except ImportError:
+    import pkgutil
 
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
-
+    __path__ = pkgutil.extend_path(__path__, __name__)

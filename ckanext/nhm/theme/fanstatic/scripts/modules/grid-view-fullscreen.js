@@ -79,7 +79,7 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
       self._is_full_screen = !self._is_full_screen;
       if (self._is_full_screen){
         $('body').addClass('fullscreen');
-      } else { 
+      } else {
         $('body').removeClass('fullscreen');
       }
       // Run resize once for browsers that trigger the event when it's ready,
@@ -89,7 +89,7 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
         self._resize_slickgrid();
       }, 1000);
     },
- 
+
     /**
      * Resize the grid canvas
      *

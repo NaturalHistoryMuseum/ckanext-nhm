@@ -9,7 +9,7 @@
        {% if rec %} data-module-record_id="{{ rec._id }}" {% endif %}
        data-module-action="{{ recaptcha_v3_action }}"
        data-module-key="{{ recaptcha_v3_key }}">
-        <i class="icon-envelope"></i>{{ link_text if link_text else _('Contact dataset curator') }}
+        <i class="fas fa-envelope"></i>{{ link_text if link_text else _('Contact dataset curator') }}
     </a>
 
     {% resource 'ckanext-contact/main' %}

@@ -3,13 +3,13 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), controller='home', action='about' %}</li>
-  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.about:AboutController', action='citation' %}</li>
+  <li>{% link_for _('About'), named_route='home.about' %}</li>
+  <li class="active">{% link_for _(title), named_route='about.citation' %}</li>
 {% endblock %}
 
 {% block about_content %}
 
-    {% set api_link = h.link_to(_('API'), h.url_for(controller='api', action='get_api', ver=3)) %}
+    {% set api_link = h.link_to(_('API'), h.url_for('api.get_api', ver=3)) %}
     {% set api_doc_link = h.api_doc_link() %}
 
     <h1 class="page-heading">{{ title }}</h1>
@@ -20,7 +20,7 @@
     <img class="pull-right" id="datacite" src="/images/datacite.jpg" alt="Datacite" />
 
     <div class="row">
-        <div class="span6">
+        <div class="col-md-6">
             <h4>Digital Object Identifier (DOI)</h4>
             <p>All of our datasets are assigned a DOI, a persistent digital identifier used to uniquely identify the dataset.  Our DOIs are provided by the <a target="_blank" href="http://www.bl.uk/aboutus/stratpolprog/digi/datasets/datacitefaq/faqhome.html" class="external">British Library's DataCite service.</a></p>
             <p>Please use the DOI in all citations.</p>

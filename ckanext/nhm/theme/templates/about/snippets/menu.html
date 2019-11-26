@@ -8,13 +8,13 @@ Displays the about menu
 
       {% block about_menu %}
         <nav class="section navigation">
-          <ul class="nav nav-aside" id="about-menu">
+          <ul class="nav nav-simple" id="about-menu">
               {{ h.build_nav_main(
-                ('about', _('About')),
-                ('about_citation', _('Citation and attribution')),
-                ('about_download', _('Download and API')),
-                ('stats_resources', _('Site statistics')),
-                ('about_credits', _('Credits'))
+                ('home.about', _('About')),
+                ('about.citation', _('Citation and attribution')),
+                ('about.download', _('Download and API')),
+                ('statistics.resources', _('Site statistics')),
+                ('about.credits', _('Credits'))
               ) }}
             </ul>
          </nav>

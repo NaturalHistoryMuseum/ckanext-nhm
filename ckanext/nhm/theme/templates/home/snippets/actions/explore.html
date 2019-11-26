@@ -1,7 +1,7 @@
 {% extends "home/snippets/actions/base.html" %}
 
 {% set title = "Explore" %}
-{% set icon_class = "icon-search" %}
+{% set icon_class = "fas fa-search" %}
 {% set text = "Explore the Museum's collection and research data." %}
 {% set link_text = "Explore the data" %}
-{% set url = h.url_for(controller='package', action='search') %}
+{% set url = h.url_for('dataset.search') %}

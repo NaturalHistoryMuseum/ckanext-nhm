@@ -3,33 +3,143 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), controller='home', action='about' %}</li>
-  <li class="active">{% link_for _(title), controller='ckanext.nhm.controllers.about:AboutController', action='credits' %}</li>
+    <li>{% link_for _('About'), named_route='home.about' %}</li>
+    <li class="active">{% link_for _(title), named_route='about.credits' %}</li>
 {% endblock %}
 
 {% block about_content %}
     <h1 class="page-heading">{{ title }}</h1>
 
-<p>The Data Portal has been developed by the Museum’s biodiversity informatics group, with the help and support of teams throughout the Museum.</p>
-<p>Project members:</p>
+    <p>The Data Portal has been developed by the Museum’s <a
+            href="https://www.nhm.ac.uk/our-science/departments-and-staff/life-sciences/diversity-informatics.html">Biodiversity
+                                                                                                                    Informatics</a>
+       group, with the help and support of teams throughout the Museum. It is a window into the
+       Museum’s research and collections data, and is the result of decades of work by the Museum's
+       science staff.</p>
+    <br>
+    <table class="credits-table">
+        <tr>
+            <th class="credits-header">
+                <span>Developers</span>
+            </th>
+            <td class="flex-container flex-wrap">
+                <a href="https://github.com/jrdh" class="credits-cell">
+                    <strong>Josh Humphries</strong>
+                    <small>Technical Lead</small>
+                </a>
+                <a href="https://github.com/alycejenni" class="credits-cell">
+                    <strong>Ginger Butcher</strong>
+                    <small>Developer</small>
+                </a>
+                <a href="https://github.com/PaulKiddle" class="credits-cell">
+                    <strong>Paul Kiddle</strong>
+                    <small>Developer</small>
+                </a>
+                <a href="https://www.nhm.ac.uk/our-science/departments-and-staff/staff-directory/ben-scott.html"
+                        class="credits-cell">
+                    <strong>Ben Scott</strong>
+                    <small>Developer, Early Phase Technical Lead</small>
+                </a>
+            </td>
+        </tr>
+    <tr>
+        <th class="credits-header">
+            <span>Product Team</span>
+        </th>
+        <td class="flex-container flex-wrap">
+            <a href="https://www.nhm.ac.uk/our-science/departments-and-staff/staff-directory/vincent-smith.html"
+                    class="credits-cell">
+                <strong>Vince Smith</strong>
+                <small>Head of Informatics</small>
+            </a>
+            <a href="https://www.nhm.ac.uk/our-science/departments-and-staff/staff-directory/matt-woodburn.html"
+                    class="credits-cell">
+                <strong>Matt Woodburn</strong>
+                <small>Data Architect</small>
+            </a>
+            <a href="https://github.com/essvee" class="credits-cell">
+                <strong>Sarah Vincent</strong>
+                <small>Data Analyst</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Pippa Gittings</strong>
+                <small>Digital Media Product Manager</small>
+            </a>
+            <a href="https://www.nhm.ac.uk/our-science/departments-and-staff/staff-directory/helen-hardy.html"
+                    class="credits-cell">
+                <strong>Helen Hardy</strong>
+                <small>Digital Collections Programme Manager</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Christopher Hopkins</strong>
+                <small>Systems Development & Operations</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>David Smith</strong>
+                <small>Data Manager</small>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <th class="credits-header">
+            <span>Past Team</span>
+        </th>
+        <td class="flex-container flex-wrap">
+            <a href="#" class="credits-cell">
+                <strong>Alice Heaton</strong>
+                <small>Senior Developer</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Andy Allan</strong>
+                <small>Developer</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Laurence Livermore</strong>
+                <small>Digital Analyst</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Yuki Geali</strong>
+                <small>Information Architecture/UX</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Hayley Dunning</strong>
+                <small>Copywriter</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Lucy Brooks</strong>
+                <small>Copywriter</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Chris Sleep</strong>
+                <small>Technical Consultant</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Dave Thomas</strong>
+                <small>Product Board</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Darrell Siebert</strong>
+                <small>Product Board</small>
+            </a>
+            <a href="#" class="credits-cell">
+                <strong>Adrian Hine</strong>
+                <small>Product Board</small>
+            </a>
+        </td>
+    </tr>
+    </table>
+    <hr>
 
-<ol id="credits">
-    <li>Vince Smith - Principal investigator</li>
-    <li>Ben Scott - Lead architect</li>
-    <li>Alice Heaton - Senior developer</li>
-    <li>Andy Allan - Developer</li>
-    <li>Laurence Livermore - Digital analyst</li>
-    <li>Yuki Geali - Information architecture/user experience</li>
-    <li>Hayley Dunning and Lucy Brooks - Copywriting</li>
-    <li>Chris Sleep -  Technical consultant</li>
-    <li>Dave Thomas, Darrell Siebert and Adrian Hine - Project board</li>
-</ol>
+    <h2>Open source</h2>
 
-<p>The Data Portal is a window into the Museum’s research and collections data, and is the result of decades of work by the Museum's science staff.</p>
-
-<h4>Open source</h4>
-
-<p>The Data Portal is built with CKAN, an open-source data-publishing platform.</p>
-<p>The Museum has extended and customised CKAN - this code is licensed under the terms of the <a target="_blank" title="GNU GPL v3.0" href="http://www.gnu.org/licenses/agpl-3.0.html">GNU GPL v3.0</a>, and available from <a title="the Natural History Museum’s Github account" href="https://github.com/NaturalHistoryMuseum">the Natural History Museum’s code repository</a>.</p>
+    <p>The Data Portal is built with <a href="https://ckan.org">CKAN</a>, an open-source
+       data-publishing platform.</p>
+    <p>The Museum has contributed to core CKAN and created several extensions to enhance its
+       functionality. This code is licensed under the terms of the <a title="GNU GPL v3.0"
+                href="http://www.gnu.org/licenses/agpl-3.0.html">GNU GPL v3.0</a>.</p>
+    <p>All our open-source code can be found on <a href="https://github.com/NaturalHistoryMuseum"
+            title="the Museum's GitHub profile">GitHub</a> (CKAN extensions <a
+            href="https://github.com/NaturalHistoryMuseum?q=ckanext"
+            title="search query for 'ckanext'">here</a>).</p>
 
 {% endblock %}

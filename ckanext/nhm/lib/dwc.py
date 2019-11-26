@@ -1,9 +1,13 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
-from lxml import etree
-import os
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
 from collections import OrderedDict
 
+import os
+from lxml import etree
 
 # even though we use simple DwC terms, we use this XSD as it allows us to group terms into events
 # etc., on record display
@@ -14,12 +18,15 @@ with open(path, u'r') as xml_f:
 
 
 def dwc_terms(fields):
-    """
-    Get DwC terms and groups, parsed from tdwg_dwcterms
-    :return: dict, keyed by groups
+    '''Get DwC terms and groups, parsed from tdwg_dwcterms. Even though we use simple
+    DwC terms, we use this XSD as it allows us to group terms into events etc.,
+    on record display.
+
     :param fields: list of fields for this record
-    :return:
-    """
+
+    :returns: dict, keyed by groups
+
+    '''
     dynamic_properties_uri = None
     terms = OrderedDict()
     for group in DWC_XSD.iterfind(u'xs:group', namespaces=DWC_XSD.nsmap):
@@ -31,8 +38,8 @@ def dwc_terms(fields):
                 # will need this later on
                 dynamic_properties_uri = uri
             if name in fields:
-                # We have a field for this group - so create the group if it doesn't exist
-                # We do this here, so we
+                # We have a field for this group -
+                # so create the group if it doesn't exist
                 try:
                     terms[group.get(u'name')]
                 except KeyError:
@@ -50,6 +57,6 @@ def dwc_terms(fields):
     # - filter out all hidden fields (starting with _)
     terms[u'dynamicProperties'] = {
         dynamic_properties_uri: [f for f in fields if not f.startswith(u'_')]
-    }
+        }
 
     return terms

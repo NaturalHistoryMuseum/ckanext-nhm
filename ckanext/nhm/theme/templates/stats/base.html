@@ -3,23 +3,16 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), controller='home', action='about' %}</li>
+  <li>{% link_for _('About'), named_route='home.about' %}</li>
 {% endblock %}
 
 {% block content_primary_nav %}
-  {{ h.build_nav_icon('stats_resources', _('Resources')) }}
-  {{ h.build_nav_icon('stats_contributors', _('Contributors')) }}
-  {{ h.build_nav_icon('stats_records', _('Records')) }}
+  {{ h.build_nav_icon('statistics.resources', _('Resources'), icon='bar-chart-o') }}
+  {{ h.build_nav_icon('statistics.records', _('Records'), icon='file-text') }}
 {% endblock %}
 
-{% block secondary %}
-
-  <aside class="secondary">
-    {% block secondary_content %}
-        {% snippet 'about/snippets/menu.html' %}
-    {% endblock %}
-  </aside>
-
+{% block secondary_content %}
+    {% snippet 'about/snippets/menu.html' %}
 {% endblock %}
 
 {% block primary_content_inner %}
@@ -28,7 +21,6 @@
 
     {% endblock %}
 
-{% resource "vendor/block_html5_shim" %}
 {% resource "ckanext_stats/stats" %}
 
 {% endblock %}

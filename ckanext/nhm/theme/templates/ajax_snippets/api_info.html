@@ -1,10 +1,11 @@
 <div{% if not embedded %} class="modal"{% endif %}>
-  <div class="modal-header">
+<div class="modal-content">
+    <div class="modal-header">
     <h3>
       {{ _('CKAN Data API') }}
     </h3>
   </div>
-  <div{% if not embedded %} class="modal-body"{% endif %}>
+    <div{% if not embedded %} class="modal-body"{% endif %}>
     <p><strong>{{ _('Access resource data via a web API with powerful query support') }}</strong>.
     Further information in the {{ h.api_doc_link() }}.</p>
     <div class="accordion" id="accordion2">
@@ -112,5 +113,5 @@ print fileobj.read()
   </div>
 
 </div>
-
+</div>
 </div>

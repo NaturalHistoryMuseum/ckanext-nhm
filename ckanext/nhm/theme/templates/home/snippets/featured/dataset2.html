@@ -1,12 +1,16 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set title = "21st century butterfly types" %}
+{% set title = "Butterfly types" %}
 {% set url="/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb?view_id=6ba121d1-da26-4ee1-81fa-7da11e68f68e&filters=project%3Apapilionoidea+new+types+digitisation+project" %}
 
 {% block image %}
-    <img src="/images/featured-butterfly.jpg" alt="{{ title }}" width="300" height="158" />
+    <div class="featured-image" style="background-image:url('/images/Heraclides_rumiko.jpg')"
+            alt="{{ title }}"
+            title="Heraclides rumiko">
+    </div>
 {% endblock %}
 
 {% block description %}
-    View some of the Museum’s invaluable butterfly reference material which has recently been digitised.
+    View some of the Museum’s invaluable butterfly reference material which has recently been
+    digitised.
 {% endblock %}

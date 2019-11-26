@@ -1,0 +1,125 @@
+@import "variables";
+
+.no-box-shadow {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+// Remove border radius
+.no-border-radius {
+  border: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.no-hover {
+  a:hover {
+    color: inherit !important;
+  }
+}
+
+.no-spacing {
+  padding: 0;
+  margin: 0;
+}
+
+.minimal-padding {
+  @media (max-width: @lg - 1) {
+    padding: 1px 0;
+  }
+  @media (min-width: @lg) {
+    padding: 1px;
+  }
+}
+
+.block-inline {
+  display: inline-block;
+}
+
+.thead-margin(@size) {
+  & > tbody {
+    &:before {
+      content: '';
+      display: block;
+      height: @size;
+    }
+
+    &:after {
+      content: '';
+      display: block;
+      height: @size * 2;
+    }
+  }
+}
+
+.trans(@trans-time) {
+  -o-transition: @trans-time;
+  -ms-transition: @trans-time;
+  -moz-transition: @trans-time;
+  -webkit-transition: @trans-time;
+  transition: @trans-time;
+}
+
+.vertical-borders(@width, @colour) {
+  & > * {
+    border-right: @width solid @colour;
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+}
+
+.horizontal-borders(@width, @colour) {
+  & > * {
+    border-bottom: @width solid @colour;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.pad-right(@prop, @width) {
+  & @{prop} {
+    padding-right: @width;
+
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+}
+
+.margin-right(@prop, @width) {
+  & @{prop} {
+    margin-right: @width;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.breakpoints(@prop) {
+  // for debugging bootstrap width breakpoints
+
+  @{prop}: red;
+
+  @media (min-width: @sm) {
+    @{prop}: darkorange;
+  }
+  @media (min-width: @md) {
+    @{prop}: yellow;
+  }
+  @media (min-width: @lg) {
+    @{prop}: blue;
+  }
+  @media (min-width: @xl) {
+    @{prop}: purple;
+  }
+}

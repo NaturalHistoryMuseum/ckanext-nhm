@@ -1,0 +1,25 @@
+dist: trusty
+language: python
+
+python:
+  - "2.7"
+
+before_install:
+  - sudo chown -R elasticsearch:elasticsearch /etc/elasticsearch && sudo chown -R elasticsearch:elasticsearch /etc/default/elasticsearch
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.7.2.deb && sudo dpkg -i --force-confnew elasticsearch-6.7.2.deb && sudo service elasticsearch restart
+
+install:
+  - sh ckanext/nhm/tests/bin/build.sh
+
+services:
+  - redis-server
+  - postgresql
+  - elasticsearch
+  - mongodb
+
+addons:
+  postgresql: "9.4"
+
+script: coverage run --source=ckanext.nhm setup.py nosetests --ckan --with-pylons=ckanext/nhm/tests/bin/test.ini --nologcapture --debug=ckantest,ckanext.nhm --rednose
+
+after_success: coveralls

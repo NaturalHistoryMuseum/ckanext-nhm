@@ -1,26 +1,34 @@
-{#
-Displays a sidebard module with information for given package
+{#Displays a sidebard module with information for given package
 
 pkg    - The package dict that owns the resources.
 
 Example:
 
-  {% snippet "package/snippets/info.html", pkg=pkg %}
+{% snippet "package/snippets/info.html", pkg=g.pkg %}
 
-#}
-{% block package_info %}
-  {% if pkg %}
+#}{% block package_info %}{% if g.pkg %}
 
-      <section class="module module-narrow module-shallow">
+<section class="module module-narrow module-shallow">
+    <div class="flex-container flex-between flex-stretch-first nav-simple-heading">
+        <h2 class="module-heading"><i class="fas fa-bell inline-icon-left"></i>{{
+                                                                               _('Update
+                                                                               alerts') }}
+        </h2>
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                data-target="#nav-alerts" aria-expanded="false">
+            <span class="sr-only">expand</span>
+        </button>
+    </div>
 
-        <h2 class="module-heading"><i class="icon-medium icon-eye-open"></i> {{ _('Update alerts') }}</h2>
 
-           <div class="module-content">
-                <p>Follow <a target="_blank" href="https://twitter.com/nhm_data">@NHM_DATA</a> to receive alerts when this dataset is updated.</p>
-           </div>
+    <ul class="nav nav-simple navbar-collapse collapse" id="nav-alerts">
+        <li class="nav-item">
+            <p>Follow <a target="_blank" href="https://twitter.com/nhm_data">@NHM_Data</a> to
+           receive alerts when this dataset is updated.</p>
+        </li>
+    </ul>
 
-      </section>
+</section>
 
 
-  {% endif %}
-{% endblock %}
+{% endif %}{% endblock %}

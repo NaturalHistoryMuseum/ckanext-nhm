@@ -1,54 +1,54 @@
 {% ckan_extends %}
 
       {% block package_additional_info %}
-        {% if pkg_dict.url %}
+        {% if g.pkg_dict.url %}
           <tr>
             <th scope="row" class="dataset-label">{{ _('Source') }}</th>
-            <td class="dataset-details" property="foaf:homepage">{{ h.link_to(pkg_dict.url, pkg_dict.url, rel='foaf:homepage', target='_blank') }}</td>
+            <td class="dataset-details" property="foaf:homepage">{{ h.link_to(g.pkg_dict.url, g.pkg_dict.url, rel='foaf:homepage', target='_blank') }}</td>
           </tr>
         {% endif %}
 
-        {% if pkg_dict.author %}
+        {% if g.pkg_dict.author %}
           {% resource 'ckanext-nhm/expand-authors' %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Author(s)") }}</th>
-            <td class="dataset-details" property="dc:creator" data-module="expand-authors">{{ pkg_dict.author }}</td>
+            <td class="dataset-details" property="dc:creator" data-module="expand-authors">{{ g.pkg_dict.author }}</td>
           </tr>
         {% endif %}
 
-        {% if pkg_dict.maintainer_email %}
+        {% if g.pkg_dict.maintainer_email %}
           <tr>
             <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
-            <td class="dataset-details" property="dc:contributor">{{ h.mail_to(email_address=pkg_dict.maintainer_email, name=pkg_dict.maintainer) }}</td>
+            <td class="dataset-details" property="dc:contributor">{{ h.mail_to(email_address=g.pkg_dict.maintainer_email, name=g.pkg_dict.maintainer) }}</td>
           </tr>
-        {% elif pkg_dict.maintainer %}
+        {% elif g.pkg_dict.maintainer %}
           <tr>
             <th scope="row" class="dataset-label">{{ _('Maintainer') }}</th>
-            <td class="dataset-details" property="dc:contributor">{{ pkg_dict.maintainer }}</td>
+            <td class="dataset-details" property="dc:contributor">{{ g.pkg_dict.maintainer }}</td>
           </tr>
         {% endif %}
 
-        {% if pkg_dict.version %}
+        {% if g.pkg_dict.version %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Version") }}</th>
-            <td class="dataset-details">{{ pkg_dict.version }}</td>
+            <td class="dataset-details">{{ g.pkg_dict.version }}</td>
           </tr>
         {% endif %}
 
-        {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
+        {% if h.check_access('package_update',{'id':g.pkg_dict.id}) %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("State") }}</th>
-            <td class="dataset-details">{{ pkg_dict.state }}</td>
+            <td class="dataset-details">{{ g.pkg.state }}</td>
           </tr>
         {% endif %}
 
       {% block extras scoped %}
 
-            {% set temporal_extent = pkg_dict.get('temporal_extent', None) %}
-            {% set update_frequency = pkg_dict.get('update_frequency', None) %}
-            {% set affiliation = pkg_dict.get('affiliation', None) %}
-            {% set contributors = pkg_dict.get('contributors', None) %}
-            {% set dataset_category = pkg_dict.dataset_category.pop() if pkg_dict.dataset_category else None %}
+            {% set temporal_extent = g.pkg_dict.get('temporal_extent', None) %}
+            {% set update_frequency = g.pkg_dict.get('update_frequency', None) %}
+            {% set affiliation = g.pkg_dict.get('affiliation', None) %}
+            {% set contributors = g.pkg_dict.get('contributors', None) %}
+            {% set dataset_category = g.pkg.dataset_category.pop() if g.pkg.dataset_category else None %}
 
             {% if affiliation %}
                 <tr>
@@ -96,11 +96,11 @@
                 </tr>
             <tr>
                 <th scope="row">{{ _('Created') }}</th>
-                <td>{{ h.render_datetime(pkg_dict.metadata_created) or _('unknown') }}</td>
+                <td>{{ h.render_datetime(g.pkg.metadata_created) or _('unknown') }}</td>
                 </tr>
             <tr>
                 <th scope="row">{{ _('License') }}</th>
-                <td>{% snippet "snippets/license.html", pkg_dict=pkg_dict, text_only=True %}</td>
+                <td>{% snippet "snippets/license.html", pkg_dict=g.pkg_dict, text_only=True %}</td>
             </tr>
 
       {% endblock %}

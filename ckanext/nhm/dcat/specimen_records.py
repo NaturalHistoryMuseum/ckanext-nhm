@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
 import json
 from operator import itemgetter
 
@@ -6,8 +12,6 @@ import re
 from datetime import datetime
 from rdflib import URIRef, Literal
 
-from ckan import logic
-from ckan.logic import get_action
 from ckan.plugins import toolkit
 from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.utils import url_to_rdflib_format, dataset_uri
@@ -83,7 +87,7 @@ class RecordGraphBuilder(object):
         self.version = version
 
         # figure out the rounded version of the record
-        self.rounded_version = get_action(u'datastore_get_rounded_version')({}, {
+        self.rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
             u'resource_id': resource.id,
             u'version': version,
         })
@@ -113,7 +117,7 @@ class RecordGraphBuilder(object):
                 context = {u'ignore_auth': True}
                 data_dict = {u'gbif_id': gbif_id}
                 return toolkit.get_action(u'gbif_record_show')(context, data_dict)
-            except logic.NotFound:
+            except toolkit.ObjectNotFound:
                 pass
         return None
 

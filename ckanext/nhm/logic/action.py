@@ -1,156 +1,167 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
+
 import logging
 
-import ckan.plugins as p
-import ckan.lib.navl.dictization_functions
 import ckanext.nhm.logic.schema as nhm_schema
-import ckan.logic as logic
-import ckan.model as model
-from ckan.common import c
-from ckan.lib.helpers import url_for
-from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.mam import mam_media_request
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib.record import get_record_by_uuid
-from pylons import config
+from ckanext.nhm.lib import helpers
 
-NotFound = logic.NotFound
-ActionError = logic.ActionError
-get_action = logic.get_action
-_get_or_bust = logic.get_or_bust
-_validate = ckan.lib.navl.dictization_functions.validate
+from ckan.logic import ActionError
+from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
 
 
 def record_show(context, data_dict):
+    '''Retrieve an individual record
 
-    """
-    Retrieve an individual record
-    @param context:
-    @param data_dict:
-    @return:
-    """
-    # Validate the data
-    context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    schema = context.get('schema', nhm_schema.record_show_schema())
-    data_dict, errors = _validate(data_dict, schema, context)
+    :param context:
+    :param data_dict:
+
+    '''
+    context[u'user'] = toolkit.c.user or toolkit.c.author
+    schema = context.get(u'schema', nhm_schema.record_show_schema())
+    data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
 
     if errors:
-        raise p.toolkit.ValidationError(errors)
+        raise toolkit.ValidationError(errors)
 
-    resource_id = _get_or_bust(data_dict, 'resource_id')
-    record_id = _get_or_bust(data_dict, 'record_id')
+    resource_id = toolkit.get_or_bust(data_dict, u'resource_id')
+    record_id = toolkit.get_or_bust(data_dict, u'record_id')
 
     # Retrieve datastore record
-    record_data_dict = {'resource_id': resource_id, 'filters': {'_id': record_id}}
-    if 'version' in data_dict:
-        record_data_dict['version'] = data_dict['version']
-    search_result = get_action('datastore_search')(context, record_data_dict)
+    record_data_dict = {
+        u'resource_id': resource_id,
+        u'filters': {
+            u'_id': record_id
+            }
+        }
+    if u'version' in data_dict:
+        record_data_dict[u'version'] = data_dict[u'version']
+    search_result = toolkit.get_action(u'datastore_search')(context, record_data_dict)
 
     try:
         record = {
-            'data': search_result['records'][0],
-            'fields': search_result['fields'],
-            'resource_id': resource_id
-        }
+            u'data': search_result[u'records'][0],
+            u'fields': search_result[u'fields'],
+            u'resource_id': resource_id
+            }
     except IndexError:
         # If we don't have a result, raise not found
-        raise NotFound
+        raise toolkit.ObjectNotFound
 
     return record
 
 
 def download_original_image(context, data_dict):
-
-    """
-    Request an original image from the MAM
+    '''Request an original image from the MAM
     Before sending request, performs a number of checks
         - The resource exists
         - The record exists on that resource
         - And the image exists on that record
-    @param context:
-    @param data_dict:
-    @return:
-    """
+
+    :param context:
+    :param data_dict:
+
+    '''
 
     # Validate the data
-    context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    schema = context.get('schema', nhm_schema.download_original_image_schema())
-    data_dict, errors = _validate(data_dict, schema, context)
+    context = {
+        u'user': toolkit.c.user or toolkit.c.author
+        }
+    schema = context.get(u'schema', nhm_schema.download_original_image_schema())
+    data_dict, errors = toolkit.validate(data_dict, schema, context)
 
     if errors:
-        raise p.toolkit.ValidationError(errors)
+        raise toolkit.ValidationError(errors)
 
     # Get the resource
-    resource = p.toolkit.get_action('resource_show')(context, {'id': data_dict['resource_id']})
+    resource = toolkit.get_action(u'resource_show')(context,
+                                                    {
+                                                        u'id': data_dict[u'resource_id']
+                                                        })
 
     # Retrieve datastore record
-    search_result = get_action('datastore_search')(context, {'resource_id': data_dict['resource_id'], 'filters': {'_id': data_dict['record_id']}})
+    search_result = toolkit.get_action(u'datastore_search')(context, {
+        u'resource_id': data_dict[u'resource_id'],
+        u'filters': {
+            u'_id': data_dict[u'record_id']
+            }
+        })
 
     try:
-        record = search_result['records'][0]
+        record = search_result[u'records'][0]
     except IndexError:
         # If we don't have a result, raise not found
-        raise NotFound
+        raise toolkit.ObjectNotFound
 
-    if not _image_exists_on_record(resource, record, data_dict['asset_id']):
-        raise NotFound
+    if not _image_exists_on_record(resource, record, data_dict[u'asset_id']):
+        raise toolkit.ObjectNotFound
 
     try:
-        mam_media_request(data_dict['asset_id'], data_dict['email'])
+        mam_media_request(data_dict[u'asset_id'], data_dict[u'email'])
     except Exception, e:
         log.error(e)
-        raise ActionError('Could not request original')
+        raise ActionError(u'Could not request original')
     else:
-        return 'Original image request successful'
+        return u'Original image request successful'
 
 
 def object_rdf(context, data_dict):
-    """
-    Get record RDF
+    '''Get record RDF
+
     :param context:
     :param data_dict:
-    :return:
-    """
-    # validate the data
-    context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
-    schema = context.get('schema', nhm_schema.object_rdf_schema())
-    data_dict, errors = _validate(data_dict, schema, context)
-    # raise any validation errors
+
+    '''
+
+    # Validate the data
+    context = {
+        u'user': toolkit.c.user or toolkit.c.author
+        }
+    schema = context.get(u'schema', nhm_schema.object_rdf_schema())
+    data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
+    # Raise any validation errors
     if errors:
-        raise p.toolkit.ValidationError(errors)
+        raise toolkit.ValidationError(errors)
 
     # get the record
     version = data_dict.get(u'version', None)
-    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'], version)
+    record_dict, resource_dict = get_record_by_uuid(data_dict[u'uuid'], version)
     if record_dict:
         serializer = ObjectSerializer()
         output = serializer.serialize_record(record_dict, resource_dict, data_dict.get(u'format'),
                                              version)
         return output
-    raise NotFound
+    raise toolkit.ObjectNotFound
 
 
 def _image_exists_on_record(resource, record, asset_id):
-    """
-    Check the image belongs to the record
+    '''Check the image belongs to the record
+
     :param resource:
-    :param record:
     :param asset_id:
-    :return:
-    """
+    :param record:
+
+    '''
     # FIXME - If no image field use gallery
-    image_field = resource.get('_image_field', None)
+    image_field = resource.get(u'_image_field', None)
 
     # Check the asset ID belongs to the record
     for image in record[image_field]:
-        url = image.get('identifier', None)
+        url = image.get(u'identifier', None)
         if asset_id in url:
             return True
     return False
 
 
-@logic.side_effect_free
+@toolkit.side_effect_free
 def get_permanent_url(context, data_dict):
     '''
     Retrieve the permanent URL of a specimen from the specimen collection using the field and value
@@ -173,7 +184,7 @@ def get_permanent_url(context, data_dict):
     :rtype: string
     '''
     schema = context.get(u'schema', nhm_schema.get_permanent_url_schema())
-    data_dict, errors = _validate(data_dict, schema, context)
+    data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
 
     # extract the request parameters
     field = data_dict[u'field']
@@ -188,16 +199,16 @@ def get_permanent_url(context, data_dict):
         },
         u'limit': 1,
     }
-    result = get_action(u'datastore_search')(context, search_dict)
+    result = toolkit.get_action(u'datastore_search')(context, search_dict)
     records = result[u'records']
     total = result[u'total']
     if total == 0:
-        raise logic.ValidationError({
+        raise toolkit.ValidationError({
             u'message': u'No records found matching the given criteria',
             u'total': total,
         })
     elif total > 1:
-        raise logic.ValidationError({
+        raise toolkit.ValidationError({
             u'message': u'More than 1 record found matching the given criteria',
             u'total': total,
         })
@@ -205,13 +216,13 @@ def get_permanent_url(context, data_dict):
         uuid = records[0][u'occurrenceID']
         if include_version:
             # figure out the latest rounded version of the specimen resource data
-            version = get_action(u'datastore_get_rounded_version')(context, {
+            version = toolkit.get_action(u'datastore_get_rounded_version')(context, {
                 u'resource_id': helpers.get_specimen_resource_id()
             })
             # create a path with the version included
-            path = url_for(u'object_view_versioned', uuid=uuid, version=version)
+            path = toolkit.url_for(u'object_view_versioned', uuid=uuid, version=version)
         else:
-            path = url_for(u'object_view', uuid=uuid)
+            path = toolkit.url_for(u'object_view', uuid=uuid)
 
         # concatenate the path with the site url and return
-        return u'{}{}'.format(config.get(u'ckan.site_url'), path)
+        return u'{}{}'.format(toolkit.config.get(u'ckan.site_url'), path)

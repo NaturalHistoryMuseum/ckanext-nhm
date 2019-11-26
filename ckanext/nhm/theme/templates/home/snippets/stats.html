@@ -1,30 +1,28 @@
 {% set stats = h.get_site_statistics() %}
 
 <div class="stats">
-  <div class="inner">
-    <ul class="unstyled inline pull-right">
-
-      <li>
-        <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='records') }}">
-          {{ h.SI_number_span(stats.record_count) }}
-          <span class="default-text-color">{{ _('record') if stats.record_count == 1 else _('records') }}</span>
+    <div class="stat-item">
+        <a href="{{ h.url_for('statistics.records') }}">
+            <div class="stat-number">{{ h.SI_number_span(stats.record_count) }}</div>
+            <span class="stat-text">
+                {{ _('record') if stats.record_count == 1 else _('records') }}
+            </span>
         </a>
-      </li>
+    </div>
 
-      <li>
-        <a href="{{ h.url_for(controller='package', action='search') }}">
-          {{ h.SI_number_span(stats.dataset_count) }}
-          <span class="default-text-color">{{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}</span>
+    <div class="stat-item">
+        <a href="{{ h.url_for('dataset.search') }}">
+            <div class="stat-number">{{ h.SI_number_span(stats.dataset_count) }}</div>
+            <span class="stat-text">
+                {{ _('dataset') if stats.dataset_count == 1 else _('datasets') }}
+            </span>
         </a>
-      </li>
+    </div>
 
-      <li>
-        <a href="{{ h.url_for(controller='ckanext.nhm.controllers.stats:StatsController', action='contributors') }}">
-          {{ h.SI_number_span(stats.contributor_count) }}
-          <span class="default-text-color">{{ _('contributor') if stats.contributor_count == 1 else _('contributors') }}</span>
+    <div class="stat-item">
+        <a href="{{ h.url_for('statistics.contributors') }}">
+            {{ h.SI_number_span(stats.contributor_count) }}
+            <span class="stat-text">{{ _('author') if stats.contributor_count == 1 else _('authors') }}</span>
         </a>
-      </li>
-
-    </ul>
-  </div>
+    </div>
 </div>

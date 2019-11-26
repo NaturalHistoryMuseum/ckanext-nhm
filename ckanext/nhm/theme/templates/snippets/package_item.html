@@ -3,7 +3,7 @@
 {% block package_item %}
 
 <tr>
-    <td>
+    <td class="td-package">
         {% block heading %}
             {{ super() }}
         {% endblock %}
@@ -18,19 +18,19 @@
 
     </td>
 
-    <td>
+    <td class="td-author">
         {% if package.author %}
             {{ package.author }}
         {% endif %}
     </td>
 
-    <td>
+    <td class="td-category">
         {% if package.dataset_category %}
             {{ package.dataset_category[0] }}
         {% endif %}
     </td>
 
-    <td>
+    <td class="td-license">
         {% if package.license_title %}
             {{ package.license_title }}
         {% endif %}

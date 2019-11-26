@@ -1,0 +1,88 @@
+@fonts: "/fonts";
+
+
+// FONT FACES
+
+.load-fonts() {
+  @font-face {
+    font-family: 'nhm_ingrid_lightregular';
+    src: url('@{fonts}/nhmingligreg-webfont.eot');
+    src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'nhm_ingridregular';
+    src: url('@{fonts}/nhmingreg-webfont.eot');
+    src: url('@{fonts}/nhmingreg-webfont.woff') format('woff');
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Elysio Light';
+    src: url('@{fonts}/2CFBF8_0_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_0_0.woff') format('woff');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Elysio Medium';
+    src: url('@{fonts}/2CFBF8_1_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_1_0.woff') format('woff');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Elysio Regular';
+    src: url('@{fonts}/2CFBF8_2_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_2_0.woff') format('woff');
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Elysio Thin';
+    src: url('@{fonts}/2CFBF8_3_0.woff2') format('woff2');
+    src: url('@{fonts}/2CFBF8_3_0.woff') format('woff');
+    font-style: normal;
+  }
+}
+
+
+@font-title: 'Elysio Regular', 'Open Sans', sans-serif;
+
+.mixin-font-symbol(@weight) {
+  font-family: 'FontAwesome', sans-serif;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  font-weight: @weight;
+}
+
+.mixin-font-body() {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+
+// FONT SIZES
+@font-size-body-m: 14px;
+@font-size-body-s: ceil(@font-size-body-m * 0.8);
+@font-size-body-xs: @font-size-body-m / 2;
+@font-size-body-l: ceil(@font-size-body-m * 1.2);
+
+@font-size-head-title: @font-size-body-m * 3;
+@font-size-head-m: ceil(@font-size-body-l * 2);
+@font-size-head-s: @font-size-head-m - 2;
+@font-size-head-xs: @font-size-head-m - 4;
+@font-size-head-xxs: @font-size-head-m - 8;
+@font-size-head-l: @font-size-head-m + 2;
+@font-size-head-xl: @font-size-head-m + 4;
+@font-size-head-xxl: @font-size-head-m + 6;
+
+
+// FONTAWESOME FIXES
+// try to avoid using these - just for overriding CKAN if the class is added in a script
+.fa-arrows:before {
+  // now fa-arrows-alt-v
+  content: '\f338' !important;
+}
+.fa-cloud-upload:before {
+  // now fa-cloud-upload-alt
+  content: '\f382' !important;
+}

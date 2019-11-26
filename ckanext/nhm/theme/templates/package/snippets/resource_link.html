@@ -1,18 +1,18 @@
 {% if res.url %}
   {% if res.resource_type in ('listing', 'service') %}
     <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-        <i class="icon-eye-open"></i> {{ _('View') }}
+        <i class="fas fa-eye"></i> {{ _('View') }}
     </a>
   {% elif res.resource_type == 'api' %}
     <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-        <i class="icon-key"></i> {{ _('API Endpoint') }}
+        <i class="fas fa-key"></i> {{ _('API Endpoint') }}
     </a>
   {% elif h.downloadable(res) %}
     {% snippet 'ckanpackager/snippets/package_resource.html',
-   res=res, pkg=pkg, bt_class="icon-cloud-download", bt_text=_('Download') %}
+   res=res, pkg=g.pkg, bt_class="fas fa-cloud-download-alt", bt_text=_('Download') %}
   {% else %}
     <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
-        <i class="icon-external-link"></i> {{ _('Go to resource') }}
+        <i class="fas fa-external-link-alt"></i> {{ _('Go to resource') }}
     </a>
   {% endif %}
 {% endif %}

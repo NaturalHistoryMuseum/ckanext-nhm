@@ -1,5 +1,11 @@
-from collections import namedtuple
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-nhm
+# Created by the Natural History Museum in London, UK
 
+
+from collections import namedtuple
 
 Site = namedtuple(u'Site', [u'name', u'icon', u'link'])
 
@@ -16,16 +22,16 @@ Mindat = Site(name=u'Mindat',
               icon=u'https://www.mindat.org/favicon.ico',
               link=u'https://www.mindat.org/search.php?search={}')
 
-
 SITES = {
     u'BMNH(E)': [BHL, CoL],
     u'BOT': [BHL, CoL],
     u'MIN': [Mindat],
     u'PAL': [PBDB],
     u'ZOO': [BHL, CoL],
-    # if there is no collection code, just check the BHL and CoL. This catches index lot entries.
+    # if there is no collection code, just check the BHL and CoL. This catches index
+    # lot entries.
     None: [BHL, CoL]
-}
+    }
 
 
 def get_relevant_sites(record):
