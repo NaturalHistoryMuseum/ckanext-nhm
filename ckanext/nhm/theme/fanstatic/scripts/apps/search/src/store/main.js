@@ -14,7 +14,7 @@ const store = new Vuex.Store(
             resourceIds: []
         },
         getters:   {
-            query: (state, getters) => {
+            query:       (state, getters) => {
                 let q = {};
                 if (state.search !== null && state.search !== '') {
                     q.search = state.search;
@@ -23,6 +23,15 @@ const store = new Vuex.Store(
                     q.filters = getters['filters/queryfy']('group_1');
                 }
                 return q;
+            },
+            requestBody: (state, getters) => {
+                return {
+                    query:        getters.query,
+                    resource_ids: getters.sortedResources
+                };
+            },
+            sortedResources: (state) => {
+                return state.resourceIds.sort();
             }
         },
         mutations: {

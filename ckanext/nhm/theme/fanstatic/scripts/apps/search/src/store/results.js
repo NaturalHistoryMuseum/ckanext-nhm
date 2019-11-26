@@ -11,16 +11,6 @@ let results = {
         resultsInvalid: false
     },
     getters:    {
-        requestBody: (state, getters, rootState, rootGetters) => {
-            let body = {
-                query:        rootGetters.query,
-                resource_ids: rootState.resourceIds
-            };
-            if (state.page > 0) {
-                body.after = state.after[state.page - 1];
-            }
-            return JSON.stringify(body);
-        },
         hasResult:   (state) => {
             return state.current.success || false;
         },
@@ -53,11 +43,16 @@ let results = {
     actions:    {
         runSearch(context, page) {
             context.state.resultsLoading = true;
-            context.state.resultsInvalid = false;
             if (page === null || page === 0) {
                 context.state.after = [];
             }
             context.commit('setPage', page);
+
+            let body = {...context.rootGetters.requestBody};
+            if (context.state.page > 0) {
+                body.after = context.state.after[context.state.page - 1];
+            }
+
             fetch('/api/3/action/datastore_multisearch', {
                 method:      'POST',
                 mode:        'cors',
@@ -68,7 +63,7 @@ let results = {
                 },
                 redirect:    'follow',
                 referrer:    'no-referrer',
-                body:        context.getters.requestBody,
+                body:        JSON.stringify(body)
             }).then(response => {
                 return response.json();
             }).then(data => {
@@ -81,6 +76,7 @@ let results = {
                 else if (!data.success) {
                     context.state.failed = true;
                 }
+                context.state.resultsInvalid = false;
             });
         },
         getSlug(context) {

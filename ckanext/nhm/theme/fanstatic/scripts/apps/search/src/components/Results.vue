@@ -1,6 +1,6 @@
 <template>
     <div id="result" :class="{disabled: resultsInvalid}">
-        <div class="flex-container flex-center alert-error full-width" v-if="failed">
+        <div class="flex-container flex-center flex-column alert-error full-width" v-if="failed">
             <h3>Something went wrong!</h3>
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
@@ -44,8 +44,18 @@
                 </a>
             </div>
         </div>
-        <component :is="viewType" v-if="hasRecords"></component>
-        <div class="pagination-wrapper" v-if="after.length > 0">
+        <div>
+            <ul class="nav nav-tabs">
+                <li v-for="viewTab in views" :key="viewTab.id"
+                    :class="{active: currentView === viewTab}" @click="currentView = viewTab">
+                    <a>{{ viewTab }}</a>
+                </li>
+            </ul>
+
+            <component :is="viewComponent" v-if="hasRecords"></component>
+        </div>
+
+        <div class="pagination-wrapper" v-if="after.length > 0 && !resultsInvalid">
             <ul class="pagination">
                 <li v-if="page > 0">
                     <a href="#" @click="runSearch(page - 1)">{{ page }}</a>
@@ -63,26 +73,32 @@
 
 <script>
     import TableView from './views/TableView.vue';
+    import ListView from './views/ListView.vue';
     import {mapActions, mapGetters, mapState} from 'vuex'
 
     export default {
         name:       'Results',
         components: {
-            TableView
+            TableView,
+            ListView
         },
         data:       function () {
             return {
                 showDownload: false,
                 showCite:     false,
                 showShare:    false,
-                viewType:     TableView,
+                views:        ['Table', 'List'],
+                currentView:  'Table',
                 doi:          '',
             }
         },
         computed:   {
             ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
                                     'resultsLoading', 'slugLoading', 'resultsInvalid']),
-            ...mapGetters('results', ['total', 'hasResult', 'hasRecords'])
+            ...mapGetters('results', ['total', 'hasResult', 'hasRecords']),
+            viewComponent() {
+                return this.currentView + 'View';
+            }
         },
         methods:    {
             ...mapActions('results', ['runSearch', 'getSlug']),

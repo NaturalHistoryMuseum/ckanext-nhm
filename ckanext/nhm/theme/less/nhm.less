@@ -671,6 +671,7 @@ iframe {
       @media (min-width: @md) {
         float: left;
       }
+      cursor: pointer;
     }
 
     @media (min-width: @lg) {
@@ -1795,6 +1796,7 @@ select {
 
 .table-grid {
   display: grid;
+  border-top: 15px solid @grey9;
   justify-content: stretch;
   overflow-x: auto;
   overflow-y: visible;
@@ -1803,12 +1805,16 @@ select {
     font-family: @font-title;
     font-size: @font-size-body-l;
     border-bottom: 2px solid @grey3;
+    background-color: @grey9;
   }
 
   & .small-column + :not(.small-column) {
     border-left: 2px solid @grey3;
     padding-left: 30px;
-    margin-left: 20px;
+  }
+
+  & .last-small-column {
+    padding-right: 40px;
   }
 
   & > * {

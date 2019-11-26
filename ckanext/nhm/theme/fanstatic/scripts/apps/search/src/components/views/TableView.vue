@@ -3,7 +3,7 @@
         :style="{gridTemplateColumns: `repeat(${3 + allHeaders.length}, auto) 1fr`}">
         <span class="th small-column">Package</span>
         <span class="th small-column">Resource</span>
-        <span class="th small-column">Record</span>
+        <span class="th small-column last-small-column">Record</span>
         <span class="th" v-for="headerGroup in headers" :key="headerGroup.id">
             <span v-for="header in headerGroup" :key="header.id" class="term-group">
                 {{ header }}
@@ -26,7 +26,7 @@
                         v-model="fieldSearch"/>
                     <select class="full-width" size="10">
                         <option v-for="field in fieldList" v-bind:key="field.id"
-                            @dblclick="addNewColumn(field)">{{ field }}
+                            @dblclick="addHeader(field)">{{ field }}
                         </option>
                     </select>
                 </div>
@@ -56,45 +56,10 @@
 
 <script>
     import BaseView from './BaseView.vue';
-    import * as d3 from 'd3-collection';
 
     export default {
         extends:  BaseView,
-        name:     'TableView',
-        data:     function () {
-            return {
-                customHeaders: [],
-                headers:       []
-            }
-        },
-        computed: {
-            allHeaders() {
-                return this.headers.concat(this.customHeaders.map(h => [h]))
-            }
-        },
-        methods:  {
-            getHeaders() {
-                let fields = [];
-
-                d3.values(this.$store.state.filters.items).forEach(f => {
-                    if (f.content.fields !== undefined) {
-                        fields.push(f.content.fields)
-                    }
-                });
-
-                this.headers = fields;
-            },
-            addNewColumn(field) {
-                this.customHeaders.push(field);
-            },
-            deleteHeader(index) {
-                this.$delete(this.customHeaders, index);
-            },
-            updateView() {
-                this.getHeaders();
-                this.getFieldList();
-            }
-        }
+        name:     'TableView'
     }
 </script>
 

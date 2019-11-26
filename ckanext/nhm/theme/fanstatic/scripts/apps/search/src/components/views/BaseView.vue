@@ -5,7 +5,8 @@
 </template>
 
 <script>
-    import {mapState, mapGetters} from 'vuex';
+    import {mapGetters, mapState} from 'vuex';
+    import * as d3 from 'd3-collection';
 
     export default {
         name:     'BaseView',
@@ -13,7 +14,9 @@
             return {
                 showFields:    false,
                 fieldSearch:   null,
-                fieldList:     []
+                fieldList:     [],
+                customHeaders: [],
+                headers:       []
             }
         },
         mounted:  function () {
@@ -23,6 +26,9 @@
             ...mapState('results', ['current']),
             ...mapGetters('constants', ['resourceDetails']),
             ...mapGetters('results', ['total', 'records']),
+            allHeaders() {
+                return this.headers.concat(this.customHeaders.map(h => [h]))
+            }
         },
         methods:  {
             getFieldList() {
@@ -40,7 +46,7 @@
                     referrer:    'no-referrer',
                     body:        JSON.stringify({
                                                     resource_ids: resourceIds,
-                                                    text:       vue.fieldSearch,
+                                                    text:         vue.fieldSearch,
                                                     lowercase:    true
                                                 }),
                 }).then(response => {
@@ -49,13 +55,10 @@
                     vue.fieldList = Object.keys(data.result.fields).sort();
                 });
             },
-            updateView() {
-                this.getFieldList();
-            },
             getUrls(resourceId) {
                 let resDetails = this.resourceDetails[resourceId];
 
-                let packageUrl = `/dataset/${resDetails.package_id}`;
+                let packageUrl  = `/dataset/${resDetails.package_id}`;
                 let resourceUrl = packageUrl + `/resource/${resDetails.id}`;
 
                 return {
@@ -63,10 +66,31 @@
                     resourceUrl,
                     resourceName: resDetails.name
                 }
+            },
+            getHeaders() {
+                let fields = [];
+
+                d3.values(this.$store.state.filters.items).forEach(f => {
+                    if (f.content.fields !== undefined) {
+                        fields.push(f.content.fields)
+                    }
+                });
+
+                this.headers = fields;
+            },
+            addHeader(field) {
+                this.customHeaders.push(field);
+            },
+            deleteHeader(index) {
+                this.$delete(this.customHeaders, index);
+            },
+            updateView() {
+                this.getHeaders();
+                this.getFieldList();
             }
         },
         watch:    {
-            current:      {
+            current: {
                 handler() {
                     this.updateView();
                 },

@@ -760,6 +760,9 @@ iframe {
 .page-header > .row > div {
   padding-bottom: 15px;
 }
+.page-header .nav-tabs > li {
+  cursor: pointer;
+}
 @media (min-width: 768px) {
   .page-header .nav-tabs > li {
     float: left;
@@ -1823,6 +1826,7 @@ select {
 }
 .table-grid {
   display: grid;
+  border-top: 15px solid #F2F2F2;
   justify-content: stretch;
   overflow-x: auto;
   overflow-y: visible;
@@ -1831,11 +1835,14 @@ select {
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;
   font-size: 17px;
   border-bottom: 2px solid #5B5B5B;
+  background-color: #F2F2F2;
 }
 .table-grid .small-column + :not(.small-column) {
   border-left: 2px solid #5B5B5B;
   padding-left: 30px;
-  margin-left: 20px;
+}
+.table-grid .last-small-column {
+  padding-right: 40px;
 }
 .table-grid > * {
   padding: 10px;

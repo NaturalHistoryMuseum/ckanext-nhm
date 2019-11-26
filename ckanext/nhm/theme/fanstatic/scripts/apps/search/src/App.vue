@@ -14,14 +14,6 @@
                         <span class="sr-only">Search</span>
                     </button>
                 </div>
-                <transition name="slidedown">
-                    <ResourceList v-if="showResources"></ResourceList>
-                </transition>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showResources = !showResources">
-                        Resources <i class="fas fa-list inline-icon-right"></i>
-                    </a>
-                </div>
                 <div class="text-right" style="margin-left: 10px;">
                     <a href="#" @click="showAdvanced = !showAdvanced">
                         Advanced <i class="fas inline-icon-right"
@@ -39,6 +31,14 @@
                         Reset <i class="inline-icon-right fas fa-trash"></i>
                     </a>
                 </div>
+                <div class="text-right" style="margin-left: 10px;">
+                    <a href="#" @click="showResources = !showResources">
+                        Resources <i class="fas fa-list inline-icon-right"></i>
+                    </a>
+                </div>
+                <transition name="slidedown">
+                    <ResourceList v-if="showResources"></ResourceList>
+                </transition>
             </div>
             <transition name="slidedown">
                 <div class="multisearch-advanced flex-container" v-if="showAdvanced">
@@ -46,7 +46,7 @@
                     </FilterGroup>
                 </div>
             </transition>
-            <pre class="fields" v-if="showQuery">{{ query }}</pre>
+            <pre class="fields" v-if="showQuery" style="margin-bottom: 20px;">{{ requestBody }}</pre>
             <Results></Results>
         </div>
     </div>
@@ -57,7 +57,7 @@
     import LoadError from './components/LoadError.vue';
     import FilterGroup from './components/FilterGroup.vue';
     import Results from './components/Results.vue';
-    import {mapGetters, mapMutations, mapState, mapActions} from 'vuex';
+    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
 
     const ResourceList = import('./components/ResourceList.vue');
 
@@ -79,7 +79,8 @@
         },
         computed:   {
             ...mapState('constants', ['loading', 'loadError', 'packageList']),
-            ...mapGetters(['query']),
+            ...mapGetters(['query', 'requestBody']),
+            ...mapState(['resourceIds']),
             search: {
                 get() {
                     return this.$store.state.search;
@@ -98,14 +99,19 @@
             ...mapMutations('filters', ['resetFilters']),
             ...mapMutations('results', ['invalidateResults'])
         },
-        watch: {
+        watch:      {
             packageList: function (newList, oldList) {
-                if (oldList.length === 0) {
+                // if no resource ids are pre-selected,
+                // select all resource ids once the package list loads
+                if (oldList.length === 0 && this.resourceIds.length === 0) {
                     this.$store.commit('selectAllResources');
                 }
             },
-            query: function () {
-                this.invalidateResults();
+            requestBody: {
+                handler() {
+                    this.invalidateResults();
+                },
+                deep: true
             }
         }
     }
