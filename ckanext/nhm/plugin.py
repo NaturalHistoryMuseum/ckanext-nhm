@@ -125,8 +125,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return {
             u'record_show': nhm_action.record_show,
             u'object_rdf': nhm_action.object_rdf,
-            u'download_image': nhm_action.download_original_image
-            }
+            u'download_image': nhm_action.download_original_image,
+            u'get_permanent_url': nhm_action.get_permanent_url,
+        }
 
     # ITemplateHelpers
     def get_helpers(self):
@@ -551,7 +552,13 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     # IVersionedDatastore
     def datastore_modify_result(self, context, original_data_dict, data_dict, result):
-        # we don't do anything to the result currently
+        # if there's the include_urls parameter then include the permanent url of each specimen
+        if helpers.get_specimen_resource_id() == data_dict[u'resource_id'] and \
+                u'include_urls' in original_data_dict:
+            for hit in result.hits:
+                if u'occurrenceID' in hit.data:
+                    hit.data.permanentUrl = url_for(u'object_view', uuid=hit.data.occurrenceID)
+
         return result
 
     # IVersionedDatastore

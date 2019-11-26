@@ -113,3 +113,11 @@ def show_package_schema():
     # This is the same as the extras field with key=spatial for ckanext-spatial
     schema[u'spatial'] = [convert_from_extras, ignore_missing]
     return schema
+
+
+def get_permanent_url_schema():
+    return {
+        u'field': [not_missing, unicode],
+        u'value': [not_missing, unicode],
+        u'include_version': [ignore_missing, boolean_validator],
+    }
