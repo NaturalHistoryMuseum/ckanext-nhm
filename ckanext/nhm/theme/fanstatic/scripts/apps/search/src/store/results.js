@@ -82,11 +82,8 @@ let results = {
                 context.state.resultsLoading = false;
                 if (data.success && data.result.after !== null) {
                     context.commit('addPage', {after: data.result.after});
-                    context.state.failed = false;
                 }
-                else if (!data.success) {
-                    context.state.failed = true;
-                }
+                context.state.failed = !data.success;
                 context.state.resultsInvalid = false;
             });
         },

@@ -52,7 +52,7 @@
             queryValues() {
                 d3.keys(this.values[this.comparisonType]).forEach(k => {
                     let v = this.values[this.comparisonType][k];
-                    if (['value', 'less_than', 'greater_than'].includes(k)) {
+                    if (['value', 'less_than', 'greater_than'].includes(k) && this.values[this.comparisonType][k] !== null) {
                         this.$set(this.values[this.comparisonType], k, Number(v))
                     }
                 });

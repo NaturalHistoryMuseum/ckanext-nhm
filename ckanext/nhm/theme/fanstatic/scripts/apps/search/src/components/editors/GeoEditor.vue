@@ -97,7 +97,8 @@
                 },
                 pastedGeoJson:  null,
                 currentPolygon: [],
-                useGeoJson:     false
+                useGeoJson:     false,
+                mapInitialised: false
             }
         },
         computed: {
@@ -222,21 +223,36 @@
             },
             deletePolygon(index) {
                 this.$delete(this.values.custom_area, index)
+            },
+            initMap() {
+                this.leafletMap = L.map('mapdisplay');
+                this.leafletMap.setView([0, 0], 0);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18
+                }).addTo(this.leafletMap);
+                this.resetMap();
+                this.mapInitialised = true;
             }
         },
         mounted() {
-            this.leafletMap = L.map('mapdisplay');
-            this.leafletMap.setView([0, 0], 0);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 18
-            }).addTo(this.leafletMap);
-            this.resetMap()
+            if (this.comparisonType !== 'named_area') {
+                this.initMap();
+            }
         },
         watch:    {
             comparisonType() {
-                this.resetMap();
+                if (this.comparisonType === 'named_area') {
+                    return;
+                }
+                if (this.mapInitialised){
+                    this.resetMap();
+                }
+                else {
+                    // give time for the DOM to load
+                    setTimeout(this.initMap, 1000);
+                }
             },
-            'values.point': {
+            'values.point':       {
                 handler: function () {
                     let latLng = [this.values.point.latitude, this.values.point.longitude];
 
@@ -271,7 +287,7 @@
                     this.pastedGeoJson = JSON.stringify(this.values.custom_area);
                     this.setGeoJson();
                 },
-                deep: true
+                deep:    true
             }
         }
     }

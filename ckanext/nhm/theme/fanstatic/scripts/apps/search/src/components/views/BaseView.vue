@@ -84,7 +84,6 @@
             getValue(item, field) {
                 let v = {...item};
                 let subFields = field.split('.');
-                console.log('---');
 
                 let subItems = (parentItem, subField) => {
                     if (Array.isArray(parentItem)) {
