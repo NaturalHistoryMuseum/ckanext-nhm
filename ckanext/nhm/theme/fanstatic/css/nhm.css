@@ -365,6 +365,9 @@ body .default-text a:focus {
   -webkit-font-smoothing: antialiased !important;
   font-weight: 'normal' !important;
 }
+.indented {
+  padding-left: 10px;
+}
 .inline-icon-left {
   padding-right: 10px;
 }
@@ -1405,8 +1408,9 @@ iframe {
   border-radius: 5px;
   line-height: 1;
 }
-.multisearch-form .fields .delete-field {
-  color: #343434;
+.multisearch-form .delete-field {
+  color: #5B5B5B;
+  padding-left: 5px;
 }
 .multisearch-form .field-picker {
   right: 0;
@@ -1624,6 +1628,46 @@ iframe {
 .multisearch-form .pagination li {
   margin: 10px;
 }
+.multisearch-form .record-item {
+  border-bottom: 2px solid #9A9A9A;
+  padding: 0 0 20px;
+  margin-bottom: 10px;
+}
+.multisearch-form .record-item > * {
+  padding: 0 10px 0;
+}
+.multisearch-form .record-item .record-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-column-gap: 20px;
+  grid-row-gap: 2px;
+  background-color: #F2F2F2;
+}
+.multisearch-form .record-item .record-header .record-name {
+  padding: 0;
+}
+.multisearch-form .record-item .record-header > *:first-child {
+  grid-row-start: 1;
+  grid-row-end: span 2;
+}
+.multisearch-form .record-item .record-header .record-pkg {
+  align-self: end;
+}
+.multisearch-form .record-item .record-header .record-res,
+.multisearch-form .record-item .record-header .record-name {
+  align-self: start;
+}
+.multisearch-form .record-item .record-body {
+  padding-top: 10px;
+}
+.multisearch-form .record-item .record-body > img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  object-position: 50% 50%;
+  border-radius: 5px;
+}
 .multisearch-form .slidedown-leave-active,
 .multisearch-form .slidedown-enter-active,
 .multisearch-form .slideright-leave-active,
@@ -1637,7 +1681,7 @@ iframe {
 }
 .multisearch-form .slideright-enter,
 .multisearch-form .slideright-leave-to {
-  transform: translateX(-10px);
+  transform: translateX(-100px);
   opacity: 0;
 }
 select {

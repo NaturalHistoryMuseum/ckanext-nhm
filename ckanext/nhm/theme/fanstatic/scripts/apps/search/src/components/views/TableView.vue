@@ -1,18 +1,17 @@
 <template>
     <div class="table-grid"
-        :style="{gridTemplateColumns: `repeat(${3 + allHeaders.length}, auto) 1fr`}">
+        :style="{gridTemplateColumns: `repeat(${3 + headers.length}, auto) 1fr`}">
         <span class="th small-column">Package</span>
         <span class="th small-column">Resource</span>
         <span class="th small-column last-small-column">Record</span>
-        <span class="th" v-for="headerGroup in headers" :key="headerGroup.id">
-            <span v-for="header in headerGroup" :key="header.id" class="term-group">
-                {{ header }}
+        <span class="th" v-for="(headerGroup, index) in headers" :key="headerGroup.id">
+            <span>
+                <span v-for="header in headerGroup" :key="header.id" class="term-group">
+                    {{ header }}
+                </span>
             </span>
-        </span>
-        <span class="th" v-for="(header, index) in customHeaders" :key="header.id">
-            {{ header }}
             <i class="delete-field fas fa-times-circle fa-xs"
-                @click="deleteHeader(index)"></i>
+                @click="removeHeader(index)"></i>
         </span>
         <span class="th text-right">
             <a href="#" @click="showFields = !showFields">
@@ -26,7 +25,7 @@
                         v-model="fieldSearch"/>
                     <select class="full-width" size="10">
                         <option v-for="field in fieldList" v-bind:key="field.id"
-                            @dblclick="addHeader(field)">{{ field }}
+                            @dblclick="addCustomHeader(field)">{{ field }}
                         </option>
                     </select>
                 </div>
@@ -34,19 +33,19 @@
         </span>
 
         <template v-for="item in records">
-            <span class="td small-column"><a :href="getUrls(item.resource).packageUrl">
+            <span class="td small-column"><a :href="getDetails(item.resource).packageUrl">
                 {{ resourceDetails[item.resource].package_name }}
             </a></span>
-            <span class="td small-column"><a :href="getUrls(item.resource).resourceUrl">
+            <span class="td small-column"><a :href="getDetails(item.resource).resourceUrl">
                 {{ resourceDetails[item.resource].name }}
             </a></span>
             <span class="td small-column"><a
-                :href="`${getUrls(item.resource).resourceUrl}/record/${item.data._id}`">
+                :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`">
                 {{ item.data._id }}
             </a></span>
-            <span class="td" v-for="headerGroup in allHeaders" :key="headerGroup.id">
+            <span class="td" v-for="headerGroup in headers" :key="headerGroup.id">
                 <span v-for="header in headerGroup" :key="header.id" class="term-group">
-                    {{ item.data[header] || '--' }}
+                    {{ getValue(item.data, header) || '--' }}
                 </span>
             </span>
             <span></span>
@@ -58,11 +57,7 @@
     import BaseView from './BaseView.vue';
 
     export default {
-        extends:  BaseView,
-        name:     'TableView'
+        extends: BaseView,
+        name:    'TableView'
     }
 </script>
-
-<style scoped>
-
-</style>

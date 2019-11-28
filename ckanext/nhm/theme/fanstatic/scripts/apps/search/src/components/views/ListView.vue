@@ -1,18 +1,44 @@
 <template>
-    <div class="flex-container flex-column flex-left full-width">
-        <div v-for="item in records" :key="item.id" class="record-item full-width">
-            <h4>Record <a :href="`${getUrls(item.resource).resourceUrl}/record/${item.data._id}`">
-                {{ item.data._id }}</a></h4>
-            <span>
-                <i class="fas fa-list"></i>
-                <a :href="getUrls(item.resource).packageUrl">
-                    {{ resourceDetails[item.resource].package_name }}
-                </a>
-                <i class="fas fa-box inline-icon-right"></i>
-                <a :href="getUrls(item.resource).resourceUrl">
-                    {{ resourceDetails[item.resource].name }}
-                </a>
-            </span>
+    <div class="flex-container flex-column flex-left full-width" style="margin-top: 15px;">
+        <div v-for="(item, index) in records" :key="item.id" class="record-item full-width">
+            <div class="record-header">
+                <h4 class="record-name">
+                    <a :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`">
+                        {{ item.data[getDetails(item.resource).titleField] || item.data._id }}
+                    </a>
+                </h4>
+                <span class="record-pkg">
+                    <i class="fas fa-archive inline-icon-left"></i>
+                    <a :href="getDetails(item.resource).packageUrl">
+                        {{ resourceDetails[item.resource].package_name }}
+                    </a>
+                </span>
+                <span class="indented record-res">
+                    ↳
+                    <i class="fas fa-list inline-icon-left"></i>
+                    <a :href="getDetails(item.resource).resourceUrl">
+                        {{ resourceDetails[item.resource].name }}
+                    </a>
+                </span>
+            </div>
+            <div class="record-body flex-container flex-stretch-first flex-smallwrap">
+                <ul class="list-unstyled">
+                    <li v-for="(headerGroup, index) in headers" :key="headerGroup.id">
+                    <span>
+                        <b v-for="header in headerGroup" :key="header.id" class="term-group">
+                            {{ header }}
+                        </b>
+                    </span>
+                        <b>:</b>
+                        <span>
+                        <span v-for="header in headerGroup" :key="header.id" class="term-group">
+                            {{ getValue(item.data, header) || '--' }}
+                        </span>
+                    </span>
+                    </li>
+                </ul>
+                <img :src="getImage(item)" :alt="getImage(item)" v-if="getImage(item) !== null">
+            </div>
         </div>
     </div>
 </template>
@@ -23,13 +49,10 @@
     export default {
         extends: BaseView,
         name:    'ListView',
+        data:    function () {
+            return {
+                showDetails: null
+            }
+        }
     }
 </script>
-
-<style scoped>
-    .record-item {
-        border-bottom: 2px solid black;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-    }
-</style>

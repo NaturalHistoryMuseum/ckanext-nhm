@@ -74,7 +74,8 @@ let constants = {
                             name: r.name,
                             id:   r.id,
                             package_id: r.package_id,
-                            package_name: pkg.title
+                            package_name: pkg.title,
+                            raw: r
                         }
                     });
                     return {

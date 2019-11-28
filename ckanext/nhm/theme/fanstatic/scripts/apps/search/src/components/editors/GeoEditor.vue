@@ -55,14 +55,14 @@
 </template>
 
 <script>
-    import BaseTerm from './BaseTerm.vue';
+    import BaseEditor from './BaseEditor.vue';
     import L from 'leaflet';
     import {mapState} from 'vuex';
     import * as d3 from 'd3-collection';
 
     export default {
-        extends:  BaseTerm,
-        name:     'GeoTerm',
+        extends:  BaseEditor,
+        name:     'GeoEditor',
         data:     function () {
             return {
                 values:         {

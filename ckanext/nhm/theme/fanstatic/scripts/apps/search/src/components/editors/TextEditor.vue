@@ -11,11 +11,11 @@
 </template>
 
 <script>
-    import BaseTerm from './BaseTerm.vue';
+    import BaseEditor from './BaseEditor.vue';
 
     export default {
-        extends: BaseTerm,
-        name: 'TextTerm',
+        extends: BaseEditor,
+        name: 'TextEditor',
         data: function () {
             return {
                 values: {

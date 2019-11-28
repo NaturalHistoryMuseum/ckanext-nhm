@@ -27,12 +27,13 @@
 </template>
 
 <script>
-    import BaseTerm from './BaseTerm.vue';
+    import BaseEditor from './BaseEditor.vue';
+    import * as d3 from 'd3-collection';
 
     export default {
-        extends: BaseTerm,
-        name:    'NumberTerm',
-        data:    function () {
+        extends:  BaseEditor,
+        name:     'NumberEditor',
+        data:     function () {
             return {
                 values: {
                     equals: {
@@ -46,6 +47,17 @@
                     }
                 }
             }
-        }
+        },
+        computed: {
+            queryValues() {
+                d3.keys(this.values[this.comparisonType]).forEach(k => {
+                    let v = this.values[this.comparisonType][k];
+                    if (['value', 'less_than', 'greater_than'].includes(k)) {
+                        this.$set(this.values[this.comparisonType], k, Number(v))
+                    }
+                });
+                return this.values[this.comparisonType];
+            }
+        },
     }
 </script>

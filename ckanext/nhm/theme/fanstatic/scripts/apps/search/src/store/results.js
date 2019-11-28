@@ -1,3 +1,6 @@
+import * as d3 from 'd3-collection';
+import Vue from 'vue';
+
 let results = {
     namespaced: true,
     state:      {
@@ -5,23 +8,24 @@ let results = {
         after:          [],
         page:           0,
         slug:           null,
+        headers:        [],
         failed:         false,
         slugLoading:    false,
         resultsLoading: false,
         resultsInvalid: false
     },
     getters:    {
-        hasResult:   (state) => {
+        hasResult:  (state) => {
             return state.current.success || false;
         },
-        hasRecords:  (state, getters) => {
+        hasRecords: (state, getters) => {
             let noRecords = getters.hasResult ? state.current.result.records.length === 0 : false;
             return getters.hasResult && !noRecords;
         },
-        total:       (state, getters) => {
+        total:      (state, getters) => {
             return getters.hasResult ? state.current.result.total : 0;
         },
-        records:     (state, getters) => {
+        records:    (state, getters) => {
             return getters.hasResult ? state.current.result.records : [];
         }
     },
@@ -36,8 +40,14 @@ let results = {
             state.current = {};
         },
         invalidateResults(state) {
-            state.slug = null;
+            state.slug           = null;
             state.resultsInvalid = true;
+        },
+        addCustomHeader(state, field) {
+            state.headers.push([field])
+        },
+        removeHeader(state, headerIndex) {
+            Vue.delete(state.headers, headerIndex);
         }
     },
     actions:    {
@@ -47,6 +57,7 @@ let results = {
                 context.state.after = [];
             }
             context.commit('setPage', page);
+            context.dispatch('getHeaders');
 
             let body = {...context.rootGetters.requestBody};
             if (context.state.page > 0) {
@@ -104,6 +115,37 @@ let results = {
                 }
                 else {
                     context.state.slug = null;
+                }
+            });
+        },
+        getHeaders(context) {
+            context.state.headers = [];
+
+            d3.values(context.rootState.filters.items).forEach(f => {
+                if (f.content.fields !== undefined) {
+                    context.state.headers.push(f.content.fields)
+                }
+            });
+
+            fetch('/api/3/action/datastore_guess_fields', {
+                method:      'POST',
+                mode:        'cors',
+                cache:       'no-cache',
+                credentials: 'same-origin',
+                headers:     {
+                    'Content-Type': 'application/json'
+                },
+                redirect:    'follow',
+                referrer:    'no-referrer',
+                body:        JSON.stringify({
+                                                query:        context.rootGetters.query,
+                                                resource_ids: context.rootState.resourceIds
+                                            }),
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data.success) {
+                    context.state.headers = context.state.headers.concat(data.result.map(f => d3.keys(f.fields)));
                 }
             });
         }

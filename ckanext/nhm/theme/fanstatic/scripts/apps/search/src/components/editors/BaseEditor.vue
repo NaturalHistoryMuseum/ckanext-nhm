@@ -7,7 +7,7 @@
     import * as d3 from 'd3-collection';
 
     export default {
-        name:     'BaseTerm',
+        name:     'BaseEditor',
         props:    ['comparisonType', 'existingTermId'],
         data:     function () {
             return {
