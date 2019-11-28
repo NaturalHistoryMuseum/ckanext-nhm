@@ -1247,6 +1247,35 @@ iframe {
   border-bottom: none;
   margin-bottom: 0;
 
+  & .search-tabs {
+    position: absolute;
+    width: 100%;
+    padding: 0 5px;
+    left: 0;
+
+    .search-tab:first-child {
+      border-right: solid 2px @grey3;
+      border-radius: 0 0 0 @rounding;
+    }
+
+    .search-tab:last-child {
+      border-radius: 0 0 @rounding 0;
+    }
+
+    & .search-tab {
+      background: @grey9;
+      text-align: center;
+      font-family: @font-title;
+      font-size: @font-size-body-l;
+      padding: 10px 5px 5px;
+      cursor: pointer;
+
+      &.selected {
+        background: @grey7;
+      }
+    }
+  }
+
   & .search-input {
     margin-bottom: @min-pad;
 
@@ -1254,7 +1283,7 @@ iframe {
       border: none;
       background: @grey9;
       .no-box-shadow;
-      border-radius: @rounding;
+      border-radius: @rounding @rounding 0 0;
       padding: 10px;
     }
 
