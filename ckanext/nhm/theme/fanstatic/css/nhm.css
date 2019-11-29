@@ -1432,7 +1432,8 @@ iframe {
   border-radius: 5px;
   line-height: 1;
 }
-.multisearch-form .delete-field {
+.multisearch-form .delete-field,
+.multisearch-form .move-field {
   color: #5B5B5B;
   padding-left: 5px;
 }

@@ -27,6 +27,9 @@ let results = {
         },
         records:    (state, getters) => {
             return getters.hasResult ? state.current.result.records : [];
+        },
+        resultResourceIds: (state, getters) => {
+            return getters.records.map(r => r.resource);
         }
     },
     mutations:  {
