@@ -61,13 +61,13 @@ window.slug_search = window.slug_search || (function () {
      * selection is changed.
      */
     self.bindScopeSelection = function () {
-        const searchTabs = $('.scope-tabs').find('.scope-tab');
-        searchTabs.each(function () {
+        const scopeTabs = $('.scope-tabs').find('.scope-tab');
+        scopeTabs.each(function () {
             const element = $(this);
             element.on('click', function () {
-                searchTabs.removeClass('selected');
+                scopeTabs.removeClass('selected');
                 element.addClass('selected');
-            })
+            });
         });
     };
 
