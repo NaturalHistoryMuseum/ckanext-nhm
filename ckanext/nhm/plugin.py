@@ -630,3 +630,14 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 }
             }
         return slugs
+
+    def datastore_modify_fields(self, resource_ids, fields):
+        # if the index lots or specimens collections are in the resource ids list, remove a bunch
+        # of groups that we don't care about
+        if (helpers.get_specimen_resource_id() in resource_ids or
+                helpers.get_indexlot_resource_id() in resource_ids):
+            fields.remove(re.compile(r'associatedMedia\.*', re.I))
+            for group in (u'created', u'modified', u'basisOfRecord', u'institutionCode'):
+                fields.remove(group)
+
+        return fields
