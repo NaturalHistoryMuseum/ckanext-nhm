@@ -7,17 +7,20 @@ let outsideClick;
 Vue.directive('dismiss', {
     bind(el, binding, vnode) {
         outsideClick = (event) => {
-            console.log(event.target);
             event.stopPropagation();
-            let ignore = binding.value.ignore.includes(event.target.id);
-            let i = 0;
-            while (!ignore && i < binding.value.ignore.length) {
-                let parentNode = $('#' + binding.value.ignore[i])[0];
-                ignore = $.contains(parentNode, event.target);
-                i++;
-            }
-            if (!el.contains(event.target) && !ignore) {
-                vnode.context[binding.value.switch] = false;
+            if (!el.contains(event.target)) {
+                let ignore = binding.value.ignore.includes(event.target.id);
+                let i      = 0;
+                while (!ignore && i < binding.value.ignore.length) {
+                    let parentNode = $('#' + binding.value.ignore[i])[0];
+                    if (parentNode !== undefined) {
+                        ignore = $.contains(parentNode, event.target);
+                    }
+                    i++;
+                }
+                if (!ignore) {
+                    vnode.context[binding.value.switch] = false;
+                }
             }
         };
         document.addEventListener('click', outsideClick);

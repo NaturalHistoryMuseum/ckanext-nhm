@@ -9,17 +9,19 @@
             <h3>{{ total }} records</h3>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup" v-if="showCite">
+                    <div class="floating info-popup" v-if="showCite"
+                        v-dismiss="{switch: 'showCite', ignore: ['show-cite']}">
                         {{ doi }}
                     </div>
                 </transition>
-                <a href="#" @click="citeSearch" class="btn btn-disabled">
+                <a href="#" @click="citeSearch" class="btn btn-disabled" id="show-cite">
                     <i class="fas fa-book"></i>Cite
                 </a>
             </div>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup" v-if="showShare">
+                    <div class="floating info-popup" v-if="showShare"
+                        v-dismiss="{switch: 'showShare', ignore: ['show-share']}">
                         <p>Share this search:</p>
                         <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span></p>
                         <small class="alert-warning">This link is for social sharing <em>only</em>.
@@ -28,18 +30,20 @@
                                                                                    DOI</a>.</small>
                     </div>
                 </transition>
-                <a href="#" @click="shareSearch" class="btn btn-disabled">
+                <a href="#" @click="shareSearch" class="btn btn-disabled" id="show-share">
                     <i class="fas"
                         :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup" v-if="showDownload">
+                    <div class="floating info-popup" v-if="showDownload"
+                        v-dismiss="{switch: 'showDownload', ignore: ['show-download']}">
                         Coming soon!
                     </div>
                 </transition>
-                <a href="#" v-if="total > 0" @click="downloadResults" class="btn btn-disabled">
+                <a href="#" v-if="total > 0" @click="downloadResults" class="btn btn-disabled"
+                    id="show-download">
                     <i class="fas fa-cloud-download-alt"></i>Download
                 </a>
             </div>
