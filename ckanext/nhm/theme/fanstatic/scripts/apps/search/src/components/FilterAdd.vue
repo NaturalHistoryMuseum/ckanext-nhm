@@ -6,13 +6,26 @@
             <div class="filter-add-choice floating" v-if="showChoice"
                 v-dismiss="{switch: 'showChoice', ignore: ['show-choice-' + _uid]}">
                 <span v-if="canAddGroups" @click="newGroup" :id="'show-editor-groups-' + _uid">new group</span>
-                <span v-if="canAddTerms" @click="newTerm"
+                <div v-if="canAddTerms"><span @click="showEditor = true"
                     :id="'show-editor-terms-' + _uid">new term</span>
+                <span @click="showPresets = true"
+                    :id="'show-editor-presets-' + _uid">presets</span></div>
             </div>
         </transition>
         <transition name="slideright">
             <TermEditor v-if="showEditor" :parent-id="parentId"
                 v-dismiss="{switch: 'showEditor', ignore: ['show-editor-groups-' + _uid, 'show-editor-terms-' + _uid]}"></TermEditor>
+        </transition>
+        <transition name="slideright">
+            <div v-if="showPresets" class="floating preset-picker"
+                v-dismiss="{switch: 'showPresets', ignore: ['show-editor-presets-' + _uid]}">
+                <select size="5">
+                    <option v-for="(presetName, presetKey) in presetKeys" v-bind:key="presetKey"
+                        @dblclick="newPreset(presetKey)">
+                        {{ presetName }}
+                    </option>
+                </select>
+            </div>
         </transition>
     </div>
 </template>
@@ -32,12 +45,13 @@
         },
         data:       function () {
             return {
-                showChoice: false,
-                showEditor: false
+                showChoice:  false,
+                showEditor:  false,
+                showPresets: false
             }
         },
         computed:   {
-            ...mapGetters('filters', ['getNestLevel']),
+            ...mapGetters('filters', ['getNestLevel', 'presetKeys']),
             nestLevel() {
                 return this.getNestLevel(this.parentId);
             },
@@ -49,15 +63,34 @@
             }
         },
         methods:    {
-            ...mapMutations('filters', ['addGroup']),
+            ...mapMutations('filters', ['addGroup', 'addPreset']),
             newGroup: function () {
                 this.showChoice = false;
-                this.showEditor = false;
                 this.addGroup(this.$parent.filterId);
             },
-            newTerm:  function () {
-                this.showChoice = false;
-                this.showEditor = true;
+            newPreset(presetKey) {
+                this.addPreset({key: presetKey, parentId: this.parentId});
+                this.showPresets = false;
+            },
+        },
+        watch: {
+            showChoice(v) {
+                if (v) {
+                    this.showEditor = false;
+                    this.showPresets = false;
+                }
+            },
+            showEditor(v) {
+                if (v) {
+                    this.showChoice = false;
+                    this.showPresets = false;
+                }
+            },
+            showPresets(v) {
+                if (v) {
+                    this.showChoice = false;
+                    this.showEditor = false;
+                }
             }
         }
     }

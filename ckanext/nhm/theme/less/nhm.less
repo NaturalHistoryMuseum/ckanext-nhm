@@ -1337,6 +1337,16 @@ iframe {
     font-size: @font-size-body-m;
   }
 
+  & .preset-picker {
+    background-color: @grey10;
+    border: @lighter-borders;
+    border-radius: @rounding;
+    top: 100%;
+    left: 0;
+    margin: 5px;
+    padding: 5px;
+  }
+
   & .resourceid-list {
     max-height: 50vh;
     max-width: 30vw;
@@ -1463,6 +1473,7 @@ iframe {
   }
 
   .filter-add-choice {
+    width: max-content;
     & span {
       background-color: @grey10;
       border-radius: @rounding;
@@ -1471,6 +1482,8 @@ iframe {
       font-family: @font-title;
       font-size: @font-size-body-l;
       margin: 2px -1px;
+      width: max-content;
+      min-width: 100%;
     }
   }
 
@@ -1627,6 +1640,7 @@ iframe {
 
     & .record-body {
       padding-top: 10px;
+      width: 100%;
       & > img {
         width: 200px;
         height: 200px;

@@ -1,21 +1,14 @@
 import Vue from 'vue';
 import * as d3 from 'd3-collection';
 import shortid from 'shortid';
+import presets from './presets';
 
 let initialFilters = {
     group_1: {
         parent:  null,
         key:     'and',
         content: []
-    },
-    // term_1:  {
-    //     parent:  'group_1',
-    //     key:     'string_contains',
-    //     content: {
-    //         fields: ['genus'],
-    //         value:  'helix'
-    //     }
-    // }
+    }
 };
 
 function dequeryfy(items, parentId) {
@@ -88,6 +81,12 @@ let filters = {
             }
             return queryData;
         },
+        presetKeys:    () => {
+            return d3.nest()
+                     .key(p => p.key)
+                     .rollup(p => p[0].value.name)
+                     .object(d3.entries(presets));
+        }
     },
     mutations:  {
         setFromQuery(state, query) {
@@ -96,7 +95,7 @@ let filters = {
             }
             else {
                 let dequeried = dequeryfy([query.filters], null);
-                state.items = {...dequeried};
+                state.items   = {...dequeried};
             }
 
         },
@@ -128,6 +127,15 @@ let filters = {
                 parent:  payload.parentId,
                 key:     payload.key,
                 content: payload.content
+            };
+            Vue.set(state.items, `term_${shortid.generate()}`, newTerm)
+        },
+        addPreset(state, payload) {
+            let presetTerm = presets[payload.key];
+            let newTerm    = {
+                parent:  payload.parentId,
+                key:     presetTerm.key,
+                content: presetTerm.content
             };
             Vue.set(state.items, `term_${shortid.generate()}`, newTerm)
         }
