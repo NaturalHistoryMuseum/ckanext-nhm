@@ -54,10 +54,10 @@
 <script>
     import * as d3 from 'd3-collection';
     import {mapMutations, mapState} from 'vuex'
-    import TextTerm from './terms/TextTerm.vue';
-    import NumberTerm from './terms/NumberTerm.vue';
-    import GeoTerm from './terms/GeoTerm.vue';
-    import OtherTerm from './terms/OtherTerm.vue';
+    import TextEditor from './editors/TextEditor.vue';
+    import NumberEditor from './editors/NumberEditor.vue';
+    import GeoEditor from './editors/GeoEditor.vue';
+    import OtherEditor from './editors/OtherEditor.vue';
 
     export default {
         name:     'TermEditor',
@@ -95,10 +95,10 @@
             ...mapState(['resourceIds']),
             termComponent: function () {
                 return {
-                    string: TextTerm,
-                    number: NumberTerm,
-                    geo:    GeoTerm,
-                    other:  OtherTerm
+                    string: TextEditor,
+                    number: NumberEditor,
+                    geo:    GeoEditor,
+                    other:  OtherEditor
                 }[this.fieldType];
             },
             terms:         function () {

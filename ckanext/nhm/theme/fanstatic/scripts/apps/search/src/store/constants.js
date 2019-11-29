@@ -60,7 +60,7 @@ let constants = {
                       });
         },
         getPackageList(context) {
-            fetch('/api/3/action/current_package_list_with_resources', {
+            fetch('/api/3/action/current_package_list_with_resources?limit=1000', {
                 method: 'GET'
             }).then(response => {
                 return response.json();
@@ -74,7 +74,8 @@ let constants = {
                             name: r.name,
                             id:   r.id,
                             package_id: r.package_id,
-                            package_name: pkg.title
+                            package_name: pkg.title,
+                            raw: r
                         }
                     });
                     return {

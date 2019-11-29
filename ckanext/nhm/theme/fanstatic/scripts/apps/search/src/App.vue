@@ -32,12 +32,14 @@
                     </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showResources = !showResources">
+                    <a href="#" @click="showResources = !showResources" id="btnResources">
                         Resources <i class="fas fa-list inline-icon-right"></i>
                     </a>
                 </div>
                 <transition name="slidedown">
-                    <ResourceList v-if="showResources"></ResourceList>
+                    <ResourceList v-if="showResources"
+                        v-dismiss="{switch: 'showResources', ignore: ['btnResources']}">
+                    </ResourceList>
                 </transition>
             </div>
             <transition name="slidedown">
@@ -46,7 +48,8 @@
                     </FilterGroup>
                 </div>
             </transition>
-            <pre class="fields" v-if="showQuery" style="margin-bottom: 20px;">{{ requestBody }}</pre>
+            <pre class="fields" v-if="showQuery"
+                style="margin-bottom: 20px;">{{ requestBody }}</pre>
             <Results></Results>
         </div>
     </div>

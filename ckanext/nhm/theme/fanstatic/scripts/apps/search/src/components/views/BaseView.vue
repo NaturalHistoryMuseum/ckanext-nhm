@@ -5,8 +5,7 @@
 </template>
 
 <script>
-    import {mapGetters, mapState} from 'vuex';
-    import * as d3 from 'd3-collection';
+    import {mapGetters, mapState, mapMutations} from 'vuex';
 
     export default {
         name:     'BaseView',
@@ -15,22 +14,18 @@
                 showFields:    false,
                 fieldSearch:   null,
                 fieldList:     [],
-                customHeaders: [],
-                headers:       []
             }
         },
         mounted:  function () {
             this.updateView();
         },
         computed: {
-            ...mapState('results', ['current']),
+            ...mapState('results', ['current', 'headers']),
             ...mapGetters('constants', ['resourceDetails']),
-            ...mapGetters('results', ['total', 'records']),
-            allHeaders() {
-                return this.headers.concat(this.customHeaders.map(h => [h]))
-            }
+            ...mapGetters('results', ['total', 'records'])
         },
         methods:  {
+            ...mapMutations('results', ['addCustomHeader', 'removeHeader']),
             getFieldList() {
                 const vue       = this;
                 let resourceIds = this.current.result === undefined ? [] : this.current.result.records.map(r => r.resource);
@@ -55,37 +50,61 @@
                     vue.fieldList = Object.keys(data.result.fields).sort();
                 });
             },
-            getUrls(resourceId) {
-                let resDetails = this.resourceDetails[resourceId];
+            getDetails(resourceId) {
+                let resourceDetails = this.resourceDetails[resourceId];
 
-                let packageUrl  = `/dataset/${resDetails.package_id}`;
-                let resourceUrl = packageUrl + `/resource/${resDetails.id}`;
+                let packageUrl  = `/dataset/${resourceDetails.package_id}`;
+                let resourceUrl = packageUrl + `/resource/${resourceDetails.id}`;
 
                 return {
                     packageUrl,
                     resourceUrl,
-                    resourceName: resDetails.name
+                    titleField: resourceDetails.raw._title_field || '_id',
+                    imageField: resourceDetails.raw._image_field
                 }
             },
-            getHeaders() {
-                let fields = [];
-
-                d3.values(this.$store.state.filters.items).forEach(f => {
-                    if (f.content.fields !== undefined) {
-                        fields.push(f.content.fields)
+            getImage(item) {
+                if (item.resource === '05ff2255-c38a-40c9-b657-4ccb55ab2feb') {
+                    try {
+                        return item.data.associatedMedia[0].identifier.replace('preview', 'thumbnail');
                     }
-                });
+                    catch (e) {
+                        return null;
+                    }
+                }
+                else {
+                    try {
+                        return item.data[this.getDetails(item.resource).imageField][0];
+                    }
+                    catch (e) {
+                        return null;
+                    }
+                }
+            },
+            getValue(item, field) {
+                let v = {...item};
+                let subFields = field.split('.');
 
-                this.headers = fields;
-            },
-            addHeader(field) {
-                this.customHeaders.push(field);
-            },
-            deleteHeader(index) {
-                this.$delete(this.customHeaders, index);
+                let subItems = (parentItem, subField) => {
+                    if (Array.isArray(parentItem)) {
+                        return parentItem.map(x => subItems(x, subField)).join('; ');
+                    }
+                    else {
+                        return parentItem[subField];
+                    }
+                };
+
+                for (let i = 0; i < subFields.length; i++) {
+                    try {
+                        v = subItems(v, subFields[i])
+                    }
+                    catch (e) {
+                        break;
+                    }
+                }
+                return v;
             },
             updateView() {
-                this.getHeaders();
                 this.getFieldList();
             }
         },
