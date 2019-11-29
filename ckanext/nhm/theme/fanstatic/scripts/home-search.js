@@ -51,6 +51,11 @@ window.slug_search = window.slug_search || (function () {
                     '05ff2255-c38a-40c9-b657-4ccb55ab2feb',
                     'bb909597-dedf-427d-8c04-4c02b3a24db3'
                 );
+            } else if (selection === 'scope-specimens') {
+                resourceIds.push(
+                    // TODO: this needs to come from the config
+                    '05ff2255-c38a-40c9-b657-4ccb55ab2feb',
+                );
             }
 
             self.doSearch(query, resourceIds);
@@ -74,6 +79,7 @@ window.slug_search = window.slug_search || (function () {
     self.bindScopeSelection = function () {
         const scopeTabs = $('.scope-tabs').find('.scope-tab');
         const collectionStats = $('.collection-stats').find('ul');
+        const specimensTitle = $('#specimens-title');
         const collectionsTitle = $('#collections-title');
         const everythingTitle = $('#everything-title');
 
@@ -82,14 +88,22 @@ window.slug_search = window.slug_search || (function () {
             element.on('click', function () {
                 scopeTabs.removeClass('selected');
                 element.addClass('selected');
-                if (element.attr('id') === 'scope-collections') {
-                    collectionStats.show();
-                    everythingTitle.hide();
-                    collectionsTitle.show();
-                } else {
-                    collectionStats.hide();
-                    everythingTitle.show();
-                    collectionsTitle.hide();
+                specimensTitle.hide();
+                collectionsTitle.hide();
+                everythingTitle.hide();
+                switch (element.attr('id')) {
+                    case 'scope-specimens':
+                        collectionStats.show();
+                        specimensTitle.show();
+                        break;
+                    case 'scope-collections':
+                        collectionStats.show();
+                        collectionsTitle.show();
+                        break;
+                    case 'scope-everything':
+                        collectionStats.hide();
+                        everythingTitle.show();
+                        break;
                 }
             });
         });

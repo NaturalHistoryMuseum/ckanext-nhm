@@ -7,6 +7,7 @@
 import itertools
 import json
 import logging
+import operator
 import time
 import urllib
 from collections import OrderedDict, defaultdict
@@ -304,27 +305,48 @@ def get_artefact_resource_id():
 
 @cache_region(u'permanent', u'collection_stats')
 def collection_stats():
-    '''Get collection stats, grouped by Collection code.'''
-    resource_id = get_specimen_resource_id()
-    total = 0
-    collections = OrderedDict()
-    search_params = dict(
-        resource_id=resource_id,
-        # use limit 0 as we're not interested in getting any results, just the facet
-        # counts
-        limit=0,
-        facets=[u'collectionCode'],
-        )
+    '''Get collection stats, including collection codes and collection totals.'''
+    stats = {}
+    collections = [
+        (u'artefacts', get_artefact_resource_id()),
+        (u'indexlots', get_indexlot_resource_id()),
+        (u'specimens', get_specimen_resource_id())
+    ]
 
-    result = toolkit.get_action(u'datastore_search')({}, search_params)
-    for collection_code, num in result[u'facets'][u'collectionCode'][u'values'].items():
-        collections[collection_code] = num
-        total += num
-
-    stats = {
-        u'total': total,
-        u'collections': collections
+    collections_total = 0
+    for name, resource_id in collections:
+        params = {
+            u'resource_id': resource_id,
+            u'limit': 0,
         }
+        stats[name] = toolkit.get_action(u'datastore_search')({}, params)[u'total']
+        collections_total += stats[name]
+    stats[u'total'] = collections_total
+
+    collection_code_counts = []
+    for collection_code in (u'PAL', u'MIN', u'BMNH(E)', u'ZOO', u'BOT'):
+        params = {
+            u'resource_id': get_specimen_resource_id(),
+            u'limit': 0,
+            u'query': {
+                u'filters': {
+                    u'and': [
+                        {
+                            u'string_equals': {
+                                u'fields': [u'collectionCode'],
+                                u'value': collection_code
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+        total = toolkit.get_action(u'datastore_search')({}, params)[u'total']
+        collection_code_counts.append((collection_code, total))
+
+    collection_code_counts.sort(key=operator.itemgetter(1), reverse=True)
+    stats[u'collectionCodes'] = OrderedDict(collection_code_counts)
+
     return stats
 
 
