@@ -2146,6 +2146,7 @@ select,
 .collection-stats .collection-block {
   display: flex;
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;
+  cursor: pointer;
 }
 @media (min-width: 992px) {
   .collection-stats .collection-block {
