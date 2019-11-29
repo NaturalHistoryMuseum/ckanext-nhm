@@ -62,11 +62,18 @@ window.slug_search = window.slug_search || (function () {
      */
     self.bindScopeSelection = function () {
         const scopeTabs = $('.scope-tabs').find('.scope-tab');
+        const collectionStats = $('.collection-stats').find('ul');
+
         scopeTabs.each(function () {
             const element = $(this);
             element.on('click', function () {
                 scopeTabs.removeClass('selected');
                 element.addClass('selected');
+                if (element.attr('id') === 'scope-collections') {
+                    collectionStats.show();
+                } else {
+                    collectionStats.hide();
+                }
             });
         });
     };
