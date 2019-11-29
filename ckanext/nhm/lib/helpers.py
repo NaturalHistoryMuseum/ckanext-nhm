@@ -341,7 +341,7 @@ def collection_stats():
                 }
             }
         }
-        total = toolkit.get_action(u'datastore_search')({}, params)[u'total']
+        total = toolkit.get_action(u'datastore_multisearch')({}, params)[u'total']
         collection_code_counts.append((collection_code, total))
 
     collection_code_counts.sort(key=operator.itemgetter(1), reverse=True)
