@@ -1318,7 +1318,7 @@ iframe {
   border-radius: 0 0 5px 0;
 }
 .search-form .search-tabs .search-tab {
-  background: #F2F2F2;
+  background: #C3C3C3;
   text-align: center;
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;
   font-size: 17px;
@@ -1326,7 +1326,7 @@ iframe {
   cursor: pointer;
 }
 .search-form .search-tabs .search-tab.selected {
-  background: #C3C3C3;
+  background: #F2F2F2;
 }
 .search-form .search-input {
   margin-bottom: 15px;
