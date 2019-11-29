@@ -1,14 +1,31 @@
 <template>
     <div class="filter-add">
-        <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"></i>
+        <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"
+            :id="'show-choice-' + _uid"></i>
         <transition name="slidedown">
-            <div class="filter-add-choice floating" v-if="showChoice">
-                <span v-if="canAddGroups" @click="newGroup">new group</span>
-                <span v-if="canAddTerms" @click="newTerm">new term</span>
+            <div class="filter-add-choice floating" v-if="showChoice"
+                v-dismiss="{switch: 'showChoice', ignore: ['show-choice-' + _uid]}">
+                <span v-if="canAddGroups" @click="newGroup" :id="'show-editor-groups-' + _uid">new group</span>
+                <div v-if="canAddTerms"><span @click="showEditor = true"
+                    :id="'show-editor-terms-' + _uid">new term</span>
+                <span @click="showPresets = true"
+                    :id="'show-editor-presets-' + _uid">presets</span></div>
             </div>
         </transition>
         <transition name="slideright">
-            <TermEditor v-if="showEditor" :parent-id="parentId"></TermEditor>
+            <TermEditor v-if="showEditor" :parent-id="parentId"
+                v-dismiss="{switch: 'showEditor', ignore: ['show-editor-groups-' + _uid, 'show-editor-terms-' + _uid]}"></TermEditor>
+        </transition>
+        <transition name="slideright">
+            <div v-if="showPresets" class="floating preset-picker"
+                v-dismiss="{switch: 'showPresets', ignore: ['show-editor-presets-' + _uid]}">
+                <select size="5">
+                    <option v-for="(presetName, presetKey) in presetKeys" v-bind:key="presetKey"
+                        @dblclick="newPreset(presetKey)">
+                        {{ presetName }}
+                    </option>
+                </select>
+            </div>
         </transition>
     </div>
 </template>
@@ -16,43 +33,64 @@
 <script>
     import Loading from './Loading.vue';
     import LoadError from './LoadError.vue';
+    import {mapGetters, mapMutations} from 'vuex';
+
     const TermEditor = import('./TermEditor.vue');
-    import {mapState, mapGetters, mapMutations} from 'vuex';
 
     export default {
         name:       'FilterAdd',
-        props: ['parentId'],
+        props:      ['parentId'],
         components: {
             TermEditor: () => ({component: TermEditor, loading: Loading, error: LoadError}),
         },
         data:       function () {
             return {
-                showChoice: false,
-                showEditor: false
+                showChoice:  false,
+                showEditor:  false,
+                showPresets: false
             }
         },
         computed:   {
-            ...mapGetters('filters', ['getNestLevel']),
+            ...mapGetters('filters', ['getNestLevel', 'presetKeys']),
             nestLevel() {
                 return this.getNestLevel(this.parentId);
             },
             canAddGroups: function () {
                 return this.nestLevel === 0;
             },
-            canAddTerms: function () {
+            canAddTerms:  function () {
                 return true;
             }
         },
         methods:    {
-            ...mapMutations('filters', ['addGroup']),
+            ...mapMutations('filters', ['addGroup', 'addPreset']),
             newGroup: function () {
                 this.showChoice = false;
-                this.showEditor = false;
                 this.addGroup(this.$parent.filterId);
             },
-            newTerm:  function () {
-                this.showChoice = false;
-                this.showEditor = true;
+            newPreset(presetKey) {
+                this.addPreset({key: presetKey, parentId: this.parentId});
+                this.showPresets = false;
+            },
+        },
+        watch: {
+            showChoice(v) {
+                if (v) {
+                    this.showEditor = false;
+                    this.showPresets = false;
+                }
+            },
+            showEditor(v) {
+                if (v) {
+                    this.showChoice = false;
+                    this.showPresets = false;
+                }
+            },
+            showPresets(v) {
+                if (v) {
+                    this.showChoice = false;
+                    this.showEditor = false;
+                }
             }
         }
     }

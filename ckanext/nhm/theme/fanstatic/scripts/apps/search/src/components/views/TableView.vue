@@ -14,11 +14,12 @@
                 @click="removeHeader(index)"></i>
         </span>
         <span class="th text-right">
-            <a href="#" @click="showFields = !showFields">
+            <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid">
                 <i class="fas fa-plus-circle"></i>
             </a>
             <transition name="slidedown">
-                <div class="floating space-children-v field-picker" v-if="showFields">
+                <div class="floating space-children-v field-picker" v-if="showFields"
+                    v-dismiss="{switch: 'showFields', ignore: ['show-fields-' + _uid]}">
                     <input type="text" class="full-width" name="fieldSearch"
                         id="fieldSearch"
                         value="" autocomplete="off" placeholder="field name"
