@@ -1901,6 +1901,12 @@ select {
   overflow-x: auto;
   overflow-y: visible;
 
+  & .data-header {
+    .mixin-flex-container();
+    .mixin-flex-column();
+    .mixin-flex-left();
+  }
+
   & .th {
     font-family: @font-title;
     font-size: @font-size-body-l;

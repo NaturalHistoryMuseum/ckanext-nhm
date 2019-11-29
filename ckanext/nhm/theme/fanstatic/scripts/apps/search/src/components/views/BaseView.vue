@@ -25,7 +25,7 @@
             ...mapGetters('results', ['total', 'records'])
         },
         methods:  {
-            ...mapMutations('results', ['addCustomHeader', 'removeHeader']),
+            ...mapMutations('results', ['addCustomHeader', 'removeHeader', 'moveHeader']),
             getFieldList() {
                 const vue       = this;
                 let resourceIds = this.current.result === undefined ? [] : this.current.result.records.map(r => r.resource);

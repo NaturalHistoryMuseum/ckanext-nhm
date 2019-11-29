@@ -1922,6 +1922,17 @@ select {
   overflow-x: auto;
   overflow-y: visible;
 }
+.table-grid .data-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.table-grid .data-header > * {
+  vertical-align: center;
+}
+.table-grid .data-header > * {
+  align-self: flex-start;
+}
 .table-grid .th {
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;
   font-size: 17px;

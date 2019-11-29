@@ -1,18 +1,24 @@
 <template>
     <div class="table-grid"
         :style="{gridTemplateColumns: `repeat(${3 + headers.length}, auto) 1fr`}">
-        <span class="th small-column">Dataset</span>
-        <span class="th small-column">Resource</span>
-        <span class="th small-column last-small-column">Record</span>
-        <span class="th" v-for="(headerGroup, index) in headers" :key="headerGroup.id">
-            <span>
+        <div class="th small-column">Dataset</div>
+        <div class="th small-column">Resource</div>
+        <div class="th small-column last-small-column">Record</div>
+        <div class="th data-header" v-for="(headerGroup, index) in headers" :key="headerGroup.id">
+            <div>
                 <span v-for="header in headerGroup" :key="header.id" class="term-group">
                     {{ header }}
                 </span>
-            </span>
-            <i class="delete-field fas fa-times-circle fa-xs"
-                @click="removeHeader(index)"></i>
-        </span>
+            </div>
+            <div class="flex-container flex-nowrap flex-equal">
+                <i class="delete-field fas fa-times-circle fa-xs"
+                    @click="removeHeader(index)"></i>
+                <i class="move-field fas fa-chevron-circle-left fa-xs"
+                    @click="moveHeader({ix: index, by: -1})" v-if="index > 0"></i>
+                <i class="move-field fas fa-chevron-circle-right fa-xs"
+                    @click="moveHeader({ix: index, by: 1})" v-if="index < (headers.length - 1)"></i>
+            </div>
+        </div>
         <span class="th text-right">
             <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid">
                 <i class="fas fa-plus-circle"></i>

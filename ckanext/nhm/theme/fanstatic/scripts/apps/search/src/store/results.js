@@ -48,6 +48,12 @@ let results = {
         },
         removeHeader(state, headerIndex) {
             Vue.delete(state.headers, headerIndex);
+        },
+        moveHeader(state, payload) {
+            let header = state.headers[payload.ix];
+            let target = state.headers[payload.ix + payload.by];
+            Vue.set(state.headers, payload.ix + payload.by, header);
+            Vue.set(state.headers, payload.ix, target);
         }
     },
     actions:    {
