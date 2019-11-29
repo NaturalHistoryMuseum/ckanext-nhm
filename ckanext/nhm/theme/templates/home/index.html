@@ -60,7 +60,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="module-content">
-                        <ul class="list-unstyled list-inline flex-container flex-smallwrap flex-around flex-top">
+                        <ul class="list-unstyled list-inline flex-container flex-smallwrap flex-around flex-top" id="scope-specimen-stats">
                             {% for collection_code, count in collection_stats['collectionCodes'].items() %} {% if collection_code %}
                                 {% set dept = h.get_department(collection_code) %}
                                 <li>
@@ -76,6 +76,44 @@
                                     </a>
                                 </li>
                             {% endif %} {% endfor %}
+                        </ul>
+                        <ul class="list-unstyled list-inline flex-container flex-smallwrap flex-around flex-top" id="scope-collection-stats" style="display: none">
+                            <li>
+                                <a class="collection-block" href="/search/specimens">
+                                    <div class="flex-container flex-smallwrap flex-center">
+                                        <svg class="botany collection-icon"></svg>
+                                        <span class="collection-code">{{ _('Specimens') }}</span>
+                                    </div>
+                                    <div class="flex-column collection-block-text">
+                                            <span class="collection-count"> {{ h.delimit_number(collection_stats['specimens']) }}</span>
+                                        <span class="collection-name default-text">{{ _('Specimens') }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="collection-block" href="/search/indexlots">
+                                    <div class="flex-container flex-smallwrap flex-center">
+                                        <svg class="entomology collection-icon"></svg>
+                                        <span class="collection-code">{{ _('Index lots') }}</span>
+                                    </div>
+                                    <div class="flex-column collection-block-text">
+                                            <span class="collection-count"> {{ h.delimit_number(collection_stats['indexlots']) }}</span>
+                                        <span class="collection-name default-text">{{ _('Index lots') }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="collection-block" href="/search/artefacts">
+                                    <div class="flex-container flex-smallwrap flex-center">
+                                        <svg class="mineralogy collection-icon"></svg>
+                                        <span class="collection-code">{{ _('Artefacts') }}</span>
+                                    </div>
+                                    <div class="flex-column collection-block-text">
+                                            <span class="collection-count"> {{ h.delimit_number(collection_stats['artefacts']) }}</span>
+                                        <span class="collection-name default-text">{{ _('Artefacts') }}</span>
+                                    </div>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

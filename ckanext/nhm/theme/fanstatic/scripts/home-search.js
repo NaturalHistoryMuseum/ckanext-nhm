@@ -78,30 +78,36 @@ window.slug_search = window.slug_search || (function () {
      */
     self.bindScopeSelection = function () {
         const scopeTabs = $('.scope-tabs').find('.scope-tab');
-        const collectionStats = $('.collection-stats').find('ul');
+        const specimenStats = $('#scope-specimen-stats');
+        const collectionStats = $('#scope-collection-stats');
         const specimensTitle = $('#specimens-title');
         const collectionsTitle = $('#collections-title');
         const everythingTitle = $('#everything-title');
+
 
         scopeTabs.each(function () {
             const element = $(this);
             element.on('click', function () {
                 scopeTabs.removeClass('selected');
                 element.addClass('selected');
+
                 specimensTitle.hide();
                 collectionsTitle.hide();
                 everythingTitle.hide();
+
+                collectionStats.hide();
+                specimenStats.hide();
+
                 switch (element.attr('id')) {
                     case 'scope-specimens':
-                        collectionStats.show();
                         specimensTitle.show();
+                        specimenStats.show();
                         break;
                     case 'scope-collections':
                         collectionStats.show();
                         collectionsTitle.show();
                         break;
                     case 'scope-everything':
-                        collectionStats.hide();
                         everythingTitle.show();
                         break;
                 }
