@@ -8,7 +8,8 @@
                 v-dismiss="{switch: 'showEditor', ignore: ['show-editor-' + _uid]}"></TermEditor>
         </transition>
         <div class="filter-buttons">
-            <i class="edit-filter fas fa-pencil-alt fa-xs" @click="showEditor = !showEditor"></i>
+            <i class="edit-filter fas fa-pencil-alt fa-xs" @click="showEditor = !showEditor"
+                :id="'show-editor-' + _uid"></i>
             <i class="delete-filter fas fa-times fa-xs" @click="deleteSelf"
                 v-if="filterItem.parent !== null"></i>
         </div>
