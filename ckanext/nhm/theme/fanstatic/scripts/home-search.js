@@ -63,6 +63,8 @@ window.slug_search = window.slug_search || (function () {
     self.bindScopeSelection = function () {
         const scopeTabs = $('.scope-tabs').find('.scope-tab');
         const collectionStats = $('.collection-stats').find('ul');
+        const collectionsTitle = $('#collections-title');
+        const everythingTitle = $('#everything-title');
 
         scopeTabs.each(function () {
             const element = $(this);
@@ -71,37 +73,13 @@ window.slug_search = window.slug_search || (function () {
                 element.addClass('selected');
                 if (element.attr('id') === 'scope-collections') {
                     collectionStats.show();
+                    everythingTitle.hide();
+                    collectionsTitle.show();
                 } else {
                     collectionStats.hide();
+                    everythingTitle.show();
+                    collectionsTitle.hide();
                 }
-            });
-        });
-    };
-
-    /**
-     * Binds click listeners to the collection blocks so that when they're clicked they request a
-     * slug and then redirect to it.
-     */
-    self.bindCollectionCodes = function () {
-        $('.collection-block').each(function() {
-            const collectionCode = $(this).attr('data-collection-code');
-
-            $(this).on('click', function() {
-                const query = {
-                    filters: {
-                        and: [
-                            {
-                                string_equals: {
-                                    fields: [
-                                        'collectionCode'
-                                    ],
-                                    value: collectionCode
-                                }
-                            }
-                        ]
-                    }
-                };
-                self.doSearch(query, ['05ff2255-c38a-40c9-b657-4ccb55ab2feb'])
             });
         });
     };
@@ -114,5 +92,4 @@ window.slug_search = window.slug_search || (function () {
 $(document).ready(function () {
     window.slug_search.bindScopeSelection();
     window.slug_search.bindMainSearch();
-    window.slug_search.bindCollectionCodes();
 });

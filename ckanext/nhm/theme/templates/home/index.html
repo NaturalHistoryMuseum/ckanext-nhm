@@ -16,6 +16,7 @@
             href="{{ h.url_for('dcat_catalog', _format='rdf', qualified=True) }}"/>{% endblock -%}
 
 {% set collection_stats = h.collection_stats() %}
+{% set stats = h.get_site_statistics() %}
 
 {% block header %}
     <div class="extended-masthead" id="content">
@@ -27,9 +28,14 @@
                 <div class="col-md-12">
                     <div class="module-content">
                         <div class="flex-container flex-stretch-first flex-smallwrap pre-search">
-                            <h3>Search <a
-                                    href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a>
-                                of the Museum's 80 million specimens.</h3>
+                            <div>
+                                <h3 id="collections-title">Search <a
+                                        href="/search/collections">{{ h.delimit_number(collection_stats['total']) }}</a>
+                                    of the Museum's 80 million specimens.</h3>
+                                <h3 id="everything-title" style="display: none">Search <a
+                                        href="/search/everything">{{ h.delimit_number(stats.record_count) }}</a>
+                                    records from the Museum's collections and research datasets.</h3>
+                            </div>
                             <div class="no-pad-h stats-container">
                                 {% block stats %}
                                     {% snippet 'home/snippets/stats.html' %} {% endblock %}
@@ -55,7 +61,7 @@
                             {% for collection_code, count in collection_stats['collections'].items() %} {% if collection_code %}
                                 {% set dept = h.get_department(collection_code) %}
                                 <li>
-                                    <div class="collection-block" data-collection-code="{{ collection_code }}">
+                                    <a class="collection-block" href="/search/{{ dept.lower() }}">
                                         <div class="flex-container flex-smallwrap flex-center">
                                             <svg class="{{ dept|lower }} collection-icon"></svg>
                                             <span class="collection-code">{{ collection_code|replace('bmnh(e)','ent')|upper }}</span>
@@ -64,7 +70,7 @@
                                                 <span class="collection-count"> {{ h.delimit_number(count) }}</span>
                                             <span class="collection-name default-text">{{ dept }}</span>
                                         </div>
-                                    </div>
+                                    </a>
                                 </li>
                             {% endif %} {% endfor %}
                         </ul>
