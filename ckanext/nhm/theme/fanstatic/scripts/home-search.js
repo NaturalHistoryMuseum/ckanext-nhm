@@ -42,7 +42,7 @@ window.slug_search = window.slug_search || (function () {
             }
 
             const resourceIds = [];
-            const selection = $('.search-tab.selected').attr('id');
+            const selection = $('.scope-tab.selected').attr('id');
             if (selection === 'scope-collections') {
                 resourceIds.push(
                     // TODO: these need to come from the config
@@ -61,7 +61,7 @@ window.slug_search = window.slug_search || (function () {
      * selection is changed.
      */
     self.bindScopeSelection = function () {
-        const searchTabs = $('.search-tabs').find('.search-tab');
+        const searchTabs = $('.scope-tabs').find('.scope-tab');
         searchTabs.each(function () {
             const element = $(this);
             element.on('click', function () {
