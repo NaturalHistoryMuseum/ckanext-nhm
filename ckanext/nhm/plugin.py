@@ -601,9 +601,32 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             pass
 
     def datastore_reserve_slugs(self):
-        return {
-            u'collections': dict(resource_ids=[helpers.get_specimen_resource_id(),
-                                               helpers.get_artefact_resource_id(),
-                                               helpers.get_indexlot_resource_id()]),
-            # TODO: research datasets? if so how?
+        collection_resource_ids = [
+            helpers.get_specimen_resource_id(),
+            helpers.get_artefact_resource_id(),
+            helpers.get_indexlot_resource_id(),
+        ]
+        slugs = {
+            u'collections': dict(resource_ids=collection_resource_ids),
+            u'everything': dict(resource_ids=[]),
+            u'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
+            u'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
+            u'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
         }
+        for collection_code in (u'PAL', u'MIN', u'BMNH(E)', u'ZOO', u'BOT'):
+            slugs[helpers.get_department(collection_code).lower()] = {
+                u'resource_ids': collection_resource_ids,
+                u'query': {
+                    u'filters': {
+                        u'and': [
+                            {
+                                u'string_equals': {
+                                    u'fields': [u'collectionCode'],
+                                    u'value': collection_code
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        return slugs
