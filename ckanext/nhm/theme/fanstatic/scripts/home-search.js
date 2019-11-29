@@ -33,10 +33,11 @@ window.slug_search = window.slug_search || (function () {
     self.bindMainSearch = function () {
         const mainSearch = $('#main_search');
         const submitButton = mainSearch.find('button');
+        const serachInput = $('#q');
 
-        submitButton.on('click', function () {
+        function onSubmit() {
             const query = {};
-            const searchValue = $('#q').val();
+            const searchValue = serachInput.val();
             if (!!searchValue) {
                 query.search = searchValue;
             }
@@ -53,6 +54,16 @@ window.slug_search = window.slug_search || (function () {
             }
 
             self.doSearch(query, resourceIds);
+        }
+
+        submitButton.on('click', function () {
+            onSubmit();
+        });
+
+        serachInput.on('keypress',function(e) {
+            if (e.which === 13) {
+                onSubmit();
+            }
         });
     };
 
