@@ -1314,13 +1314,14 @@ iframe {
   left: 0;
 }
 .search-form .scope-tabs .scope-tab:first-child {
-  border-right: solid 2px #5B5B5B;
   border-radius: 0 0 0 5px;
 }
 .search-form .scope-tabs .scope-tab:last-child {
+  border-right: none;
   border-radius: 0 0 5px 0;
 }
 .search-form .scope-tabs .scope-tab {
+  border-right: solid 2px #5B5B5B;
   background: #C3C3C3;
   text-align: center;
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;

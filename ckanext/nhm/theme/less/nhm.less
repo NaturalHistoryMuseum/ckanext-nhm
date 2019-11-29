@@ -1258,15 +1258,16 @@ iframe {
     left: 0;
 
     .scope-tab:first-child {
-      border-right: solid 2px @grey3;
       border-radius: 0 0 0 @rounding;
     }
 
     .scope-tab:last-child {
+      border-right: none;
       border-radius: 0 0 @rounding 0;
     }
 
     & .scope-tab {
+      border-right: solid 2px @grey3;
       background: @grey7;
       text-align: center;
       font-family: @font-title;
