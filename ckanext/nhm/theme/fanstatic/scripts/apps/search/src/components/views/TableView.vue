@@ -1,7 +1,7 @@
 <template>
     <div class="table-grid"
         :style="{gridTemplateColumns: `repeat(${3 + headers.length}, auto) 1fr`}">
-        <span class="th small-column">Package</span>
+        <span class="th small-column">Dataset</span>
         <span class="th small-column">Resource</span>
         <span class="th small-column last-small-column">Record</span>
         <span class="th" v-for="(headerGroup, index) in headers" :key="headerGroup.id">

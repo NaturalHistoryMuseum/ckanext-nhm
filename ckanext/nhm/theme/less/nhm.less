@@ -1345,7 +1345,6 @@ iframe {
   }
 
   & .fields {
-    font-family: monospace;
     font-weight: normal !important;
     background-color: @grey10;
     border: 1px dashed @grey6;
@@ -1363,7 +1362,6 @@ iframe {
   & .field-picker {
     right: 0;
     width: 200px;
-    font-family: monospace;
     font-size: @font-size-body-m;
   }
 
@@ -1476,12 +1474,19 @@ iframe {
         &:hover, &:active {
           color: @grey3;
         }
+
+        &::after {
+          .mixin-font-symbol(normal);
+          content: '\f061';
+          font-size: 0.7em;
+          padding-left: 5px;
+        }
       }
     }
 
     &.filter-type-and {
       &, & > .group-type {
-        background-color: #d4f9ef;
+        background-color: @primary6;
       }
     }
 
@@ -1493,7 +1498,7 @@ iframe {
 
     &.filter-type-not {
       &, & > .group-type {
-        background-color: #f7c8b9;
+        background-color: @warning3;
       }
     }
   }
@@ -1543,13 +1548,11 @@ iframe {
       width: 200px;
       min-height: unset !important;
       height: unset;
-      font-family: monospace;
       border: @lighter-borders;
       padding: 1.2px 2px 2px;
     }
 
     input {
-      font-family: monospace;
       border: @lighter-borders;
       border-radius: @rounding;
     }
@@ -2018,7 +2021,7 @@ tr.empty {
 // ALERTS ------------------------------------------------------------------------------------------
 
 .alert-danger, .alert-error {
-  background-color: @warning3;
+  background-color: @warning4;
   border-color: @warning2;
   color: @warning2;
 }

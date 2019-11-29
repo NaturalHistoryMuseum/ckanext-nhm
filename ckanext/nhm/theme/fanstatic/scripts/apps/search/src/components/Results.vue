@@ -6,7 +6,7 @@
                found a problem.</p>
         </div>
         <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
-            <h3>{{ total }} records</h3>
+            <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup" v-if="showCite"
