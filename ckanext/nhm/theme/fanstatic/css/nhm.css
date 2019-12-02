@@ -2052,8 +2052,9 @@ tr.empty {
 .alert-danger,
 .alert-error {
   background-color: #F8F0F0;
-  border-color: #890022;
   color: #890022;
+  padding: 3px;
+  border: 1px dashed #E2B8B8;
 }
 .error-block {
   background-color: #890022;

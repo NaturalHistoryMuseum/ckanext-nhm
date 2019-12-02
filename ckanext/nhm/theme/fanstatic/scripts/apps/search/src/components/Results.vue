@@ -10,11 +10,22 @@
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup" v-if="showCite"
-                        v-dismiss="{switch: 'showCite', ignore: ['show-cite']}">
-                        {{ doi }}
+                        v-dismiss="{switch: 'showCite', ignore: ['show-cite', 'use-a-doi']}">
+                        <p>Cite this search:</p>
+                        <p>
+                            <a href="#" @click="citeSearch" class="btn btn-primary"
+                                v-if="doi === null"><i class="fas"
+                                :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
+                                Create a DOI
+                            </a>
+                        </p>
+                        <p class="nowrap copyable" v-if="doi !== null">{{ doi }}</p>
+                        <p class="alert-error" v-if="doiFailed">
+                            Failed to retrieve DOI. Please try again later.
+                        </p>
                     </div>
                 </transition>
-                <a href="#" @click="citeSearch" class="btn btn-disabled" id="show-cite">
+                <a href="#" @click="showCite = !showCite" class="btn btn-disabled" id="show-cite">
                     <i class="fas fa-book"></i>Cite
                 </a>
             </div>
@@ -22,12 +33,18 @@
                 <transition name="slidedown">
                     <div class="floating info-popup" v-if="showShare"
                         v-dismiss="{switch: 'showShare', ignore: ['show-share']}">
-                        <p>Share this search:</p>
-                        <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span></p>
-                        <small class="alert-warning">This link is for social sharing <em>only</em>.
-                                                     If you are intending to reference this search
-                                                     in a publication, <a href="#">use a
-                                                                                   DOI</a>.</small>
+                        <div v-if="slug !== null">
+                            <p>Share this search:</p>
+                            <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span>
+                            </p>
+                            <small class="alert-warning">This link is for social sharing
+                                <em>only</em>. If you are intending to reference this search in a
+                                                         publication, <a href="#"
+                                    @click="citeNotShare" id="use-a-doi">use a DOI</a>.</small>
+                        </div>
+                        <p class="alert-error" v-if="slugFailed">
+                            Failed to retrieve link. Please try again later.
+                        </p>
                     </div>
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled" id="show-share">
@@ -107,15 +124,15 @@
                 showDownload: false,
                 showCite:     false,
                 showShare:    false,
-                showFields: false,
+                showFields:   false,
                 views:        ['Table', 'List'],
                 currentView:  'Table',
-                doi:          '',
             }
         },
         computed:   {
             ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
-                                    'resultsLoading', 'slugLoading', 'resultsInvalid']),
+                                    'resultsLoading', 'slugLoading', 'resultsInvalid', 'doi',
+                                    'doiLoading', 'slugFailed', 'doiFailed']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
             viewComponent() {
                 return this.currentView + 'View';
@@ -123,7 +140,7 @@
         },
         methods:    {
             ...mapMutations('results', ['addCustomHeader']),
-            ...mapActions('results', ['runSearch', 'getSlug']),
+            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI']),
             downloadResults() {
                 this.showDownload = true;
                 setTimeout(() => {
@@ -131,7 +148,7 @@
                 }, 1000);
             },
             citeSearch() {
-                this.showCite = !this.showCite;
+                this.getDOI();
             },
             shareSearch() {
                 if (!this.showShare && this.slug === null) {
@@ -140,11 +157,20 @@
                 else {
                     this.showShare = !this.showShare;
                 }
+            },
+            citeNotShare() {
+                this.showShare = false;
+                this.showCite  = true;
             }
         },
         watch:      {
             slug() {
                 this.showShare = this.slug !== null;
+            },
+            slugFailed(fail) {
+                if (fail) {
+                    this.showShare = true;
+                }
             }
         }
     }

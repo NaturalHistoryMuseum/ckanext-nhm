@@ -14,7 +14,7 @@ const store = new Vuex.Store(
             resourceIds: []
         },
         getters:   {
-            query:       (state, getters) => {
+            query:           (state, getters) => {
                 let q = {};
                 if (state.search !== null && state.search !== '') {
                     q.search = state.search;
@@ -24,7 +24,7 @@ const store = new Vuex.Store(
                 }
                 return q;
             },
-            requestBody: (state, getters) => {
+            requestBody:     (state, getters) => {
                 return {
                     query:        getters.query,
                     resource_ids: getters.sortedResources
@@ -32,6 +32,22 @@ const store = new Vuex.Store(
             },
             sortedResources: (state) => {
                 return state.resourceIds.sort();
+            },
+            post:            () => (action, body) => {
+                return fetch('/api/3/action/' + action, {
+                    method:      'POST',
+                    mode:        'cors',
+                    cache:       'no-cache',
+                    credentials: 'same-origin',
+                    headers:     {
+                        'Content-Type': 'application/json'
+                    },
+                    redirect:    'follow',
+                    referrer:    'no-referrer',
+                    body:        JSON.stringify(body)
+                }).then(response => {
+                    return response.json();
+                });
             }
         },
         mutations: {
@@ -71,21 +87,8 @@ const store = new Vuex.Store(
                     context.commit('filters/resetFilters');
                     return;
                 }
-                fetch('/api/3/action/datastore_resolve_slug', {
-                    method:      'POST',
-                    mode:        'cors',
-                    cache:       'no-cache',
-                    credentials: 'same-origin',
-                    headers:     {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect:    'follow',
-                    referrer:    'no-referrer',
-                    body:        JSON.stringify({
-                                                    slug: slug
-                                                }),
-                }).then(response => {
-                    return response.json();
+                context.getters.post('datastore_resolve_slug', {
+                    slug: slug
                 }).then(data => {
                     if (data.success) {
                         context.commit('setResourceIds', data.result.resource_ids);

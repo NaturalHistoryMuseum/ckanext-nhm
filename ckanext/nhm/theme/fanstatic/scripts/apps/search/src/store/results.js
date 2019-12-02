@@ -8,24 +8,28 @@ let results = {
         after:          [],
         page:           0,
         slug:           null,
+        doi:            null,
         headers:        [],
         failed:         false,
         slugLoading:    false,
+        slugFailed:     false,
+        doiLoading:     false,
+        doiFailed:      false,
         resultsLoading: false,
         resultsInvalid: false
     },
     getters:    {
-        hasResult:  (state) => {
+        hasResult:         (state) => {
             return state.current.success || false;
         },
-        hasRecords: (state, getters) => {
+        hasRecords:        (state, getters) => {
             let noRecords = getters.hasResult ? state.current.result.records.length === 0 : false;
             return getters.hasResult && !noRecords;
         },
-        total:      (state, getters) => {
+        total:             (state, getters) => {
             return getters.hasResult ? state.current.result.total : 0;
         },
-        records:    (state, getters) => {
+        records:           (state, getters) => {
             return getters.hasResult ? state.current.result.records : [];
         },
         resultResourceIds: (state, getters) => {
@@ -72,48 +76,22 @@ let results = {
             if (context.state.page > 0) {
                 body.after = context.state.after[context.state.page - 1];
             }
-
-            fetch('/api/3/action/datastore_multisearch', {
-                method:      'POST',
-                mode:        'cors',
-                cache:       'no-cache',
-                credentials: 'same-origin',
-                headers:     {
-                    'Content-Type': 'application/json'
-                },
-                redirect:    'follow',
-                referrer:    'no-referrer',
-                body:        JSON.stringify(body)
-            }).then(response => {
-                return response.json();
-            }).then(data => {
+            context.rootGetters.post('datastore_multisearch', body).then(data => {
                 context.state.current        = data;
                 context.state.resultsLoading = false;
                 if (data.success && data.result.after !== null) {
                     context.commit('addPage', {after: data.result.after});
                 }
-                context.state.failed = !data.success;
+                context.state.failed         = !data.success;
                 context.state.resultsInvalid = false;
             });
         },
         getSlug(context) {
             context.state.slugLoading = true;
-            fetch('/api/3/action/datastore_create_slug', {
-                method:      'POST',
-                mode:        'cors',
-                cache:       'no-cache',
-                credentials: 'same-origin',
-                headers:     {
-                    'Content-Type': 'application/json'
-                },
-                redirect:    'follow',
-                referrer:    'no-referrer',
-                body:        JSON.stringify({
-                                                query:        context.rootGetters.query,
-                                                resource_ids: context.rootState.resourceIds
-                                            }),
-            }).then(response => {
-                return response.json();
+            context.state.slugFailed = false;
+            context.rootGetters.post('datastore_create_slug', {
+                query:        context.rootGetters.query,
+                resource_ids: context.rootState.resourceIds
             }).then(data => {
                 context.state.slugLoading = false;
                 if (data.success) {
@@ -121,6 +99,24 @@ let results = {
                 }
                 else {
                     context.state.slug = null;
+                    context.state.slugFailed = true;
+                }
+            });
+        },
+        getDOI(context) {
+            context.state.doiLoading = true;
+            context.state.doiFailed = false;
+            context.rootGetters.post('create_doi', {
+                query:        context.rootGetters.query,
+                resource_ids: context.rootState.resourceIds
+            }).then(data => {
+                context.state.doiLoading = false;
+                if (data.success) {
+                    context.state.doi = data.result.doi;
+                }
+                else {
+                    context.state.doi = null;
+                    context.state.doiFailed = true;
                 }
             });
         },
@@ -132,23 +128,9 @@ let results = {
                     context.state.headers.push(f.content.fields)
                 }
             });
-
-            fetch('/api/3/action/datastore_guess_fields', {
-                method:      'POST',
-                mode:        'cors',
-                cache:       'no-cache',
-                credentials: 'same-origin',
-                headers:     {
-                    'Content-Type': 'application/json'
-                },
-                redirect:    'follow',
-                referrer:    'no-referrer',
-                body:        JSON.stringify({
-                                                query:        context.rootGetters.query,
-                                                resource_ids: context.rootState.resourceIds
-                                            }),
-            }).then(response => {
-                return response.json();
+            context.rootGetters.post('datastore_guess_fields', {
+                query:        context.rootGetters.query,
+                resource_ids: context.rootState.resourceIds
             }).then(data => {
                 if (data.success) {
                     context.state.headers = context.state.headers.concat(data.result.map(f => d3.keys(f.fields)));
