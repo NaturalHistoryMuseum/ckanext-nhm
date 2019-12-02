@@ -15,6 +15,11 @@
                     </button>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
+                    <a href="/help/search" target="_blank" class="collapse-to-icon">
+                        Help <i class="fas inline-icon-right fa-question"></i>
+                    </a>
+                </div>
+                <div class="text-right" style="margin-left: 10px;">
                     <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
                         Advanced <i class="fas inline-icon-right"
                         :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>

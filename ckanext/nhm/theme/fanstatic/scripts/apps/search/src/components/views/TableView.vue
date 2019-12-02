@@ -10,7 +10,7 @@
                     {{ header }}
                 </span>
             </div>
-            <div>
+            <div class="flex-container flex-nowrap flex-equal">
                 <i class="delete-field fas fa-times-circle fa-xs"
                     @click="removeHeader(index)"></i>
                 <i class="move-field fas fa-chevron-circle-left fa-xs"

@@ -1,9 +1,91 @@
 {% extends 'help/base.html' %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _(title), named_route='help.search' %}</li>
+    <li class="active">{% link_for _(title), named_route='help.search' %}</li>
 {% endblock %}
 
 {% block help_content %}
-    <p>This is the help page for our <em>Integrated Search</em> feature.</p>
+    {% set stats = h.get_site_statistics() %}
+    {% set specimens_url = h.url_for_collection_view() %}
+
+    <p>This is the help page for our <em>Integrated Search</em> feature. Access it
+        <a href="{{ url_for('search.view') }}">here</a>.</p>
+
+    <hr>
+
+    <h4>What is integrated search?</h4>
+    <p>
+        The Data Portal hosts many different datasets. The largest and most commonly used is our <a
+            href="{{ url_for('dataset.read', id='collection-specimens') }}">Specimens Collection</a>,
+        but there are {{ h.SI_number_span(stats.dataset_count - 1) }} more. Previously, you could
+        only search in one resource (one file within a dataset) at a time, but integrated search
+        allows you to search <em>multiple</em> resources at the same time. </p>
+    <p>
+        We've also made the search a lot more powerful by adding advanced features such as boolean
+        logic (AND, OR, and NOT) and number-based range queries (greater than, less than), with more
+        planned in the future. </p>
+
+    <h4>The old search</h4>
+    <p>If you still want to use the old search, we haven't removed anything. Just view the resource
+       you want to search in and everything should be exactly the same as before.</p>
+
+    <hr>
+
+    <h3>Using the integrated search</h3>
+    <h4>UI Overview</h4>
+    <img src="/images/help/search-overview-labelled.png" class="img-responsive">
+    <ul class="fa-ul">
+        <li>
+            <span class="fa-li"><i class="fas fa-question"></i></span> <b>Help</b>: takes you to
+                                                                                  this help page.
+        </li>
+        <li>
+            <span class="fa-li"><i class="fas fa-minus-circle"></i></span> <b>Advanced</b>:
+                                                                                          hides/shows
+                                                                                          the
+                                                                                          filters
+                                                                                          (shown by
+                                                                                          default).
+        </li>
+        <li>
+            <span class="fa-li"><i class="fas fa-eye"></i></span> <b>Query</b>: shows the JSON query
+                                                                              that will be submitted
+                                                                              to the API; useful if
+                                                                              you need to
+                                                                              troubleshoot or want
+                                                                              to use the search
+                                                                              programmatically.
+        </li>
+        <li>
+            <span class="fa-li"><i class="fas fa-trash"></i></span> <b>Reset</b>: clears all the
+                                                                                filters and
+                                                                                free-text search.
+        </li>
+        <li>
+            <span class="fa-li"><i class="fas fa-list"></i></span> <b>Resources</b>: view/edit the
+                                                                                   list of resources
+                                                                                   being searched by
+                                                                                   the current
+                                                                                   query.
+        </li>
+    </ul>
+
+    <h4>Selecting resources</h4>
+    <p>
+        Clicking on <b>Resources</b> <i class="fas fa-list"></i> will bring up a dialog similar to
+        this one:</p>
+    <img src="images/help/search-resources.png" class="img-responsive">
+    <p>To include a resource in your search, tick the box next to its name. You can select/deselect
+       all the resources within a dataset by clicking the dataset name in green above it, and
+       select/deselect all resources in the list using the "select all" checkbox at the top of the
+       list. </p>
+    <p>
+        To dismiss the dialog and save your changes, click outside the box. </p>
+
+    <h4>Free-text search</h4>
+    <p>
+        The free-text search box allows you to search all fields in your chosen resource list. For
+        example, the free-text search "<em>linnaeus</em>" will find records where "Linnaeus" is in
+        <em>scientificName</em> and those where "Linnaeus" is in <em>determinationNames</em>. </p>
+    <img src="/images/help/search-freetext.png" class="img-responsive">
 {% endblock %}
