@@ -1273,12 +1273,6 @@ iframe {
   text-align: center;
   padding: 10px 0;
 }
-.ckanpackager-form .privacy-warning {
-  text-align: left;
-  padding: 10px 0 5px 0;
-  font-size: 75%;
-  border-top: 1px solid #AFAFAF;
-}
 .dataset-form #field-temporal-extent {
   width: 200px;
 }
@@ -1299,9 +1293,18 @@ iframe {
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
+.form-row {
+  margin: 5px 0;
+}
 .info-block {
   color: #5B5B5B;
   font-size: 12px;
+}
+.privacy-warning {
+  text-align: left;
+  padding: 10px 0 5px 0;
+  font-size: 75%;
+  border-top: 1px solid #AFAFAF;
 }
 .search-form {
   border-bottom: none;
@@ -1659,6 +1662,10 @@ iframe {
   right: 0;
   margin: 5px;
   padding: 5px;
+}
+.multisearch-form .download-popup {
+  width: 400px;
+  max-width: 90vw;
 }
 .multisearch-form .filter-buttons {
   position: absolute;

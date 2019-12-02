@@ -54,12 +54,51 @@
             </div>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup" v-if="showDownload"
+                    <div class="floating info-popup download-popup" v-if="showDownload"
                         v-dismiss="{switch: 'showDownload', ignore: ['show-download']}">
-                        Coming soon!
+                        <p>The data will be extracted, with current filters
+                           applied, and sent to the given email address
+                           shortly.</p>
+                        <div class="form-row">
+                            <input id="download-email" type="text" class="full-width"
+                                v-model="downloadForm.email_address"
+                                placeholder="Please enter your email address">
+                        </div>
+                        <div class="form-row">
+                            <label for="download-format">File format</label>
+                            <select id="download-format" v-model="downloadForm.format"
+                                class="full-width">
+                                <option>csv</option>
+                            </select>
+                        </div>
+                        <div class="form-row flex-container flex-wrap flex-between">
+                            <div>
+                                <label for="download-sep">One file per resource</label>
+                                <input id="download-sep" type="checkbox"
+                                    v-model="downloadForm.separate_files">
+                            </div>
+                            <div>
+                                <label for="download-empty">Skip empty columns</label>
+                                <input id="download-empty" type="checkbox"
+                                    v-model="downloadForm.ignore_empty_fields">
+                            </div>
+                        </div>
+                        <div class="privacy-warning">
+                            <p><i>Data Protection</i></p>
+                            <p>The Natural History Museum will use your personal data in
+                               accordance with data protection legislation to process your
+                               requests. For more information please read our
+                                <a href="/privacy">privacy notice</a>.
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <a href="#" class="btn btn-primary text-right"
+                                @click="requestDownload(downloadForm)">Request Download</a>
+                        </div>
                     </div>
                 </transition>
-                <a href="#" v-if="total > 0" @click="downloadResults" class="btn btn-disabled"
+                <a href="#" v-if="total > 0" @click="showDownload = !showDownload"
+                    class="btn btn-disabled"
                     id="show-download">
                     <i class="fas fa-cloud-download-alt"></i>Download
                 </a>
@@ -127,6 +166,12 @@
                 showFields:   false,
                 views:        ['Table', 'List'],
                 currentView:  'Table',
+                downloadForm: {
+                    email_address:       null,
+                    format:              'csv',
+                    separate_files:      true,
+                    ignore_empty_fields: true
+                }
             }
         },
         computed:   {
@@ -140,13 +185,7 @@
         },
         methods:    {
             ...mapMutations('results', ['addCustomHeader']),
-            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI']),
-            downloadResults() {
-                this.showDownload = true;
-                setTimeout(() => {
-                    this.showDownload = false;
-                }, 1000);
-            },
+            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'requestDownload']),
             citeSearch() {
                 this.getDOI();
             },

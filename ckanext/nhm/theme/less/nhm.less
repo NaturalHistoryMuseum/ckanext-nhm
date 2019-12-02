@@ -1187,13 +1187,6 @@ iframe {
     text-align: center;
     padding: 10px 0;
   }
-
-  & .privacy-warning {
-    text-align: left;
-    padding: 10px 0 5px 0;
-    font-size: 75%;
-    border-top: 1px solid @grey6;
-  }
 }
 
 .dataset-form {
@@ -1223,9 +1216,20 @@ iframe {
   margin-right: 0 !important;
 }
 
+.form-row {
+  margin: 5px 0;
+}
+
 .info-block {
   color: @grey3;
   font-size: @font-size-body-s;
+}
+
+.privacy-warning {
+  text-align: left;
+  padding: 10px 0 5px 0;
+  font-size: 75%;
+  border-top: 1px solid @grey6;
 }
 
 .search-button(@button-size, @button-pad) {
@@ -1509,6 +1513,7 @@ iframe {
 
   .filter-add-choice {
     width: max-content;
+
     & span {
       background-color: @grey10;
       border-radius: @rounding;
@@ -1615,6 +1620,11 @@ iframe {
     padding: 5px;
   }
 
+  .download-popup {
+    width: 400px;
+    max-width: 90vw;
+  }
+
   .filter-buttons {
     position: absolute;
     right: 0;
@@ -1674,6 +1684,7 @@ iframe {
     & .record-body {
       padding-top: 10px;
       width: 100%;
+
       & > img {
         width: 200px;
         height: 200px;

@@ -88,7 +88,7 @@ let results = {
         },
         getSlug(context) {
             context.state.slugLoading = true;
-            context.state.slugFailed = false;
+            context.state.slugFailed  = false;
             context.rootGetters.post('datastore_create_slug', {
                 query:        context.rootGetters.query,
                 resource_ids: context.rootState.resourceIds
@@ -98,14 +98,14 @@ let results = {
                     context.state.slug = data.result.slug;
                 }
                 else {
-                    context.state.slug = null;
+                    context.state.slug       = null;
                     context.state.slugFailed = true;
                 }
             });
         },
         getDOI(context) {
             context.state.doiLoading = true;
-            context.state.doiFailed = false;
+            context.state.doiFailed  = false;
             context.rootGetters.post('create_doi', {
                 query:        context.rootGetters.query,
                 resource_ids: context.rootState.resourceIds
@@ -115,7 +115,7 @@ let results = {
                     context.state.doi = data.result.doi;
                 }
                 else {
-                    context.state.doi = null;
+                    context.state.doi       = null;
                     context.state.doiFailed = true;
                 }
             });
@@ -136,6 +136,18 @@ let results = {
                     context.state.headers = context.state.headers.concat(data.result.map(f => d3.keys(f.fields)));
                 }
             });
+        },
+        requestDownload(context, payload) {
+            if (payload.email_address === null) {
+                return;
+            }
+
+            payload.query        = context.rootGetters.query;
+            payload.resource_ids = context.rootState.resourceIds;
+
+            context.rootGetters.post('datastore_queue_download', payload).then(data => {
+                console.log(data);
+            })
         }
     }
 };

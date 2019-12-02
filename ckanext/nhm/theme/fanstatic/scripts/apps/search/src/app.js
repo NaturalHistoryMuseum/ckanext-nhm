@@ -8,7 +8,6 @@ Vue.directive('dismiss', {
     bind(el, binding, vnode) {
         outsideClick = (event) => {
             event.stopPropagation();
-            console.log(el);
             if (!$.contains(el, event.target)) {
                 let ignore = binding.value.ignore.includes(event.target.id);
                 let i      = 0;
