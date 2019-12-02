@@ -1207,6 +1207,9 @@ iframe {
 .control-group.error .add-on {
   border-color: #890022;
 }
+.control-required {
+  display: inline !important;
+}
 .contact-form {
   display: flex;
   flex-direction: column;

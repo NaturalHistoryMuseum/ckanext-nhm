@@ -4,19 +4,22 @@ import Vue from 'vue';
 let results = {
     namespaced: true,
     state:      {
-        current:        {},
-        after:          [],
-        page:           0,
-        slug:           null,
-        doi:            null,
-        headers:        [],
-        failed:         false,
-        slugLoading:    false,
-        slugFailed:     false,
-        doiLoading:     false,
-        doiFailed:      false,
-        resultsLoading: false,
-        resultsInvalid: false
+        current:            {},
+        after:              [],
+        page:               0,
+        failed:             false,
+        headers:            [],
+        resultsLoading:     false,
+        resultsInvalid:     false,
+        slug:               null,
+        slugLoading:        false,
+        slugFailed:         false,
+        doi:                null,
+        doiLoading:         false,
+        doiFailed:          false,
+        download:         null,
+        downloadProcessing: false,
+        downloadFailed:     false
     },
     getters:    {
         hasResult:         (state) => {
@@ -48,6 +51,8 @@ let results = {
         },
         invalidateResults(state) {
             state.slug           = null;
+            state.doi            = null;
+            state.downloadId     = null;
             state.resultsInvalid = true;
         },
         addCustomHeader(state, field) {
@@ -111,7 +116,7 @@ let results = {
             context.state.doiLoading = true;
             context.state.doiFailed  = false;
 
-            payload.query = context.rootGetters.query;
+            payload.query        = context.rootGetters.query;
             payload.resource_ids = context.rootState.resourceIds;
 
             context.rootGetters.post('create_doi', payload).then(data => {
@@ -148,11 +153,20 @@ let results = {
                 return;
             }
 
+            context.state.downloadProcessing = true;
+            context.state.downloadFailed = false;
+
             payload.query        = context.rootGetters.query;
             payload.resource_ids = context.rootState.resourceIds;
 
             context.rootGetters.post('datastore_queue_download', payload).then(data => {
-                console.log(data);
+                context.state.downloadProcessing = false;
+                if (data.success) {
+                    context.state.download = data.result;
+                }
+                else {
+                    context.state.downloadFailed = true;
+                }
             })
         }
     }

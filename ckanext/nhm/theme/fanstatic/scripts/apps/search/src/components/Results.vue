@@ -17,7 +17,9 @@
                             Failed to retrieve DOI. Please try again later.
                         </p>
                         <div class="form-row" v-if="doi === null">
-                            <label for="doi-email" class="control-required">Your email</label>
+                            <label for="doi-email" class="control-label">
+                                <span class="control-required">*</span>Your email
+                            </label>
                             <input id="doi-email" type="text" class="full-width"
                                 v-model="doiForm.email_address"
                                 placeholder="data@nhm.ac.uk">
@@ -70,32 +72,42 @@
                 <transition name="slidedown">
                     <div class="floating info-popup download-popup" v-if="showDownload"
                         v-dismiss="{switch: 'showDownload', ignore: ['show-download']}">
-                        <p>The data will be extracted, with current filters
-                           applied, and sent to the given email address
-                           shortly.</p>
-                        <div class="form-row">
-                            <label for="download-email" class="control-required">Your email</label>
-                            <input id="download-email" type="text" class="full-width"
-                                v-model="downloadForm.email_address"
-                                placeholder="data@nhm.ac.uk">
-                        </div>
-                        <div class="form-row">
-                            <label for="download-format">File format</label>
-                            <select id="download-format" v-model="downloadForm.format"
-                                class="full-width">
-                                <option>csv</option>
-                            </select>
-                        </div>
-                        <div class="form-row flex-container flex-wrap flex-between">
-                            <div>
-                                <label for="download-sep">One file per resource</label>
-                                <input id="download-sep" type="checkbox"
-                                    v-model="downloadForm.separate_files">
+                        <p v-if="download !== null">
+                            Success! You should receive an email at <b>{{ downloadForm.email_address }}</b> soon.
+                        </p>
+                        <p class="alert-error" v-if="downloadFailed">
+                            The download request failed. Please try again later.
+                        </p>
+                        <div v-if="download === null">
+                            <p>The data will be extracted, with current filters
+                               applied, and sent to the given email address
+                               shortly.</p>
+                            <div class="form-row">
+                                <label for="download-email" class="control-label">
+                                    <span class="control-required">*</span>Your email
+                                </label>
+                                <input id="download-email" type="text" class="full-width"
+                                    v-model="downloadForm.email_address"
+                                    placeholder="data@nhm.ac.uk">
                             </div>
-                            <div>
-                                <label for="download-empty">Skip empty columns</label>
-                                <input id="download-empty" type="checkbox"
-                                    v-model="downloadForm.ignore_empty_fields">
+                            <div class="form-row">
+                                <label for="download-format">File format</label>
+                                <select id="download-format" v-model="downloadForm.format"
+                                    class="full-width">
+                                    <option>csv</option>
+                                </select>
+                            </div>
+                            <div class="form-row flex-container flex-wrap flex-between">
+                                <div>
+                                    <label for="download-sep">One file per resource</label>
+                                    <input id="download-sep" type="checkbox"
+                                        v-model="downloadForm.separate_files">
+                                </div>
+                                <div>
+                                    <label for="download-empty">Skip empty columns</label>
+                                    <input id="download-empty" type="checkbox"
+                                        v-model="downloadForm.ignore_empty_fields">
+                                </div>
                             </div>
                         </div>
                         <div class="privacy-warning">
@@ -106,9 +118,12 @@
                                 <a href="/privacy">privacy notice</a>.
                             </p>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right" v-if="download === null">
                             <a href="#" class="btn btn-primary text-right"
-                                @click="requestDownload(downloadForm)">Request Download</a>
+                                @click="requestDownload(downloadForm)">
+                                <i class="fas" :class="downloadProcessing ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                                Request Download
+                            </a>
                         </div>
                     </div>
                 </transition>
@@ -181,7 +196,7 @@
                 showFields:   false,
                 views:        ['Table', 'List'],
                 currentView:  'Table',
-                doiForm: {
+                doiForm:      {
                     email_address: null
                 },
                 downloadForm: {
@@ -195,7 +210,8 @@
         computed:   {
             ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
                                     'resultsLoading', 'slugLoading', 'resultsInvalid', 'doi',
-                                    'doiLoading', 'slugFailed', 'doiFailed']),
+                                    'doiLoading', 'slugFailed', 'doiFailed', 'download',
+                                    'downloadProcessing', 'downloadFailed']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
             viewComponent() {
                 return this.currentView + 'View';
