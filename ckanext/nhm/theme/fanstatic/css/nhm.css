@@ -351,7 +351,9 @@ body .default-text a:focus {
 .copyable {
   font-family: monospace;
   background-color: #F2F2F2;
-  border: 1px dotted #DDDDDD;
+  border: 1px dashed #DDDDDD;
+  font-size: 1.5em;
+  padding: 5px;
 }
 .handle i {
   position: relative;
@@ -1662,10 +1664,13 @@ iframe {
   right: 0;
   margin: 5px;
   padding: 5px;
+  max-width: 90vw;
 }
 .multisearch-form .download-popup {
   width: 400px;
-  max-width: 90vw;
+}
+.multisearch-form .doi-popup {
+  min-width: 200px;
 }
 .multisearch-form .filter-buttons {
   position: absolute;
@@ -1715,6 +1720,7 @@ iframe {
 .multisearch-form .record-item .record-body {
   padding-top: 10px;
   width: 100%;
+  height: 100%;
 }
 .multisearch-form .record-item .record-body > img {
   width: 200px;

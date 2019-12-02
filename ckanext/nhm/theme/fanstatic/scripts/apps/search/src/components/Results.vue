@@ -9,20 +9,34 @@
             <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup" v-if="showCite"
+                    <div class="floating info-popup doi-popup" v-if="showCite"
                         v-dismiss="{switch: 'showCite', ignore: ['show-cite', 'use-a-doi']}">
                         <p>Cite this search:</p>
-                        <p>
-                            <a href="#" @click="citeSearch" class="btn btn-primary"
-                                v-if="doi === null"><i class="fas"
-                                :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
-                                Create a DOI
-                            </a>
-                        </p>
                         <p class="nowrap copyable" v-if="doi !== null">{{ doi }}</p>
                         <p class="alert-error" v-if="doiFailed">
                             Failed to retrieve DOI. Please try again later.
                         </p>
+                        <div class="form-row" v-if="doi === null">
+                            <label for="doi-email" class="control-required">Your email</label>
+                            <input id="doi-email" type="text" class="full-width"
+                                v-model="doiForm.email_address"
+                                placeholder="data@nhm.ac.uk">
+                        </div>
+                        <div class="privacy-warning">
+                            <p><i>Data Protection</i></p>
+                            <p>The Natural History Museum will use your personal data in
+                               accordance with data protection legislation to process your
+                               requests. For more information please read our
+                                <a href="/privacy">privacy notice</a>.
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <a href="#" @click="getDOI(doiForm)" class="btn btn-primary"
+                                v-if="doi === null"><i class="fas"
+                                :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
+                                Create a DOI
+                            </a>
+                        </div>
                     </div>
                 </transition>
                 <a href="#" @click="showCite = !showCite" class="btn btn-disabled" id="show-cite">
@@ -60,9 +74,10 @@
                            applied, and sent to the given email address
                            shortly.</p>
                         <div class="form-row">
+                            <label for="download-email" class="control-required">Your email</label>
                             <input id="download-email" type="text" class="full-width"
                                 v-model="downloadForm.email_address"
-                                placeholder="Please enter your email address">
+                                placeholder="data@nhm.ac.uk">
                         </div>
                         <div class="form-row">
                             <label for="download-format">File format</label>
@@ -166,6 +181,9 @@
                 showFields:   false,
                 views:        ['Table', 'List'],
                 currentView:  'Table',
+                doiForm: {
+                    email_address: null
+                },
                 downloadForm: {
                     email_address:       null,
                     format:              'csv',
@@ -186,9 +204,6 @@
         methods:    {
             ...mapMutations('results', ['addCustomHeader']),
             ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'requestDownload']),
-            citeSearch() {
-                this.getDOI();
-            },
             shareSearch() {
                 if (!this.showShare && this.slug === null) {
                     this.getSlug();

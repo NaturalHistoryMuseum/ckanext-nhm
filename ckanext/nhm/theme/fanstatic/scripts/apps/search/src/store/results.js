@@ -103,14 +103,20 @@ let results = {
                 }
             });
         },
-        getDOI(context) {
+        getDOI(context, payload) {
+            if (payload.email_address === null) {
+                return;
+            }
+
             context.state.doiLoading = true;
             context.state.doiFailed  = false;
-            context.rootGetters.post('create_doi', {
-                query:        context.rootGetters.query,
-                resource_ids: context.rootState.resourceIds
-            }).then(data => {
+
+            payload.query = context.rootGetters.query;
+            payload.resource_ids = context.rootState.resourceIds;
+
+            context.rootGetters.post('create_doi', payload).then(data => {
                 context.state.doiLoading = false;
+                console.log(data);
                 if (data.success) {
                     context.state.doi = data.result.doi;
                 }
