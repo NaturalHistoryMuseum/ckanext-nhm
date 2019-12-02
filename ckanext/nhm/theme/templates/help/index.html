@@ -1,0 +1,55 @@
+{% extends 'help/base.html' %}
+
+{% block breadcrumb_content %}
+    <li class="active">{% link_for _(title), named_route='help.index' %}</li>
+{% endblock %}
+
+{% block help_content %}
+    <table class="blocks-table">
+        <tr>
+            <th class="blocks-table-header">
+                <span>Documentation</span>
+            </th>
+            <td class="flex-container flex-wrap flex-wrap-spacing">
+                <span class="blocks-table-cell">
+                    <a href="https://naturalhistorymuseum.github.io/dataportal-docs"
+                            class="external">
+                    API docs
+                </a>
+                </span>
+
+                <span class="blocks-table-cell"><a
+                        href="https://docs.ckan.org/en/latest/api/index.html"
+                        class="external">
+                    CKAN API docs
+
+                </a></span>
+                <span class="blocks-table-cell">
+                    <a href="https://github.com/search?q=topic%3Ackan-extension+org%3ANaturalHistoryMuseum&type=Repositories"
+                            class="external">
+                    Look through our source code
+                </a></span>
+            </td>
+        </tr>
+        <tr>
+            <th class="blocks-table-header">
+                <span>Contact</span>
+            </th>
+            <td class="flex-container flex-wrap flex-wrap-spacing">
+                <span class="blocks-table-cell">
+                    <a href="https://gitter.im/nhm-data-portal" class="external">
+                    Chat to us on Gitter
+                    </a>
+                </span>
+                <span class="blocks-table-cell">
+                    <a href="/contact">Email us</a>
+                </span>
+                <span class="blocks-table-cell">
+                    <a href="https://twitter.com/nhm_data" class="external">
+                    Follow us on Twitter
+                    </a>
+                </span>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

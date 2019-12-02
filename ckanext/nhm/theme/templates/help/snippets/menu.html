@@ -1,0 +1,18 @@
+{#
+Displays the help menu
+#}
+
+<section class="module module-narrow">
+    <div class="module context-info">
+        <nav class="section navigation">
+            <ul class="nav nav-simple" id="help-menu">
+                {{ h.build_nav_main(
+                    ('help.index', _('Index')),
+                    ('help.search', _('Integrated Search'))
+              ) }}
+            </ul>
+        </nav>
+    </div>
+</section>
+
+

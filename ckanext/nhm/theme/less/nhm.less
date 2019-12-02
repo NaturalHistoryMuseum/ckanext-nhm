@@ -548,7 +548,8 @@ iframe {
   background: transparent;
   padding-top: 40px;
   position: relative;
-  min-height: 100%;
+  height: 100%;
+  min-height: 40vh;
 }
 
 .masthead {
@@ -779,7 +780,7 @@ iframe {
   position: relative;
   bottom: 0;
   width: 100%;
-  z-index: -1;
+  z-index: 0;
 
   .nav {
     margin: 20px 0;
@@ -2448,7 +2449,7 @@ select, .select2-choice {
   display: inline-block;
 }
 
-.credits-header {
+.blocks-table-header {
   background-color: @grey9;
   text-transform: capitalize;
   font-weight: bold;
@@ -2459,7 +2460,7 @@ select, .select2-choice {
   vertical-align: top;
 }
 
-.credits-cell {
+.blocks-table-cell {
   .mixin-flex-container();
   .mixin-flex-column();
   .mixin-flex-top();
@@ -2475,12 +2476,12 @@ select, .select2-choice {
   }
 }
 
-.credits-table {
+.blocks-table {
   border-spacing: 2px 15px;
   border-collapse: separate;
 
   & td {
-    margin: -1px 0; // to offset the .credits-cell margins
+    margin: -1px 0; // to offset the .blocks-table-cell margins
   }
 }
 

@@ -1,0 +1,9 @@
+{% extends 'help/base.html' %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _(title), named_route='help.search' %}</li>
+{% endblock %}
+
+{% block help_content %}
+    <p>This is the help page for our <em>Integrated Search</em> feature.</p>
+{% endblock %}
