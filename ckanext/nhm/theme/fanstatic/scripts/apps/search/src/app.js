@@ -2,11 +2,11 @@ import Vue from 'vue';
 import App from './App.vue';
 import store from './store/main';
 
-let outsideClick;
+let outsideClick = {};
 
 Vue.directive('dismiss', {
     bind(el, binding, vnode) {
-        outsideClick = (event) => {
+        outsideClick[vnode.context._uid] = (event) => {
             event.stopPropagation();
             if (!$.contains(el, event.target)) {
                 let ignore = binding.value.ignore.includes(event.target.id);
@@ -23,13 +23,13 @@ Vue.directive('dismiss', {
                 }
             }
         };
-        document.addEventListener('click', outsideClick);
-        document.addEventListener('touchStart', outsideClick);
+        document.addEventListener('click', outsideClick[vnode.context._uid]);
+        document.addEventListener('touchStart', outsideClick[vnode.context._uid]);
     },
 
-    unbind() {
-        document.removeEventListener('click', outsideClick);
-        document.removeEventListener('touchstart', outsideClick);
+    unbind(el, binding, vnode) {
+        document.removeEventListener('click', outsideClick[vnode.context._uid]);
+        document.removeEventListener('touchstart', outsideClick[vnode.context._uid]);
     }
 });
 
