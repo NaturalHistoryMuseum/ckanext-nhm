@@ -15,24 +15,24 @@
                     </button>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showAdvanced = !showAdvanced">
+                    <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
                         Advanced <i class="fas inline-icon-right"
                         :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
                     </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showQuery = !showQuery">
+                    <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon">
                         Query <i class="inline-icon-right fas"
                         :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i>
                     </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="resetFilters">
+                    <a href="#" @click="resetFilters" class="collapse-to-icon">
                         Reset <i class="inline-icon-right fas fa-trash"></i>
                     </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showResources = !showResources" id="btnResources">
+                    <a href="#" @click="showResources = !showResources" id="btnResources" class="collapse-to-icon">
                         Resources <i class="fas fa-list inline-icon-right"></i>
                     </a>
                 </div>
