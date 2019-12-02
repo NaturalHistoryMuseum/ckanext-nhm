@@ -1,7 +1,7 @@
 <template>
     <div :class="[...filterClasses, 'filter-group', 'filter-type-' + filterKey]">
         <a class="group-type" href="#" @click.self="changeGroupType">
-            {{ readableGroupType }}<i class="fas fa-sync fa-xs inline-icon-right"></i>
+            {{ readableGroupType }}
         </a>
         <FilterTerm
             v-for="id in subTerms"

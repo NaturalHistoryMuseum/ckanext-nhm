@@ -1424,7 +1424,6 @@ iframe {
   margin: 10px;
 }
 .multisearch-form .fields {
-  font-family: monospace;
   font-weight: normal !important;
   background-color: #FFFFFF;
   border: 1px dashed #AFAFAF;
@@ -1433,14 +1432,14 @@ iframe {
   border-radius: 5px;
   line-height: 1;
 }
-.multisearch-form .delete-field {
+.multisearch-form .delete-field,
+.multisearch-form .move-field {
   color: #5B5B5B;
   padding-left: 5px;
 }
 .multisearch-form .field-picker {
   right: 0;
   width: 200px;
-  font-family: monospace;
   font-size: 14px;
 }
 .multisearch-form .preset-picker {
@@ -1546,9 +1545,19 @@ iframe {
 .multisearch-form .filter-item.filter-group > a.group-type:active {
   color: #5B5B5B;
 }
+.multisearch-form .filter-item.filter-group > a.group-type::after {
+  font-family: 'FontAwesome', sans-serif;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  font-weight: normal;
+  content: '\f061';
+  font-size: 0.7em;
+  padding-left: 5px;
+}
 .multisearch-form .filter-item.filter-type-and,
 .multisearch-form .filter-item.filter-type-and > .group-type {
-  background-color: #d4f9ef;
+  background-color: #BBEDA9;
 }
 .multisearch-form .filter-item.filter-type-or,
 .multisearch-form .filter-item.filter-type-or > .group-type {
@@ -1556,7 +1565,7 @@ iframe {
 }
 .multisearch-form .filter-item.filter-type-not,
 .multisearch-form .filter-item.filter-type-not > .group-type {
-  background-color: #f7c8b9;
+  background-color: #E2B8B8;
 }
 .multisearch-form .filter-add {
   text-align: right;
@@ -1598,12 +1607,10 @@ iframe {
   width: 200px;
   min-height: unset !important;
   height: unset;
-  font-family: monospace;
   border: 2px solid #C3C3C3;
   padding: 1.2px 2px 2px;
 }
 .multisearch-form .term-editor input {
-  font-family: monospace;
   border: 2px solid #C3C3C3;
   border-radius: 5px;
 }
@@ -1915,6 +1922,17 @@ select {
   justify-content: stretch;
   overflow-x: auto;
   overflow-y: visible;
+}
+.table-grid .data-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.table-grid .data-header > * {
+  vertical-align: center;
+}
+.table-grid .data-header > * {
+  align-self: flex-start;
 }
 .table-grid .th {
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;

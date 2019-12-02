@@ -11,9 +11,7 @@
         name:     'BaseView',
         data:     function () {
             return {
-                showFields:    false,
-                fieldSearch:   null,
-                fieldList:     [],
+                showFields:    false
             }
         },
         mounted:  function () {
@@ -25,31 +23,7 @@
             ...mapGetters('results', ['total', 'records'])
         },
         methods:  {
-            ...mapMutations('results', ['addCustomHeader', 'removeHeader']),
-            getFieldList() {
-                const vue       = this;
-                let resourceIds = this.current.result === undefined ? [] : this.current.result.records.map(r => r.resource);
-                fetch('/api/3/action/datastore_field_autocomplete', {
-                    method:      'POST',
-                    mode:        'cors',
-                    cache:       'no-cache',
-                    credentials: 'same-origin',
-                    headers:     {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect:    'follow',
-                    referrer:    'no-referrer',
-                    body:        JSON.stringify({
-                                                    resource_ids: resourceIds,
-                                                    text:         vue.fieldSearch,
-                                                    lowercase:    true
-                                                }),
-                }).then(response => {
-                    return response.json();
-                }).then(data => {
-                    vue.fieldList = Object.keys(data.result.fields).sort();
-                });
-            },
+            ...mapMutations('results', ['removeHeader', 'moveHeader']),
             getDetails(resourceId) {
                 let resourceDetails = this.resourceDetails[resourceId];
 
@@ -105,7 +79,7 @@
                 return v;
             },
             updateView() {
-                this.getFieldList();
+                //
             }
         },
         watch:    {
@@ -114,9 +88,6 @@
                     this.updateView();
                 },
                 deep: true
-            },
-            fieldSearch() {
-                this.getFieldList();
             }
         }
     }

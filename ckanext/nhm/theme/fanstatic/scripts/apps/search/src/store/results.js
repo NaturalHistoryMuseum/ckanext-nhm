@@ -27,6 +27,9 @@ let results = {
         },
         records:    (state, getters) => {
             return getters.hasResult ? state.current.result.records : [];
+        },
+        resultResourceIds: (state, getters) => {
+            return getters.records.map(r => r.resource);
         }
     },
     mutations:  {
@@ -48,6 +51,12 @@ let results = {
         },
         removeHeader(state, headerIndex) {
             Vue.delete(state.headers, headerIndex);
+        },
+        moveHeader(state, payload) {
+            let header = state.headers[payload.ix];
+            let target = state.headers[payload.ix + payload.by];
+            Vue.set(state.headers, payload.ix + payload.by, header);
+            Vue.set(state.headers, payload.ix, target);
         }
     },
     actions:    {

@@ -6,7 +6,7 @@
                found a problem.</p>
         </div>
         <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
-            <h3>{{ total }} records</h3>
+            <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup" v-if="showCite"
@@ -49,12 +49,26 @@
             </div>
         </div>
         <div>
-            <ul class="nav nav-tabs">
-                <li v-for="viewTab in views" :key="viewTab.id"
-                    :class="{active: currentView === viewTab}" @click="currentView = viewTab">
-                    <a>{{ viewTab }}</a>
-                </li>
-            </ul>
+            <div class="flex-container flex-stretch-first flex-center">
+                <ul class="nav nav-tabs">
+                    <li v-for="viewTab in views" :key="viewTab.id"
+                        :class="{active: currentView === viewTab}" @click="currentView = viewTab">
+                        <a>{{ viewTab }}</a>
+                    </li>
+                </ul>
+                <div class="text-right">
+                    <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid">
+                        <i class="fas fa-plus-circle"></i>
+                    </a>
+                    <transition name="slidedown">
+                        <FieldPicker v-if="showFields" :callback="addCustomHeader"
+                            :resource-ids="resultResourceIds"
+                            v-dismiss="{switch: 'showFields', ignore: ['show-fields-' + _uid]}">
+                        </FieldPicker>
+                    </transition>
+                </div>
+            </div>
+
 
             <component :is="viewComponent" v-if="hasRecords"></component>
         </div>
@@ -78,19 +92,22 @@
 <script>
     import TableView from './views/TableView.vue';
     import ListView from './views/ListView.vue';
-    import {mapActions, mapGetters, mapState} from 'vuex'
+    import FieldPicker from './misc/FieldPicker.vue';
+    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
 
     export default {
         name:       'Results',
         components: {
             TableView,
-            ListView
+            ListView,
+            FieldPicker
         },
         data:       function () {
             return {
                 showDownload: false,
                 showCite:     false,
                 showShare:    false,
+                showFields: false,
                 views:        ['Table', 'List'],
                 currentView:  'Table',
                 doi:          '',
@@ -99,12 +116,13 @@
         computed:   {
             ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
                                     'resultsLoading', 'slugLoading', 'resultsInvalid']),
-            ...mapGetters('results', ['total', 'hasResult', 'hasRecords']),
+            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
             viewComponent() {
                 return this.currentView + 'View';
             }
         },
         methods:    {
+            ...mapMutations('results', ['addCustomHeader']),
             ...mapActions('results', ['runSearch', 'getSlug']),
             downloadResults() {
                 this.showDownload = true;
