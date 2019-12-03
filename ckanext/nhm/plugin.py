@@ -636,8 +636,12 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # of groups that we don't care about
         if (helpers.get_specimen_resource_id() in resource_ids or
                 helpers.get_indexlot_resource_id() in resource_ids):
-            fields.remove(re.compile(r'associatedMedia\.*', re.I))
-            for group in (u'created', u'modified', u'basisOfRecord', u'institutionCode'):
-                fields.remove(group)
+            fields.force(u'collectionCode')
+            fields.force(u'typeStatus')
+            fields.force(u'family')
+            fields.force(u'genus')
+            for group in (u'created', u'modified', u'basisOfRecord', u'institutionCode',
+                          u'associatedMedia.*'):
+                fields.ignore(group)
 
         return fields
