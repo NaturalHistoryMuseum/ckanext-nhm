@@ -1268,26 +1268,23 @@ iframe {
     padding: 0 5px;
     left: 0;
 
-    .scope-tab:first-child {
-      border-radius: 0 0 0 @rounding;
-    }
-
-    .scope-tab:last-child {
-      border-right: none;
-      border-radius: 0 0 @rounding 0;
-    }
-
     & .scope-tab {
-      border-right: solid 2px @grey3;
       background: @grey7;
       text-align: center;
       font-family: @font-title;
       font-size: @font-size-body-l;
       padding: 10px 5px 5px;
       cursor: pointer;
+      opacity: 0.9;
+      border-radius: 0 0 @rounding @rounding;
 
       &.selected {
         background: @grey9;
+        opacity: 1;
+      }
+
+      &:not(:last-child){
+        margin-right: 5px;
       }
     }
   }
@@ -2140,15 +2137,15 @@ select, .select2-choice {
   border: none;
   position: relative;
   @media (max-width: @xl - 1) {
-    padding: @pad-search (@pad-search / 2) @pad-search !important;
+    padding: @pad-search (@pad-search / 2) (@pad-search + @margin-search) !important;
   }
   @media (min-width: @xl) {
-    padding: @pad-search (@pad-search * 2) @pad-search !important;
+    padding: @pad-search (@pad-search * 2) (@pad-search + @margin-search) !important;
     margin: 0 !important;
   }
   @media (max-width: @sm - 1) {
     max-height: 15vw;
-    padding: @pad-search/2 5px @pad-search/2 !important;
+    padding: @pad-search/2 5px (@pad-search + @margin-search)/2 !important;
   }
 
   & .search-input input {

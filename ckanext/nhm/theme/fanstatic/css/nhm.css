@@ -1322,24 +1322,22 @@ iframe {
   padding: 0 5px;
   left: 0;
 }
-.search-form .scope-tabs .scope-tab:first-child {
-  border-radius: 0 0 0 5px;
-}
-.search-form .scope-tabs .scope-tab:last-child {
-  border-right: none;
-  border-radius: 0 0 5px 0;
-}
 .search-form .scope-tabs .scope-tab {
-  border-right: solid 2px #5B5B5B;
   background: #C3C3C3;
   text-align: center;
   font-family: 'Elysio Regular', 'Open Sans', sans-serif;
   font-size: 17px;
   padding: 10px 5px 5px;
   cursor: pointer;
+  opacity: 0.9;
+  border-radius: 0 0 5px 5px;
 }
 .search-form .scope-tabs .scope-tab.selected {
   background: #F2F2F2;
+  opacity: 1;
+}
+.search-form .scope-tabs .scope-tab:not(:last-child) {
+  margin-right: 5px;
 }
 .search-form .search-input {
   margin-bottom: 15px;
@@ -2155,19 +2153,19 @@ select,
 }
 @media (max-width: 1199px) {
   .collection-search-form {
-    padding: 80px 40px 80px !important;
+    padding: 80px 40px 100px !important;
   }
 }
 @media (min-width: 1200px) {
   .collection-search-form {
-    padding: 80px 160px 80px !important;
+    padding: 80px 160px 100px !important;
     margin: 0 !important;
   }
 }
 @media (max-width: 575px) {
   .collection-search-form {
     max-height: 15vw;
-    padding: 40px 5px 40px !important;
+    padding: 40px 5px 50px !important;
   }
 }
 .collection-search-form .search-input input {
