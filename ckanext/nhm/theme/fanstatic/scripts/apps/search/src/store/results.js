@@ -17,7 +17,7 @@ let results = {
         doi:                null,
         doiLoading:         false,
         doiFailed:          false,
-        download:         null,
+        download:           null,
         downloadProcessing: false,
         downloadFailed:     false
     },
@@ -147,6 +147,11 @@ let results = {
                     context.state.headers = context.state.headers.concat(data.result.map(f => d3.keys(f.fields)));
                 }
             });
+
+            context.state.headers = context.state.headers.filter(h => {
+                return !context.state.headers.map(x => JSON.stringify(x))
+                               .includes(JSON.stringify(h))
+            });
         },
         requestDownload(context, payload) {
             if (payload.email_address === null) {
@@ -154,7 +159,7 @@ let results = {
             }
 
             context.state.downloadProcessing = true;
-            context.state.downloadFailed = false;
+            context.state.downloadFailed     = false;
 
             payload.query        = context.rootGetters.query;
             payload.resource_ids = context.rootState.resourceIds;
