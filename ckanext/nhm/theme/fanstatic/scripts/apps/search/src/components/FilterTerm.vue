@@ -5,7 +5,7 @@
         <transition name="slideright">
             <TermEditor v-if="showEditor" :existing-term-id="filterId"
                 :parent-id="filterItem.parent"
-                v-dismiss="{switch: 'showEditor', ignore: ['show-editor-' + _uid]}"></TermEditor>
+                v-dismiss="{switch: 'showEditor', ignore: ['#show-editor-' + _uid]}"></TermEditor>
         </transition>
         <div class="filter-buttons">
             <i class="edit-filter fas fa-pencil-alt fa-xs" @click="showEditor = !showEditor"

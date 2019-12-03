@@ -43,7 +43,7 @@
                 </div>
                 <transition name="slidedown">
                     <ResourceList v-if="showResources"
-                        v-dismiss="{switch: 'showResources', ignore: ['btnResources']}">
+                        v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}">
                     </ResourceList>
                 </transition>
             </div>

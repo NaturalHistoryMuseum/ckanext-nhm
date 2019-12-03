@@ -10,7 +10,7 @@
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup doi-popup" v-if="showCite"
-                        v-dismiss="{switch: 'showCite', ignore: ['show-cite', 'use-a-doi']}">
+                        v-dismiss="{switch: 'showCite', ignore: ['#show-cite', 'use-a-doi']}">
                         <p>Cite this search:</p>
                         <p class="nowrap copyable" v-if="doi !== null">{{ doi }}</p>
                         <p class="alert-error" v-if="doiFailed">
@@ -48,7 +48,7 @@
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup" v-if="showShare"
-                        v-dismiss="{switch: 'showShare', ignore: ['show-share']}">
+                        v-dismiss="{switch: 'showShare', ignore: ['#show-share']}">
                         <div v-if="slug !== null">
                             <p>Share this search:</p>
                             <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span>
@@ -71,7 +71,7 @@
             <div style="position: relative;">
                 <transition name="slidedown">
                     <div class="floating info-popup download-popup" v-if="showDownload"
-                        v-dismiss="{switch: 'showDownload', ignore: ['show-download']}">
+                        v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
                         <p v-if="download !== null">
                             Success! You should receive an email at <b>{{ downloadForm.email_address }}</b> soon.
                         </p>
@@ -149,7 +149,7 @@
                     <transition name="slidedown">
                         <FieldPicker v-if="showFields" :callback="addCustomHeader"
                             :resource-ids="resultResourceIds"
-                            v-dismiss="{switch: 'showFields', ignore: ['show-fields-' + _uid]}">
+                            v-dismiss="{switch: 'showFields', ignore: ['#show-fields-' + _uid]}">
                         </FieldPicker>
                     </transition>
                 </div>

@@ -9,10 +9,10 @@ Vue.directive('dismiss', {
         outsideClick[vnode.context._uid] = (event) => {
             event.stopPropagation();
             if (!$.contains(el, event.target)) {
-                let ignore = binding.value.ignore.includes(event.target.id);
+                let ignore = binding.value.ignore.some(selector => event.target.matches(selector));
                 let i      = 0;
                 while (!ignore && i < binding.value.ignore.length) {
-                    let parentNode = $('#' + binding.value.ignore[i])[0];
+                    let parentNode = $(binding.value.ignore[i])[0];
                     if (parentNode !== undefined) {
                         ignore = $.contains(parentNode, event.target);
                     }

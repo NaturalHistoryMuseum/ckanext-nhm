@@ -2,7 +2,7 @@
     <div class="filter-fields fields" :class="fieldsClasses" @click="toggleShowFields" :id="'fields-dropdown-' + _uid">
         <span>{{ fieldsPlaceholder }}</span>
         <transition name="slidedown">
-            <div v-if="showFields" class="floating" v-dismiss="{switch: 'showFields', ignore: ['fields-dropdown-' + _uid]}">
+            <div v-if="showFields" class="floating" v-dismiss="{switch: 'showFields', ignore: ['#fields-dropdown-' + _uid]}">
                 <span class="fields"
                     v-for="field in (fields || [])"
                     v-bind:key="field.id">{{ field }}</span>
