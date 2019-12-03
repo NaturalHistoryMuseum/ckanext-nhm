@@ -31,7 +31,8 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.dev.js",
-    "watch": "webpack --config webpack.config.dev.js --watch"
+    "watch": "webpack --config webpack.config.dev.js --watch",
+    "prod": "webpack --config webpack.config.prod.js"
   },
   "author": "",
   "license": "ISC"
