@@ -2155,19 +2155,19 @@ select,
 }
 @media (max-width: 1199px) {
   .collection-search-form {
-    padding: 80px 40px 60px !important;
+    padding: 80px 40px 80px !important;
   }
 }
 @media (min-width: 1200px) {
   .collection-search-form {
-    padding: 80px 160px 60px !important;
+    padding: 80px 160px 80px !important;
     margin: 0 !important;
   }
 }
 @media (max-width: 575px) {
   .collection-search-form {
     max-height: 15vw;
-    padding: 40px 5px 30px !important;
+    padding: 40px 5px 40px !important;
   }
 }
 .collection-search-form .search-input input {
@@ -2530,6 +2530,16 @@ select,
 }
 #datacite {
   margin: 50px 20px 0 0;
+}
+.help-section {
+  padding: 20px 0 40px;
+  border-bottom: 1px solid #DDDDDD;
+}
+.help-section *:not(h3) + h4 {
+  margin-top: 50px;
+}
+.help-section img {
+  margin: 20px;
 }
 .label[data-format=dwc],
 .label[data-format*=dwc] {

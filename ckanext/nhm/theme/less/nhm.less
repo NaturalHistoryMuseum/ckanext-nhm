@@ -2140,15 +2140,15 @@ select, .select2-choice {
   border: none;
   position: relative;
   @media (max-width: @xl - 1) {
-    padding: @pad-search (@pad-search / 2) (@pad-search - @margin-search) !important;
+    padding: @pad-search (@pad-search / 2) @pad-search !important;
   }
   @media (min-width: @xl) {
-    padding: @pad-search (@pad-search * 2) (@pad-search - @margin-search) !important;
+    padding: @pad-search (@pad-search * 2) @pad-search !important;
     margin: 0 !important;
   }
   @media (max-width: @sm - 1) {
     max-height: 15vw;
-    padding: @pad-search/2 5px (@pad-search - @margin-search)/2 !important;
+    padding: @pad-search/2 5px @pad-search/2 !important;
   }
 
   & .search-input input {
@@ -2489,6 +2489,21 @@ select, .select2-choice {
   margin: 50px 20px 0 0;
 }
 
+
+// HELP --------------------------------------------------------------------------------------------
+
+.help-section {
+  padding: 20px 0 40px;
+  border-bottom: 1px solid @grey8;
+
+  & *:not(h3) + h4 {
+    margin-top: 50px;
+  }
+
+  & img {
+    margin: 20px;
+  }
+}
 
 // DATASET LIST ------------------------------------------------------------------------------------
 
