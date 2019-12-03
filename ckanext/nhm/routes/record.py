@@ -15,9 +15,9 @@ import logging
 from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
 from ckanext.nhm.views import DarwinCoreView
-from flask import Blueprint
+from flask import Blueprint, current_app
 
-from ckan import common, model
+from ckan import model
 from ckan.plugins import toolkit
 
 
@@ -175,7 +175,7 @@ def init_jinja_extensions():
     ensure that the taxonomy extension is loaded into jinja2 before it's used.
     '''
     # Load the taxonomy formatter
-    common.current_app.jinja_env.add_extension(TaxonomyFormatExtension)
+    current_app.jinja_env.add_extension(TaxonomyFormatExtension)
 
 
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>', defaults={u'version': None})

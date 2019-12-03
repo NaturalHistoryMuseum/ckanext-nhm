@@ -13,7 +13,7 @@
 
             <div class="col-md-9 col-sm-9">
                 <div class="search-input control-group">
-                  <input type="text" class="search" name="q" autocomplete="off" value="{{ q.decode('utf-8') }}" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
+                  <input type="text" class="search" name="q" autocomplete="off" value="{{ q }}" placeholder="{% block search_placeholder %}{{ placeholder }}{% endblock %}" />
                   <input type="hidden" name="view_id" value="{{ resource_view['id'] }}" />
                   {% if query_params['filters'] %}
                       <input type="hidden" name="filters" value="{{ query_params['filters'] }}" />

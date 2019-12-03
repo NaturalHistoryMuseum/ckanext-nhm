@@ -55,7 +55,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'PyYAML==3.10',
+        'PyYAML==5.1',
         'amqp==1.4.9',
         'anyjson==0.3.3',
         'billiard==3.3.0.13',
