@@ -63,7 +63,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IDoi)
     implements(IGalleryImage)
     implements(ICkanPackager)
-    implements(IVersionedDatastore)
+    implements(IVersionedDatastore, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -561,7 +561,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         return result
 
-    # IVersionedDatastore
     def datastore_modify_fields(self, resource_id, mapping, fields):
         '''
         This function allows us to modify the field definitions before they are
@@ -594,10 +593,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return fields
 
     # IVersionedDatastore
-    def datastore_modify_index_doc(self, resource_id, index_doc):
-        return index_doc
-
-    # IVersionedDatastore
     def datastore_is_read_only_resource(self, resource_id):
         # we don't want any of the versioned datastore ingestion and indexing code
         # modifying the
@@ -615,3 +610,49 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             requests.request(u'purge', toolkit.config.get(u'ckan.site_url'), timeout=2)
         except:
             pass
+
+    def datastore_reserve_slugs(self):
+        collection_resource_ids = [
+            helpers.get_specimen_resource_id(),
+            helpers.get_artefact_resource_id(),
+            helpers.get_indexlot_resource_id(),
+        ]
+        slugs = {
+            u'collections': dict(resource_ids=collection_resource_ids),
+            u'everything': dict(resource_ids=[]),
+            u'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
+            u'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
+            u'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
+        }
+        for collection_code in (u'PAL', u'MIN', u'BMNH(E)', u'ZOO', u'BOT'):
+            slugs[helpers.get_department(collection_code).lower()] = {
+                u'resource_ids': collection_resource_ids,
+                u'query': {
+                    u'filters': {
+                        u'and': [
+                            {
+                                u'string_equals': {
+                                    u'fields': [u'collectionCode'],
+                                    u'value': collection_code
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        return slugs
+
+    def datastore_modify_guess_fields(self, resource_ids, fields):
+        # if the index lots or specimens collections are in the resource ids list, remove a bunch
+        # of groups that we don't care about
+        if (helpers.get_specimen_resource_id() in resource_ids or
+                helpers.get_indexlot_resource_id() in resource_ids):
+            fields.force(u'collectionCode')
+            fields.force(u'typeStatus')
+            fields.force(u'family')
+            fields.force(u'genus')
+            for group in (u'created', u'modified', u'basisOfRecord', u'institutionCode',
+                          u'associatedMedia.*'):
+                fields.ignore(group)
+
+        return fields

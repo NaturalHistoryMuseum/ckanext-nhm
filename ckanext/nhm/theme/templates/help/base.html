@@ -1,0 +1,25 @@
+{% extends 'page.html' %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block primary %}
+    <div class="primary col-sm-9 col-xs-12">
+        <article class="module">
+            <div class="module-content">
+                <h1 class="page-heading">{{ title }}</h1>
+                {% block help_content %}
+                {% endblock %}
+            </div>
+        </article>
+    </div>
+{% endblock %}
+
+{% block secondary %}
+
+    <div class="secondary col-sm-3">
+        {% block secondary_content %}
+            {% snippet 'help/snippets/menu.html' %}
+        {% endblock %}
+    </div>
+
+{% endblock %}

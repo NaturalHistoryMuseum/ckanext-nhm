@@ -1,0 +1,7 @@
+{% ckan_extends %}
+
+{% block search_content %}
+    {% resource 'ckanext-nhm/search' %}
+    <div id="searchApp" data-slug="{{ slug }}">
+    </div>
+{% endblock %}

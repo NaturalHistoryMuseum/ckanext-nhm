@@ -1,0 +1,152 @@
+{% extends 'help/base.html' %}
+
+{% block breadcrumb_content %}
+    <li class="active">{% link_for _(title), named_route='help.search' %}</li>
+{% endblock %}
+
+{% block help_content %}
+    {% set stats = h.get_site_statistics() %}
+    {% set specimens_url = h.url_for_collection_view() %}
+
+    <p>This is the help page for our <em>Integrated Search</em> feature. Access it
+        <a href="{{ url_for('search.view') }}">here</a>.</p>
+
+    <div class="help-section">
+        <h4>What is integrated search?</h4>
+        <p>
+            The Data Portal hosts many different datasets. The largest and most commonly used is our
+            <a href="{{ url_for('dataset.read', id='collection-specimens') }}">Specimens
+                                                                               Collection</a>, but
+            there are {{ h.SI_number_span(stats.dataset_count - 1) }} more. Previously, you could
+            only search in one resource (one file within a dataset) at a time, but integrated search
+            allows you to search <em>multiple</em> resources at the same time. </p>
+        <p>
+            We've also made the search a lot more powerful by adding advanced features such as
+            boolean logic (AND, OR, and NOT) and number-based range queries (greater than, less
+            than), with more planned in the future. </p>
+
+        <h4>The old search</h4>
+        <p>If you still want to use the old search, we haven't removed anything. Just view the
+           resource you want to search in and everything should be exactly the same as before.</p>
+    </div>
+
+    <div class="help-section">
+        <h3>Using the integrated search</h3>
+        <h4>UI Overview</h4>
+        <img src="/images/help/search-overview-labelled.png" class="img-responsive">
+        <ul class="fa-ul">
+            <li>
+                <span class="fa-li"><i class="fas fa-question"></i></span> <b>Help</b>: takes you to
+                                                                                      this help
+                                                                                      page.
+            </li>
+            <li>
+                <span class="fa-li"><i class="fas fa-minus-circle"></i></span> <b>Advanced</b>:
+                                                                                              hides/shows
+                                                                                              the
+                                                                                              filters
+                                                                                              (shown
+                                                                                              by
+                                                                                              default).
+            </li>
+            <li>
+                <span class="fa-li"><i class="fas fa-eye"></i></span> <b>Query</b>: shows the JSON
+                                                                                  query that will be
+                                                                                  submitted to the
+                                                                                  API; useful if you
+                                                                                  need to
+                                                                                  troubleshoot or
+                                                                                  want to use the
+                                                                                  search
+                                                                                  programmatically.
+            </li>
+            <li>
+                <span class="fa-li"><i class="fas fa-trash"></i></span> <b>Reset</b>: clears all the
+                                                                                    filters and
+                                                                                    free-text
+                                                                                    search.
+            </li>
+            <li>
+                <span class="fa-li"><i class="fas fa-list"></i></span> <b>Resources</b>: view/edit
+                                                                                       the list of
+                                                                                       resources
+                                                                                       being
+                                                                                       searched by
+                                                                                       the current
+                                                                                       query.
+            </li>
+        </ul>
+
+        <h4>Selecting resources</h4>
+        <p>
+            Clicking on <b>Resources</b> <i class="fas fa-list"></i> will bring up a dialog similar
+            to this one:</p>
+        <img src="/images/help/search-resources.png" class="img-responsive">
+        <p>To include a resource in your search, tick the box next to its name. You can
+           select/deselect all the resources within a dataset by clicking the dataset name in green
+           above it, and select/deselect all resources in the list using the "select all" checkbox
+           at the top of the list. </p>
+        <p>
+            To dismiss the dialog and save your changes, click outside the box. </p>
+
+        <h4>Free-text search</h4>
+        <p>
+            The free-text search box allows you to search all fields in your chosen resource list.
+            For example, the free-text search "<em>linnaeus</em>" will find records where "Linnaeus"
+            is in <em>scientificName</em> and those where "Linnaeus" is in
+            <em>determinationNames</em>. </p>
+        <img src="/images/help/search-freetext.png"
+             class="img-responsive"
+             alt="The integrated search UI with 'linnaeus' written in the free-text search field. Six rows of results are shown.">
+
+        <h4>Filters: Terms + Groups</h4>
+        <p>
+            Below the free-text search is the filter builder. <em>Filter</em> can refer to any part
+            of this: a whole group of multiple items, or a single item. Each of the smallest items
+            are referred to as <em>terms</em>, and they are linked together in <em>groups</em>. For
+            example:</p>
+        <div class="flex-container no-padding">
+            <img src="/images/help/search-filters.png"
+                 class="img-responsive"
+                 alt="Two terms (kingdom=animalia and collectionCode=zoo) grouped together in a green box. The words 'all of' are in the top right corner.">
+            <p>There are two <em>terms</em> in this filter: <b>kingdom = animalia</b> and <b>collectionCode
+                                                                                             =
+                                                                                             zoo</b>.
+               They are linked together in an AND (all) <em>group</em>.</p>
+        </div>
+
+        <h4>Groups</h4>
+        <p>Groups allow you to use some boolean logic in your queries. You can have three types of
+           group: AND (aka 'all of'), OR (aka 'any of'), and NOT (aka 'none of'). To change the
+           group type, click the name in the top left corner. In the groups below, the terms are the
+           same but the group type has changed. This drastically changes the records found.</p>
+        <div class="flex-container flex-top">
+            <img src="/images/help/search-groups-and.png" class="img-responsive">
+            <img src="/images/help/search-groups-or.png" class="img-responsive">
+            <img src="/images/help/search-groups-not.png" class="img-responsive">
+        </div>
+        <ol>
+            <li>
+                In the first group, each record must match <em>all of</em> the terms; so each record
+                must have collectionCode=BOT <b>and</b> year=2000.
+            </li>
+            <li>In the second group, each record can match <em>any of</em> the terms; so each record
+                must have collectionCode=BOT <b>or</b> year=2000 (or both!).
+            </li>
+            <li>In the third group, each record must <b>not</b> match any of the terms; so the
+                records match neither collectionCode=BOT nor year=2000.
+            </li>
+        </ol>
+        <p>Groups can also be nested under the top level:</p>
+        <img src="/images/help/search-nested-groups.png" class="img-responsive">
+        <p>This query would search for <em>either</em> botany records from 2000 <em>or</em>
+           palaeontology records from 2008.</p>
+
+        <h4>Terms</h4>
+        <p>To add a new term, click the <i class="fas fa-plus-square"></i> symbol at the right hand
+           side of a group.</p>
+        <img src="/images/help/search-empty-filter.png" class="img-responsive">
+        <p>This will bring up the term editor.</p>
+    </div>
+
+{% endblock %}

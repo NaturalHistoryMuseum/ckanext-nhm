@@ -1,0 +1,7 @@
+{
+    "rules": {
+        "no-console": "off",
+        "no-undef": "warn",
+        "vue/no-parsing-error": "warn"
+    }
+}

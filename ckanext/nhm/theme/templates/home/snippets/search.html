@@ -2,7 +2,7 @@
 {% set placeholder = [_('Mollusca'),_('Homo sapiens'),_('Papilinoidea'),_('Diplodocus')]|random %}
 
 <div class="module module-search module-narrow module-shallow">
-  <form class="module-content search-form collection-search-form flex-container flex-equal" method="get" action="{{ h.url_for_collection_view() }}">
+  <div id="main_search" class="module-content search-form collection-search-form flex-container flex-equal">
     <div class="search-input control-group search-giant">
       <label for="q" class="sr-only">Search</label>
       <input type="text" class="search" name="q" id="q" value="" autocomplete="off" placeholder="{% block search_placeholder %}e.g. {{ placeholder }}{% endblock %}" />
@@ -10,6 +10,17 @@
         <i class="fas fa-search"></i>
         <span class="sr-only">{{ _('Search') }}</span>
       </button>
+      <div class="scope-tabs flex-container flex-equal">
+        <div class="scope-tab selected" id="scope-specimens">
+          <span>{{ _('Specimens') }}</span>
+        </div>
+        <div class="scope-tab" id="scope-collections">
+          <span>{{ _('Collections') }}</span>
+        </div>
+        <div class="scope-tab" id="scope-everything">
+          <span>{{ _('Everything') }}</span>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 </div>
