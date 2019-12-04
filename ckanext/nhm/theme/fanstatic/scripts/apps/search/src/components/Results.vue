@@ -162,12 +162,15 @@
         <div class="pagination-wrapper" v-if="after.length > 0 && !resultsInvalid">
             <ul class="pagination">
                 <li v-if="page > 0">
+                    <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>
+                </li>
+                <li v-if="page > 0">
                     <a href="#" @click="runSearch(page - 1)">{{ page }}</a>
                 </li>
                 <li class="active">
                     <a href="#">{{ page + 1 }}</a>
                 </li>
-                <li>
+                <li v-if="after.length > page">
                     <a href="#" @click="runSearch(page + 1)">{{ page + 2}}</a>
                 </li>
             </ul>

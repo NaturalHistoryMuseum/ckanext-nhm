@@ -1,6 +1,7 @@
 <template>
     <div class="table-grid"
-        :style="{gridTemplateColumns: 'repeat(3, max-content)' + (headers.length > 0 ? `repeat(${headers.length}, auto)` : '')}">
+        :style="{gridTemplateColumns: 'repeat(4, max-content)' + (headers.length > 0 ? `repeat(${headers.length}, auto)` : '')}">
+        <div class="th small-column"></div>
         <div class="th small-column">Dataset</div>
         <div class="th small-column">Resource</div>
         <div class="th small-column last-small-column">Record</div>
@@ -20,7 +21,8 @@
             </div>
         </div>
 
-        <template v-for="item in records">
+        <template v-for="(item, ix) in records">
+            <div class="td small-column">{{ (page * 100) + ix + 1 }}</div>
             <div class="td small-column"><a :href="getDetails(item.resource).packageUrl">
                 {{ resourceDetails[item.resource].package_name }}
             </a></div>
