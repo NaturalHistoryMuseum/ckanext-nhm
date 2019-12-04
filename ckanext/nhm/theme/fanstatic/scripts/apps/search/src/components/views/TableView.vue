@@ -13,7 +13,8 @@
             </div>
 
         </div>
-        <div class="table-grid" @resize="scrollable"
+        <div class="table-grid"
+             @resize="scrollable"
              ref="tableGrid"
              :style="{gridTemplateColumns: 'repeat(4, max-content)' + (headers.length > 0 ? `repeat(${headers.length}, auto)` : '')}">
             <div class="th small-column"></div>
@@ -95,6 +96,11 @@
             // give the table a second to load properly...
             setTimeout(this.scrollable, 1000);
             $(window).resize(this.scrollable);
+        },
+        watch:    {
+            headers() {
+                this.scrollable();
+            }
         }
     }
 </script>
