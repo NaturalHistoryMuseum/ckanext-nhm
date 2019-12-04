@@ -706,7 +706,7 @@ iframe {
     margin: 0 10px;
     padding: 5px;
     height: 30%;
-    background-color: @grey8;
+    background-color: @grey9;
     .mixin-flex-container();
     .mixin-flex-column();
     .mixin-flex-center();
@@ -724,6 +724,14 @@ iframe {
 
       &:not(.disabled) {
         box-shadow: -30px 0 25px 0 rgba(255, 255, 255, 1);
+      }
+    }
+
+    &:not(.disabled) {
+      cursor: pointer;
+
+      &:hover {
+        background-color: @grey8;
       }
     }
   }
