@@ -1,8 +1,10 @@
 {% ckan_extends %}
 
 {%- block meta -%}
-   <meta charset="UTF-8"/>
-  {% block meta_generator %}<meta name="generator" content="ckan {{ g.__version__ }}" />{% endblock %}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block meta_generator %}
+        <meta name="generator" content="ckan {{ g.__version__ }}"/>{% endblock %}
 {%- endblock -%}
 
 {% block styles %}
