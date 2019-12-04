@@ -1339,6 +1339,10 @@ iframe {
 .search-form .scope-tabs .scope-tab:not(:last-child) {
   margin-right: 5px;
 }
+.search-form .scope-tabs .scope-tab:not(.selected) {
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
 .search-form .search-input {
   margin-bottom: 15px;
 }

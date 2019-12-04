@@ -1286,6 +1286,11 @@ iframe {
       &:not(:last-child){
         margin-right: 5px;
       }
+
+      &:not(.selected) {
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 
