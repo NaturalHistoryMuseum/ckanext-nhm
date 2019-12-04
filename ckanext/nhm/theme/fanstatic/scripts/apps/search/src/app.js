@@ -2,6 +2,13 @@ import Vue from 'vue';
 import App from './App.vue';
 import store from './store/main';
 
+function importFolder(context) {
+    context.keys().forEach(context);
+}
+
+importFolder(require.context('leaflet/dist/images/', true, /\.(png|jpe?g|gif)$/i));
+
+
 let outsideClick = {};
 
 Vue.directive('dismiss', {

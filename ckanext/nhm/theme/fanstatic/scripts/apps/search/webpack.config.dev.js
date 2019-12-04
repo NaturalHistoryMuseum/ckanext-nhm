@@ -23,7 +23,12 @@ module.exports = {
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,
-                use:  'file-loader'
+                loader:  'file-loader',
+                options: {
+                    name: '[name].[ext]',
+                    publicPath: '/images/leaflet/',
+                    outputPath: '../../../../../public/images/leaflet'
+                }
             },
         ]
     },
