@@ -790,6 +790,34 @@ iframe {
 .primary {
   padding: 0;
 }
+.scrolling-arrows {
+  width: 100%;
+}
+.scrolling-arrows > * {
+  position: fixed;
+  margin: 0 10px;
+  padding: 5px;
+  height: 30%;
+  background-color: #DDDDDD;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.scrolling-arrows > * > * {
+  vertical-align: center;
+}
+.scrolling-arrows > *.scroll-left {
+  left: 0;
+}
+.scrolling-arrows > *.scroll-left:not(.disabled) {
+  box-shadow: 30px 0 25px 0 #ffffff;
+}
+.scrolling-arrows > *.scroll-right {
+  right: 0;
+}
+.scrolling-arrows > *.scroll-right:not(.disabled) {
+  box-shadow: -30px 0 25px 0 #ffffff;
+}
 .secondary {
   background: transparent;
   padding: 0 0 15px !important;
