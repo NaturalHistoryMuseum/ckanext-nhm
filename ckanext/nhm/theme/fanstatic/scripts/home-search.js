@@ -14,15 +14,12 @@ window.slug_search = window.slug_search || (function () {
         }
         payload.resource_ids = resourceIds;
 
-        fetch('/api/3/action/datastore_create_slug', {
+        $.ajax('/api/3/action/datastore_create_slug', {
             method: 'POST',
-            body: JSON.stringify(payload),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
+            data: JSON.stringify(payload),
+            contentType: 'application/json',
+            dataType: 'json'
+        }).done(function (json) {
             window.location.href = '/search/' + json.result.slug;
         });
     };
