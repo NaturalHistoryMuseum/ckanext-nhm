@@ -30,11 +30,11 @@ window.slug_search = window.slug_search || (function () {
     self.bindMainSearch = function () {
         const mainSearch = $('#main_search');
         const submitButton = mainSearch.find('button');
-        const serachInput = $('#q');
+        const searchInput = $('#q');
 
         function onSubmit() {
             const query = {};
-            const searchValue = serachInput.val();
+            const searchValue = searchInput.val();
             if (!!searchValue) {
                 query.search = searchValue;
             }
@@ -62,7 +62,7 @@ window.slug_search = window.slug_search || (function () {
             onSubmit();
         });
 
-        serachInput.on('keypress',function(e) {
+        searchInput.on('keypress',function(e) {
             if (e.which === 13) {
                 onSubmit();
             }
@@ -80,7 +80,6 @@ window.slug_search = window.slug_search || (function () {
         const specimensTitle = $('#specimens-title');
         const collectionsTitle = $('#collections-title');
         const everythingTitle = $('#everything-title');
-
 
         scopeTabs.each(function () {
             const element = $(this);
