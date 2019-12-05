@@ -9,46 +9,47 @@
             <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup doi-popup" v-if="showCite"
-                        v-dismiss="{switch: 'showCite', ignore: ['#show-cite', 'use-a-doi']}">
+                    <div class="floating info-popup doi-popup"
+                         v-if="showCite"
+                         v-dismiss="{switch: 'showCite', ignore: ['#show-cite', 'use-a-doi']}">
                         <p>Cite this search:</p>
                         <p class="nowrap copyable" v-if="doi !== null">{{ doi }}</p>
                         <p class="alert-error" v-if="doiFailed">
-                            Failed to retrieve DOI. Please try again later.
-                        </p>
+                            Failed to retrieve DOI. Please try again later. </p>
                         <div class="form-row" v-if="doi === null">
                             <label for="doi-email" class="control-label">
-                                <span class="control-required">*</span>Your email
-                            </label>
-                            <input id="doi-email" type="text" class="full-width"
-                                v-model="doiForm.email_address"
-                                placeholder="data@nhm.ac.uk">
+                                <span class="control-required">*</span>Your email </label>
+                            <input id="doi-email"
+                                   type="text"
+                                   class="full-width"
+                                   v-model="doiForm.email_address"
+                                   placeholder="data@nhm.ac.uk">
                         </div>
                         <div class="privacy-warning">
                             <p><i>Data Protection</i></p>
-                            <p>The Natural History Museum will use your personal data in
-                               accordance with data protection legislation to process your
-                               requests. For more information please read our
-                                <a href="/privacy">privacy notice</a>.
+                            <p>The Natural History Museum will use your personal data in accordance
+                               with data protection legislation to process your requests. For more
+                               information please read our <a href="/privacy">privacy notice</a>.
                             </p>
                         </div>
                         <div class="text-right">
-                            <a href="#" @click="getDOI(doiForm)" class="btn btn-primary"
-                                v-if="doi === null"><i class="fas"
-                                :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
-                                Create a DOI
-                            </a>
+                            <a href="#"
+                               @click="getDOI(doiForm)"
+                               class="btn btn-primary"
+                               v-if="doi === null"><i class="fas"
+                                                      :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
+                                Create a DOI </a>
                         </div>
                     </div>
                 </transition>
                 <a href="#" @click="showCite = !showCite" class="btn btn-disabled" id="show-cite">
-                    <i class="fas fa-book"></i>Cite
-                </a>
+                    <i class="fas fa-book"></i>Cite </a>
             </div>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup" v-if="showShare"
-                        v-dismiss="{switch: 'showShare', ignore: ['#show-share']}">
+                    <div class="floating info-popup"
+                         v-if="showShare"
+                         v-dismiss="{switch: 'showShare', ignore: ['#show-share']}">
                         <div v-if="slug !== null">
                             <p>Share this search:</p>
                             <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span>
@@ -56,101 +57,106 @@
                             <small class="alert-warning">This link is for social sharing
                                 <em>only</em>. If you are intending to reference this search in a
                                                          publication, <a href="#"
-                                    @click="citeNotShare" id="use-a-doi">use a DOI</a>.</small>
+                                                                         @click="citeNotShare"
+                                                                         id="use-a-doi">use a
+                                                                                        DOI</a>.</small>
                         </div>
                         <p class="alert-error" v-if="slugFailed">
-                            Failed to retrieve link. Please try again later.
-                        </p>
+                            Failed to retrieve link. Please try again later. </p>
                     </div>
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled" id="show-share">
                     <i class="fas"
-                        :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
+                       :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
             <div style="position: relative;">
                 <transition name="slidedown">
-                    <div class="floating info-popup download-popup" v-if="showDownload"
-                        v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
+                    <div class="floating info-popup download-popup"
+                         v-if="showDownload"
+                         v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
                         <p v-if="download !== null">
-                            Success! You should receive an email at <b>{{ downloadForm.email_address }}</b> soon.
-                        </p>
+                            Success! You should receive an email at <b>{{ downloadForm.email_address
+                                                                       }}</b> soon. </p>
                         <p class="alert-error" v-if="downloadFailed">
-                            The download request failed. Please try again later.
-                        </p>
+                            The download request failed. Please try again later. </p>
                         <div v-if="download === null">
-                            <p>The data will be extracted, with current filters
-                               applied, and sent to the given email address
-                               shortly.</p>
+                            <p>The data will be extracted, with current filters applied, and sent to
+                               the given email address shortly.</p>
                             <div class="form-row">
                                 <label for="download-email" class="control-label">
-                                    <span class="control-required">*</span>Your email
-                                </label>
-                                <input id="download-email" type="text" class="full-width"
-                                    v-model="downloadForm.email_address"
-                                    placeholder="data@nhm.ac.uk">
+                                    <span class="control-required">*</span>Your email </label>
+                                <input id="download-email"
+                                       type="text"
+                                       class="full-width"
+                                       v-model="downloadForm.email_address"
+                                       placeholder="data@nhm.ac.uk">
                             </div>
                             <div class="form-row">
                                 <label for="download-format">File format</label>
-                                <select id="download-format" v-model="downloadForm.format"
-                                    class="full-width">
+                                <select id="download-format"
+                                        v-model="downloadForm.format"
+                                        class="full-width">
                                     <option>csv</option>
                                 </select>
                             </div>
                             <div class="form-row flex-container flex-wrap flex-between">
                                 <div>
-                                    <label for="download-sep">One file per resource</label>
-                                    <input id="download-sep" type="checkbox"
-                                        v-model="downloadForm.separate_files">
+                                    <label for="download-sep">One file per resource</label> <input
+                                    id="download-sep"
+                                    type="checkbox"
+                                    v-model="downloadForm.separate_files">
                                 </div>
                                 <div>
                                     <label for="download-empty">Skip empty columns</label>
-                                    <input id="download-empty" type="checkbox"
-                                        v-model="downloadForm.ignore_empty_fields">
+                                    <input id="download-empty"
+                                           type="checkbox"
+                                           v-model="downloadForm.ignore_empty_fields">
                                 </div>
                             </div>
                         </div>
                         <div class="privacy-warning">
                             <p><i>Data Protection</i></p>
-                            <p>The Natural History Museum will use your personal data in
-                               accordance with data protection legislation to process your
-                               requests. For more information please read our
-                                <a href="/privacy">privacy notice</a>.
+                            <p>The Natural History Museum will use your personal data in accordance
+                               with data protection legislation to process your requests. For more
+                               information please read our <a href="/privacy">privacy notice</a>.
                             </p>
                         </div>
                         <div class="text-right" v-if="download === null">
-                            <a href="#" class="btn btn-primary text-right"
-                                @click="requestDownload(downloadForm)">
-                                <i class="fas" :class="downloadProcessing ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
-                                Request Download
-                            </a>
+                            <a href="#"
+                               class="btn btn-primary text-right"
+                               @click="requestDownload(downloadForm)"> <i class="fas"
+                                                                          :class="downloadProcessing ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                                Request Download </a>
                         </div>
                     </div>
                 </transition>
-                <a href="#" v-if="total > 0" @click="showDownload = !showDownload"
-                    class="btn btn-disabled"
-                    id="show-download">
-                    <i class="fas fa-cloud-download-alt"></i>Download
-                </a>
+                <a href="#"
+                   v-if="total > 0"
+                   @click="showDownload = !showDownload"
+                   class="btn btn-disabled"
+                   id="show-download"> <i class="fas fa-cloud-download-alt"></i>Download </a>
             </div>
         </div>
         <div>
             <div class="flex-container flex-stretch-first flex-center">
                 <ul class="nav nav-tabs">
-                    <li v-for="viewTab in views" :key="viewTab.id"
-                        :class="{active: currentView === viewTab}" @click="currentView = viewTab">
+                    <li v-for="viewTab in views"
+                        :key="viewTab.id"
+                        :class="{active: currentView === viewTab}"
+                        @click="currentView = viewTab">
                         <a>{{ viewTab }}</a>
                     </li>
                 </ul>
                 <div class="text-right">
-                    <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid">
-                        <i class="fas fa-plus-circle"></i>
-                    </a>
+                    <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid"> <i
+                        class="fas fa-plus-circle"></i> </a>
                     <transition name="slidedown">
-                        <FieldPicker v-if="showFields" :callback="addCustomHeader"
-                            :resource-ids="resultResourceIds"
-                            v-dismiss="{switch: 'showFields', ignore: ['#show-fields-' + _uid]}">
-                        </FieldPicker>
+                        <FieldPicker v-if="showFields"
+                                     :callback="addCustomHeader"
+                                     :resource-ids="resultResourceIds"
+                                     :classes="['floating']"
+                                     v-dismiss="{switch: 'showFields', ignore: ['#show-fields-' + _uid]}"></FieldPicker>
                     </transition>
                 </div>
             </div>

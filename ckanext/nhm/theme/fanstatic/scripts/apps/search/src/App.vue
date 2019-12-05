@@ -55,7 +55,7 @@
             </transition>
             <pre class="fields" v-if="showQuery"
                 style="margin-bottom: 20px;">{{ requestBody }}</pre>
-            <Results></Results>
+            <Results v-if="hasResult"></Results>
         </div>
     </div>
 </template>
@@ -89,6 +89,7 @@
             ...mapState('constants', ['loading', 'loadError', 'packageList']),
             ...mapGetters(['query', 'requestBody']),
             ...mapState(['resourceIds']),
+            ...mapGetters('results', ['hasResult']),
             search: {
                 get() {
                     return this.$store.state.search;
