@@ -1,5 +1,5 @@
 window.slug_search = window.slug_search || (function () {
-    let self = {};
+    var self = {};
 
     /**
      * Given a query and some resource ids to search on, requests a slug for it and redirects to it.
@@ -8,7 +8,7 @@ window.slug_search = window.slug_search || (function () {
      * @param resourceIds a list of resource ids
      */
     self.doSearch = function (query, resourceIds) {
-        const payload = {};
+        var payload = {};
         if (!!query) {
             payload.query = query;
         }
@@ -28,19 +28,19 @@ window.slug_search = window.slug_search || (function () {
      * Binds up listeners on the main search bar so that it does things when you click search.
      */
     self.bindMainSearch = function () {
-        const mainSearch = $('#main_search');
-        const submitButton = mainSearch.find('button');
-        const searchInput = $('#q');
+        var mainSearch = $('#main_search');
+        var submitButton = mainSearch.find('button');
+        var searchInput = $('#q');
 
         function onSubmit() {
-            const query = {};
-            const searchValue = searchInput.val();
+            var query = {};
+            var searchValue = searchInput.val();
             if (!!searchValue) {
                 query.search = searchValue;
             }
 
-            const resourceIds = [];
-            const selection = $('.scope-tab.selected').attr('id');
+            var resourceIds = [];
+            var selection = $('.scope-tab.selected').attr('id');
             if (selection === 'scope-collections') {
                 resourceIds.push(
                     // TODO: these need to come from the config
@@ -74,15 +74,15 @@ window.slug_search = window.slug_search || (function () {
      * selection is changed.
      */
     self.bindScopeSelection = function () {
-        const scopeTabs = $('.scope-tabs').find('.scope-tab');
-        const specimenStats = $('#scope-specimen-stats');
-        const collectionStats = $('#scope-collection-stats');
-        const specimensTitle = $('#specimens-title');
-        const collectionsTitle = $('#collections-title');
-        const everythingTitle = $('#everything-title');
+        var scopeTabs = $('.scope-tabs').find('.scope-tab');
+        var specimenStats = $('#scope-specimen-stats');
+        var collectionStats = $('#scope-collection-stats');
+        var specimensTitle = $('#specimens-title');
+        var collectionsTitle = $('#collections-title');
+        var everythingTitle = $('#everything-title');
 
         scopeTabs.each(function () {
-            const element = $(this);
+            var element = $(this);
             element.on('click', function () {
                 scopeTabs.removeClass('selected');
                 element.addClass('selected');
