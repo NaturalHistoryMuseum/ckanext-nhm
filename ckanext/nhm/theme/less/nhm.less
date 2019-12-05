@@ -732,7 +732,8 @@ iframe {
     position: fixed;
     margin: 0 10px;
     padding: 5px;
-    height: 30%;
+    height: 20%;
+    top: 75%;
     background-color: @grey9;
     .mixin-flex-container();
     .mixin-flex-column();
@@ -1456,7 +1457,9 @@ iframe {
 
   & .resourceid-list {
     max-height: 50vh;
-    max-width: 30vw;
+    @media (min-width: @md) {
+      max-width: 30vw;
+    }
     overflow-y: auto;
     top: 100%;
     right: 0;
@@ -1603,10 +1606,6 @@ iframe {
   }
 
   .term-editor {
-    & > div:not(:last-child) {
-      border-right: @lighter-borders;
-      padding: 0 10px;
-    }
 
     label {
       margin-bottom: 0;
@@ -1620,9 +1619,26 @@ iframe {
     border-radius: @rounding;
     border: @borders;
     padding: 5px;
-    margin: -2px 5px;
-    top: 0;
-    left: 100%;
+    @media (min-width: @md) {
+      margin: -2px 5px;
+      top: 0;
+      left: 100%;
+
+      & > div:not(:last-child) {
+        border-right: @lighter-borders;
+        padding: 0 10px;
+      }
+    }
+    @media (max-width: @md - 1) {
+      margin: 5px -2px;
+      top: 100%;
+      left: 0;
+
+      & > div:not(:last-child) {
+        border-bottom: @lighter-borders;
+        padding: 10px 0;
+      }
+    }
 
     select {
       width: 200px;
@@ -1671,6 +1687,12 @@ iframe {
       border-top: @lighter-borders;
       padding: 10px 0;
     }
+
+    & .term-editor-query {
+      @media (max-width: @md - 1) {
+        padding-top: 10px;
+      }
+    }
   }
 
   .floating {
@@ -1685,15 +1707,33 @@ iframe {
     }
   }
 
+  .info-popup-button {
+    @media (min-width: @md) {
+      position: relative;
+    }
+  }
+
   .info-popup {
     background-color: @grey10;
     border: @lighter-borders;
     border-radius: @rounding;
-    top: 100%;
     right: 0;
     margin: 5px;
     padding: 5px;
     max-width: 90vw;
+
+    @media (min-width: @md) {
+      top: 100%;
+    }
+    @media (max-width: @md - 1) {
+      left: 0;
+    }
+
+    & .nowrap {
+      @media (max-width: @md - 1) {
+        white-space: normal !important;
+      }
+    }
   }
 
   .download-popup {

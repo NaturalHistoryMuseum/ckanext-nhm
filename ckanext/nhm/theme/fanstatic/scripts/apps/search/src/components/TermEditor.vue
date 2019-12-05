@@ -1,5 +1,5 @@
 <template>
-    <div class="term-editor floating flex-container flex-nowrap flex-stretch-height">
+    <div class="term-editor floating flex-container flex-smallwrap flex-stretch-height">
         <i class="fas fa-caret-square-left" @click="closeDialog"></i>
         <div class="term-editor-fields space-children-v" v-if="fieldType !== 'geo'">
             <div class="flex-container flex-wrap flex-wrap-spacing">

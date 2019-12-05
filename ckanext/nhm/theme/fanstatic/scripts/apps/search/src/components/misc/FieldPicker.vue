@@ -6,7 +6,7 @@
             v-model="fieldSearch"/>
         <select class="full-width" size="10">
             <option v-for="field in fieldList" v-bind:key="field.id"
-                @dblclick="callback(field)">{{ field }}
+                @click="callback(field)">{{ field }}
             </option>
         </select>
     </div>

@@ -3,7 +3,7 @@
         <Loading v-if="loading"></Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="search-form multisearch-form" v-if="!loading && !loadError">
-            <div class="multisearch-simple flex-container flex-stretch-first">
+            <div class="multisearch-simple flex-container flex-stretch-first flex-smallwrap space-children-v flex-right">
                 <div class="search-input control-group search-giant">
                     <label for="all" class="sr-only">Search</label> <input type="text"
                                                                            class="search"
@@ -18,36 +18,39 @@
                         <i class="fas fa-search"></i> <span class="sr-only">Search</span>
                     </button>
                 </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="/help/search" target="_blank" class="collapse-to-icon"> Help
-                        <i class="fas inline-icon-right fa-question"></i> </a>
+                <div class="flex-container flex-nowrap">
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="/help/search" target="_blank" class="collapse-to-icon"> Help <i
+                            class="fas inline-icon-right fa-question"></i> </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
+                            Advanced <i class="fas inline-icon-right"
+                                        :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
+                        </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon"> Query
+                            <i class="inline-icon-right fas"
+                               :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#" @click="resetFilters" class="collapse-to-icon"> Reset
+                            <i class="inline-icon-right fas fa-trash"></i> </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#"
+                           @click="showResources = !showResources"
+                           id="btnResources"
+                           class="collapse-to-icon"> Resources
+                            <i class="fas fa-list inline-icon-right"></i> </a>
+                    </div>
+                    <transition name="slidedown">
+                        <ResourceList v-if="showResources"
+                                      v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}"></ResourceList>
+                    </transition>
                 </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
-                        Advanced <i class="fas inline-icon-right"
-                                    :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
-                    </a>
-                </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon"> Query <i
-                        class="inline-icon-right fas"
-                        :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
-                </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="resetFilters" class="collapse-to-icon"> Reset
-                        <i class="inline-icon-right fas fa-trash"></i> </a>
-                </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#"
-                       @click="showResources = !showResources"
-                       id="btnResources"
-                       class="collapse-to-icon"> Resources
-                        <i class="fas fa-list inline-icon-right"></i> </a>
-                </div>
-                <transition name="slidedown">
-                    <ResourceList v-if="showResources"
-                                  v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}"></ResourceList>
-                </transition>
+
             </div>
             <transition name="slidedown">
                 <div class="multisearch-advanced flex-container" v-if="showAdvanced">

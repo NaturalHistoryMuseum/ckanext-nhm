@@ -7,7 +7,7 @@
         </div>
         <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
             <h3>{{ total.toLocaleString('en-GB') }} records</h3>
-            <div style="position: relative;">
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup doi-popup"
                          v-if="showCite"
@@ -47,7 +47,7 @@
                 <a href="#" @click="showCite = !showCite" class="btn btn-disabled" id="show-cite">
                     <i class="fas fa-book"></i>Cite </a>
             </div>
-            <div style="position: relative;">
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup"
                          v-if="showShare"
@@ -73,7 +73,7 @@
                        :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
-            <div style="position: relative;">
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup download-popup"
                          v-if="showDownload"
