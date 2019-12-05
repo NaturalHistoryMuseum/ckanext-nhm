@@ -2,7 +2,8 @@
   "presets": [
     ["@babel/env", {
       "modules": false
-    }]
+    }],
+    "minify"
   ],
   "plugins": ["syntax-dynamic-import"]
 }
