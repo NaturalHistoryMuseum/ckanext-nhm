@@ -18,7 +18,7 @@
             this.updateView();
         },
         computed: {
-            ...mapState('results', ['current', 'headers']),
+            ...mapState('results', ['current', 'headers', 'page']),
             ...mapGetters('constants', ['resourceDetails']),
             ...mapGetters('results', ['total', 'records'])
         },

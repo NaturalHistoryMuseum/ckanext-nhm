@@ -1,9 +1,22 @@
 import Vue from 'vue';
 import App from './App.vue';
+import VueClipboard from 'vue-clipboard2'
 import store from './store/main';
 
-let outsideClick = {};
+// for bundling purposes
+require('leaflet/dist/leaflet.css');
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
+// bundle leaflet images
+function importFolder(context) {
+    context.keys().forEach(context);
+}
+importFolder(require.context('leaflet/dist/images/', true, /\.(png|jpe?g|gif)$/i));
+
+Vue.use(VueClipboard);
+
+let outsideClick = {};
 Vue.directive('dismiss', {
     bind(el, binding, vnode) {
         outsideClick[vnode.context._uid] = (event) => {
