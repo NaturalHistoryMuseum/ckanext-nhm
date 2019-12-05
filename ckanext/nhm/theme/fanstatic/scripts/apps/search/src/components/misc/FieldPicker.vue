@@ -1,5 +1,5 @@
 <template>
-    <div class="floating space-children-v field-picker">
+    <div class="space-children-v field-picker" :class="classes">
         <input type="text" class="full-width" name="fieldSearch"
             id="fieldSearch"
             value="" autocomplete="off" placeholder="field name"
@@ -23,7 +23,7 @@
                 fieldList:   []
             }
         },
-        props:   ['callback', 'resourceIds'],
+        props:   ['callback', 'resourceIds', 'classes'],
         computed: {
             ...mapState('results', ['current']),
         },

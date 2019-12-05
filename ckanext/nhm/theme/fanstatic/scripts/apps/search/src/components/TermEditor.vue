@@ -3,45 +3,43 @@
         <i class="fas fa-caret-square-left" @click="closeDialog"></i>
         <div class="term-editor-fields space-children-v" v-if="fieldType !== 'geo'">
             <div class="flex-container flex-wrap flex-wrap-spacing">
-                            <span class="fields" v-for="(field, index) in newFields"
-                                v-bind:key="field.id">
+                            <span class="fields"
+                                  v-for="(field, index) in newFields"
+                                  v-bind:key="field.id">
                                 {{ field }}
                                 <i class="delete-field fas fa-times-circle fa-xs"
-                                    @click="deleteField(index)"></i>
+                                   @click="deleteField(index)"></i>
                             </span>
             </div>
-            <input type="text" class="full-width" name="fieldSearch"
-                id="fieldSearch"
-                value="" autocomplete="off" placeholder="field name"
-                v-model="fieldSearch" @keyup.enter="addNewField(fieldSearch)"/>
-            <select class="full-width" size="10">
-                <option v-for="field in fieldList" v-bind:key="field.id"
-                    @dblclick="addNewField(field)">{{ field }}
-                </option>
-            </select>
+            <FieldPicker v-if="showFields"
+                         :callback="addNewField"
+                         :resource-ids="resourceIds"></FieldPicker>
         </div>
         <div class="term-editor-query space-children-v">
             <div class="flex-container flex-nowrap flex-stretch-last">
-                <span>As:</span>
-                <select v-model="fieldType" @change="comparisonType = schema.terms[fieldType][0]">
-                    <option v-for="(v, k) in readableFieldTypes" v-bind:key="v.id"
-                        :value="k">{{ v }}
-                    </option>
-                </select>
+                <span>As:</span> <select v-model="fieldType"
+                                         @change="comparisonType = schema.terms[fieldType][0]">
+                <option v-for="(v, k) in readableFieldTypes" v-bind:key="v.id" :value="k">{{ v }}
+                </option>
+            </select>
             </div>
             <div class="comparison-types flex-container flex-center">
                     <span v-for="q in terms" :key="q.id">
-                        <input type="radio" :id="q" name="comparisonType" :value="q"
-                            v-model="comparisonType"
-                            checked>
+                        <input type="radio"
+                               :id="q"
+                               name="comparisonType"
+                               :value="q"
+                               v-model="comparisonType"
+                               checked>
                         <label :for="q">{{ q }}</label>
                     </span>
             </div>
             <div class="query-values">
                 <keep-alive>
-                    <component :is="termComponent" :comparison-type="comparisonType"
-                        :existing-term-id="existingTermId"
-                        v-on:set-query-values="setQueryValues"></component>
+                    <component :is="fieldType"
+                               :comparison-type="comparisonType"
+                               :existing-term-id="existingTermId"
+                               v-on:set-query-values="setQueryValues"></component>
                 </keep-alive>
             </div>
             <div class="query-submit">
@@ -54,17 +52,27 @@
 <script>
     import * as d3 from 'd3-collection';
     import {mapMutations, mapState} from 'vuex'
-    import TextEditor from './editors/TextEditor.vue';
-    import NumberEditor from './editors/NumberEditor.vue';
-    import GeoEditor from './editors/GeoEditor.vue';
-    import OtherEditor from './editors/OtherEditor.vue';
+    import Loading from './Loading.vue';
+    import LoadError from './LoadError.vue';
+
+    const FieldPicker  = import('./misc/FieldPicker.vue');
+    const TextEditor   = import('./editors/TextEditor.vue');
+    const NumberEditor = import('./editors/NumberEditor.vue');
+    const GeoEditor    = import('./editors/GeoEditor.vue');
+    const OtherEditor  = import('./editors/OtherEditor.vue');
 
     export default {
-        name:     'TermEditor',
-        props:    ['existingTermId', 'parentId'],
-        data:     function () {
+        name:       'TermEditor',
+        components: {
+            FieldPicker: () => ({component: FieldPicker, loading: Loading, error: LoadError}),
+            string:      () => ({component: TextEditor, loading: Loading, error: LoadError}),
+            number:      () => ({component: NumberEditor, loading: Loading, error: LoadError}),
+            geo:         () => ({component: GeoEditor, loading: Loading, error: LoadError}),
+            other:       () => ({component: OtherEditor, loading: Loading, error: LoadError})
+        },
+        props:      ['existingTermId', 'parentId'],
+        data:       function () {
             let data = {
-                fieldSearch:        null,
                 newFields:          [],
                 fieldList:          [],
                 fieldType:          'string',
@@ -87,29 +95,21 @@
 
             return data;
         },
-        mounted:  function () {
+        mounted:    function () {
             this.getFieldList();
         },
-        computed: {
+        computed:   {
             ...mapState('constants', ['schema']),
             ...mapState(['resourceIds']),
-            termComponent: function () {
-                return {
-                    string: TextEditor,
-                    number: NumberEditor,
-                    geo:    GeoEditor,
-                    other:  OtherEditor
-                }[this.fieldType];
-            },
-            terms:         function () {
+            terms:     function () {
                 let schemaTerms = this.schema.terms[this.fieldType];
                 let emptyTerms  = schemaTerms.length === 1 && (schemaTerms[0] === '' || schemaTerms[0] === null);
                 return emptyTerms ? [] : schemaTerms;
             },
-            queryType:     function () {
+            queryType: function () {
                 return this.fieldType !== 'other' ? [this.fieldType, this.comparisonType].join('_') : this.comparisonType;
             },
-            query:         function () {
+            query:     function () {
                 let queryData = {};
 
                 if (this.fieldType !== 'geo') {
@@ -131,7 +131,7 @@
                 return queryData;
             }
         },
-        methods:  {
+        methods:    {
             ...mapMutations('filters', ['changeKey', 'changeContent', 'addTerm']),
             setQueryValues: function (queryValues) {
                 this.queryValues = queryValues;
@@ -158,7 +158,7 @@
                     referrer:    'no-referrer',
                     body:        JSON.stringify({
                                                     resource_ids: this.resourceIds,
-                                                    text:       this.fieldSearch,
+                                                    text:         this.fieldSearch,
                                                     lowercase:    true
                                                 }),
                 }).then(response => {
@@ -180,14 +180,6 @@
                                  })
                 }
                 this.closeDialog();
-            }
-        },
-        watch:    {
-            fieldSearch: function () {
-                this.getFieldList();
-            },
-            resourceIds: function () {
-                this.getFieldList();
             }
         }
     }

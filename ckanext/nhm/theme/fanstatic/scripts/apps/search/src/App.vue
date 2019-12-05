@@ -55,7 +55,7 @@
             </transition>
             <pre class="fields" v-if="showQuery"
                 style="margin-bottom: 20px;">{{ requestBody }}</pre>
-            <Results></Results>
+            <Results v-if="hasResult"></Results>
         </div>
     </div>
 </template>
@@ -64,10 +64,10 @@
     import Loading from './components/Loading.vue';
     import LoadError from './components/LoadError.vue';
     import FilterGroup from './components/FilterGroup.vue';
-    import Results from './components/Results.vue';
     import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
 
     const ResourceList = import('./components/ResourceList.vue');
+    const Results = import('./components/Results.vue');
 
     export default {
         name:       'App',
@@ -76,7 +76,7 @@
             Loading,
             LoadError,
             FilterGroup,
-            Results
+            Results: () => ({component: Results, loading: Loading, error: LoadError})
         },
         data:       function () {
             return {
@@ -89,6 +89,7 @@
             ...mapState('constants', ['loading', 'loadError', 'packageList']),
             ...mapGetters(['query', 'requestBody']),
             ...mapState(['resourceIds']),
+            ...mapGetters('results', ['hasResult']),
             search: {
                 get() {
                     return this.$store.state.search;
