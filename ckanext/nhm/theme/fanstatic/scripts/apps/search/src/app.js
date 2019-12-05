@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import store from './store/main';
+import {styles} from 'leaflet/dist/leaflet.css';
 
 function importFolder(context) {
     context.keys().forEach(context);
