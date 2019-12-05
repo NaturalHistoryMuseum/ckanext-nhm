@@ -38,7 +38,8 @@ module.exports = {
     output:  {
         library:       'search',
         libraryTarget: 'umd',
-        filename:      'search.js'
+        filename:      'search.js',
+        publicPath: '/fanstatic/scripts/apps/search/'
     },
     resolve: {
         alias: {
