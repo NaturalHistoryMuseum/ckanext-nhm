@@ -5,56 +5,59 @@
         <div class="search-form multisearch-form" v-if="!loading && !loadError">
             <div class="multisearch-simple flex-container flex-stretch-first">
                 <div class="search-input control-group search-giant">
-                    <label for="all" class="sr-only">Search</label>
-                    <input type="text" class="search" name="all" id="all"
-                        value="" autocomplete="off" placeholder="Search all fields"
-                        v-model="search" @keyup.enter="runSearch(0)"/>
+                    <label for="all" class="sr-only">Search</label> <input type="text"
+                                                                           class="search"
+                                                                           name="all"
+                                                                           id="all"
+                                                                           value=""
+                                                                           autocomplete="off"
+                                                                           placeholder="Search all fields"
+                                                                           v-model="search"
+                                                                           @keyup.enter="runSearch(0)"/>
                     <button type="submit" @click="runSearch(0)">
-                        <i class="fas fa-search"></i>
-                        <span class="sr-only">Search</span>
+                        <i class="fas fa-search"></i> <span class="sr-only">Search</span>
                     </button>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="/help/search" target="_blank" class="collapse-to-icon">
-                        Help <i class="fas inline-icon-right fa-question"></i>
-                    </a>
+                    <a href="/help/search" target="_blank" class="collapse-to-icon"> Help
+                        <i class="fas inline-icon-right fa-question"></i> </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
                     <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
                         Advanced <i class="fas inline-icon-right"
-                        :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
+                                    :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
                     </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon">
-                        Query <i class="inline-icon-right fas"
-                        :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i>
-                    </a>
+                    <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon"> Query <i
+                        class="inline-icon-right fas"
+                        :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="resetFilters" class="collapse-to-icon">
-                        Reset <i class="inline-icon-right fas fa-trash"></i>
-                    </a>
+                    <a href="#" @click="resetFilters" class="collapse-to-icon"> Reset
+                        <i class="inline-icon-right fas fa-trash"></i> </a>
                 </div>
                 <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showResources = !showResources" id="btnResources" class="collapse-to-icon">
-                        Resources <i class="fas fa-list inline-icon-right"></i>
-                    </a>
+                    <a href="#"
+                       @click="showResources = !showResources"
+                       id="btnResources"
+                       class="collapse-to-icon"> Resources
+                        <i class="fas fa-list inline-icon-right"></i> </a>
                 </div>
                 <transition name="slidedown">
                     <ResourceList v-if="showResources"
-                        v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}">
-                    </ResourceList>
+                                  v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}"></ResourceList>
                 </transition>
             </div>
             <transition name="slidedown">
                 <div class="multisearch-advanced flex-container" v-if="showAdvanced">
-                    <FilterGroup filter-id="group_1" v-bind:nest-level="0" key="root">
-                    </FilterGroup>
+                    <FilterGroup filter-id="group_1" v-bind:nest-level="0" key="root"></FilterGroup>
                 </div>
             </transition>
-            <pre class="fields" v-if="showQuery"
-                style="margin-bottom: 20px;">{{ requestBody }}</pre>
+            <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery">
+                <pre>{{ requestBody }}</pre>
+            </Copyable>
+
             <Results v-if="hasResult"></Results>
         </div>
     </div>
@@ -65,6 +68,7 @@
     import LoadError from './components/LoadError.vue';
     import FilterGroup from './components/FilterGroup.vue';
     import Results from './components/Results.vue';
+    import Copyable from './components/misc/Copyable.vue';
     import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
 
     const ResourceList = import('./components/ResourceList.vue');
@@ -76,7 +80,8 @@
             Loading,
             LoadError,
             FilterGroup,
-            Results
+            Results,
+            Copyable
         },
         data:       function () {
             return {

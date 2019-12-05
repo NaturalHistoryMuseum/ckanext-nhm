@@ -1,9 +1,9 @@
 <template>
     <div class="flex-container">
         <span v-if="isRange && data.greater_than !== undefined">{{ data.greater_than }}</span>
-        <span v-if="isRange && data.greater_than !== undefined">{{ data.greater_than_inclusive ? '≤' : '<' }}</span>
+        <span v-if="isRange && data.greater_than !== undefined">{{ data.greater_than_inclusive ? '≤' : 'gt' }}</span>
         <FieldsDropdown v-bind:fields="data.fields"></FieldsDropdown>
-        <span v-if="isRange && data.less_than !== undefined">{{ data.less_than_inclusive ? '≤' : '<' }}</span>
+        <span v-if="isRange && data.less_than !== undefined">{{ data.less_than_inclusive ? '≤' : 'lt' }}</span>
         <span v-if="isRange && data.less_than !== undefined">{{ data.less_than }}</span>
         <span v-if="!isRange">{{ comparison === 'contains' ? '~' : '=' }}</span>
         <span v-if="!isRange">{{ data.value }}</span>

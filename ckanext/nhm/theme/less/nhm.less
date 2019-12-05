@@ -265,8 +265,35 @@ body {
   font-family: monospace;
   background-color: @grey9;
   border: 1px dashed @grey8;
-  font-size: 1.5em;
-  padding: 5px;
+  font-size: 1.3em;
+  padding: 0;
+  .mixin-flex-container();
+  .mixin-flex-row();
+  .mixin-flex-top();
+  .mixin-flex-stretch-first();
+
+  &.copied {
+    border-color: @primary5;
+  }
+
+  &.copy-failed {
+    border-color: @warning2;
+  }
+
+  & button {
+    margin: 0 0 0 10px;
+    padding: 0 5px;
+    border: 5px solid @grey8;
+    background-color: @grey8;
+
+    & .fa-check {
+      color: @primary3;
+    }
+
+    & .fa-times {
+      color: @warning2;
+    }
+  }
 }
 
 .handle i {

@@ -13,7 +13,9 @@
                          v-if="showCite"
                          v-dismiss="{switch: 'showCite', ignore: ['#show-cite', 'use-a-doi']}">
                         <p>Cite this search:</p>
-                        <p class="nowrap copyable" v-if="doi !== null">{{ doi }}</p>
+                        <Copyable :copy-text="'https://doi.org/' + doi" v-if="doi !== null">
+                            <span class="nowrap">{{ doi }}</span>
+                        </Copyable>
                         <p class="alert-error" v-if="doiFailed">
                             Failed to retrieve DOI. Please try again later. </p>
                         <div class="form-row" v-if="doi === null">
@@ -52,8 +54,9 @@
                          v-dismiss="{switch: 'showShare', ignore: ['#show-share']}">
                         <div v-if="slug !== null">
                             <p>Share this search:</p>
-                            <p><span class="nowrap copyable">data.nhm.ac.uk/search/{{ slug }}</span>
-                            </p>
+                            <Copyable :copy-text="'https://' + shareUrl" :display-text="shareUrl">
+                                <span class="nowrap">{{ shareUrl }}</span>
+                            </Copyable>
                             <small class="alert-warning">This link is for social sharing
                                 <em>only</em>. If you are intending to reference this search in a
                                                          publication, <a href="#"
@@ -189,10 +192,12 @@
     import ListView from './views/ListView.vue';
     import FieldPicker from './misc/FieldPicker.vue';
     import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+    import Copyable from './misc/Copyable.vue';
 
     export default {
         name:       'Results',
         components: {
+            Copyable,
             TableView,
             ListView,
             FieldPicker
@@ -224,6 +229,9 @@
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
             viewComponent() {
                 return this.currentView + 'View';
+            },
+            shareUrl() {
+                return `data.nhm.ac.uk/search/${this.slug}`;
             }
         },
         methods:    {
