@@ -150,6 +150,17 @@
                                  })
                 }
                 this.closeDialog();
+            },
+            resetQuery: function () {
+                this.queryValues = {};
+            }
+        },
+        watch: {
+            fieldType() {
+                this.resetQuery();
+            },
+            comparisonType() {
+                this.resetQuery();
             }
         }
     }

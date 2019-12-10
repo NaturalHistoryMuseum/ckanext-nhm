@@ -282,6 +282,17 @@
                 },
                 deep:    true
             },
+            'values.named_area': {
+              handler: function (namedArea) {
+                  let entries = d3.entries(namedArea);
+                  if (entries.map(e => e.value !== null ? 1 : 0).reduce((a,b) => a + b) > 1) {
+                      entries.forEach(e => {
+                          this.$set(this.values.named_area, e.key, null)
+                      })
+                  }
+              },
+              deep: true
+            },
             'values.custom_area': {
                 handler: function () {
                     this.pastedGeoJson = JSON.stringify(this.values.custom_area);
