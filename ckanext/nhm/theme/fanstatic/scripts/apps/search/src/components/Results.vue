@@ -146,8 +146,8 @@
                 <ul class="nav nav-tabs">
                     <li v-for="viewTab in views"
                         :key="viewTab.id"
-                        :class="{active: currentView === viewTab}"
-                        @click="currentView = viewTab">
+                        :class="{active: view === viewTab}"
+                        @click="setView(viewTab)">
                         <a>{{ viewTab }}</a>
                     </li>
                 </ul>
@@ -190,6 +190,7 @@
 <script>
     import TableView from './views/TableView.vue';
     import ListView from './views/ListView.vue';
+    import GalleryView from './views/GalleryView.vue';
     import FieldPicker from './misc/FieldPicker.vue';
     import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
     import Copyable from './misc/Copyable.vue';
@@ -200,6 +201,7 @@
             Copyable,
             TableView,
             ListView,
+            GalleryView,
             FieldPicker
         },
         data:       function () {
@@ -208,8 +210,7 @@
                 showCite:     false,
                 showShare:    false,
                 showFields:   false,
-                views:        ['Table', 'List'],
-                currentView:  'Table',
+                views:        ['Table', 'List', 'Gallery'],
                 doiForm:      {
                     email_address: null
                 },
@@ -225,17 +226,17 @@
             ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
                                     'resultsLoading', 'slugLoading', 'resultsInvalid', 'doi',
                                     'doiLoading', 'slugFailed', 'doiFailed', 'download',
-                                    'downloadProcessing', 'downloadFailed']),
+                                    'downloadProcessing', 'downloadFailed', 'view']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
             viewComponent() {
-                return this.currentView + 'View';
+                return this.view + 'View';
             },
             shareUrl() {
                 return `data.nhm.ac.uk/search/${this.slug}`;
             }
         },
         methods:    {
-            ...mapMutations('results', ['addCustomHeader']),
+            ...mapMutations('results', ['addCustomHeader', 'setView']),
             ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'requestDownload']),
             shareSearch() {
                 if (!this.showShare && this.slug === null) {

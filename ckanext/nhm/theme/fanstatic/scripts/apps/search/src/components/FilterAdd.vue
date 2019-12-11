@@ -69,7 +69,7 @@
                 this.addGroup(this.$parent.filterId);
             },
             newPreset(presetKey) {
-                this.addPreset({key: presetKey, parentId: this.parentId});
+                this.addPreset({key: presetKey, parent: this.parentId});
                 this.showPresets = false;
             },
         },

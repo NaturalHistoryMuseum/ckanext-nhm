@@ -79,7 +79,7 @@ const store = new Vuex.Store(
                         return !state.resourceIds.includes(x);
                     }));
                 }
-            }
+            },
         },
         actions:   {
             resolveSlug(context, slug) {
@@ -102,6 +102,24 @@ const store = new Vuex.Store(
                         context.commit('filters/resetFilters');
                     }
                 });
+            },
+            setHasImage(context) {
+                let imageFields = context.state.resourceIds.map(r => {
+                    return context.getters['constants/resourceDetails'][r].raw._image_field
+                }).filter(f => {
+                    return f !== null && f !== undefined && f !== 'None';
+                });
+
+                let newTerm = {
+                    parent: 'group_1', key: 'exists', content: {
+                        fields: imageFields
+                    }
+                };
+
+                if (!context.getters['filters/hasTerm'](newTerm)) {
+                    context.commit('filters/addTerm', newTerm);
+                    context.dispatch('results/runSearch', 0);
+                }
             }
         },
         modules:   {

@@ -1036,6 +1036,69 @@ iframe {
 .space-right {
   margin-right: 10px;
 }
+.tiling-gallery {
+  -webkit-column-gap: 10px;
+  -moz-column-gap: 10px;
+  column-gap: 10px;
+}
+@media (min-width: 576px) {
+  .tiling-gallery {
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+  }
+}
+@media (min-width: 768px) {
+  .tiling-gallery {
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+    column-count: 4;
+  }
+}
+@media (min-width: 992px) {
+  .tiling-gallery {
+    -webkit-column-count: 5;
+    -moz-column-count: 5;
+    column-count: 5;
+  }
+}
+@media (min-width: 1200px) {
+  .tiling-gallery {
+    -webkit-column-count: 6;
+    -moz-column-count: 6;
+    column-count: 6;
+  }
+}
+.tiling-gallery img {
+  width: 100% !important;
+  height: auto !important;
+}
+.tiling-gallery .gallery-tile {
+  position: relative;
+  margin-bottom: 10px;
+  -o-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  z-index: 0;
+}
+.tiling-gallery .gallery-tile:hover {
+  transform: scale(1.1);
+  z-index: 100;
+}
+.tiling-gallery .gallery-tile-title {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
 .toolbar {
   background: #BBEDA9;
   padding: 0;

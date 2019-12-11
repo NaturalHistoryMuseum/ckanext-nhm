@@ -5,6 +5,7 @@ let results = {
     namespaced: true,
     state:      {
         current:            {},
+        view: 'Table',
         after:              [],
         page:               0,
         failed:             false,
@@ -48,6 +49,9 @@ let results = {
         setPage(state, page) {
             state.page    = page;
             state.current = {};
+        },
+        setView(state, viewName) {
+            state.view = viewName;
         },
         invalidateResults(state) {
             state.slug           = null;

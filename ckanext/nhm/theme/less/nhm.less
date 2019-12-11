@@ -930,6 +930,68 @@ iframe {
   margin-right: 10px;
 }
 
+.tiling-gallery {
+  @col-gap: 10px;
+  -webkit-column-gap: @col-gap;
+  -moz-column-gap: @col-gap;
+  column-gap: @col-gap;
+
+  @media (min-width: @sm) {
+    @n-cols: 3;
+    -webkit-column-count: @n-cols;
+    -moz-column-count: @n-cols;
+    column-count: @n-cols;
+  }
+  @media (min-width: @md) {
+    @n-cols: 4;
+    -webkit-column-count: @n-cols;
+    -moz-column-count: @n-cols;
+    column-count: @n-cols;
+  }
+  @media (min-width: @lg) {
+    @n-cols: 5;
+    -webkit-column-count: @n-cols;
+    -moz-column-count: @n-cols;
+    column-count: @n-cols;
+  }
+  @media (min-width: @xl) {
+    @n-cols: 6;
+    -webkit-column-count: @n-cols;
+    -moz-column-count: @n-cols;
+    column-count: @n-cols;
+  }
+
+  & img {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  & .gallery-tile {
+    position: relative;
+    margin-bottom: @col-gap;
+    .trans(0.2s);
+    z-index: 0;
+
+    &:hover {
+      transform: scale(1.1);
+      z-index: 100;
+    }
+  }
+
+  & .gallery-tile-title {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    padding: 5px;
+    border-radius: @rounding;
+    background-color: fade(@grey10, 80%);
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .toolbar {
   background: @primary6;
   .no-spacing;

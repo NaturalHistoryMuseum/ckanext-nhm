@@ -8,6 +8,7 @@
     "d3-collection": "^1.0.7",
     "json-schema-ref-parser": "^7.1.2",
     "leaflet": "^1.6.0",
+    "masonry-layout": "^4.2.2",
     "shortid": "^2.2.15",
     "vue": "^2.6.10",
     "vue-clipboard2": "^0.3.1",

@@ -144,7 +144,7 @@
                 }
                 else {
                     this.addTerm({
-                                     parentId: this.parentId,
+                                     parent: this.parentId,
                                      key:      this.queryType,
                                      content:  this.query
                                  })

@@ -37,22 +37,34 @@
                     imageField: resourceDetails.raw._image_field
                 }
             },
-            getImage(item) {
-                if (item.resource === '05ff2255-c38a-40c9-b657-4ccb55ab2feb') {
+            getImages(item, first) {
+                let images;
+                if (item.data.associatedMedia !== undefined) {
                     try {
-                        return item.data.associatedMedia[0].identifier.replace('preview', 'thumbnail');
+                        images = item.data.associatedMedia.map(i => {
+                            return {preview: i.identifier, thumb: i.identifier.replace('preview', 'thumbnail')};
+                        });
                     }
                     catch (e) {
-                        return null;
+                        images = [];
                     }
                 }
                 else {
                     try {
-                        return item.data[this.getDetails(item.resource).imageField][0];
+                        images = item.data[this.getDetails(item.resource).imageField].map(i => {
+                            return {preview: i, thumb: i}
+                        });
                     }
                     catch (e) {
-                        return null;
+                        images = [];
                     }
+                }
+
+                if (first) {
+                    return images.length > 0 ? images[0] : null;
+                }
+                else {
+                    return images;
                 }
             },
             getValue(item, field) {

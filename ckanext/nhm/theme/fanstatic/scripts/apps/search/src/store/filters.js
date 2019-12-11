@@ -11,14 +11,14 @@ let initialFilters = {
     }
 };
 
-function dequeryfy(items, parentId) {
+function dequeryfy(items, parent) {
     let itemList = {};
     items.forEach((i) => {
         let item = d3.entries(i)[0];
         if (Array.isArray(item.value)) {
-            let groupId       = parentId === null ? 'group_1' : `group_${shortid.generate()}`;
+            let groupId       = parent === null ? 'group_1' : `group_${shortid.generate()}`;
             itemList[groupId] = {
-                parent:  parentId,
+                parent:  parent,
                 key:     item.key,
                 content: []
             };
@@ -28,7 +28,7 @@ function dequeryfy(items, parentId) {
         }
         else {
             itemList[`term_${shortid.generate()}`] = {
-                parent:  parentId,
+                parent:  parent,
                 key:     item.key,
                 content: item.value
             }
@@ -86,6 +86,9 @@ let filters = {
                      .key(p => p.key)
                      .rollup(p => p[0].value.name)
                      .object(d3.entries(presets));
+        },
+        hasTerm:       (state) => (termPayload) => {
+            return d3.values(state.items).some(i => JSON.stringify(i) === JSON.stringify(termPayload))
         }
     },
     mutations:  {
@@ -114,26 +117,21 @@ let filters = {
         resetFilters(state) {
             state.items = {...initialFilters};
         },
-        addGroup(state, parentId) {
+        addGroup(state, parent) {
             let newGroup = {
-                parent:  parentId,
+                parent:  parent,
                 key:     'and',
                 content: []
             };
             Vue.set(state.items, `group_${shortid.generate()}`, newGroup);
         },
         addTerm(state, payload) {
-            let newTerm = {
-                parent:  payload.parentId,
-                key:     payload.key,
-                content: payload.content
-            };
-            Vue.set(state.items, `term_${shortid.generate()}`, newTerm)
+            Vue.set(state.items, `term_${shortid.generate()}`, payload)
         },
         addPreset(state, payload) {
             let presetTerm = presets[payload.key];
             let newTerm    = {
-                parent:  payload.parentId,
+                parent:  payload.parent,
                 key:     presetTerm.key,
                 content: presetTerm.content
             };
