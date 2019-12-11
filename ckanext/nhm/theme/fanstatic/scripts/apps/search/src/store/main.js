@@ -104,10 +104,16 @@ const store = new Vuex.Store(
                 });
             },
             setHasImage(context) {
-                let imageFields = context.state.resourceIds.map(r => {
+                let imageFields = []
+
+                context.state.resourceIds.map(r => {
                     return context.getters['constants/resourceDetails'][r].raw._image_field
                 }).filter(f => {
                     return f !== null && f !== undefined && f !== 'None';
+                }).forEach(f => {
+                    if (!imageFields.includes(f)){
+                        imageFields.push(f)
+                    }
                 });
 
                 let newTerm = {
