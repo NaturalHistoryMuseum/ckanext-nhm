@@ -5,7 +5,7 @@
 var MAM = {
     config : {
         endpoint: '/api/3/action/download_image',
-        formTpl: '<form id="mam"><p><small>Please enter your email address, and we will send you the original image.</small></p><input type="hidden" value="{{resource_id}}" name="resource_id"><input type="hidden" name="record_id" value="{{record_id}}"><input type="hidden" name="asset_id" value="{{asset_id}}"><div class="input-append"><input type="email" class="input-large" name="email" value="" required placeholder="Email address" oninvalid="this.setCustomValidity(\'Please enter your email\')" oninput="setCustomValidity(\'\')"><button type="submit" class="btn btn-success"><i class="icon-circle-arrow-right icon-large"></i></button></div><hr><p><small><i>Data Protection</i></small></p><p><small>The Natural History Museum will use your personal data in accordance with data protection legislation to process your requests. For more information please read our <a href="/privacy">privacy notice</a>.</small></p></form>'
+        formTpl: '<form id="mam"><p><small>Please enter your email address, and we will send you the original image.</small></p><input type="hidden" value="{{resource_id}}" name="resource_id"><input type="hidden" name="record_id" value="{{record_id}}"><input type="hidden" name="asset_id" value="{{asset_id}}"><div class="mam-input-container"><input type="email" name="email" value="" required placeholder="Email address" oninvalid="this.setCustomValidity(\'Please enter your email\')" oninput="setCustomValidity(\'\')"><button type="submit" class="btn btn-success"><i class="fa fa-arrow-circle-right inline-icon-right"></i></button></div><hr><p><small><i>Data Protection</i></small></p><p><small>The Natural History Museum will use your personal data in accordance with data protection legislation to process your requests. For more information please read our <a href="/privacy">privacy notice</a>.</small></p></form>'
     },
 
     init : function() {
@@ -88,7 +88,7 @@ var MAM = {
                        $(this).removeClass('working')
                    },
                    error: function(){
-                       self.html('<p class="result"><small><i class="icon-exclamation-sign" aria-hidden="true"></i> Sorry we could not complete your request at this time - please try again later.</small></p>')
+                       self.html('<p class="result"><small><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Sorry we could not complete your request at this time - please try again later.</small></p>')
                    },
                    success: function(){
                        self.html('<p class="result"><small>Thank you - you will receive a confirmation email shortly.</small></p>')
