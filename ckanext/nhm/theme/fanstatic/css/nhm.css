@@ -2869,17 +2869,52 @@ select,
   }
 }
 .download-tooltip {
-  min-width: 290px;
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
+  font-size: 17px;
+  min-width: 350px;
+  z-index: 1000;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 0;
+  border-radius: 3px;
+}
+.download-tooltip ul {
+  margin: 0;
+  padding: 0;
+}
+.download-tooltip ul li {
+  list-style: none;
+}
+.download-tooltip ul li a {
+  display: block;
+  padding: 5px;
+}
+.download-tooltip ul li a:hover,
+.download-tooltip ul li a.active {
+  background: #F2F2F2;
 }
 .download-tooltip form#mam {
-  width: 95%;
   display: none;
   margin: 0;
   padding: 5px;
   background: #F2F2F2;
 }
-.download-tooltip form#mam input.input-large {
-  height: 26px;
+.download-tooltip form#mam .mam-input-container {
+  display: flex;
+  border: 1px solid #a9a9a9;
+  border-radius: 5px;
+  background-color: #F2F2F2;
+}
+.download-tooltip form#mam .mam-input-container:not(.flex-reverse) > *:first-child {
+  flex-grow: 1;
+}
+.download-tooltip form#mam .mam-input-container.flex-reverse > *:last-child {
+  flex-grow: 1;
+}
+.download-tooltip form#mam .mam-input-container input {
+  border: none;
+  border-radius: 5px;
+  padding-left: 10px;
 }
 .facet,
 .filter {
