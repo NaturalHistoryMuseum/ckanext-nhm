@@ -54,7 +54,7 @@
             </div>
             <transition name="slidedown">
                 <div class="multisearch-advanced flex-container" v-if="showAdvanced">
-                    <FilterGroup filter-id="group_1" v-bind:nest-level="0" key="root"></FilterGroup>
+                    <FilterGroup filter-id="group_root" v-bind:nest-level="0" key="root"></FilterGroup>
                 </div>
             </transition>
             <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery">

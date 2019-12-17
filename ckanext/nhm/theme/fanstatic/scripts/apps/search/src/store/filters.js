@@ -4,7 +4,7 @@ import shortid from 'shortid';
 import presets from './presets';
 
 let initialFilters = {
-    group_1: {
+    group_root: {
         parent:  null,
         key:     'and',
         content: []
@@ -16,7 +16,7 @@ function dequeryfy(items, parent) {
     items.forEach((i) => {
         let item = d3.entries(i)[0];
         if (Array.isArray(item.value)) {
-            let groupId       = parent === null ? 'group_1' : `group_${shortid.generate()}`;
+            let groupId       = parent === null ? 'group_root' : `group_${shortid.generate()}`;
             itemList[groupId] = {
                 parent:  parent,
                 key:     item.key,

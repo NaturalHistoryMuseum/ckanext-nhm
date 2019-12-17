@@ -20,7 +20,7 @@ const store = new Vuex.Store(
                     q.search = state.search;
                 }
                 if (d3.values(state.filters.items).some((f) => f.parent !== null)) {
-                    q.filters = getters['filters/queryfy']('group_1');
+                    q.filters = getters['filters/queryfy']('group_root');
                 }
                 return q;
             },
@@ -104,7 +104,7 @@ const store = new Vuex.Store(
                 });
             },
             setHasImage(context) {
-                let imageFields = []
+                let imageFields = [];
 
                 context.state.resourceIds.map(r => {
                     return context.getters['constants/resourceDetails'][r].raw._image_field
@@ -117,7 +117,7 @@ const store = new Vuex.Store(
                 });
 
                 let newTerm = {
-                    parent: 'group_1', key: 'exists', content: {
+                    parent: 'group_root', key: 'exists', content: {
                         fields: imageFields
                     }
                 };
