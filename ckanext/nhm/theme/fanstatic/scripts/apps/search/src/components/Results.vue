@@ -1,10 +1,11 @@
 <template>
-    <div id="result" :class="{disabled: resultsInvalid}">
-        <div class="flex-container flex-center flex-column alert-error full-width" v-if="failed">
+    <div id="result">
+        <Loading v-if="resultsLoading"></Loading>
+        <LoadError v-if="failed">
             <h3>Something went wrong!</h3>
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
-        </div>
+        </LoadError>
         <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
             <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div class="info-popup-button">
@@ -141,7 +142,7 @@
                    id="show-download"> <i class="fas fa-cloud-download-alt"></i>Download </a>
             </div>
         </div>
-        <div>
+        <div v-if="hasResult">
             <div class="flex-container flex-stretch-first flex-center">
                 <ul class="nav nav-tabs">
                     <li v-for="viewTab in views"
@@ -164,8 +165,9 @@
                 </div>
             </div>
 
-
-            <component :is="viewComponent" v-if="hasRecords"></component>
+            <div :class="{disabled: resultsInvalid}">
+                <component :is="viewComponent" v-if="hasRecords"></component>
+            </div>
         </div>
 
         <div class="pagination-wrapper" v-if="after.length > 0 && !resultsInvalid">
@@ -194,6 +196,8 @@
     import FieldPicker from './misc/FieldPicker.vue';
     import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
     import Copyable from './misc/Copyable.vue';
+    import Loading from './Loading.vue';
+    import LoadError from './LoadError.vue'
 
     export default {
         name:       'Results',
@@ -202,7 +206,9 @@
             TableView,
             ListView,
             GalleryView,
-            FieldPicker
+            FieldPicker,
+            LoadError,
+            Loading
         },
         data:       function () {
             return {

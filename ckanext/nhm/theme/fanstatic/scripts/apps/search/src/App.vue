@@ -61,7 +61,7 @@
                 <pre>{{ requestBody }}</pre>
             </Copyable>
 
-            <Results v-if="hasResult"></Results>
+            <Results></Results>
         </div>
     </div>
 </template>
@@ -97,7 +97,6 @@
             ...mapState('constants', ['loading', 'loadError', 'packageList']),
             ...mapGetters(['query', 'requestBody']),
             ...mapState(['resourceIds']),
-            ...mapGetters('results', ['hasResult']),
             search: {
                 get() {
                     return this.$store.state.search;

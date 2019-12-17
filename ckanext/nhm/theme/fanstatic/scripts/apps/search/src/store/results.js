@@ -5,7 +5,7 @@ let results = {
     namespaced: true,
     state:      {
         current:            {},
-        view: 'Table',
+        view:               'Table',
         after:              [],
         page:               0,
         failed:             false,
