@@ -126,7 +126,7 @@ def view(uuid, version):
     format_ = check_access_header()
 
     if format_:
-        return rdf(uuid, format_)
+        return rdf(uuid, format_, version)
     else:
         try:
             # get the record at the given version
