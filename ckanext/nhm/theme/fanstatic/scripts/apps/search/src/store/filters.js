@@ -87,8 +87,13 @@ let filters = {
                      .rollup(p => p[0].value.name)
                      .object(d3.entries(presets));
         },
-        hasTerm:       (state) => (termPayload) => {
-            return d3.values(state.items).some(i => JSON.stringify(i) === JSON.stringify(termPayload))
+        hasTerm:       (state) => (payload) => {
+            let termPayload = JSON.stringify({
+                parent: payload.parent,
+                key: payload.key,
+                content: payload.content
+            });
+            return d3.values(state.items).some(i => JSON.stringify(i) === termPayload)
         }
     },
     mutations:  {
@@ -126,7 +131,21 @@ let filters = {
             Vue.set(state.items, `group_${shortid.generate()}`, newGroup);
         },
         addTerm(state, payload) {
-            Vue.set(state.items, `term_${shortid.generate()}`, payload)
+            let newTerm = {
+                parent: payload.parent,
+                key: payload.key,
+                content: payload.content
+            };
+            let termKey;
+            if (payload.name) {
+                termKey = payload.name;
+            }
+            else {
+                termKey = shortid.generate();
+            }
+            let termName = `term_${termKey}`;
+            Vue.set(state.items, termName, newTerm);
+            console.log(state.items);
         },
         addPreset(state, payload) {
             let presetTerm = presets[payload.key];

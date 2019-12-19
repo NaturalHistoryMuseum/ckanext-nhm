@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import VueClipboard from 'vue-clipboard2'
-import store from './store/main';
+import store from './store/new/main';
 
 // for bundling purposes
 require('leaflet/dist/leaflet.css');

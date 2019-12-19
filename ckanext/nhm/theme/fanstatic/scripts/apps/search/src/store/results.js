@@ -53,12 +53,6 @@ let results = {
         setView(state, viewName) {
             state.view = viewName;
         },
-        invalidateResults(state) {
-            state.slug           = null;
-            state.doi            = null;
-            state.downloadId     = null;
-            state.resultsInvalid = true;
-        },
         addCustomHeader(state, field) {
             state.headers.push([field])
         },
@@ -177,7 +171,13 @@ let results = {
                     context.state.downloadFailed = true;
                 }
             })
-        }
+        },
+        invalidateResults(context) {
+            context.state.slug           = null;
+            context.state.doi            = null;
+            context.state.downloadId     = null;
+            context.state.resultsInvalid = true;
+        },
     }
 };
 

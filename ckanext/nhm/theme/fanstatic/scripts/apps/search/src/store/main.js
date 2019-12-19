@@ -119,7 +119,7 @@ const store = new Vuex.Store(
                 let newTerm = {
                     parent: 'group_root', key: 'exists', content: {
                         fields: imageFields
-                    }
+                    }, name: 'hasImage'
                 };
 
                 if (!context.getters['filters/hasTerm'](newTerm)) {

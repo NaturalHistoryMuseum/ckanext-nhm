@@ -1,8 +1,8 @@
 <template>
     <div>
-        <Loading v-if="loading"></Loading>
-        <LoadError v-if="loadError"></LoadError>
-        <div class="search-form multisearch-form" v-if="!loading && !loadError">
+        <Loading v-if="appLoading"></Loading>
+        <LoadError v-if="appError"></LoadError>
+        <div class="search-form multisearch-form" v-if="!appLoading && !appError">
             <div class="multisearch-simple flex-container flex-stretch-first flex-smallwrap space-children-v flex-right">
                 <div class="search-input control-group search-giant">
                     <label for="all" class="sr-only">Search</label> <input type="text"
@@ -94,26 +94,24 @@
             }
         },
         computed:   {
-            ...mapState('constants', ['loading', 'loadError', 'packageList']),
-            ...mapGetters(['query', 'requestBody']),
-            ...mapState(['resourceIds']),
+            ...mapState(['appLoading', 'appError']),
+            ...mapState('query', ['packageList', 'resourceIds', 'requestBody', 'search']),
             search: {
                 get() {
-                    return this.$store.state.search;
+                    return this.$store.state.query.search;
                 },
                 set(value) {
-                    this.$store.commit('setSearch', value)
+                    this.$store.commit('query/setSearch', value)
                 }
             }
         },
         created:    function () {
-            this.$store.dispatch('constants/getSchema');
-            this.$store.dispatch('constants/getPackageList');
+            this.$store.dispatch('getSchema');
+            this.$store.dispatch('query/getPackageList');
         },
         methods:    {
-            ...mapActions('results', ['runSearch']),
-            ...mapMutations('filters', ['resetFilters']),
-            ...mapMutations('results', ['invalidateResults'])
+            ...mapActions(['runSearch', 'invalidateResults']),
+            ...mapMutations('filters', ['resetFilters'])
         },
         watch:      {
             packageList: function (newList, oldList) {
