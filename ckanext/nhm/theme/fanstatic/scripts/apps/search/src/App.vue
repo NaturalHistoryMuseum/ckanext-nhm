@@ -35,7 +35,7 @@
                                :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
                     </div>
                     <div class="text-right nowrap" style="margin-left: 10px;">
-                        <a href="#" @click="resetFilters" class="collapse-to-icon"> Reset
+                        <a href="#" @click="reset" class="collapse-to-icon"> Reset
                             <i class="inline-icon-right fas fa-trash"></i> </a>
                     </div>
                     <div class="text-right nowrap" style="margin-left: 10px;">
@@ -54,7 +54,9 @@
             </div>
             <transition name="slidedown">
                 <div class="multisearch-advanced flex-container" v-if="showAdvanced">
-                    <FilterGroup filter-id="group_root" v-bind:nest-level="0" key="root"></FilterGroup>
+                    <FilterGroup filter-id="group_root"
+                                 v-bind:nest-level="0"
+                                 key="root"></FilterGroup>
                 </div>
             </transition>
             <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery">
@@ -72,7 +74,7 @@
     import FilterGroup from './components/FilterGroup.vue';
     import Results from './components/Results.vue';
     import Copyable from './components/misc/Copyable.vue';
-    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
+    import {mapActions, mapMutations, mapState, mapGetters} from 'vuex';
 
     const ResourceList = import('./components/ResourceList.vue');
 
@@ -95,37 +97,37 @@
         },
         computed:   {
             ...mapState(['appLoading', 'appError']),
-            ...mapState('query', ['packageList', 'resourceIds', 'requestBody', 'search']),
+            ...mapGetters('results/query', ['requestBody']),
+            ...mapState('results/query/resources', ['packageList', 'resourceIds']),
             search: {
                 get() {
-                    return this.$store.state.query.search;
+                    return this.$store.state.results.query.search;
                 },
                 set(value) {
-                    this.$store.commit('query/setSearch', value)
+                    this.setSearch(value);
                 }
             }
         },
         created:    function () {
-            this.$store.dispatch('getSchema');
-            this.$store.dispatch('query/getPackageList');
+            this.getSchema();
+            this.getPackageList();
         },
         methods:    {
-            ...mapActions(['runSearch', 'invalidateResults']),
-            ...mapMutations('filters', ['resetFilters'])
+            ...mapMutations('results/query', ['setSearch']),
+            ...mapMutations('results/query/resources', ['selectAllResources']),
+            ...mapMutations('results/query/filters', ['resetFilters']),
+            ...mapActions(['getSchema']),
+            ...mapActions('results', ['runSearch', 'invalidate', 'reset']),
+            ...mapActions('results/query', ['setRequestBody']),
+            ...mapActions('results/query/resources', ['getPackageList'])
         },
         watch:      {
             packageList: function (newList, oldList) {
                 // if no resource ids are pre-selected,
                 // select all resource ids once the package list loads
                 if (oldList.length === 0 && this.resourceIds.length === 0) {
-                    this.$store.commit('selectAllResources');
+                    this.selectAllResources();
                 }
-            },
-            requestBody: {
-                handler() {
-                    this.invalidateResults();
-                },
-                deep: true
             }
         }
     }

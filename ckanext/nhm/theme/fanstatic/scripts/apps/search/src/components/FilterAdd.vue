@@ -20,7 +20,7 @@
             <div v-if="showPresets" class="floating preset-picker"
                 v-dismiss="{switch: 'showPresets', ignore: ['#show-editor-presets-' + _uid]}">
                 <select size="5">
-                    <option v-for="(presetName, presetKey) in presetKeys" v-bind:key="presetKey"
+                    <option v-for="(presetName, presetKey) in presets" v-bind:key="presetKey"
                         @dblclick="newPreset(presetKey)">
                         {{ presetName }}
                     </option>
@@ -33,7 +33,7 @@
 <script>
     import Loading from './Loading.vue';
     import LoadError from './LoadError.vue';
-    import {mapGetters, mapMutations} from 'vuex';
+    import {mapGetters, mapActions} from 'vuex';
 
     const TermEditor = import('./TermEditor.vue');
 
@@ -51,7 +51,7 @@
             }
         },
         computed:   {
-            ...mapGetters('filters', ['getNestLevel', 'presetKeys']),
+            ...mapGetters('results/query/filters', ['getNestLevel', 'presets']),
             nestLevel() {
                 return this.getNestLevel(this.parentId);
             },
@@ -63,10 +63,10 @@
             }
         },
         methods:    {
-            ...mapMutations('filters', ['addGroup', 'addPreset']),
+            ...mapActions('results/query/filters', ['addGroup', 'addPreset']),
             newGroup: function () {
                 this.showChoice = false;
-                this.addGroup(this.$parent.filterId);
+                this.addGroup({parent: this.$parent.filterId});
             },
             newPreset(presetKey) {
                 this.addPreset({key: presetKey, parent: this.parentId});

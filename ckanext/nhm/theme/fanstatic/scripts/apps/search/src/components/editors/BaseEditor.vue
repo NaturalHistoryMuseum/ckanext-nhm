@@ -17,7 +17,7 @@
             }
         },
         computed: {
-            ...mapGetters('filters', ['getFilterById']),
+            ...mapGetters('results/query/filters', ['getFilterById']),
             queryValues() {
                 return this.values[this.comparisonType];
             }

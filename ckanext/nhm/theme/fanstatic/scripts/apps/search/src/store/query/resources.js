@@ -1,13 +1,14 @@
 import {get} from '../utils'
+import * as d3 from 'd3-collection';
 
 let resources = {
-    namespaced: false,
+    namespaced: true,
     state:      {
         resourceIds: [],
         packageList: [],
     },
     getters:    {
-        resourceDetails: state => {
+        resourceDetails:        state => {
             let lookup = {};
 
             state.packageList.forEach(p => {
@@ -18,17 +19,27 @@ let resources = {
 
             return lookup;
         },
-        sortedResources: (state) => {
+        currentResourceDetails: (state, getters) => {
+            let resourceDetails = d3.entries(getters.resourceDetails);
+            if (state.resourceIds.length > 0) {
+                resourceDetails = resourceDetails.filter(r => {
+                    return state.resourceIds.includes(r.key)
+                });
+            }
+            return resourceDetails.map(r => r.value);
+
+        },
+        sortedResources:        (state) => {
             return state.resourceIds.sort();
         },
-        allResourceIds: (state) => {
+        allResourceIds:         (state) => {
             let resourceIds = [];
             state.packageList.forEach((pkg) => {
                 resourceIds = resourceIds.concat(pkg.resourceIds)
             });
             return resourceIds;
         },
-        invalidResourceIds: (state, getters) => (resourceIds) => {
+        invalidResourceIds:     (state, getters) => (resourceIds) => {
             let invalidIds = resourceIds.filter(r => {
                 !getters.allResourceIds.includes(r);
             });

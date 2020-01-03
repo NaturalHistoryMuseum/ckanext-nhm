@@ -4,20 +4,29 @@ let dynamicPresets = {
     namespaced: true,
     state:      {
         hasImage: {
-            name: 'Has Image'
+            name: 'Has Image',
+            args: {
+                state:   [],
+                getters: [
+                    'results/query/resources/currentResourceDetails'
+                ]
+            }
         }
     },
     getters:    {
-        keys:     (state) => {
+        presets:  (state) => {
             return d3.nest()
                      .key(p => p.key)
                      .rollup(p => p[0].value.name)
                      .object(d3.entries(state));
         },
-        hasImage: (state) => (resourceDetails) => {
+        keys:     (state) => {
+            return d3.entries(state).map(p => p.key);
+        },
+        hasImage: (state) => (args) => {
             let imageFields = [];
 
-            resourceDetails.map(r => {
+            args['results/query/resources/currentResourceDetails'].map(r => {
                 return r.raw._image_field
             }).filter(f => {
                 return f !== null && f !== undefined && f !== 'None';
@@ -28,13 +37,12 @@ let dynamicPresets = {
             });
 
             return {
-                parent:  'group_root',
                 key:     'exists',
                 content: {
                     fields: imageFields
                 },
                 name:    state.hasImage.name,
-                type: 'term'
+                type:    'term'
             };
         }
     }

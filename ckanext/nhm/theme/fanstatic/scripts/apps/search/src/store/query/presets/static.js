@@ -15,11 +15,14 @@ let staticPresets = {
         }
     },
     getters:    {
-        keys: (state) => {
+        presets: (state) => {
             return d3.nest()
                      .key(p => p.key)
                      .rollup(p => p[0].value.name)
                      .object(d3.entries(state));
+        },
+        keys: (state) => {
+            return d3.entries(state).map(p => p.key);
         }
     }
 };

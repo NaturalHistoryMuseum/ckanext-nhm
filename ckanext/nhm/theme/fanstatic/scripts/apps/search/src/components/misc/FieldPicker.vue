@@ -25,7 +25,7 @@
         },
         props:   ['callback', 'resourceIds', 'classes'],
         computed: {
-            ...mapState('results', ['current']),
+            ...mapState('results', ['resultData']),
         },
         methods: {
             getFieldList() {
@@ -59,7 +59,7 @@
             fieldSearch() {
                 this.getFieldList();
             },
-            current: {
+            resultData: {
                 handler() {
                     this.getFieldList();
                 },

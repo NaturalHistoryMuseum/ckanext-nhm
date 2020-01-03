@@ -25,6 +25,9 @@ let filters = {
         parsingError: null
     },
     getters:    {
+        count:         (state) => {
+            return d3.keys(state.items).length;
+        },
         getFilterById: (state) => (id) => {
             return state.items[id];
         },
@@ -65,15 +68,13 @@ let filters = {
         },
         hasFilter:     (state) => (payload) => {
             // TODO: check for equality in a better/more consistent way
-            let filterPayload = JSON.stringify({
-                                                   parent:  payload.parent,
-                                                   key:     payload.key,
-                                                   content: payload.content
-                                               });
-            return d3.values(state.items).some(i => JSON.stringify(i) === filterPayload)
+            let filterContent = JSON.stringify(payload.content);
+            return d3.values(state.items).some(i => {
+                return payload.parent === i.parent && payload.key === i.key && filterContent === JSON.stringify(i.content);
+            })
         },
-        presets:       (state) => {
-            return $.extend(staticPresets.getters.keys, dynamicPresets.getters.keys)
+        presets:       (state, getters) => {
+            return $.extend(getters['staticPresets/presets'], getters['dynamicPresets/presets'])
         }
     },
     mutations:  {
@@ -177,11 +178,19 @@ let filters = {
         },
         addPreset(context, payload) {
             let preset;
-            if (staticPresets.getters.keys.includes(payload.key)) {
-                preset = staticPresets.state[payload.key];
+            if (context.getters['staticPresets/keys'].includes(payload.key)) {
+                preset = context.state.staticPresets[payload.key];
             }
-            else if (dynamicPresets.getters.keys.includes(payload.key)) {
-                preset = dynamicPresets.getters[payload.key](payload.args);
+            else if (context.getters['dynamicPresets/keys'].includes(payload.key)) {
+                let presetDetails = context.state.dynamicPresets[payload.key];
+                let args          = {};
+                presetDetails.args.state.forEach(s => {
+                    args[s] = context.rootState[s];
+                });
+                presetDetails.args.getters.forEach(g => {
+                    args[g] = context.rootGetters[g]
+                });
+                preset = context.getters[`dynamicPresets/${payload.key}`](args);
             }
             else {
                 return;
@@ -190,10 +199,16 @@ let filters = {
                 parent:  payload.parent,
                 key:     preset.key,
                 content: preset.content,
-                name:    preset.name,
+                name:    preset.name + payload.parent.replace('group_', ''),
                 type:    preset.type
             };
-            context.commit('addFilter', newFilter);
+
+            if (!context.getters.hasFilter(newFilter)) {
+                context.commit('addFilter', newFilter);
+                return true;
+            }
+
+            return false;
         }
     }
 };

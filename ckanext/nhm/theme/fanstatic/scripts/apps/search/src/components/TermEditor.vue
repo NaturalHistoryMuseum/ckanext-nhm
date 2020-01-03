@@ -50,7 +50,7 @@
 
 <script>
     import * as d3 from 'd3-collection';
-    import {mapMutations, mapState} from 'vuex'
+    import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
     import TextEditor from './editors/TextEditor.vue';
     import NumberEditor from './editors/NumberEditor.vue';
     import GeoEditor from './editors/GeoEditor.vue';
@@ -82,7 +82,7 @@
             };
 
             if (this.existingTermId !== undefined) {
-                let existing        = this.$store.getters['filters/getFilterById'](this.existingTermId);
+                let existing        = this.getFilterById(this.existingTermId);
                 data.newFields      = [...(existing.content.fields || [])];
                 data.fieldType      = existing.key.includes('_') ? existing.key.split('_')[0] : 'other';
                 data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
@@ -91,8 +91,9 @@
             return data;
         },
         computed:   {
-            ...mapState('constants', ['schema']),
-            ...mapState(['resourceIds']),
+            ...mapState(['schema']),
+            ...mapState('results/query', ['resourceIds']),
+            ...mapGetters('results/query/filters', ['getFilterById']),
             terms:     function () {
                 let schemaTerms = this.schema.terms[this.fieldType];
                 let emptyTerms  = schemaTerms.length === 1 && (schemaTerms[0] === '' || schemaTerms[0] === null);
@@ -124,7 +125,8 @@
             }
         },
         methods:    {
-            ...mapMutations('filters', ['changeKey', 'changeContent', 'addTerm']),
+            ...mapMutations('results/query/filters', ['changeKey', 'changeContent']),
+            ...mapActions('results/query/filters', ['addTerm']),
             setQueryValues: function (queryValues) {
                 this.queryValues = queryValues;
             },

@@ -1,0 +1,79 @@
+import resources from './resources';
+import filters from './filters';
+import Vue from 'vue';
+
+let query = {
+    namespaced: true,
+    modules:    {
+        resources,
+        filters
+    },
+    state:      {
+        parsingError: {
+            unknown:     false,
+            resourceIds: null,
+            queryBody:   null
+        },
+        search:       null,
+        after:        null
+    },
+    getters:    {
+        requestBody: (state, getters) => {
+            let body = {
+                query:        getters.queryBody,
+                resource_ids: getters['resources/sortedResources']
+            };
+
+            if (state.after !== null && state.after !== undefined) {
+                body.after = state.after;
+            }
+
+            return body;
+        },
+        queryBody:   (state, getters) => {
+            let body = {};
+            if (state.search !== null && state.search !== '') {
+                body.search = state.search;
+            }
+
+            if (getters['filters/count'] > 1) {
+                body.filters = getters['filters/queryfy']('group_root')
+            }
+            return body;
+        }
+    },
+    mutations:  {
+        setSearch(state, searchString) {
+            state.search = searchString;
+        },
+        setAfter(state, after) {
+            state.after = after;
+        }
+    },
+    actions:    {
+        setRequestBody(context, newBody) {
+            Vue.set(context.state.parsingError, 'resourceIds', context.getters['resources/invalidResourceIds'](newBody.resource_ids));
+            if (context.state.parsingError.resourceIds === null) {
+                context.commit('resources/setResourceIds', newBody.resource_ids);
+            }
+            else {
+                return;
+            }
+            context.commit('filters/setFromQuery', newBody.query || {});
+            Vue.set(context.state.parsingError, 'queryBody', context.state.filters.parsingError);
+            if (context.state.parsingError.queryBody !== null) {
+                return;
+            }
+
+            if (newBody.query !== undefined && newBody.query.search !== undefined) {
+                context.state.search = newBody.query.search.toString();
+            }
+
+            if (newBody.after !== undefined) {
+                context.state.after = newBody.after;
+            }
+        }
+    }
+};
+
+export default query;
