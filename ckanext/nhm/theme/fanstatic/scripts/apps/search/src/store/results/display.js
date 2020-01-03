@@ -7,10 +7,20 @@ let display = {
     state:      {
         view:    'Table',
         headers: [],
+        viewerImage: {},
+        showImage: false
     },
     mutations:  {
         setView(state, viewName) {
             state.view = viewName;
+        },
+        setImage(state, image) {
+            state.viewerImage = image;
+            state.showImage = true;
+        },
+        hideImage(state) {
+            state.showImage = false;
+            state.viewerImage = {}
         },
         addCustomHeader(state, field) {
             state.headers.push([field])

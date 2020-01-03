@@ -5,13 +5,13 @@
 </template>
 
 <script>
-    import {mapGetters, mapState, mapMutations} from 'vuex';
+    import {mapGetters, mapMutations, mapState} from 'vuex';
 
     export default {
         name:     'BaseView',
         data:     function () {
             return {
-                showFields:    false
+                showFields: false
             }
         },
         mounted:  function () {
@@ -42,21 +42,29 @@
                 let images;
                 if (item.data.associatedMedia !== undefined) {
                     try {
-                        images = item.data.associatedMedia.map(i => {
-                            return {preview: i.identifier, thumb: i.identifier.replace('preview', 'thumbnail')};
+                        images = item.data.associatedMedia.map((img) => {
+                            return {
+                                preview: img.identifier,
+                                thumb:   img.identifier.replace('preview', 'thumbnail'),
+                                title:   img.title,
+                                id:      img.assetId
+                            };
                         });
-                    }
-                    catch (e) {
+                    } catch (e) {
                         images = [];
                     }
                 }
                 else {
                     try {
-                        images = item.data[this.getDetails(item.resource).imageField].map(i => {
-                            return {preview: i, thumb: i}
+                        images = item.data[this.getDetails(item.resource).imageField].map((img, ix) => {
+                            return {
+                                preview: img,
+                                thumb:   img,
+                                title:   '',
+                                id:      `${item.data._id}_${ix}`
+                            }
                         });
-                    }
-                    catch (e) {
+                    } catch (e) {
                         images = [];
                     }
                 }
@@ -69,7 +77,7 @@
                 }
             },
             getValue(item, field) {
-                let v = {...item};
+                let v         = {...item};
                 let subFields = field.split('.');
 
                 let subItems = (parentItem, subField) => {
@@ -84,8 +92,7 @@
                 for (let i = 0; i < subFields.length; i++) {
                     try {
                         v = subItems(v, subFields[i])
-                    }
-                    catch (e) {
+                    } catch (e) {
                         break;
                     }
                 }

@@ -12,32 +12,32 @@ let results = {
     },
     state:      {
         invalidated: false,
-        resultData:        {},
+        resultData:  {},
         slug:        null,
         doi:         null,
         download:    null,
         after:       [],
         page:        0,
         status:      {
-            resultData:     {
+            resultData: {
                 loading: false,
                 failed:  false
             },
-            slug:     {
+            slug:       {
                 loading: false,
                 failed:  false
             },
-            doi:      {
+            doi:        {
                 loading: false,
                 failed:  false
             },
-            download: {
+            download:   {
                 loading: false,
                 failed:  false
             }
         }
     },
-    getters: {
+    getters:    {
         hasResult:         (state) => {
             return state.resultData.success || false;
         },
@@ -62,7 +62,7 @@ let results = {
             }
         },
         setPage(state, page) {
-            state.page = page;
+            state.page       = page;
             state.resultData = {};
         },
     },
@@ -115,8 +115,8 @@ let results = {
         },
         getSlug(context) {
             context.dispatch('getMetadata', {
-                meta: 'slug',
-                action: 'datastore_create_slug',
+                meta:    'slug',
+                action:  'datastore_create_slug',
                 extract: (data) => data.result.slug
             });
         },
@@ -126,10 +126,10 @@ let results = {
             }
 
             context.dispatch('getMetadata', {
-                meta: 'doi',
-                action: 'create_doi',
+                meta:     'doi',
+                action:   'create_doi',
                 formData: payload,
-                extract: (data) => data.result.doi
+                extract:  (data) => data.result.doi
             });
         },
         getDownload(context, payload) {
@@ -138,10 +138,10 @@ let results = {
             }
 
             context.dispatch('getMetadata', {
-                meta: 'download',
-                action: 'datastore_queue_download',
+                meta:     'download',
+                action:   'datastore_queue_download',
                 formData: payload,
-                extract: (data) => data.result
+                extract:  (data) => data.result
             });
         },
         reset(context) {
@@ -153,9 +153,9 @@ let results = {
         },
         invalidate(context) {
             context.state.invalidated = true;
-            context.state.slug = null;
-            context.state.doi = null;
-            context.state.download = null;
+            context.state.slug        = null;
+            context.state.doi         = null;
+            context.state.download    = null;
         }
     }
 };

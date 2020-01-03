@@ -4,14 +4,11 @@
             <div v-for="(image, index) in getImages(item, false)"
                  :key="image.id"
                  class="gallery-tile">
-                <a :href="image.preview"> <img :src="image.thumb" :alt="image.preview"> </a> <small
-                class="gallery-tile-title">
-                <a :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`"> {{
-                                                                                               item.data[getDetails(item.resource).titleField]
-                                                                                               ||
-                                                                                               item.data._id
-                                                                                               }} </a>
-            </small>
+                <img @click="setImage(image)" :src="image.thumb" :alt="image.preview">
+                <small class="gallery-tile-title">
+                    <a :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`">
+                        {{ item.data[getDetails(item.resource).titleField] || item.data._id }} </a>
+                </small>
             </div>
         </template>
     </div>
@@ -19,17 +16,14 @@
 
 <script>
     import BaseView from './BaseView.vue';
-    import {mapActions} from 'vuex';
+
+    import {mapGetters, mapMutations, mapActions} from 'vuex';
 
     export default {
-        extends: BaseView,
-        name:    'GalleryView',
-        data:    function () {
-            return {
-                showDetails: null
-            }
-        },
-        methods: {
+        extends:    BaseView,
+        name:       'GalleryView',
+        methods:    {
+            ...mapMutations('results/display', ['setImage']),
             ...mapActions('results', ['runSearch']),
             ...mapActions('results/query/filters', ['addPreset'])
         },

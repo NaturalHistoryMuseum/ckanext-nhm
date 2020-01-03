@@ -2,6 +2,7 @@
     <div>
         <Loading v-if="appLoading"></Loading>
         <LoadError v-if="appError"></LoadError>
+        <ImageViewer v-if="showImage"></ImageViewer>
         <div class="search-form multisearch-form" v-if="!appLoading && !appError">
             <div class="multisearch-simple flex-container flex-stretch-first flex-smallwrap space-children-v flex-right">
                 <div class="search-input control-group search-giant">
@@ -74,6 +75,7 @@
     import FilterGroup from './components/FilterGroup.vue';
     import Results from './components/Results.vue';
     import Copyable from './components/misc/Copyable.vue';
+    import ImageViewer from './components/misc/ImageViewer.vue';
     import {mapActions, mapMutations, mapState, mapGetters} from 'vuex';
 
     const ResourceList = import('./components/ResourceList.vue');
@@ -86,7 +88,8 @@
             LoadError,
             FilterGroup,
             Results,
-            Copyable
+            Copyable,
+            ImageViewer
         },
         data:       function () {
             return {
@@ -99,6 +102,7 @@
             ...mapState(['appLoading', 'appError']),
             ...mapGetters('results/query', ['requestBody']),
             ...mapState('results/query/resources', ['packageList', 'resourceIds']),
+            ...mapState('results/display', ['showImage']),
             search: {
                 get() {
                     return this.$store.state.results.query.search;
