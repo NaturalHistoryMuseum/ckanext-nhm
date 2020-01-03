@@ -6,7 +6,7 @@
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
         </LoadError>
-        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
+        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult" :class="{disabled: invalidated}">
             <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div class="info-popup-button">
                 <transition name="slidedown">
@@ -142,7 +142,7 @@
                    id="show-download"> <i class="fas fa-cloud-download-alt"></i>Download </a>
             </div>
         </div>
-        <div v-if="hasResult">
+        <div v-if="hasResult" :class="{disabled: invalidated}">
             <div class="flex-container flex-stretch-first flex-center">
                 <ul class="nav nav-tabs">
                     <li v-for="viewTab in views"
@@ -165,12 +165,12 @@
                 </div>
             </div>
 
-            <div :class="{disabled: invalidated}">
+            <div>
                 <component :is="viewComponent" v-if="hasRecords"></component>
             </div>
         </div>
 
-        <div class="pagination-wrapper" v-if="after.length > 0 && !invalidated">
+        <div class="pagination-wrapper" v-if="after.length > 0 && !invalidated" :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
                     <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>

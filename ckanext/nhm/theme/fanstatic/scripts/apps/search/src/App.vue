@@ -128,6 +128,12 @@
                 if (oldList.length === 0 && this.resourceIds.length === 0) {
                     this.selectAllResources();
                 }
+            },
+            requestBody: {
+                handler() {
+                    this.invalidate();
+                },
+                deep: true
             }
         }
     }
