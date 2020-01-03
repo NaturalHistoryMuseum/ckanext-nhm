@@ -1,12 +1,12 @@
 <template>
     <div id="result">
-        <Loading v-if="resultsLoading"></Loading>
-        <LoadError v-if="failed">
+        <Loading v-if="status.resultData.loading"></Loading>
+        <LoadError v-if="status.resultData.failed">
             <h3>Something went wrong!</h3>
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
         </LoadError>
-        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
+        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult" :class="{disabled: invalidated}">
             <h3>{{ total.toLocaleString('en-GB') }} records</h3>
             <div class="info-popup-button">
                 <transition name="slidedown">
@@ -17,7 +17,7 @@
                         <Copyable :copy-text="'https://doi.org/' + doi" v-if="doi !== null">
                             <span class="nowrap">{{ doi }}</span>
                         </Copyable>
-                        <p class="alert-error" v-if="doiFailed">
+                        <p class="alert-error" v-if="status.doi.failed">
                             Failed to retrieve DOI. Please try again later. </p>
                         <div class="form-row" v-if="doi === null">
                             <label for="doi-email" class="control-label">
@@ -40,7 +40,7 @@
                                @click="getDOI(doiForm)"
                                class="btn btn-primary"
                                v-if="doi === null"><i class="fas"
-                                                      :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
+                                                      :class="status.doi.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
                                 Create a DOI </a>
                         </div>
                     </div>
@@ -65,13 +65,13 @@
                                                                          id="use-a-doi">use a
                                                                                         DOI</a>.</small>
                         </div>
-                        <p class="alert-error" v-if="slugFailed">
+                        <p class="alert-error" v-if="status.slug.failed">
                             Failed to retrieve link. Please try again later. </p>
                     </div>
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled" id="show-share">
                     <i class="fas"
-                       :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
+                       :class="status.slug.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
             <div class="info-popup-button">
@@ -82,7 +82,7 @@
                         <p v-if="download !== null">
                             Success! You should receive an email at <b>{{ downloadForm.email_address
                                                                        }}</b> soon. </p>
-                        <p class="alert-error" v-if="downloadFailed">
+                        <p class="alert-error" v-if="status.download.failed">
                             The download request failed. Please try again later. </p>
                         <div v-if="download === null">
                             <p>The data will be extracted, with current filters applied, and sent to
@@ -129,8 +129,8 @@
                         <div class="text-right" v-if="download === null">
                             <a href="#"
                                class="btn btn-primary text-right"
-                               @click="requestDownload(downloadForm)"> <i class="fas"
-                                                                          :class="downloadProcessing ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                               @click="getDownload(downloadForm)"> <i class="fas"
+                                                                      :class="status.download.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
                                 Request Download </a>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
                    id="show-download"> <i class="fas fa-cloud-download-alt"></i>Download </a>
             </div>
         </div>
-        <div v-if="hasResult">
+        <div v-if="hasResult" :class="{disabled: invalidated}">
             <div class="flex-container flex-stretch-first flex-center">
                 <ul class="nav nav-tabs">
                     <li v-for="viewTab in views"
@@ -165,12 +165,12 @@
                 </div>
             </div>
 
-            <div :class="{disabled: resultsInvalid}">
+            <div>
                 <component :is="viewComponent" v-if="hasRecords"></component>
             </div>
         </div>
 
-        <div class="pagination-wrapper" v-if="after.length > 0 && !resultsInvalid">
+        <div class="pagination-wrapper" v-if="after.length > 0 && !invalidated" :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
                     <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>
@@ -229,10 +229,8 @@
             }
         },
         computed:   {
-            ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
-                                    'resultsLoading', 'slugLoading', 'resultsInvalid', 'doi',
-                                    'doiLoading', 'slugFailed', 'doiFailed', 'download',
-                                    'downloadProcessing', 'downloadFailed', 'view']),
+            ...mapState('results', ['resultData', 'page', 'after', 'status', 'slug', 'doi', 'download', 'invalidated']),
+            ...mapState('results/display', ['view', 'headers']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
             viewComponent() {
                 return this.view + 'View';
@@ -242,8 +240,8 @@
             }
         },
         methods:    {
-            ...mapMutations('results', ['addCustomHeader', 'setView']),
-            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'requestDownload']),
+            ...mapMutations('results/display', ['addCustomHeader', 'setView']),
+            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'getDownload']),
             shareSearch() {
                 if (!this.showShare && this.slug === null) {
                     this.getSlug();
@@ -266,6 +264,6 @@
                     this.showShare = true;
                 }
             }
-        }
+        },
     }
 </script>

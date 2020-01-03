@@ -30,22 +30,21 @@
             }
         },
         computed: {
-            ...mapState(['resourceIds']),
-            ...mapState('constants', ['packageList']),
+            ...mapState('results/query/resources', ['packageList']),
             resourceIds: {
                 get() {
-                    return this.$store.state.resourceIds;
+                    return this.$store.state.results.query.resources.resourceIds;
                 },
                 set(value) {
-                    this.$store.commit('setResourceIds', value);
+                    this.setResourceIds(value);
                 }
             }
         },
         methods:  {
-            ...mapMutations(['togglePackageResources']),
+            ...mapMutations('results/query/resources', ['togglePackageResources', 'selectAllResources', 'setResourceIds']),
             toggleAllResourceSelect: function (event) {
                 if (event.target.checked) {
-                    this.$store.commit('selectAllResources');
+                    this.selectAllResources();
                 }
                 else {
                     this.resourceIds = [];

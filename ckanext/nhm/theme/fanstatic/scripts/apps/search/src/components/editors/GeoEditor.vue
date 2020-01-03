@@ -102,7 +102,7 @@
             }
         },
         computed: {
-            ...mapState('constants', ['schema']),
+            ...mapState(['schema']),
             radiusUnits() {
                 return this.schema.raw.definitions.term.properties.geo_point.properties.radius_unit.enum
             },

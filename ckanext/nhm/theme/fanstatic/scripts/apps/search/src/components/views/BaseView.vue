@@ -1,6 +1,6 @@
 <template>
     <pre>
-        {{ $store.state.results.current.result }}
+        {{ resultData.result }}
     </pre>
 </template>
 
@@ -18,12 +18,13 @@
             this.updateView();
         },
         computed: {
-            ...mapState('results', ['current', 'headers', 'page']),
-            ...mapGetters('constants', ['resourceDetails']),
-            ...mapGetters('results', ['total', 'records'])
+            ...mapState('results', ['resultData', 'page']),
+            ...mapState('results/display', ['headers']),
+            ...mapGetters('results', ['total', 'records']),
+            ...mapGetters('results/query/resources', ['resourceDetails'])
         },
         methods:  {
-            ...mapMutations('results', ['removeHeader', 'moveHeader']),
+            ...mapMutations('results/display', ['removeHeader', 'moveHeader']),
             getDetails(resourceId) {
                 let resourceDetails = this.resourceDetails[resourceId];
 

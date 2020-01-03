@@ -1,137 +1,79 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import results from './results/main';
+import $RefParser from 'json-schema-ref-parser';
 import * as d3 from 'd3-collection';
-import constants from './constants';
-import results from './results';
-import filters from './filters';
+import {post} from './utils';
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store(
     {
-        state:     {
-            search:      '',
-            resourceIds: []
+        modules:   {
+            results
         },
-        getters:   {
-            query:           (state, getters) => {
-                let q = {};
-                if (state.search !== null && state.search !== '') {
-                    q.search = state.search;
-                }
-                if (d3.values(state.filters.items).some((f) => f.parent !== null)) {
-                    q.filters = getters['filters/queryfy']('group_root');
-                }
-                return q;
-            },
-            requestBody:     (state, getters) => {
-                return {
-                    query:        getters.query,
-                    resource_ids: getters.sortedResources
-                };
-            },
-            sortedResources: (state) => {
-                return state.resourceIds.sort();
-            },
-            post:            () => (action, body) => {
-                return fetch('/api/3/action/' + action, {
-                    method:      'POST',
-                    mode:        'cors',
-                    cache:       'no-cache',
-                    credentials: 'same-origin',
-                    headers:     {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect:    'follow',
-                    referrer:    'no-referrer',
-                    body:        JSON.stringify(body)
-                }).then(response => {
-                    return response.json();
-                });
+        state:     {
+            appLoading: false,
+            appError:   false,
+            schema:     {
+                groups: [],
+                terms:  {},
+                raw:    {}
             }
         },
-        mutations: {
-            setSearch(state, searchString) {
-                state.search = searchString;
-            },
-            setResourceIds(state, resourceIds) {
-                state.resourceIds = resourceIds;
-            },
-            selectAllResources(state) {
-                let resourceIds = [];
-                state.constants.packageList.forEach((pkg) => {
-                    resourceIds = resourceIds.concat(pkg.resourceIds)
-                });
-                state.resourceIds = resourceIds;
-            },
-            togglePackageResources(state, packageIx) {
-                let pkg           = state.constants.packageList[packageIx];
-                let isInResources = pkg.resourceIds.some((r) => {
-                    return state.resourceIds.includes(r);
-                });
-                if (isInResources) {
-                    state.resourceIds = state.resourceIds.filter((resourceId) => {
-                        return !pkg.resourceIds.includes(resourceId);
-                    });
-                }
-                else {
-                    state.resourceIds = state.resourceIds.concat(pkg.resourceIds.filter((x) => {
-                        return !state.resourceIds.includes(x);
-                    }));
-                }
+        getters:   {
+            getGroup: state => groupId => {
+                return {
+                    'and': 'ALL OF',
+                    'or':  'ANY OF',
+                    'not': 'NONE OF'
+                }[groupId];
             },
         },
+        mutations: {},
         actions:   {
+            getSchema(context) {
+                context.state.appLoading = true;
+                context.state.appError   = false;
+                let schemaPath           = '/querySchemas/v1.0.0/v1.0.0.json';
+                $RefParser.dereference(schemaPath, {resolve: {http: {timeout: 2000}}})
+                          .then(data => {
+                              let groups = d3.keys(data.definitions.group.properties);
+                              let terms  = d3.nest()
+                                             .key(t => t.key.includes('_') ? t.key.split('_')[0] : 'other')
+                                             .rollup(leaves => leaves.map((l) => l.key.slice(l.key.indexOf('_') + 1) || ''))
+                                             .object(d3.entries(data.definitions.term.properties));
+                              return {
+                                  groups: groups,
+                                  terms:  terms,
+                                  raw:    data
+                              };
+                          })
+                          .then(schema => {
+                              context.state.schema     = schema;
+                              context.state.appLoading = false;
+                          }, error => {
+                              context.state.appLoading = false;
+                              context.state.appError   = true;
+                          });
+            },
             resolveSlug(context, slug) {
                 if (slug === undefined || slug === '') {
-                    context.commit('filters/resetFilters');
+                    context.commit('results/query/filters/resetFilters');
                     return;
                 }
-                context.getters.post('datastore_resolve_slug', {
+                post('datastore_resolve_slug', {
                     slug: slug
                 }).then(data => {
                     if (data.success) {
-                        context.commit('setResourceIds', data.result.resource_ids);
-                        if (data.result.query.search !== undefined) {
-                            context.commit('setSearch', data.result.query.search)
-                        }
-                        context.commit('filters/setFromQuery', data.result.query);
+                        context.dispatch('results/query/setRequestBody', data.result);
                         context.dispatch('results/runSearch', 0);
                     }
                     else {
-                        context.commit('filters/resetFilters');
+                        context.commit('results/query/filters/resetFilters');
                     }
                 });
             },
-            setHasImage(context) {
-                let imageFields = [];
-
-                context.state.resourceIds.map(r => {
-                    return context.getters['constants/resourceDetails'][r].raw._image_field
-                }).filter(f => {
-                    return f !== null && f !== undefined && f !== 'None';
-                }).forEach(f => {
-                    if (!imageFields.includes(f)){
-                        imageFields.push(f)
-                    }
-                });
-
-                let newTerm = {
-                    parent: 'group_root', key: 'exists', content: {
-                        fields: imageFields
-                    }
-                };
-
-                if (!context.getters['filters/hasTerm'](newTerm)) {
-                    context.commit('filters/addTerm', newTerm);
-                    context.dispatch('results/runSearch', 0);
-                }
-            }
-        },
-        modules:   {
-            constants: constants,
-            results:   results,
-            filters:   filters
         }
     }
 );

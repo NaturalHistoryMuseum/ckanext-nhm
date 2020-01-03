@@ -27,8 +27,8 @@
             FilterTerm
         },
         computed:   {
-            ...mapGetters('constants', ['getGroup']),
-            ...mapGetters('filters', ['getChildren']),
+            ...mapGetters(['getGroup']),
+            ...mapGetters('results/query/filters', ['getChildren']),
             subTerms() {
                 return this.getChildren(this.filterId, true).filter((f) => {
                     return !f.key.startsWith('group_');
@@ -44,7 +44,7 @@
             },
         },
         methods:    {
-            ...mapMutations('filters', ['changeKey']),
+            ...mapMutations('results/query/filters', ['changeKey']),
             changeGroupType() {
                 let ix       = this.schema.groups.indexOf(this.filterKey);
                 let newIx    = ix + 1 >= this.schema.groups.length ? 0 : ix + 1;
