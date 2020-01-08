@@ -35,7 +35,8 @@
                     packageUrl,
                     resourceUrl,
                     titleField: resourceDetails.raw._title_field || '_id',
-                    imageField: resourceDetails.raw._image_field
+                    imageField: resourceDetails.raw._image_field,
+                    imageDelimiter: resourceDetails.raw._image_delimiter || ''
                 }
             },
             getImages(item, first) {
@@ -56,7 +57,15 @@
                 }
                 else {
                     try {
-                        images = item.data[this.getDetails(item.resource).imageField].map((img, ix) => {
+                        let resourceDetails = this.getDetails(item.resource);
+                        let imageFieldValue = item.data[resourceDetails.imageField];
+                        if (resourceDetails.imageDelimiter !== '') {
+                            images = imageFieldValue.split(resourceDetails.imageDelimiter);
+                        }
+                        else {
+                            images = [imageFieldValue]
+                        }
+                        images = images.map((img, ix) => {
                             return {
                                 preview: img,
                                 thumb:   img,
