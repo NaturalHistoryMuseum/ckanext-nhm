@@ -7,7 +7,6 @@ import store from './store/main';
 require('leaflet/dist/leaflet.css');
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import 'masonry-layout';
 
 // bundle leaflet images
 function importFolder(context) {

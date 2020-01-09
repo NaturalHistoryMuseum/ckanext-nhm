@@ -730,10 +730,11 @@ iframe {
 
   & > * {
     position: fixed;
-    margin: 0 10px;
+    margin: auto 10px;
     padding: 5px;
-    height: 20%;
-    top: 75%;
+    top: 10px;
+    bottom: 10px;
+    border-radius: @rounding;
     background-color: @grey9;
     .mixin-flex-container();
     .mixin-flex-column();
@@ -741,18 +742,10 @@ iframe {
 
     &.scroll-left {
       left: 0;
-
-      &:not(.disabled) {
-        box-shadow: 30px 0 25px 0 rgba(255, 255, 255, 1);
-      }
     }
 
     &.scroll-right {
       right: 0;
-
-      &:not(.disabled) {
-        box-shadow: -30px 0 25px 0 rgba(255, 255, 255, 1);
-      }
     }
 
     &:not(.disabled) {
@@ -930,40 +923,41 @@ iframe {
   margin-right: 10px;
 }
 
+.processing {
+  height: 0;
+  overflow-y: hidden;
+}
+
 .tiling-gallery {
   @col-gap: 10px;
-  -webkit-column-gap: @col-gap;
-  -moz-column-gap: @col-gap;
-  column-gap: @col-gap;
 
-  @media (min-width: @sm) {
-    @n-cols: 3;
-    -webkit-column-count: @n-cols;
-    -moz-column-count: @n-cols;
-    column-count: @n-cols;
+  & .gallery-column-sizer, & .gallery-tile {
+    @media (max-width: @sm - 1) {
+      @n-cols: 1;
+      width: 100%;
+    }
+    @media (min-width: @sm) {
+      @n-cols: 3;
+      width: 100% * (1 / @n-cols);
+    }
+    @media (min-width: @md) {
+      @n-cols: 4;
+      width: 100% * (1 / @n-cols);
+    }
+    @media (min-width: @lg) {
+      @n-cols: 5;
+      width: 100% * (1 / @n-cols);
+    }
+    @media (min-width: @xl) {
+      @n-cols: 6;
+      width: 100% * (1 / @n-cols);
+    }
   }
-  @media (min-width: @md) {
-    @n-cols: 4;
-    -webkit-column-count: @n-cols;
-    -moz-column-count: @n-cols;
-    column-count: @n-cols;
-  }
-  @media (min-width: @lg) {
-    @n-cols: 5;
-    -webkit-column-count: @n-cols;
-    -moz-column-count: @n-cols;
-    column-count: @n-cols;
-  }
-  @media (min-width: @xl) {
-    @n-cols: 6;
-    -webkit-column-count: @n-cols;
-    -moz-column-count: @n-cols;
-    column-count: @n-cols;
-  }
+
 
   & .gallery-tile {
     position: relative;
-    margin-bottom: @col-gap;
+    padding: @col-gap / 2;
     .trans(0.2s);
 
     & > img {
@@ -988,6 +982,17 @@ iframe {
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
+  }
+
+  & .gallery-tile-number {
+    font-size: 0.5em;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 0 2px;
+    border-radius: 2px;
+    background-color: fade(@grey10, 40%);
+    white-space: nowrap;
   }
 }
 
@@ -1015,6 +1020,7 @@ iframe {
     color: @grey1;
     background: fade(@grey10, 80%);
     padding: 10px;
+    border-radius: @rounding;
     position: absolute;
     margin: auto;
     bottom: 5vh;
@@ -1024,6 +1030,13 @@ iframe {
     @media (max-width: @sm) {
       font-size: 0.5em;
     }
+  }
+
+  & .scrolling-arrows > * {
+    height: 25%;
+    background-color: fade(@grey10, 80%);
+    width: 2em;
+    .flex-container;
   }
 }
 
@@ -3226,5 +3239,26 @@ select, .select2-choice {
     right: 0;
     margin-left: auto;
     margin-right: auto;
+  }
+}
+
+// MULTISEARCH FORM VIEWS ------------------------------------------------------------------------
+
+.table-view {
+  .scrolling-arrows > * {
+    height: 20%;
+    top: 75%;
+
+    &.scroll-left {
+      &:not(.disabled) {
+        box-shadow: 30px 0 25px 0 rgba(255, 255, 255, 1);
+      }
+    }
+
+    &.scroll-right {
+      &:not(.disabled) {
+        box-shadow: -30px 0 25px 0 rgba(255, 255, 255, 1);
+      }
+    }
   }
 }

@@ -69,7 +69,7 @@
                             return {
                                 preview: img,
                                 thumb:   img,
-                                title:   '',
+                                title:   item.data[resourceDetails.titleField],
                                 id:      `${item.data._id}_${ix}`
                             }
                         });
