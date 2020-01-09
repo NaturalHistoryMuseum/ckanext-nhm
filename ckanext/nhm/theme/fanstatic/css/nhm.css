@@ -829,25 +829,43 @@ iframe {
   width: 100%;
 }
 .scrolling-arrows > * {
+  display: flex;
+  justify-content: center;
   position: fixed;
-  margin: auto 10px;
-  padding: 5px;
-  top: 10px;
-  bottom: 10px;
   border-radius: 5px;
   background-color: #F2F2F2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  border: 1px solid #C3C3C3;
+  padding: 5px;
+  bottom: 0;
+  margin: 5px;
 }
-.scrolling-arrows > * > * {
-  vertical-align: center;
+@media (min-width: 768px) {
+  .scrolling-arrows > * {
+    margin: auto 10px;
+    top: 0;
+  }
+}
+@media (max-width: 767px) {
+  .scrolling-arrows > * {
+    height: 3em;
+    width: 50%;
+  }
 }
 .scrolling-arrows > *.scroll-left {
   left: 0;
 }
+@media (max-width: 767px) {
+  .scrolling-arrows > *.scroll-left {
+    right: 50%;
+  }
+}
 .scrolling-arrows > *.scroll-right {
   right: 0;
+}
+@media (max-width: 767px) {
+  .scrolling-arrows > *.scroll-right {
+    left: 50%;
+  }
 }
 .scrolling-arrows > *:not(.disabled) {
   cursor: pointer;
@@ -1123,6 +1141,11 @@ iframe {
   right: 0;
   margin: auto;
 }
+@media (max-width: 767px) {
+  .image-viewer img {
+    bottom: 15vh;
+  }
+}
 .image-viewer h4 {
   color: #343434;
   background: rgba(255, 255, 255, 0.8);
@@ -1137,15 +1160,32 @@ iframe {
 }
 @media (max-width: 576px) {
   .image-viewer h4 {
-    font-size: 0.5em;
+    font-size: 14px;
+  }
+}
+@media (max-width: 767px) {
+  .image-viewer h4 {
+    bottom: 10vh;
   }
 }
 .image-viewer .scrolling-arrows > * {
-  height: 25%;
-  background-color: rgba(255, 255, 255, 0.8);
-  width: 2em;
-  display: flex;
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.5);
   flex-direction: row;
+}
+@media (max-width: 767px) {
+  .image-viewer .scrolling-arrows > * {
+    bottom: 3.5em;
+  }
+}
+@media (min-width: 768px) {
+  .image-viewer .scrolling-arrows > * {
+    height: 5vw;
+    width: 5vw;
+    max-width: 5em;
+    max-height: 5em;
+    border-radius: 5vw;
+  }
 }
 .image-viewer .scrolling-arrows > * > * {
   align-self: center;
@@ -3224,13 +3264,32 @@ select,
   margin-left: auto;
   margin-right: auto;
 }
-.table-view .scrolling-arrows > * {
-  height: 20%;
-  top: 75%;
+@media (min-width: 768px) {
+  .table-view .scrolling-arrows > * {
+    height: 20%;
+    top: 75%;
+    flex-direction: column;
+  }
+  .table-view .scrolling-arrows > * > * {
+    vertical-align: center;
+  }
+  .table-view .scrolling-arrows > *.scroll-left:not(.disabled) {
+    box-shadow: 10px 0 15px 0 #ffffff;
+  }
+  .table-view .scrolling-arrows > *.scroll-right:not(.disabled) {
+    box-shadow: -10px 0 15px 0 #ffffff;
+  }
 }
-.table-view .scrolling-arrows > *.scroll-left:not(.disabled) {
-  box-shadow: 30px 0 25px 0 #ffffff;
-}
-.table-view .scrolling-arrows > *.scroll-right:not(.disabled) {
-  box-shadow: -30px 0 25px 0 #ffffff;
+@media (max-width: 767px) {
+  .table-view .scrolling-arrows > * {
+    flex-direction: row;
+  }
+  .table-view .scrolling-arrows > *:not(.disabled) {
+    box-shadow: 0 -10px 15px 0 #ffffff;
+  }
+  .table-view .scrolling-arrows > * > * {
+    align-self: center;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
 }

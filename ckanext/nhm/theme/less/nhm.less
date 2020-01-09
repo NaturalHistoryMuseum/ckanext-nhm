@@ -729,23 +729,40 @@ iframe {
   width: 100%;
 
   & > * {
+    .mixin-flex-container();
+    .mixin-flex-center();
+
     position: fixed;
-    margin: auto 10px;
-    padding: 5px;
-    top: 10px;
-    bottom: 10px;
     border-radius: @rounding;
     background-color: @grey9;
-    .mixin-flex-container();
-    .mixin-flex-column();
-    .mixin-flex-center();
+    border: 1px solid @grey7;
+    padding: 5px;
+    bottom: 0;
+    margin: 5px;
+
+    @media (min-width: @md) {
+      margin: auto 10px;
+      top: 0;
+    }
+    @media (max-width: @md - 1) {
+      height: 3em;
+      width: 50%;
+    }
+
 
     &.scroll-left {
       left: 0;
+      @media (max-width: @md - 1) {
+        right: 50%;
+      }
     }
 
     &.scroll-right {
       right: 0;
+
+      @media (max-width: @md - 1) {
+        left: 50%;
+      }
     }
 
     &:not(.disabled) {
@@ -1014,6 +1031,10 @@ iframe {
     left: 0;
     right: 0;
     margin: auto;
+
+    @media (max-width: @md - 1) {
+      bottom: 15vh;
+    }
   }
 
   & h4 {
@@ -1028,15 +1049,30 @@ iframe {
     right: 5vw;
     text-align: center;
     @media (max-width: @sm) {
-      font-size: 0.5em;
+      font-size: @font-size-body-m;
+    }
+
+    @media (max-width: @md - 1) {
+      bottom: 10vh;
     }
   }
 
-  & .scrolling-arrows > * {
-    height: 25%;
-    background-color: fade(@grey10, 80%);
-    width: 2em;
-    .flex-container;
+  & .scrolling-arrows {
+    & > * {
+      position: absolute;
+      @media (max-width: @md - 1) {
+        bottom: 3.5em;
+      }
+      @media (min-width: @md) {
+        height: 5vw;
+        width: 5vw;
+        max-width: 5em;
+        max-height: 5em;
+        border-radius: 5vw;
+      }
+      background-color: fade(@grey10, 50%);
+      .mixin-flex-row();
+    }
   }
 }
 
@@ -3246,19 +3282,28 @@ select, .select2-choice {
 
 .table-view {
   .scrolling-arrows > * {
-    height: 20%;
-    top: 75%;
+    @media (min-width: @md) {
+      height: 20%;
+      top: 75%;
+      .mixin-flex-column();
+      &.scroll-left {
+        &:not(.disabled) {
+          box-shadow: 10px 0 15px 0 rgba(255, 255, 255, 1);
+        }
+      }
 
-    &.scroll-left {
-      &:not(.disabled) {
-        box-shadow: 30px 0 25px 0 rgba(255, 255, 255, 1);
+      &.scroll-right {
+        &:not(.disabled) {
+          box-shadow: -10px 0 15px 0 rgba(255, 255, 255, 1);
+        }
       }
     }
-
-    &.scroll-right {
+    @media (max-width: @md - 1) {
       &:not(.disabled) {
-        box-shadow: -30px 0 25px 0 rgba(255, 255, 255, 1);
+        box-shadow: 0 -10px 15px 0 rgba(255, 255, 255, 1);
       }
+
+      .mixin-flex-row();
     }
   }
 }
