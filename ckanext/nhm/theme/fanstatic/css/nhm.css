@@ -1175,7 +1175,7 @@ iframe {
 }
 @media (max-width: 767px) {
   .image-viewer .scrolling-arrows > * {
-    bottom: 3.5em;
+    bottom: 1em;
   }
 }
 @media (min-width: 768px) {
