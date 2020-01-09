@@ -86,6 +86,9 @@
                 this.scrollable();
             },
             scrollable() {
+                if (this.$refs.tableGrid === undefined) {
+                    return;
+                }
                 this.scrollableLeft  = this.tableGrid.scrollLeft() > 0;
                 let fullWidth        = this.$refs.tableGrid.scrollWidth;
                 let viewWidth        = this.tableGrid.width();
