@@ -42,7 +42,7 @@
                 </keep-alive>
             </div>
             <div class="query-submit">
-                <button @click="submitTerm" class="btn btn-primary">Save</button>
+                <button @click="submitTerm" class="btn btn-primary no-icon">Save</button>
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@
 
 <script>
     import * as d3 from 'd3-collection';
-    import {mapMutations, mapState, mapGetters, mapActions} from 'vuex'
+    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
     import TextEditor from './editors/TextEditor.vue';
     import NumberEditor from './editors/NumberEditor.vue';
     import GeoEditor from './editors/GeoEditor.vue';
@@ -82,7 +82,7 @@
             };
 
             if (this.existingTermId !== undefined) {
-                let existing        = this.getFilterById(this.existingTermId);
+                let existing        = this.$store.getters['results/query/filters/getFilterById'](this.existingTermId);
                 data.newFields      = [...(existing.content.fields || [])];
                 data.fieldType      = existing.key.includes('_') ? existing.key.split('_')[0] : 'other';
                 data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
@@ -146,18 +146,18 @@
                 }
                 else {
                     this.addTerm({
-                                     parent: this.parentId,
-                                     key:      this.queryType,
-                                     content:  this.query
+                                     parent:  this.parentId,
+                                     key:     this.queryType,
+                                     content: this.query
                                  })
                 }
                 this.closeDialog();
             },
-            resetQuery: function () {
+            resetQuery:     function () {
                 this.queryValues = {};
             }
         },
-        watch: {
+        watch:      {
             fieldType() {
                 this.resetQuery();
             },

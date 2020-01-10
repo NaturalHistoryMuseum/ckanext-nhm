@@ -848,7 +848,7 @@ iframe {
 @media (max-width: 767px) {
   .scrolling-arrows > * {
     height: 3em;
-    width: 50%;
+    width: 40%;
   }
 }
 .scrolling-arrows > *.scroll-left {
@@ -857,6 +857,7 @@ iframe {
 @media (max-width: 767px) {
   .scrolling-arrows > *.scroll-left {
     right: 50%;
+    margin-left: auto;
   }
 }
 .scrolling-arrows > *.scroll-right {
@@ -865,6 +866,7 @@ iframe {
 @media (max-width: 767px) {
   .scrolling-arrows > *.scroll-right {
     left: 50%;
+    margin-right: auto;
   }
 }
 .scrolling-arrows > *:not(.disabled) {
