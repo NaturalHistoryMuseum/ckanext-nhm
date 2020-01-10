@@ -127,6 +127,9 @@ let filters = {
         changeContent(state, payload) {
             Vue.set(state.items[payload.id], 'content', payload.content);
         },
+        changeName(state, payload){
+            Vue.set(state.items[payload.id], 'name', payload.name);
+        },
         deleteFilter(state, filterId) {
             if (state.items[filterId].parent === null) {
                 return;
@@ -141,7 +144,8 @@ let filters = {
                 parent:  payload.parent,
                 key:     payload.key,
                 content: payload.content,
-                name:    payload.name || ''
+                name:    payload.name || '',
+                id:      payload.id || shortid.generate()
             };
 
             let filterKey;
@@ -149,7 +153,7 @@ let filters = {
                 filterKey = camelCase(newFilter.name);
             }
             else {
-                filterKey = shortid.generate();
+                filterKey = newFilter.id;
             }
             let filterName = `${payload.type}_${filterKey}`;
             Vue.set(state.items, filterName, newFilter);
@@ -162,6 +166,7 @@ let filters = {
                 key:     'and',
                 content: [],
                 name:    payload.name || '',
+                id:      payload.id || shortid.generate(),
                 type:    'group'
             };
             context.commit('addFilter', newGroup)
@@ -172,6 +177,7 @@ let filters = {
                 key:     payload.key,
                 content: payload.content,
                 name:    payload.name || '',
+                id:      payload.id || shortid.generate(),
                 type:    'term'
             };
             context.commit('addFilter', newTerm)
@@ -199,7 +205,8 @@ let filters = {
                 parent:  payload.parent,
                 key:     preset.key,
                 content: preset.content,
-                name:    preset.name + payload.parent.replace('group_', ''),
+                name:    preset.name,
+                id:      camelCase(preset.name) + payload.parent.replace('group_', ''),
                 type:    preset.type
             };
 

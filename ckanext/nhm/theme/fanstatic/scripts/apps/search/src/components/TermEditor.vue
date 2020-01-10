@@ -41,6 +41,10 @@
                                v-on:set-query-values="setQueryValues"></component>
                 </keep-alive>
             </div>
+            <div class="flex-container flex-column flex-stretch-height">
+                <span>Name (optional):</span>
+                <input type="text" v-model="termName">
+            </div>
             <div class="query-submit">
                 <button @click="submitTerm" class="btn btn-primary no-icon">Save</button>
             </div>
@@ -72,6 +76,7 @@
                 newFields:          [],
                 fieldType:          'string',
                 comparisonType:     'equals',
+                termName:           null,
                 queryValues:        {},
                 readableFieldTypes: {
                     string: 'Text',
@@ -86,6 +91,7 @@
                 data.newFields      = [...(existing.content.fields || [])];
                 data.fieldType      = existing.key.includes('_') ? existing.key.split('_')[0] : 'other';
                 data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
+                data.termName       = existing.name;
             }
 
             return data;
@@ -125,7 +131,7 @@
             }
         },
         methods:    {
-            ...mapMutations('results/query/filters', ['changeKey', 'changeContent']),
+            ...mapMutations('results/query/filters', ['changeKey', 'changeContent', 'changeName']),
             ...mapActions('results/query/filters', ['addTerm']),
             setQueryValues: function (queryValues) {
                 this.queryValues = queryValues;
@@ -143,12 +149,14 @@
                 if (this.existingTermId !== undefined) {
                     this.changeKey({key: this.queryType, id: this.existingTermId});
                     this.changeContent({content: this.query, id: this.existingTermId});
+                    this.changeName({name: this.termName, id: this.existingTermId});
                 }
                 else {
                     this.addTerm({
                                      parent:  this.parentId,
                                      key:     this.queryType,
-                                     content: this.query
+                                     content: this.query,
+                                     name:    this.termName
                                  })
                 }
                 this.closeDialog();

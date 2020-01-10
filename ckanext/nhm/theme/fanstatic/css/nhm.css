@@ -1895,15 +1895,14 @@ iframe {
   width: 65px;
   padding-right: 0;
 }
-.multisearch-form .term-editor .query-values,
-.multisearch-form .term-editor .query-submit {
-  border-top: 2px solid #C3C3C3;
-  padding: 10px 0;
-}
 @media (max-width: 767px) {
   .multisearch-form .term-editor .term-editor-query {
     padding-top: 10px;
   }
+}
+.multisearch-form .term-editor .term-editor-query > div {
+  border-top: 2px solid #C3C3C3;
+  padding: 10px 0;
 }
 .multisearch-form .floating {
   position: absolute;

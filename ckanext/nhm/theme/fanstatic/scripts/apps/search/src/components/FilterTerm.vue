@@ -1,7 +1,7 @@
 <template>
     <div :class="[...filterClasses, 'filter-term']">
         <component :is="termType"
-                   v-bind:data="termData"
+                   v-bind:data="filterItem"
                    v-bind:comparison="termComparison"></component>
         <transition name="slideright">
             <TermEditor v-if="showEditor"
