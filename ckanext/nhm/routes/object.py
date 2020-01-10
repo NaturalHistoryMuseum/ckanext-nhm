@@ -29,7 +29,7 @@ import logging
 from ckanext.dcat.controllers import check_access_header
 from ckanext.dcat.utils import CONTENT_TYPES
 from ckanext.nhm.lib.record import get_record_by_uuid
-from flask import Blueprint, Response
+from flask import Blueprint, Response, redirect
 
 from ckan.plugins import toolkit
 
@@ -141,9 +141,10 @@ def view(uuid, version):
                                                                   u'id': package_id
                                                                   })
                 # redirect to the object record
-                return toolkit.redirect_to(u'record.view', package_name=package[u'name'],
-                                           resource_id=resource.id, record_id=record[u'_id'],
-                                           version=version)
+                url = toolkit.url_for(u'record.view', package_name=package[u'name'],
+                                      resource_id=resource.id, record_id=record[u'_id'],
+                                      version=version)
+                return redirect(url, code=303)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
 
