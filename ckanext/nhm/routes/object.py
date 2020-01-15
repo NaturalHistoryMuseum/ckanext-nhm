@@ -122,11 +122,13 @@ def view(uuid, version):
     if uuid in ABYSSLINE_UUIDS:
         abyssline_object_redirect(uuid, version)
 
-    # is the request for a particular format
+    # is the request for a particular format?
     format_ = check_access_header()
 
     if format_:
-        return rdf(uuid, format_, version)
+        # cetaf standards require us to return a 303 redirect to the rdf doc
+        url = toolkit.url_for(u'object.rdf', uuid=uuid, format_=format_, version=version)
+        return redirect(url, code=303)
     else:
         try:
             # get the record at the given version
@@ -140,7 +142,7 @@ def view(uuid, version):
                                                               {
                                                                   u'id': package_id
                                                                   })
-                # redirect to the object record
+                # cetaf standards require us to return a 303 redirect to the html record page
                 url = toolkit.url_for(u'record.view', package_name=package[u'name'],
                                       resource_id=resource.id, record_id=record[u'_id'],
                                       version=version)
