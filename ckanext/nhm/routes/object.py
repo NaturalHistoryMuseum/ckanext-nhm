@@ -29,7 +29,7 @@ import logging
 from ckanext.dcat.controllers import check_access_header
 from ckanext.dcat.utils import CONTENT_TYPES
 from ckanext.nhm.lib.record import get_record_by_uuid
-from flask import Blueprint, Response, redirect
+from flask import Blueprint, Response, redirect, url_for
 
 from ckan.plugins import toolkit
 
@@ -123,11 +123,11 @@ def view(uuid, version):
         abyssline_object_redirect(uuid, version)
 
     # is the request for a particular format?
-    format_ = check_access_header()
+    _format = check_access_header()
 
-    if format_:
+    if _format:
         # cetaf standards require us to return a 303 redirect to the rdf doc
-        url = toolkit.url_for(u'object.rdf', uuid=uuid, format_=format_, version=version)
+        url = url_for(u'object.rdf', uuid=uuid, _format=_format, version=version)
         return redirect(url, code=303)
     else:
         try:
@@ -138,14 +138,10 @@ def view(uuid, version):
         else:
             if record:
                 package_id = resource.get_package_id()
-                package = toolkit.get_action(u'package_show')(_context(),
-                                                              {
-                                                                  u'id': package_id
-                                                                  })
+                package = toolkit.get_action(u'package_show')(_context(), {u'id': package_id})
                 # cetaf standards require us to return a 303 redirect to the html record page
-                url = toolkit.url_for(u'record.view', package_name=package[u'name'],
-                                      resource_id=resource.id, record_id=record[u'_id'],
-                                      version=version)
+                url = url_for(u'record.view', package_name=package[u'name'],
+                              resource_id=resource.id, record_id=record[u'_id'], version=version)
                 return redirect(url, code=303)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
