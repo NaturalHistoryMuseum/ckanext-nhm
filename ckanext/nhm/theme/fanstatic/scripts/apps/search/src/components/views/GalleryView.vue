@@ -1,10 +1,10 @@
 <template>
     <div style="margin-top: 15px;">
-        <Loading v-if="loading"><h3>Loading {{ imageRecords.length }} images...</h3></Loading>
+        <Loading v-if="loading"><h3>Loading {{ nLoaded }} of {{ imageRecords.length }}
+                                    images...</h3></Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="tiling-gallery full-width"
-             v-images-loaded:on.done="loadFinished"
-             v-images-loaded:on.fail="loadFailed"
+             v-images-loaded:on.progress="loadImages"
              :class="{'processing': loading || loadError}">
             <div class="gallery-column-sizer"></div>
             <div v-for="(record, recordIndex) in imageRecords"
@@ -35,8 +35,10 @@
         name:       'GalleryView',
         data:       function () {
             return {
-                loading:   true,
-                loadError: false
+                loading:     true,
+                loadError:   false,
+                nLoaded:     0,
+                loadTimeout: false
             }
         },
         components: {
@@ -74,8 +76,8 @@
             ...mapMutations('results/display', ['setViewerImage', 'addPageImages']),
             ...mapActions('results', ['runSearch']),
             ...mapActions('results/query/filters', ['addPreset']),
-            loadFinished() {
-                this.loading = false;
+            relayout(loadFinished) {
+                this.loading = loadFinished;
                 $('.tiling-gallery').masonry({
                                                  itemSelector:    '.gallery-tile',
                                                  columnWidth:     '.gallery-column-sizer',
@@ -85,6 +87,12 @@
             loadFailed() {
                 this.loading   = false;
                 this.loadError = true;
+            },
+            loadImages(instance) {
+                this.nLoaded = instance.progressedCount;
+                if (instance.isComplete || (this.loadTimeout && instance.progressedCount > Math.floor(instance.images.length * 0.01))) {
+                    this.relayout(!instance.isComplete);
+                }
             }
         },
         created() {
@@ -94,11 +102,9 @@
                 }
             });
             this.addPageImages(this.imageRecords);
-
-            // let loader = imagesLoaded('.tiling-gallery .gallery-tile');
-            // loader.on('always', () => {
-            //     console.log(loader.images.length);
-            // });
-        }
+            setTimeout(() => {
+                this.loadTimeout = true;
+            }, 1000)
+        },
     }
 </script>
