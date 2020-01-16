@@ -7,13 +7,13 @@
 import logging
 
 import ckanext.nhm.logic.schema as nhm_schema
-from ckanext.nhm.lib.mam import mam_media_request
-from ckanext.nhm.dcat.specimen_records import ObjectSerializer
-from ckanext.nhm.lib.record import get_record_by_uuid
-from ckanext.nhm.lib import helpers
-
+from ckan.lib.navl.dictization_functions import validate
 from ckan.logic import ActionError
 from ckan.plugins import toolkit
+from ckanext.nhm.dcat.specimen_records import ObjectSerializer
+from ckanext.nhm.lib import helpers
+from ckanext.nhm.lib.mam import mam_media_request
+from ckanext.nhm.lib.record import get_record_by_uuid
 
 log = logging.getLogger(__name__)
 
@@ -60,23 +60,18 @@ def record_show(context, data_dict):
 
 
 def download_original_image(context, data_dict):
-    '''Request an original image from the MAM
-    Before sending request, performs a number of checks
+    '''
+    Request an original image from the MAM. Before sending request, performs a number of checks
         - The resource exists
         - The record exists on that resource
         - And the image exists on that record
 
     :param context:
     :param data_dict:
-
     '''
-
-    # Validate the data
-    context = {
-        u'user': toolkit.c.user or toolkit.c.author
-        }
+    # validate the data
     schema = context.get(u'schema', nhm_schema.download_original_image_schema())
-    data_dict, errors = toolkit.validate(data_dict, schema, context)
+    data_dict, errors = validate(data_dict, schema, context)
 
     if errors:
         raise toolkit.ValidationError(errors)

@@ -3060,18 +3060,53 @@ select, .select2-choice {
 }
 
 .download-tooltip {
-  min-width: 290px;
+  font-family: @font-title;
+  font-size: @font-size-body-l;
+  min-width: 350px;
+  z-index: 1000;
+  background: @baseBackgroundColor;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 0;
+  border-radius: 3px;
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    li {
+      list-style: none;
+
+      a {
+        display: block;
+        padding: 5px;
+
+        &:hover,
+        &.active {
+          background: @grey9;
+        }
+      }
+    }
+  }
 
   & form#mam {
     // the email form for downloading the original res img
-    width: 95%;
     display: none;
     margin: 0;
     padding: 5px;
     background: @grey9;
 
-    input.input-large {
-      height: 26px;
+    .mam-input-container {
+      .mixin-flex-container();
+      .mixin-flex-stretch-first();
+      border: 1px solid #a9a9a9;
+      border-radius: @rounding;
+      background-color: @grey9;
+
+      input {
+        border: none;
+        border-radius: @rounding;
+        padding-left: 10px;
+      }
     }
   }
 }

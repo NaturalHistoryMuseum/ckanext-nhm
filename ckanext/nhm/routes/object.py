@@ -81,28 +81,28 @@ def _context():
         }
 
 
-@blueprint.route(u'/object/<uuid>.<format_>', defaults={
+@blueprint.route(u'/object/<uuid>.<_format>', defaults={
     u'version': None
     })
-@blueprint.route(u'/object/<uuid>/<int:version>.<format_>')
-def rdf(uuid, format_, version):
+@blueprint.route(u'/object/<uuid>/<int:version>.<_format>')
+def rdf(uuid, _format, version):
     '''
     Return RDF view of object.
 
     :param uuid: the object's uuid
-    :param format_: the format requested
+    :param _format: the format requested
     :param version: the version of the record to retrieve, or None if the current
                     version is desired
     :return: the data to display
     '''
     data_dict = {
         u'uuid': uuid,
-        u'format': format_,
+        u'format': _format,
         u'version': version,
     }
     try:
         result = toolkit.get_action(u'object_rdf')(_context(), data_dict)
-        return Response(result, mimetype=CONTENT_TYPES[format_])
+        return Response(result, mimetype=CONTENT_TYPES[_format])
     except toolkit.ValidationError, e:
         toolkit.abort(409, str(e))
 
@@ -126,7 +126,7 @@ def view(uuid, version):
     format_ = check_access_header()
 
     if format_:
-        return rdf(uuid, format_)
+        return rdf(uuid, format_, version)
     else:
         try:
             # get the record at the given version
