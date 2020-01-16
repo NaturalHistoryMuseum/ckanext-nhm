@@ -90,7 +90,7 @@
             },
             loadImages(instance) {
                 this.nLoaded = instance.progressedCount;
-                if (instance.isComplete || (this.loadTimeout && instance.progressedCount > Math.floor(instance.images.length * 0.01))) {
+                if (instance.isComplete || (this.loadTimeout && instance.progressedCount > Math.floor(instance.images.length * 0.1))) {
                     this.relayout(!instance.isComplete);
                 }
             }
