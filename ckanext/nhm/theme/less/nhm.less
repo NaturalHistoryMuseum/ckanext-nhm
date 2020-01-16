@@ -2194,6 +2194,13 @@ select {
     background-color: @grey9;
   }
 
+  & .td.small-column {
+    max-width: 7em;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+
   & .small-column + :not(.small-column) {
     border-left: 2px solid @grey3;
     padding-left: 30px;

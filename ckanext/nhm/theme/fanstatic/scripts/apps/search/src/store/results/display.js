@@ -5,13 +5,13 @@ import {post} from '../utils';
 let display = {
     namespaced: true,
     state:      {
-        view:    'Table',
-        headers: [],
+        view:             'Table',
+        headers:          [],
         viewerImageIndex: 0,
-        viewerImagePage: [],
-        showImage: false
+        viewerImagePage:  [],
+        showImage:        false
     },
-    getters: {
+    getters:    {
         viewerImage: (state) => {
             return state.viewerImagePage[state.viewerImageIndex];
         }
@@ -22,13 +22,13 @@ let display = {
         },
         setViewerImage(state, imageIndex) {
             state.viewerImageIndex = imageIndex;
-            state.showImage = true;
+            state.showImage        = true;
         },
         addPageImages(state, images) {
             state.viewerImagePage = images;
         },
         hideImage(state) {
-            state.showImage = false;
+            state.showImage   = false;
             state.viewerImage = 0;
         },
         addCustomHeader(state, field) {
@@ -47,23 +47,26 @@ let display = {
     actions:    {
         getHeaders(context, payload) {
             context.state.headers = [];
+            let headers           = [];
 
             d3.values(payload.filters).forEach(f => {
                 if (f.content.fields !== undefined) {
-                    context.state.headers.push(f.content.fields)
+                    headers.push(f.content.fields)
                 }
             });
+
             post('datastore_guess_fields', payload.request)
                 .then(data => {
                     if (data.success) {
-                        context.state.headers = context.state.headers.concat(data.result.map(f => d3.keys(f.fields)));
+                        headers = headers.concat(data.result.map(f => d3.keys(f.fields)));
+                        headers.forEach(h => {
+                            if (!context.state.headers.map(x => JSON.stringify(x))
+                                        .includes(JSON.stringify(h))) {
+                                context.state.headers.push(h)
+                            }
+                        });
                     }
                 });
-
-            context.state.headers = context.state.headers.filter(h => {
-                return !context.state.headers.map(x => JSON.stringify(x))
-                               .includes(JSON.stringify(h))
-            });
         },
     }
 };

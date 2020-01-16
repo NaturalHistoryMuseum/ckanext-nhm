@@ -2229,6 +2229,12 @@ select {
   border-bottom: 2px solid #5B5B5B;
   background-color: #F2F2F2;
 }
+.table-grid .td.small-column {
+  max-width: 7em;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
 .table-grid .small-column + :not(.small-column) {
   border-left: 2px solid #5B5B5B;
   padding-left: 30px;
