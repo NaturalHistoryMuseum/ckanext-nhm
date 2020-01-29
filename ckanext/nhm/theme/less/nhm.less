@@ -1021,41 +1021,45 @@ iframe {
   bottom: 0;
   right: 0;
   left: 0;
-  background-color: fade(@grey1, 80%);
+  background-color: fade(black, 90%);
   z-index: 1000;
 
   & img {
     max-width: 80%;
-    max-height: 80vh;
+    max-height: 90vh;
     position: absolute;
-    top: 0;
-    bottom: 10vh;
+    top: 5vh;
+    bottom: 0;
     left: 0;
     right: 0;
     margin: auto;
 
     @media (max-width: @md - 1) {
+      top: 10vh;
       bottom: 15vh;
+      max-height: 70vh;
     }
   }
 
   & h4 {
-    color: @grey1;
-    background: fade(@grey10, 80%);
+    color: @grey10;
     padding: 10px;
     border-radius: @rounding;
     position: absolute;
     margin: auto;
-    bottom: 5vh;
-    left: 5vw;
-    right: 5vw;
+    top: 1vh;
+    left: 1em;
     text-align: center;
     @media (max-width: @sm) {
       font-size: @font-size-body-m;
     }
 
     @media (max-width: @md - 1) {
-      bottom: 10vh;
+      top: 2vh;
+    }
+
+    & a, & a:active {
+      color: @grey10;
     }
   }
 

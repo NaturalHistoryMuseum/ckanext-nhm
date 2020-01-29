@@ -46,7 +46,7 @@ let display = {
             let target = state.headers[payload.ix + payload.by];
             Vue.set(state.headers, payload.ix + payload.by, header);
             Vue.set(state.headers, payload.ix, target);
-        }
+        },
     },
     actions:    {
         getHeaders(context, payload) {

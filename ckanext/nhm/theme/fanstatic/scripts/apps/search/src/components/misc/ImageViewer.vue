@@ -1,5 +1,6 @@
 <template>
     <div class="image-viewer" @click.self="hideImage">
+        <h4><a :href="viewerImage.recordUrl">{{ viewerImage.image.title }}</a></h4>
         <div class="scrolling-arrows">
             <div class="scroll-left" @click="previousImage" v-if="!firstImage">
                 <i class="fas fa-angle-double-left"></i>
@@ -9,7 +10,6 @@
             </div>
         </div>
         <img :src="viewerImage.image.preview" :alt="viewerImage.image.title">
-        <h4><a :href="viewerImage.recordUrl">{{ viewerImage.image.title }}</a></h4>
     </div>
 </template>
 
