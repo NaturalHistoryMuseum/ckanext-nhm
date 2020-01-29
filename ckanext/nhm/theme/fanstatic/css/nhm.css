@@ -3335,3 +3335,16 @@ select,
     padding-right: 5px;
   }
 }
+.records-total h3 {
+  margin: 0;
+}
+.results-header {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.view-component {
+  margin-top: 15px;
+}
+.view-component > :first-child {
+  margin-top: 0;
+}

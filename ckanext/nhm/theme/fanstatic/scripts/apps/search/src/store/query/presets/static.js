@@ -4,13 +4,16 @@ let staticPresets = {
     namespaced: true,
     state:      {
         specimensHasImage: {
-            name:    'Has Image (Specimens Collection)',
             type: 'term',
-            key:     'exists',
+            key:     'string_equals',
             content: {
                 fields: [
-                    'associatedMedia'
-                ]
+                    'project'
+                ],
+                value: 'Birdwing Butterfly Digitisation'
+            },
+            display: {
+                name: 'Birdwing Butterfly Digitisation'
             }
         }
     },
@@ -18,7 +21,7 @@ let staticPresets = {
         presets: (state) => {
             return d3.nest()
                      .key(p => p.key)
-                     .rollup(p => p[0].value.name)
+                     .rollup(p => p[0].value.display.name)
                      .object(d3.entries(state));
         },
         keys: (state) => {

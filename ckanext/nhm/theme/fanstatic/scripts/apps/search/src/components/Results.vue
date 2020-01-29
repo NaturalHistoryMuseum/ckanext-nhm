@@ -6,8 +6,13 @@
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
         </LoadError>
-        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult" :class="{disabled: invalidated}">
-            <h3>{{ total.toLocaleString('en-GB') }} records</h3>
+        <div class="flex-container flex-left flex-stretch-first results-header"
+             v-if="hasResult"
+             :class="{disabled: invalidated}">
+            <div class="records-total">
+                <h3>{{ recordHeader(unfilteredTotal) }}</h3>
+                <small class="filtered-total" v-if="total !== unfilteredTotal">showing {{ total.toLocaleString('en-GB') }}</small>
+            </div>
             <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup doi-popup"
@@ -170,7 +175,9 @@
             </div>
         </div>
 
-        <div class="pagination-wrapper" v-if="after.length > 0 && !invalidated" :class="{disabled: invalidated}">
+        <div class="pagination-wrapper"
+             v-if="after.length > 0 && !invalidated"
+             :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
                     <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>
@@ -231,7 +238,8 @@
         computed:   {
             ...mapState('results', ['resultData', 'page', 'after', 'status', 'slug', 'doi', 'download', 'invalidated']),
             ...mapState('results/display', ['view', 'headers']),
-            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
+            ...mapGetters('results', ['total', 'unfilteredTotal', 'hasResult', 'hasRecords', 'resultResourceIds']),
+            ...mapGetters('results/display', ['recordHeader']),
             viewComponent() {
                 return this.view + 'View';
             },
@@ -241,6 +249,7 @@
         },
         methods:    {
             ...mapMutations('results/display', ['addCustomHeader', 'setView']),
+            ...mapActions('results/query/filters', ['deleteTemporaryFilters']),
             ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'getDownload']),
             shareSearch() {
                 if (!this.showShare && this.slug === null) {
@@ -263,6 +272,13 @@
                 if (fail) {
                     this.showShare = true;
                 }
+            },
+            view() {
+                this.deleteTemporaryFilters().then((deleteCount) => {
+                    if (deleteCount > 0) {
+                        this.runSearch(this.page);
+                    }
+                });
             }
         },
     }

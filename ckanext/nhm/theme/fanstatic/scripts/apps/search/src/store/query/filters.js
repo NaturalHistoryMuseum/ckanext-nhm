@@ -10,7 +10,12 @@ let initialFilters = {
         parent:  null,
         key:     'and',
         content: [],
-        name:    ''
+        id:      'root',
+        display: {
+            name:   '',
+            hidden: false,
+            temp:   false
+        }
     }
 };
 
@@ -25,13 +30,13 @@ let filters = {
         parsingError: null
     },
     getters:    {
-        count:         (state) => {
-            return d3.keys(state.items).length;
+        count:            (state) => (ignoreTemp) => {
+            return d3.entries(state.items).filter(c => ignoreTemp ? !c.value.display.temp : true).length;
         },
-        getFilterById: (state) => (id) => {
+        getFilterById:    (state) => (id) => {
             return state.items[id];
         },
-        getChildren:   (state) => (id, asArray) => {
+        getChildren:      (state) => (id, asArray) => {
             let children = d3.entries(state.items)
                              .filter(f => f.value.parent === id);
             if (asArray) {
@@ -44,7 +49,7 @@ let filters = {
                          .object(children);
             }
         },
-        getNestLevel:  (state, getters) => (id) => {
+        getNestLevel:     (state, getters) => (id) => {
             let filter    = getters.getFilterById(id);
             let nestLevel = 0;
             while (filter.parent !== null) {
@@ -53,7 +58,7 @@ let filters = {
             }
             return nestLevel;
         },
-        queryfy:       (state, getters) => (id) => {
+        queryfy:          (state, getters) => (id, ignoreTemp) => {
             let data      = state.items[id];
             let queryData = {};
             let isGroup   = id.startsWith('group_');
@@ -61,20 +66,26 @@ let filters = {
                 queryData[data.key] = data.content;
             }
             else {
-                queryData[data.key] = getters.getChildren(id, true)
-                                             .map(c => getters.queryfy(c.key));
+                let children        = getters.getChildren(id, true)
+                                             .filter(c => ignoreTemp ? !c.value.display.temp : true);
+                if (children.length > 0) {
+                    queryData[data.key] = children.map(c => getters.queryfy(c.key, ignoreTemp));
+                }
             }
             return queryData;
         },
-        hasFilter:     (state) => (payload) => {
+        hasFilter:        (state) => (payload) => {
             // TODO: check for equality in a better/more consistent way
             let filterContent = JSON.stringify(payload.content);
             return d3.values(state.items).some(i => {
                 return payload.parent === i.parent && payload.key === i.key && filterContent === JSON.stringify(i.content);
             })
         },
-        presets:       (state, getters) => {
+        presets:          (state, getters) => {
             return $.extend(getters['staticPresets/presets'], getters['dynamicPresets/presets'])
+        },
+        temporaryFilters: (state) => {
+            return d3.entries(state.items).filter(f => f.value.display.temp);
         }
     },
     mutations:  {
@@ -127,8 +138,8 @@ let filters = {
         changeContent(state, payload) {
             Vue.set(state.items[payload.id], 'content', payload.content);
         },
-        changeName(state, payload){
-            Vue.set(state.items[payload.id], 'name', payload.name);
+        changeName(state, payload) {
+            Vue.set(state.items[payload.id].display, 'name', payload.name);
         },
         deleteFilter(state, filterId) {
             if (state.items[filterId].parent === null) {
@@ -144,13 +155,17 @@ let filters = {
                 parent:  payload.parent,
                 key:     payload.key,
                 content: payload.content,
-                name:    payload.name || '',
-                id:      payload.id || shortid.generate()
+                id:      payload.id || shortid.generate(),
+                display: {
+                    name:   payload.display.name || '',
+                    hidden: payload.display.hidden || false,
+                    temp:   payload.display.temp || false
+                }
             };
 
             let filterKey;
-            if (newFilter.name !== '') {
-                filterKey = camelCase(newFilter.name);
+            if (newFilter.display.name !== '') {
+                filterKey = camelCase(newFilter.display.name);
             }
             else {
                 filterKey = newFilter.id;
@@ -165,9 +180,13 @@ let filters = {
                 parent:  payload.parent,
                 key:     'and',
                 content: [],
-                name:    payload.name || '',
                 id:      payload.id || shortid.generate(),
-                type:    'group'
+                type:    'group',
+                display: {
+                    name:   payload.display.name || '',
+                    hidden: payload.display.hidden || false,
+                    temp:   payload.display.temp || false
+                }
             };
             context.commit('addFilter', newGroup)
         },
@@ -176,9 +195,13 @@ let filters = {
                 parent:  payload.parent,
                 key:     payload.key,
                 content: payload.content,
-                name:    payload.name || '',
                 id:      payload.id || shortid.generate(),
-                type:    'term'
+                type:    'term',
+                display: {
+                    name:   payload.display.name || '',
+                    hidden: payload.display.hidden || false,
+                    temp:   payload.display.temp || false
+                }
             };
             context.commit('addFilter', newTerm)
         },
@@ -201,13 +224,18 @@ let filters = {
             else {
                 return;
             }
+
             let newFilter = {
                 parent:  payload.parent,
                 key:     preset.key,
                 content: preset.content,
-                name:    preset.name,
-                id:      camelCase(preset.name) + payload.parent.replace('group_', ''),
-                type:    preset.type
+                id:      camelCase(preset.display.name) + payload.parent.replace('group_', ''),
+                type:    preset.type,
+                display: {
+                    name:   preset.display.name || '',
+                    hidden: payload.display.hidden || false,
+                    temp:   payload.display.temp || false
+                }
             };
 
             if (!context.getters.hasFilter(newFilter)) {
@@ -216,7 +244,15 @@ let filters = {
             }
 
             return false;
-        }
+        },
+        deleteTemporaryFilters(context) {
+            let deleteCount = 0;
+            d3.entries(context.state.items).filter(f => f.value.display.temp).forEach(f => {
+                context.commit('deleteFilter', f.key);
+                deleteCount++;
+            });
+            return deleteCount;
+        },
     }
 };
 

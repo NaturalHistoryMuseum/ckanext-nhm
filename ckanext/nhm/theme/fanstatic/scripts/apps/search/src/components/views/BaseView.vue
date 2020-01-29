@@ -14,9 +14,6 @@
                 showFields: false
             }
         },
-        mounted:  function () {
-            this.updateView();
-        },
         computed: {
             ...mapState('results', ['resultData', 'page']),
             ...mapState('results/display', ['headers']),
@@ -59,7 +56,10 @@
                     try {
                         let resourceDetails = this.getDetails(item.resource);
                         let imageFieldValue = item.data[resourceDetails.imageField];
-                        if (resourceDetails.imageDelimiter !== '') {
+                        if (imageFieldValue === undefined) {
+                            images = [];
+                        }
+                        else if (resourceDetails.imageDelimiter !== '') {
                             images = imageFieldValue.split(resourceDetails.imageDelimiter);
                         }
                         else {
@@ -106,17 +106,6 @@
                     }
                 }
                 return v;
-            },
-            updateView() {
-                //
-            }
-        },
-        watch:    {
-            current: {
-                handler() {
-                    this.updateView();
-                },
-                deep: true
             }
         }
     }

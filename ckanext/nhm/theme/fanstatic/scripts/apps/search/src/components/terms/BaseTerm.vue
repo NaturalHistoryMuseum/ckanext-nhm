@@ -13,7 +13,7 @@
         props: ['data', 'comparison'],
         computed: {
             showName() {
-                return this.data.name !== '' && this.data.name !== undefined;
+                return this.data.display.name !== '' && this.data.display.name !== undefined;
             }
         }
     }

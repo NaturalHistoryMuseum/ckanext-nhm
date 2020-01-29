@@ -41,8 +41,10 @@ let dynamicPresets = {
                 content: {
                     fields: imageFields
                 },
-                name:    state.hasImage.name,
-                type:    'term'
+                type:    'term',
+                display: {
+                    name:   state.hasImage.name
+                }
             };
         }
     }

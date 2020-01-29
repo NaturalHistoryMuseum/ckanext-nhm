@@ -61,7 +61,7 @@
                 </div>
             </transition>
             <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery">
-                <pre>{{ requestBody }}</pre>
+                <pre>{{ requestBody(false) }}</pre>
             </Copyable>
 
             <Results></Results>

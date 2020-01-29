@@ -1,7 +1,7 @@
 <template>
     <div :class="[...filterClasses, 'filter-group', 'filter-type-' + filterKey]">
         <a class="group-type" href="#" @click.self="changeGroupType"> {{ readableGroupType }} </a>
-        <FilterTerm v-for="id in subTerms" v-bind:filter-id="id" v-bind:key="id.id"></FilterTerm>
+        <FilterTerm v-for="id in subTerms" v-bind:filter-id="id" v-bind:key="id.id" v-if="!getFilterById(id).display.hidden"></FilterTerm>
         <FilterGroup v-for="id in subGroups" v-bind:filter-id="id" v-bind:key="id.id"></FilterGroup>
         <FilterAdd v-bind:parent-id="filterId" v-bind:key="_uid + '-new'"></FilterAdd>
         <div class="filter-buttons">

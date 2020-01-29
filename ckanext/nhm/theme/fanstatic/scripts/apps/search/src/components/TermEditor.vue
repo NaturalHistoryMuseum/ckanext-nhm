@@ -91,7 +91,7 @@
                 data.newFields      = [...(existing.content.fields || [])];
                 data.fieldType      = existing.key.includes('_') ? existing.key.split('_')[0] : 'other';
                 data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
-                data.termName       = existing.name;
+                data.termName       = existing.display.name;
             }
 
             return data;
@@ -156,7 +156,10 @@
                                      parent:  this.parentId,
                                      key:     this.queryType,
                                      content: this.query,
-                                     name:    this.termName
+                                     display: {
+                                         name:    this.termName
+                                     }
+
                                  })
                 }
                 this.closeDialog();

@@ -11,14 +11,15 @@ let results = {
         query
     },
     state:      {
-        invalidated: false,
-        resultData:  {},
-        slug:        null,
-        doi:         null,
-        download:    null,
-        after:       [],
-        page:        0,
-        status:      {
+        invalidated:          false,
+        resultData:           {},
+        unfilteredResultData: {},
+        slug:                 null,
+        doi:                  null,
+        download:             null,
+        after:                [],
+        page:                 0,
+        status:               {
             resultData: {
                 loading: false,
                 failed:  false
@@ -53,6 +54,17 @@ let results = {
         },
         resultResourceIds: (state, getters) => {
             return getters.records.map(r => r.resource);
+        },
+        unfilteredTotal:   (state, getters) => {
+            if (state.unfilteredResultData.success) {
+                return state.unfilteredResultData.result.total;
+            }
+            else if (getters.hasResult) {
+                return getters.total;
+            }
+            else {
+                return 0;
+            }
         }
     },
     mutations:  {
@@ -76,12 +88,14 @@ let results = {
             context.commit('setPage', page);
             context.dispatch('display/getHeaders', {
                 filters: context.state.query.filters.items,
-                request: context.state.query.requestBody
+                request: context.getters['query/requestBody'](false)
             });
 
             context.commit('query/setAfter', context.state.after[context.state.page - 1]);
 
-            post('datastore_multisearch', context.getters['query/requestBody'])
+            let tempFilters = context.getters['query/filters/temporaryFilters'];
+
+            post('datastore_multisearch', context.getters['query/requestBody'](false))
                 .then(data => {
                     context.state.resultData = data;
                     Vue.set(context.state.status.resultData, 'loading', false);
@@ -90,13 +104,24 @@ let results = {
                     }
                     Vue.set(context.state.status.resultData, 'failed', !data.success);
                     context.state.invalidated = false;
+
+                    if (tempFilters.length === 0) {
+                        context.state.unfilteredResultData = data;
+                    }
                 });
+
+            if (tempFilters.length > 0) {
+                post('datastore_multisearch', context.getters['query/requestBody'](true))
+                    .then(data => {
+                        context.state.unfilteredResultData = data;
+                    });
+            }
         },
         getMetadata(context, payload) {
             Vue.set(context.state.status[payload.meta], 'loading', true);
             Vue.set(context.state.status[payload.meta], 'failed', false);
 
-            let body = context.state.query.requestBody;
+            let body = context.getters['query/requestBody'](false);
             if (payload.formData !== undefined) {
                 body = $.extend(payload.formData);
             }

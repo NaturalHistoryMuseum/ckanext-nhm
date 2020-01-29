@@ -18,9 +18,10 @@ let query = {
         after:        null
     },
     getters:    {
-        requestBody: (state, getters) => {
+        requestBody: (state, getters) => (ignoreTemp) => {
+            ignoreTemp = ignoreTemp || false;
             let body = {
-                query:        getters.queryBody,
+                query:        getters.queryBody(ignoreTemp),
                 resource_ids: getters['resources/sortedResources']
             };
 
@@ -30,14 +31,15 @@ let query = {
 
             return body;
         },
-        queryBody:   (state, getters) => {
-            let body = {};
+        queryBody:   (state, getters) => (ignoreTemp) => {
+            ignoreTemp = ignoreTemp || false;
+            let body   = {};
             if (state.search !== null && state.search !== '') {
                 body.search = state.search;
             }
 
-            if (getters['filters/count'] > 1) {
-                body.filters = getters['filters/queryfy']('group_root')
+            if (getters['filters/count'](ignoreTemp) > 1) {
+                body.filters = getters['filters/queryfy']('group_root', ignoreTemp)
             }
             return body;
         }

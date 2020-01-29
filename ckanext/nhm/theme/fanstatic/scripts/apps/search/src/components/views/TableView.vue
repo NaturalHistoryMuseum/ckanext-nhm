@@ -1,5 +1,5 @@
 <template>
-    <div class="table-view" style="position: relative;">
+    <div class="table-view view-component" style="position: relative;">
         <div class="scrolling-arrows">
             <div class="scroll-left"
                  @click="tableScroll(-100)"

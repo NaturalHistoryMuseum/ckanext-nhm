@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-container flex-column flex-left full-width" style="margin-top: 15px;">
+    <div class="flex-container flex-column flex-left full-width view-component">
         <div v-for="(item, index) in records" :key="item.id" class="record-item full-width">
             <div class="record-header">
                 <h4 class="record-name">

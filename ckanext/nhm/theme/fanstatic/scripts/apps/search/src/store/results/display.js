@@ -9,11 +9,15 @@ let display = {
         headers:          [],
         viewerImageIndex: 0,
         viewerImagePage:  [],
-        showImage:        false
+        showImage:        false,
+        recordName:       'record$'  // replace $ with s to make plural
     },
     getters:    {
-        viewerImage: (state) => {
+        viewerImage:  (state) => {
             return state.viewerImagePage[state.viewerImageIndex];
+        },
+        recordHeader: (state) => (recordCount) => {
+            return `${recordCount.toLocaleString('en-GB')} ${state.recordName.replace('$', recordCount === 1 ? '' : 's')}`
         }
     },
     mutations:  {

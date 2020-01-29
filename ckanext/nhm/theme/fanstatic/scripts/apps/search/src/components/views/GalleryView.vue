@@ -1,8 +1,10 @@
 <template>
-    <div style="margin-top: 15px;">
-        <Loading v-if="loading"><h3>Loading {{ nLoaded }} of {{ imageRecords.length }}
-                                    images...</h3></Loading>
+    <div class="view-component">
+        <Loading v-if="loading && imageRecords.length > 0"><h3>Loading {{ nLoaded }} of {{
+                                                               imageRecords.length }} images...</h3>
+        </Loading>
         <LoadError v-if="loadError"></LoadError>
+        <h4 v-if="!loading">{{ imageRecords.length }} images</h4>
         <div class="tiling-gallery full-width"
              v-images-loaded:on.progress="loadImages"
              :class="{'processing': loading || loadError}">
@@ -28,17 +30,25 @@
     import Loading from '../Loading.vue';
     import LoadError from '../LoadError.vue';
 
-    import {mapActions, mapMutations} from 'vuex';
+    import {mapActions, mapGetters, mapMutations} from 'vuex';
 
     export default {
         extends:    BaseView,
         name:       'GalleryView',
         data:       function () {
             return {
-                loading:     true,
-                loadError:   false,
-                nLoaded:     0,
-                loadTimeout: false
+                loading:        true,
+                loadError:      false,
+                nLoaded:        0,
+                loadTimeout:    false,
+                presetData:     {
+                    key:    'hasImage',
+                    parent: 'group_root',
+                    display: {
+                        hidden: true,
+                        temp: true
+                    }
+                }
             }
         },
         components: {
@@ -49,10 +59,11 @@
             imagesLoaded
         },
         computed:   {
+            ...mapGetters('results/query/filters', ['hasFilter']),
             imageRecords() {
                 let imgRecords = [];
 
-                this.records.forEach((r, rix, ra) => {
+                this.records.forEach((r, rix) => {
                     let resourceDetails = this.getDetails(r.resource);
                     let recordUrl       = `${resourceDetails.resourceUrl}/record/${r.data._id}`;
                     let recordTitle     = r.data[resourceDetails.titleField] || r.data._id;
@@ -70,7 +81,7 @@
                 });
 
                 return imgRecords;
-            }
+            },
         },
         methods:    {
             ...mapMutations('results/display', ['setViewerImage', 'addPageImages']),
@@ -93,18 +104,18 @@
                 if (instance.isComplete || (this.loadTimeout && instance.progressedCount > Math.floor(instance.images.length * 0.1))) {
                     this.relayout(!instance.isComplete);
                 }
-            }
+            },
         },
         created() {
-            this.addPreset({key: 'hasImage', parent: 'group_root'}).then(wasAdded => {
+            this.addPreset(this.presetData).then(wasAdded => {
                 if (wasAdded) {
-                    this.runSearch(0)
+                    this.runSearch(0);
                 }
             });
             this.addPageImages(this.imageRecords);
             setTimeout(() => {
                 this.loadTimeout = true;
             }, 1000)
-        },
+        }
     }
 </script>
