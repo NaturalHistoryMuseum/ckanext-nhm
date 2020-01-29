@@ -5,19 +5,22 @@ import {post} from '../utils';
 let display = {
     namespaced: true,
     state:      {
-        view:             'Table',
-        headers:          [],
-        viewerImageIndex: 0,
-        viewerImagePage:  [],
-        showImage:        false,
-        recordName:       'record$'  // replace $ with s to make plural
+        view:               'Table',
+        headers:            [],
+        viewerImageIndex:   0,
+        viewerImagePage:    [],
+        showImage:          false,
+        filteredRecordName: 'record$'  // replace $ with s to make plural
     },
     getters:    {
-        viewerImage:  (state) => {
+        viewerImage:          (state) => {
             return state.viewerImagePage[state.viewerImageIndex];
         },
-        recordHeader: (state) => (recordCount) => {
-            return `${recordCount.toLocaleString('en-GB')} ${state.recordName.replace('$', recordCount === 1 ? '' : 's')}`
+        recordHeader:         (state) => (recordCount) => {
+            return `${recordCount.toLocaleString('en-GB')} record${recordCount === 1 ? '' : 's'}`;
+        },
+        filteredRecordHeader: (state) => (recordCount) => {
+            return `showing ${recordCount.toLocaleString('en-GB')} ${state.filteredRecordName.replace('$', recordCount === 1 ? '' : 's')}`
         }
     },
     mutations:  {
@@ -47,6 +50,12 @@ let display = {
             Vue.set(state.headers, payload.ix + payload.by, header);
             Vue.set(state.headers, payload.ix, target);
         },
+        setFilteredRecordName(state, template) {
+            state.filteredRecordName = template;
+        },
+        resetFilteredRecordName(state) {
+            state.filteredRecordName = 'record$';
+        }
     },
     actions:    {
         getHeaders(context, payload) {

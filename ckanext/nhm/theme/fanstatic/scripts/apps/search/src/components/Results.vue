@@ -11,7 +11,7 @@
              :class="{disabled: invalidated}">
             <div class="records-total">
                 <h3>{{ recordHeader(unfilteredTotal) }}</h3>
-                <small class="filtered-total" v-if="total !== unfilteredTotal">showing {{ total.toLocaleString('en-GB') }}</small>
+                <small class="filtered-total" v-if="total !== unfilteredTotal">{{ filteredRecordHeader(total) }}</small>
             </div>
             <div class="info-popup-button">
                 <transition name="slidedown">
@@ -239,7 +239,7 @@
             ...mapState('results', ['resultData', 'page', 'after', 'status', 'slug', 'doi', 'download', 'invalidated']),
             ...mapState('results/display', ['view', 'headers']),
             ...mapGetters('results', ['total', 'unfilteredTotal', 'hasResult', 'hasRecords', 'resultResourceIds']),
-            ...mapGetters('results/display', ['recordHeader']),
+            ...mapGetters('results/display', ['recordHeader', 'filteredRecordHeader']),
             viewComponent() {
                 return this.view + 'View';
             },
@@ -248,7 +248,7 @@
             }
         },
         methods:    {
-            ...mapMutations('results/display', ['addCustomHeader', 'setView']),
+            ...mapMutations('results/display', ['addCustomHeader', 'setView', 'resetFilteredRecordName']),
             ...mapActions('results/query/filters', ['deleteTemporaryFilters']),
             ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'getDownload']),
             shareSearch() {
@@ -279,6 +279,7 @@
                         this.runSearch(this.page);
                     }
                 });
+                this.resetFilteredRecordName();
             }
         },
     }

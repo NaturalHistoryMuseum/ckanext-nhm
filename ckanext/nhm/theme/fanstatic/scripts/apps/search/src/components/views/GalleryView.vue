@@ -4,7 +4,10 @@
                                                                imageRecords.length }} images...</h3>
         </Loading>
         <LoadError v-if="loadError"></LoadError>
-        <h4 v-if="!loading">{{ imageRecords.length }} images</h4>
+        <div class="flex-container flex-right">
+            <small v-if="!loading">{{ imageRecords.length }} images from {{
+                                                      records.length }} records on this page</small>
+        </div>
         <div class="tiling-gallery full-width"
              v-images-loaded:on.progress="loadImages"
              :class="{'processing': loading || loadError}">
@@ -37,16 +40,16 @@
         name:       'GalleryView',
         data:       function () {
             return {
-                loading:        true,
-                loadError:      false,
-                nLoaded:        0,
-                loadTimeout:    false,
-                presetData:     {
-                    key:    'hasImage',
-                    parent: 'group_root',
+                loading:     true,
+                loadError:   false,
+                nLoaded:     0,
+                loadTimeout: false,
+                presetData:  {
+                    key:     'hasImage',
+                    parent:  'group_root',
                     display: {
                         hidden: true,
-                        temp: true
+                        temp:   true
                     }
                 }
             }
@@ -84,7 +87,7 @@
             },
         },
         methods:    {
-            ...mapMutations('results/display', ['setViewerImage', 'addPageImages']),
+            ...mapMutations('results/display', ['setViewerImage', 'addPageImages', 'setFilteredRecordName']),
             ...mapActions('results', ['runSearch']),
             ...mapActions('results/query/filters', ['addPreset']),
             relayout(loadFinished) {
@@ -112,6 +115,7 @@
                     this.runSearch(0);
                 }
             });
+            this.setFilteredRecordName('record$ with images');
             this.addPageImages(this.imageRecords);
             setTimeout(() => {
                 this.loadTimeout = true;
