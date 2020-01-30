@@ -5,8 +5,7 @@
         </Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="flex-container flex-right">
-            <small v-if="!loading">{{ imageRecords.length }} images from {{
-                                                      records.length }} records on this page</small>
+            <small v-if="!loading">{{ imageRecords.length }} images associated with {{ recordTag }}s {{ (page * 100) + 1 }} - {{ (page * 100) + records.length }}</small>
         </div>
         <div class="tiling-gallery full-width"
              v-images-loaded:on.progress="loadImages"
@@ -33,7 +32,7 @@
     import Loading from '../Loading.vue';
     import LoadError from '../LoadError.vue';
 
-    import {mapActions, mapGetters, mapMutations} from 'vuex';
+    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
 
     export default {
         extends:    BaseView,
@@ -62,6 +61,7 @@
             imagesLoaded
         },
         computed:   {
+            ...mapState('results/display', ['recordTag']),
             ...mapGetters('results/query/filters', ['hasFilter']),
             imageRecords() {
                 let imgRecords = [];
@@ -87,7 +87,7 @@
             },
         },
         methods:    {
-            ...mapMutations('results/display', ['setViewerImage', 'addPageImages', 'setFilteredRecordName']),
+            ...mapMutations('results/display', ['setViewerImage', 'addPageImages', 'setFilteredRecordTag']),
             ...mapActions('results', ['runSearch']),
             ...mapActions('results/query/filters', ['addPreset']),
             relayout(loadFinished) {
@@ -115,7 +115,7 @@
                     this.runSearch(0);
                 }
             });
-            this.setFilteredRecordName('record$ with images');
+            this.setFilteredRecordTag(this.recordTag + '$ with images');
             this.addPageImages(this.imageRecords);
             setTimeout(() => {
                 this.loadTimeout = true;

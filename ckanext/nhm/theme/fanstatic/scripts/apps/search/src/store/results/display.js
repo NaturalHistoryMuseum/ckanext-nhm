@@ -5,22 +5,23 @@ import {post} from '../utils';
 let display = {
     namespaced: true,
     state:      {
-        view:               'Table',
-        headers:            [],
-        viewerImageIndex:   0,
-        viewerImagePage:    [],
-        showImage:          false,
-        filteredRecordName: 'record$'  // replace $ with s to make plural
+        view:              'Table',
+        headers:           [],
+        viewerImageIndex:  0,
+        viewerImagePage:   [],
+        showImage:         false,
+        recordTag:         'result',
+        filteredRecordTag: 'result$'  // replace $ with s to make plural
     },
     getters:    {
         viewerImage:          (state) => {
             return state.viewerImagePage[state.viewerImageIndex];
         },
         recordHeader:         (state) => (recordCount) => {
-            return `${recordCount.toLocaleString('en-GB')} record${recordCount === 1 ? '' : 's'}`;
+            return `${recordCount.toLocaleString('en-GB')} ${state.recordTag}${recordCount === 1 ? '' : 's'}`;
         },
         filteredRecordHeader: (state) => (recordCount) => {
-            return `showing ${recordCount.toLocaleString('en-GB')} ${state.filteredRecordName.replace('$', recordCount === 1 ? '' : 's')}`
+            return `${recordCount.toLocaleString('en-GB')} ${state.filteredRecordTag.replace('$', recordCount === 1 ? '' : 's')}`
         }
     },
     mutations:  {
@@ -50,11 +51,11 @@ let display = {
             Vue.set(state.headers, payload.ix + payload.by, header);
             Vue.set(state.headers, payload.ix, target);
         },
-        setFilteredRecordName(state, template) {
-            state.filteredRecordName = template;
+        setFilteredRecordTag(state, template) {
+            state.filteredRecordTag = template;
         },
-        resetFilteredRecordName(state) {
-            state.filteredRecordName = 'record$';
+        resetFilteredRecordTag(state) {
+            state.filteredRecordTag = state.recordTag + '$';
         }
     },
     actions:    {

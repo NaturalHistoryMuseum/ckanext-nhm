@@ -11,15 +11,15 @@ let results = {
         query
     },
     state:      {
-        invalidated:          false,
-        resultData:           {},
-        unfilteredResultData: {},
-        slug:                 null,
-        doi:                  null,
-        download:             null,
-        after:                [],
-        page:                 0,
-        status:               {
+        invalidated:           false,
+        resultData:            {},
+        unfilteredTotal: 0,
+        slug:                  null,
+        doi:                   null,
+        download:              null,
+        after:                 [],
+        page:                  0,
+        status:                {
             resultData: {
                 loading: false,
                 failed:  false
@@ -54,17 +54,6 @@ let results = {
         },
         resultResourceIds: (state, getters) => {
             return getters.records.map(r => r.resource);
-        },
-        unfilteredTotal:   (state, getters) => {
-            if (state.unfilteredResultData.success) {
-                return state.unfilteredResultData.result.total;
-            }
-            else if (getters.hasResult) {
-                return getters.total;
-            }
-            else {
-                return 0;
-            }
         }
     },
     mutations:  {
@@ -94,6 +83,7 @@ let results = {
             context.commit('query/setAfter', context.state.after[context.state.page - 1]);
 
             let tempFilters = context.getters['query/filters/temporaryFilters'];
+            let unfilteredData = {};
 
             post('datastore_multisearch', context.getters['query/requestBody'](false))
                 .then(data => {
@@ -106,15 +96,25 @@ let results = {
                     context.state.invalidated = false;
 
                     if (tempFilters.length === 0) {
-                        context.state.unfilteredResultData = data;
+                        unfilteredData = data;
                     }
                 });
 
             if (tempFilters.length > 0) {
                 post('datastore_multisearch', context.getters['query/requestBody'](true))
                     .then(data => {
-                        context.state.unfilteredResultData = data;
+                        unfilteredData = data;
                     });
+            }
+
+            if (unfilteredData.success) {
+                context.state.unfilteredTotal = unfilteredData.result.total;
+            }
+            else if (context.getters.hasResult) {
+                context.state.unfilteredTotal = context.getters.total;
+            }
+            else {
+                context.state.unfilteredTotal = 0;
             }
         },
         getMetadata(context, payload) {

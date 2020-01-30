@@ -11,7 +11,9 @@
              :class="{disabled: invalidated}">
             <div class="records-total">
                 <h3>{{ recordHeader(unfilteredTotal) }}</h3>
-                <small class="filtered-total" v-if="total !== unfilteredTotal">{{ filteredRecordHeader(total) }}</small>
+                <small class="filtered-total">
+                    showing {{ (page * 100) + 1 }}-{{ (page * 100) + records.length }} of {{ filteredRecordHeader(total) }}
+                </small>
             </div>
             <div class="info-popup-button">
                 <transition name="slidedown">
@@ -236,9 +238,9 @@
             }
         },
         computed:   {
-            ...mapState('results', ['resultData', 'page', 'after', 'status', 'slug', 'doi', 'download', 'invalidated']),
+            ...mapState('results', ['resultData', 'page', 'after', 'status', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
             ...mapState('results/display', ['view', 'headers']),
-            ...mapGetters('results', ['total', 'unfilteredTotal', 'hasResult', 'hasRecords', 'resultResourceIds']),
+            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds', 'records']),
             ...mapGetters('results/display', ['recordHeader', 'filteredRecordHeader']),
             viewComponent() {
                 return this.view + 'View';
@@ -248,7 +250,7 @@
             }
         },
         methods:    {
-            ...mapMutations('results/display', ['addCustomHeader', 'setView', 'resetFilteredRecordName']),
+            ...mapMutations('results/display', ['addCustomHeader', 'setView', 'resetFilteredRecordTag']),
             ...mapActions('results/query/filters', ['deleteTemporaryFilters']),
             ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'getDownload']),
             shareSearch() {
@@ -279,7 +281,7 @@
                         this.runSearch(this.page);
                     }
                 });
-                this.resetFilteredRecordName();
+                this.resetFilteredRecordTag();
             }
         },
     }
