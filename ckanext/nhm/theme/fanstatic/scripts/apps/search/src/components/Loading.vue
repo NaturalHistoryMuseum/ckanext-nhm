@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-container flex-center flex-around">
+    <div class="flex-container flex-center flex-around loading-box">
         <slot>
             <h3>
                 Loading...</h3>

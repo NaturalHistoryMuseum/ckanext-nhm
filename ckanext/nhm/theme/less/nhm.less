@@ -563,6 +563,12 @@ span.caret {
   padding-right: 0;
 }
 
+.full-height {
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 iframe {
   max-width: 100%;
 }
@@ -1024,7 +1030,7 @@ iframe {
   background-color: fade(black, 90%);
   z-index: 1000;
 
-  & img {
+  & img.main-image {
     max-width: 80%;
     max-height: 90vh;
     position: absolute;
@@ -1033,39 +1039,73 @@ iframe {
     left: 0;
     right: 0;
     margin: auto;
+    .trans(0.2s);
 
     @media (max-width: @md - 1) {
       top: 10vh;
       bottom: 15vh;
       max-height: 70vh;
     }
+
+    &.loading {
+      opacity: 0.2;
+    }
   }
 
-  & h4 {
-    color: @grey10;
-    padding: 10px;
-    border-radius: @rounding;
-    position: absolute;
+  & .loading-box {
+    top: 0;
+    bottom: 0;
     margin: auto;
-    top: 1vh;
-    left: 1em;
-    text-align: center;
-    @media (max-width: @sm) {
-      font-size: @font-size-body-m;
-    }
+    color: @grey10;
+    height: 100%;
+  }
 
-    @media (max-width: @md - 1) {
-      top: 2vh;
+  & .image-viewer-header {
+    width: 100%;
+    color: @grey10;
+    padding: 1vh 1em 0;
+
+    & h4 {
+      padding: 0;
+      margin: 0 0 -5px;
+      @media (max-width: @sm) {
+        font-size: @font-size-body-m;
+      }
     }
 
     & a, & a:active {
       color: @grey10;
+    }
+
+    & .image-viewer-icon {
+      border-radius: @rounding;
+      border: 2px solid @grey10;
+      background-color: black;
+      text-align: center;
+      padding: 1px;
+      margin-left: 10px;
+      width: 2em;
+      cursor: pointer;
+
+      & i {
+        vertical-align: middle;
+      }
     }
   }
 
   & .scrolling-arrows {
     & > * {
       position: absolute;
+      .mixin-flex-row();
+      border: 2px solid @grey10;
+      background-color: black;
+      color: @grey10;
+      font-size: @font-size-body-l;
+
+      &:hover {
+        background-color: fade(@grey10, 10%);
+      }
+
       @media (max-width: @md - 1) {
         bottom: 1em;
       }
@@ -1076,8 +1116,6 @@ iframe {
         max-height: 5em;
         border-radius: 5vw;
       }
-      background-color: fade(@grey10, 50%);
-      .mixin-flex-row();
     }
   }
 }
@@ -3370,6 +3408,7 @@ select, .select2-choice {
 
 .view-component {
   margin-top: 15px;
+
   & > :first-child {
     margin-top: 0;
   }

@@ -672,6 +672,11 @@ span.caret {
   padding-left: 0;
   padding-right: 0;
 }
+.full-height {
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
 iframe {
   max-width: 100%;
 }
@@ -1133,7 +1138,7 @@ iframe {
   background-color: rgba(0, 0, 0, 0.9);
   z-index: 1000;
 }
-.image-viewer img {
+.image-viewer img.main-image {
   max-width: 80%;
   max-height: 90vh;
   position: absolute;
@@ -1142,42 +1147,75 @@ iframe {
   left: 0;
   right: 0;
   margin: auto;
+  -o-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
 }
 @media (max-width: 767px) {
-  .image-viewer img {
+  .image-viewer img.main-image {
     top: 10vh;
     bottom: 15vh;
     max-height: 70vh;
   }
 }
-.image-viewer h4 {
-  color: #FFFFFF;
-  padding: 10px;
-  border-radius: 5px;
-  position: absolute;
+.image-viewer img.main-image.loading {
+  opacity: 0.2;
+}
+.image-viewer .loading-box {
+  top: 0;
+  bottom: 0;
   margin: auto;
-  top: 1vh;
-  left: 1em;
-  text-align: center;
+  color: #FFFFFF;
+  height: 100%;
+}
+.image-viewer .image-viewer-header {
+  width: 100%;
+  color: #FFFFFF;
+  padding: 1vh 1em 0;
+}
+.image-viewer .image-viewer-header h4 {
+  padding: 0;
+  margin: 0 0 -5px;
 }
 @media (max-width: 576px) {
-  .image-viewer h4 {
+  .image-viewer .image-viewer-header h4 {
     font-size: 14px;
   }
 }
-@media (max-width: 767px) {
-  .image-viewer h4 {
-    top: 2vh;
-  }
-}
-.image-viewer h4 a,
-.image-viewer h4 a:active {
+.image-viewer .image-viewer-header a,
+.image-viewer .image-viewer-header a:active {
   color: #FFFFFF;
+}
+.image-viewer .image-viewer-header .image-viewer-icon {
+  border-radius: 5px;
+  border: 2px solid #FFFFFF;
+  background-color: black;
+  text-align: center;
+  padding: 1px;
+  margin-left: 10px;
+  width: 2em;
+  cursor: pointer;
+}
+.image-viewer .image-viewer-header .image-viewer-icon i {
+  vertical-align: middle;
 }
 .image-viewer .scrolling-arrows > * {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.5);
   flex-direction: row;
+  border: 2px solid #FFFFFF;
+  background-color: black;
+  color: #FFFFFF;
+  font-size: 17px;
+}
+.image-viewer .scrolling-arrows > * > * {
+  align-self: center;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.image-viewer .scrolling-arrows > *:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 @media (max-width: 767px) {
   .image-viewer .scrolling-arrows > * {
@@ -1192,11 +1230,6 @@ iframe {
     max-height: 5em;
     border-radius: 5vw;
   }
-}
-.image-viewer .scrolling-arrows > * > * {
-  align-self: center;
-  padding-left: 5px;
-  padding-right: 5px;
 }
 .toolbar {
   background: #BBEDA9;
