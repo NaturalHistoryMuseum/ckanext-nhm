@@ -11,15 +11,15 @@ let results = {
         query
     },
     state:      {
-        invalidated:           false,
-        resultData:            {},
+        invalidated:     false,
+        resultData:      {},
         unfilteredTotal: 0,
-        slug:                  null,
-        doi:                   null,
-        download:              null,
-        after:                 [],
-        page:                  0,
-        status:                {
+        slug:            null,
+        doi:             null,
+        download:        null,
+        after:           [],
+        page:            0,
+        status:          {
             resultData: {
                 loading: false,
                 failed:  false
@@ -83,7 +83,6 @@ let results = {
             context.commit('query/setAfter', context.state.after[context.state.page - 1]);
 
             let tempFilters = context.getters['query/filters/temporaryFilters'];
-            let unfilteredData = {};
 
             post('datastore_multisearch', context.getters['query/requestBody'](false))
                 .then(data => {
@@ -96,25 +95,28 @@ let results = {
                     context.state.invalidated = false;
 
                     if (tempFilters.length === 0) {
-                        unfilteredData = data;
+                        if (data.success) {
+                            context.state.unfilteredTotal = data.result.total;
+                        }
+                        else {
+                            context.state.unfilteredTotal = 0;
+                        }
                     }
                 });
 
             if (tempFilters.length > 0) {
                 post('datastore_multisearch', context.getters['query/requestBody'](true))
                     .then(data => {
-                        unfilteredData = data;
+                        if (data.success) {
+                            context.state.unfilteredTotal = data.result.total;
+                        }
+                        else if (context.getters.hasResult) {
+                            context.state.unfilteredTotal = context.getters.total;
+                        }
+                        else {
+                            context.state.unfilteredTotal = 0;
+                        }
                     });
-            }
-
-            if (unfilteredData.success) {
-                context.state.unfilteredTotal = unfilteredData.result.total;
-            }
-            else if (context.getters.hasResult) {
-                context.state.unfilteredTotal = context.getters.total;
-            }
-            else {
-                context.state.unfilteredTotal = 0;
             }
         },
         getMetadata(context, payload) {
