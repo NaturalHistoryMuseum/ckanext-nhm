@@ -110,6 +110,9 @@
                 set(value) {
                     this.setSearch(value);
                 }
+            },
+            watchedRequestBody() {
+                return this.requestBody(false);
             }
         },
         created:    function () {
@@ -133,7 +136,7 @@
                     this.selectAllResources();
                 }
             },
-            requestBody: {
+            watchedRequestBody: {
                 handler() {
                     this.invalidate();
                 },

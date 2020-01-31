@@ -178,6 +178,7 @@ let filters = {
     },
     actions:    {
         addGroup(context, payload) {
+            payload.display = payload.display || {};
             let newGroup = {
                 parent:  payload.parent,
                 key:     'and',
@@ -193,6 +194,7 @@ let filters = {
             context.commit('addFilter', newGroup)
         },
         addTerm(context, payload) {
+            payload.display = payload.display || {};
             let newTerm = {
                 parent:  payload.parent,
                 key:     payload.key,
@@ -227,6 +229,7 @@ let filters = {
                 return;
             }
 
+            payload.display = payload.display || {};
             let newFilter = {
                 parent:  payload.parent,
                 key:     preset.key,
