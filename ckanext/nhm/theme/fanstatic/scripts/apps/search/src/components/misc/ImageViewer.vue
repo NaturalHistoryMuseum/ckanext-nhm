@@ -1,54 +1,76 @@
 <template>
     <div class="image-viewer" @click.self="hideImage">
         <div class="flex-container flex-stretch-first image-viewer-header">
-            <h4><a :href="viewerImage.recordUrl">{{ viewerImage.image.title }}</a></h4>
-            <div class="info-popup-button" v-if="isMAM">
+            <h4>
+                <a :href="viewerImage.recordUrl" title="View record">
+                    {{ viewerImage.image.title }}
+                    <i class="fas fa-arrow-right fa-xs inline-icon-right"></i>
+                </a>
+            </h4>
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup download-popup"
                          v-if="showDownload"
                          v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
-                        <p v-if="download !== null">
-                            Success! You should receive an email at <b>{{ email }}</b> soon.</p>
                         <p class="alert-error" v-if="downloadStatus.failed">
                             The download request failed. Please try again later.</p>
-                        <div v-if="download === null">
-                            <p>Please enter your email address, and we will send you the original
-                               image.</p>
-                            <div class="form-row">
-                                <label for="download-email" class="control-label">
-                                    <span class="control-required">*</span>Your email</label> <input
-                                id="download-email"
-                                type="text"
-                                class="full-width"
-                                v-model="email"
-                                placeholder="data@nhm.ac.uk">
-                            </div>
-                        </div>
-                        <div class="privacy-warning">
-                            <p><i>Data Protection</i></p>
-                            <p>The Natural History Museum will use your personal data in accordance
-                               with data protection legislation to process your requests. For more
-                               information please read our <a href="/privacy">privacy notice</a>.
+                        <template v-if="isMAM">
+                            <p v-if="download !== null">
+                                Success! You should receive an email at
+                                <b>{{ email }}</b>
+                                soon.
                             </p>
-                        </div>
+                            <div v-if="download === null">
+                                <p>Please enter your email address, and we will send you the
+                                   original image.</p>
+                                <div class="form-row">
+                                    <label for="download-email" class="control-label">
+                                        <span class="control-required">*</span>
+                                        Your email
+                                    </label>
+                                    <input id="download-email"
+                                           type="text"
+                                           class="full-width"
+                                           v-model="email"
+                                           placeholder="data@nhm.ac.uk">
+                                </div>
+                            </div>
+                            <div class="privacy-warning">
+                                <p>
+                                    <i>Data Protection</i>
+                                </p>
+                                <p>The Natural History Museum will use your personal data in
+                                   accordance with data protection legislation to process your
+                                   requests. For more information please read our
+                                    <a href="/privacy">privacy notice</a>
+                                   .
+                                </p>
+                            </div>
+                        </template>
+                        <template v-if="!isMAM">
+                            <p>Click below to download the original image.</p>
+                        </template>
                         <div class="text-right" v-if="download === null">
                             <a href="#"
                                class="btn btn-primary text-right"
-                               @click="downloadMAMImage"> <i class="fas"
-                                                             :class="downloadStatus.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
-                                Request Download </a>
+                               @click="downloadImage">
+                                <i class="fas"
+                                   :class="downloadStatus.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                                {{ isMAM ? 'Request ': ''}}Download
+                            </a>
                         </div>
                     </div>
                 </transition>
-                <span class="image-viewer-icon"
-                      @click="showDownload = !showDownload"
-                      id="show-download">
+                <a class="image-viewer-icon" title="Download original image"
+                   @click="showDownload = !showDownload"
+                   id="show-download">
                     <i class="fas fa-cloud-download-alt fa-2x"></i>
-                </span>
+                </a>
             </div>
-            <a class="image-viewer-icon" v-if="!isMAM" :href="viewerImage.image.preview" download><i
-                class="fas fa-cloud-download-alt fa-2x"></i></a> <span class="image-viewer-icon"
-                                                                       @click="hideImage"><i class="fas fa-times fa-2x"></i></span>
+            <a class="image-viewer-icon" title="Close image viewer"
+               @click="hideImage">
+                <i class="fas fa-times fa-2x"></i>
+            </a>
         </div>
         <div class="scrolling-arrows">
             <div class="scroll-left" @click="previousImage" v-if="!firstImage">
@@ -72,7 +94,8 @@
     import imagesLoaded from 'vue-images-loaded';
     import Loading from '../Loading.vue';
     import LoadError from '../LoadError.vue';
-    import {post} from '../../store/utils';
+    import {camelCase, post} from '../../store/utils';
+    import axios from 'axios';
 
     export default {
         name:       'ImageViewer',
@@ -138,6 +161,20 @@
                 this.loading   = false;
                 this.loadError = instance.hasAnyBroken;
             },
+            downloadImage() {
+                this.downloadStatus.loading = true;
+                this.downloadStatus.failed  = false;
+
+                let download = this.isMAM ? this.downloadMAMImage : this.downloadOtherImage;
+
+                download()
+                    .catch(error => {
+                        this.downloadStatus.failed = true;
+                    })
+                    .finally(() => {
+                        this.downloadStatus.loading = false;
+                    })
+            },
             downloadMAMImage() {
                 let body = {
                     'resource_id': this.viewerImage.record.resource,
@@ -146,9 +183,7 @@
                     'email':       this.email
                 };
 
-                this.downloadStatus.loading = true;
-                this.downloadStatus.failed  = false;
-                post('download_image', body)
+                return post('download_image', body)
                     .then(data => {
                         if (data.success) {
                             this.download = data;
@@ -156,13 +191,27 @@
                         else {
                             throw Error;
                         }
-                    })
-                    .catch(error => {
-                        this.downloadStatus.failed = true;
-                    })
-                    .finally(() => {
-                        this.downloadStatus.loading = false;
-                    })
+                    });
+
+            },
+            downloadOtherImage() {
+                return axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
+                     .then(response => {
+                         if (response.status === 200 &&
+                             response.data instanceof Blob &&
+                             response.data.type.startsWith('image/')) {
+                             let imageType = response.data.type.split('/')[1];
+
+                             let link      = document.createElement('a');
+                             link.download = camelCase(this.viewerImage.image.title) + '.' + imageType;
+                             link.href     = URL.createObjectURL(response.data);
+                             link.click();
+                             URL.revokeObjectURL(link.href);
+                         }
+                         else {
+                             throw Error;
+                         }
+                     });
             }
         },
         mounted() {

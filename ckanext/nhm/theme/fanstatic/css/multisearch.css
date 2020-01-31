@@ -190,7 +190,7 @@
   text-align: center;
   padding: 1px;
   margin-left: 10px;
-  width: 2em;
+  width: 3em;
   cursor: pointer;
 }
 .image-viewer .image-viewer-header .image-viewer-icon i {
@@ -199,12 +199,13 @@
 .image-viewer .info-popup {
   color: #343434;
   position: absolute;
+  width: 300px;
 }
 @media (max-width: 576px) {
   .image-viewer .info-popup {
     left: 0;
     right: 0;
-    margin: 5vh auto auto;
+    margin: 7vh auto auto;
   }
 }
 .image-viewer .scrolling-arrows > * {
