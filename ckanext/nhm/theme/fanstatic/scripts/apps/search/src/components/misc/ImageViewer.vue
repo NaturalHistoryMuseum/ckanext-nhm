@@ -202,7 +202,7 @@
 
                 const regx = /\.[A-Za-z]{3,4}$/gm;
                 if (regx.test(this.viewerImage.image.preview)) {
-                    downloader = new Promise(resolve => {
+                    downloader = new Promise(resolve => resolve()).then(() => {
                         link.href     = this.viewerImage.image.preview;
                         link.download = imageName;
                     });
