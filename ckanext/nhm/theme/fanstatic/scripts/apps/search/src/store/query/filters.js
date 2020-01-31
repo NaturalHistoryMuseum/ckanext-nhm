@@ -105,7 +105,8 @@ let filters = {
                                 itemList[groupId] = {
                                     parent:  parent,
                                     key:     item.key,
-                                    content: []
+                                    content: [],
+                                    display: {}
                                 };
                                 d3.entries(dequeryfy(item.value, groupId)).forEach((f) => {
                                     itemList[f.key] = f.value;
@@ -115,7 +116,8 @@ let filters = {
                                 itemList[`term_${shortid.generate()}`] = {
                                     parent:  parent,
                                     key:     item.key,
-                                    content: item.value
+                                    content: item.value,
+                                    display: {}
                                 }
                             }
                         });

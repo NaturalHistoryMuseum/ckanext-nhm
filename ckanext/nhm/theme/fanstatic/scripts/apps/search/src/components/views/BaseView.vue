@@ -45,7 +45,7 @@
                                 preview: img.identifier,
                                 thumb:   img.identifier.replace('preview', 'thumbnail'),
                                 title:   img.title,
-                                id:      img.assetId
+                                id:      img.assetID
                             };
                         });
                     } catch (e) {

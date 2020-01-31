@@ -2,8 +2,53 @@
     <div class="image-viewer" @click.self="hideImage">
         <div class="flex-container flex-stretch-first image-viewer-header">
             <h4><a :href="viewerImage.recordUrl">{{ viewerImage.image.title }}</a></h4>
-            <span class="image-viewer-icon"><i class="fas fa-download"></i></span>
-            <span class="image-viewer-icon" @click="hideImage"><i class="fas fa-times"></i></span>
+            <div class="info-popup-button" v-if="isMAM">
+                <transition name="slidedown">
+                    <div class="floating info-popup download-popup"
+                         v-if="showDownload"
+                         v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
+                        <p v-if="download !== null">
+                            Success! You should receive an email at <b>{{ email }}</b> soon.</p>
+                        <p class="alert-error" v-if="downloadStatus.failed">
+                            The download request failed. Please try again later.</p>
+                        <div v-if="download === null">
+                            <p>Please enter your email address, and we will send you the original
+                               image.</p>
+                            <div class="form-row">
+                                <label for="download-email" class="control-label">
+                                    <span class="control-required">*</span>Your email</label> <input
+                                id="download-email"
+                                type="text"
+                                class="full-width"
+                                v-model="email"
+                                placeholder="data@nhm.ac.uk">
+                            </div>
+                        </div>
+                        <div class="privacy-warning">
+                            <p><i>Data Protection</i></p>
+                            <p>The Natural History Museum will use your personal data in accordance
+                               with data protection legislation to process your requests. For more
+                               information please read our <a href="/privacy">privacy notice</a>.
+                            </p>
+                        </div>
+                        <div class="text-right" v-if="download === null">
+                            <a href="#"
+                               class="btn btn-primary text-right"
+                               @click="downloadMAMImage"> <i class="fas"
+                                                             :class="downloadStatus.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                                Request Download </a>
+                        </div>
+                    </div>
+                </transition>
+                <span class="image-viewer-icon"
+                      @click="showDownload = !showDownload"
+                      id="show-download">
+                    <i class="fas fa-cloud-download-alt"></i>
+                </span>
+            </div>
+            <a class="image-viewer-icon" v-if="!isMAM" :href="viewerImage.image.preview" download><i
+                class="fas fa-cloud-download-alt"></i></a> <span class="image-viewer-icon"
+                                                                 @click="hideImage"><i class="fas fa-times"></i></span>
         </div>
         <div class="scrolling-arrows">
             <div class="scroll-left" @click="previousImage" v-if="!firstImage">
@@ -27,13 +72,21 @@
     import imagesLoaded from 'vue-images-loaded';
     import Loading from '../Loading.vue';
     import LoadError from '../LoadError.vue';
+    import {post} from '../../store/utils';
 
     export default {
         name:       'ImageViewer',
         data:       function () {
             return {
-                loading:   true,
-                loadError: false
+                loading:        true,
+                loadError:      false,
+                email:          null,
+                showDownload:   false,
+                download:       null,
+                downloadStatus: {
+                    failed:  false,
+                    loading: false
+                }
             }
         },
         directives: {
@@ -51,6 +104,9 @@
             },
             lastImage() {
                 return this.viewerImagePage.length < (this.viewerImageIndex + 1);
+            },
+            isMAM() {
+                return this.viewerImage.image.preview.startsWith('https://www.nhm.ac.uk/services/media-store/asset/')
             }
         },
         methods:    {
@@ -81,6 +137,24 @@
             loadImage(instance) {
                 this.loading   = false;
                 this.loadError = instance.hasAnyBroken;
+            },
+            downloadMAMImage() {
+                let body = {
+                    'resource_id': this.viewerImage.record.resource,
+                    'record_id':   this.viewerImage.record.data._id,
+                    'asset_id':    this.viewerImage.image.id,
+                    'email':       this.email
+                };
+                console.log(body);
+
+                this.downloadStatus.loading = true;
+                post('download_image', body).then(data => {
+                    this.downloadStatus.loading = false;
+                    this.downloadStatus.failed  = !data.success;
+                    if (data.success) {
+                        this.download = data;
+                    }
+                })
             }
         },
         mounted() {
