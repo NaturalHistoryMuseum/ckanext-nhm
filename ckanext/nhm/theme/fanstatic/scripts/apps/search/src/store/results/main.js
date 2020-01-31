@@ -71,6 +71,7 @@ let results = {
         runSearch(context, page) {
             page = page || 0;
             Vue.set(context.state.status.resultData, 'loading', true);
+            Vue.set(context.state.status.resultData, 'failed', false);
             if (page === 0) {
                 context.state.after = [];
             }
@@ -87,12 +88,13 @@ let results = {
             post('datastore_multisearch', context.getters['query/requestBody'](false))
                 .then(data => {
                     context.state.resultData = data;
-                    Vue.set(context.state.status.resultData, 'loading', false);
+
                     if (data.success && data.result.after !== null) {
                         context.commit('addPage', data.result.after);
                     }
-                    Vue.set(context.state.status.resultData, 'failed', !data.success);
-                    context.state.invalidated = false;
+                    if (!data.success) {
+                        throw Error;
+                    }
 
                     if (tempFilters.length === 0) {
                         if (data.success) {
@@ -102,6 +104,13 @@ let results = {
                             context.state.unfilteredTotal = 0;
                         }
                     }
+                })
+                .catch(error => {
+                    Vue.set(context.state.status.resultData, 'failed', true);
+                })
+                .finally(() => {
+                    Vue.set(context.state.status.resultData, 'loading', false);
+                    context.state.invalidated = false;
                 });
 
             if (tempFilters.length > 0) {
@@ -110,7 +119,12 @@ let results = {
                         if (data.success) {
                             context.state.unfilteredTotal = data.result.total;
                         }
-                        else if (context.getters.hasResult) {
+                        else {
+                            throw Error;
+                        }
+                    })
+                    .catch(error => {
+                        if (context.getters.hasResult) {
                             context.state.unfilteredTotal = context.getters.total;
                         }
                         else {
@@ -130,14 +144,19 @@ let results = {
 
             post(payload.action, body)
                 .then(data => {
-                    Vue.set(context.state.status[payload.meta], 'loading', false);
                     if (data.success) {
                         context.state[payload.meta] = payload.extract(data);
                     }
                     else {
-                        context.state[payload.meta] = null;
-                        Vue.set(context.state.status[payload.meta], 'failed', true);
+                        throw Error;
                     }
+                })
+                .catch(error => {
+                    context.state[payload.meta] = null;
+                    Vue.set(context.state.status[payload.meta], 'failed', true);
+                })
+                .finally(() => {
+                    Vue.set(context.state.status[payload.meta], 'loading', false);
                 });
         },
         getSlug(context) {

@@ -4,6 +4,7 @@
   "description": "multisearch ui",
   "dependencies": {
     "@babel/runtime": "^7.7.7",
+    "axios": "^0.19.2",
     "core-js": "^3.4.7",
     "d3-collection": "^1.0.7",
     "imagesloaded": "^4.1.4",

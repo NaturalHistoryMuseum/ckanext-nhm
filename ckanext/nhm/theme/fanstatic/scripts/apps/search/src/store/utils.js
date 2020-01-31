@@ -1,26 +1,25 @@
+import axios from 'axios';
+
+const api = axios.create({
+                             baseURL: '/api/3/action/',
+                             timeout: 5000,
+                             headers: {
+                                 'Content-Type': 'application/json'
+                             }
+                         });
+
 export function post(action, body) {
-    return fetch('/api/3/action/' + action, {
-        method:      'POST',
-        mode:        'cors',
-        cache:       'no-cache',
-        credentials: 'same-origin',
-        headers:     {
-            'Content-Type': 'application/json'
-        },
-        redirect:    'follow',
-        referrer:    'no-referrer',
-        body:        JSON.stringify(body)
-    }).then(response => {
-        return response.json();
-    });
+    return api.post(action, body)
+              .then(response => {
+                  return response.data;
+              });
 }
 
 export function get(action) {
-    return fetch('/api/3/action/' + action, {
-        method: 'GET'
-    }).then(response => {
-        return response.json();
-    })
+    return api.get(action)
+              .then(response => {
+                  return response.data;
+              })
 }
 
 export function camelCase(str) {

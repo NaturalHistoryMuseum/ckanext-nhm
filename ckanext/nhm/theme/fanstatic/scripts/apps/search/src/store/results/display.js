@@ -73,13 +73,16 @@ let display = {
                 .then(data => {
                     if (data.success) {
                         headers = headers.concat(data.result.map(f => d3.keys(f.fields)));
-                        headers.forEach(h => {
-                            if (!context.state.headers.map(x => JSON.stringify(x))
-                                        .includes(JSON.stringify(h))) {
-                                context.state.headers.push(h)
-                            }
-                        });
                     }
+                })
+                .catch()
+                .finally(() => {
+                    headers.forEach(h => {
+                        if (!context.state.headers.map(x => JSON.stringify(x))
+                                    .includes(JSON.stringify(h))) {
+                            context.state.headers.push(h)
+                        }
+                    });
                 });
         },
     }

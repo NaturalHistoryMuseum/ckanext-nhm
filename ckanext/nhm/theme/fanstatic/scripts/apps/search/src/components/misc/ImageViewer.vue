@@ -47,8 +47,8 @@
                 </span>
             </div>
             <a class="image-viewer-icon" v-if="!isMAM" :href="viewerImage.image.preview" download><i
-                class="fas fa-cloud-download-alt fa-2x"></i></a>
-            <span class="image-viewer-icon" @click="hideImage"><i class="fas fa-times fa-2x"></i></span>
+                class="fas fa-cloud-download-alt fa-2x"></i></a> <span class="image-viewer-icon"
+                                                                       @click="hideImage"><i class="fas fa-times fa-2x"></i></span>
         </div>
         <div class="scrolling-arrows">
             <div class="scroll-left" @click="previousImage" v-if="!firstImage">
@@ -145,16 +145,24 @@
                     'asset_id':    this.viewerImage.image.id,
                     'email':       this.email
                 };
-                console.log(body);
 
                 this.downloadStatus.loading = true;
-                post('download_image', body).then(data => {
-                    this.downloadStatus.loading = false;
-                    this.downloadStatus.failed  = !data.success;
-                    if (data.success) {
-                        this.download = data;
-                    }
-                })
+                this.downloadStatus.failed  = false;
+                post('download_image', body)
+                    .then(data => {
+                        if (data.success) {
+                            this.download = data;
+                        }
+                        else {
+                            throw Error;
+                        }
+                    })
+                    .catch(error => {
+                        this.downloadStatus.failed = true;
+                    })
+                    .finally(() => {
+                        this.downloadStatus.loading = false;
+                    })
             }
         },
         mounted() {

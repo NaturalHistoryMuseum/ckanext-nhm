@@ -70,8 +70,10 @@ const store = new Vuex.Store(
                         context.dispatch('results/runSearch', 0);
                     }
                     else {
-                        context.commit('results/query/filters/resetFilters');
+                        throw Error;
                     }
+                }).catch(error => {
+                    context.commit('results/query/filters/resetFilters');
                 });
             },
         }
