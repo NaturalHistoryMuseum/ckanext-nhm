@@ -195,23 +195,43 @@
 
             },
             downloadOtherImage() {
-                return axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
-                     .then(response => {
-                         if (response.status === 200 &&
-                             response.data instanceof Blob &&
-                             response.data.type.startsWith('image/')) {
-                             let imageType = response.data.type.split('/')[1];
+                let link      = document.createElement('a');
+                let imageName = this.viewerImage.image.preview.split('/').slice(-1)
+                                    .pop() || camelCase(this.viewerImage.image.title);
+                let downloader;
 
-                             let link      = document.createElement('a');
-                             link.download = camelCase(this.viewerImage.image.title) + '.' + imageType;
-                             link.href     = URL.createObjectURL(response.data);
-                             link.click();
-                             URL.revokeObjectURL(link.href);
-                         }
-                         else {
-                             throw Error;
-                         }
-                     });
+                const regx = /\.[A-Za-z]{3,4}$/gm;
+                if (regx.test(this.viewerImage.image.preview)) {
+                    downloader = new Promise(resolve => {
+                        link.href     = this.viewerImage.image.preview;
+                        link.download = imageName;
+                    });
+
+                }
+                else {
+                    downloader = axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
+                                      .then(response => {
+                                          if (response.status === 200 &&
+                                              response.data instanceof Blob &&
+                                              response.data.type.startsWith('image/')) {
+                                              let imageType = response.data.type.split('/')[1];
+
+                                              link.download = imageName + '.' + imageType;
+                                              link.href     = URL.createObjectURL(response.data);
+                                          }
+                                          else {
+                                              throw Error;
+                                          }
+                                      });
+                }
+
+
+                downloader.then(() => {
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                });
+
+                return downloader;
             }
         },
         mounted() {
