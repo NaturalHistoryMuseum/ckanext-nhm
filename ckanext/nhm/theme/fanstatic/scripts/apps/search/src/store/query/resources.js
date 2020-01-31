@@ -44,6 +44,10 @@ let resources = {
                 !getters.allResourceIds.includes(r);
             });
             return invalidIds.length > 0 ? invalidIds : null;
+        },
+        packageResources:       (state) => (packageIx) => {
+            let pkg = state.packageList[packageIx];
+            return pkg.resourceIds;
         }
     },
     mutations:  {
