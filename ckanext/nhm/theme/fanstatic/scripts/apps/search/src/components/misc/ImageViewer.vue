@@ -43,12 +43,12 @@
                 <span class="image-viewer-icon"
                       @click="showDownload = !showDownload"
                       id="show-download">
-                    <i class="fas fa-cloud-download-alt"></i>
+                    <i class="fas fa-cloud-download-alt fa-2x"></i>
                 </span>
             </div>
             <a class="image-viewer-icon" v-if="!isMAM" :href="viewerImage.image.preview" download><i
-                class="fas fa-cloud-download-alt"></i></a> <span class="image-viewer-icon"
-                                                                 @click="hideImage"><i class="fas fa-times"></i></span>
+                class="fas fa-cloud-download-alt fa-2x"></i></a>
+            <span class="image-viewer-icon" @click="hideImage"><i class="fas fa-times fa-2x"></i></span>
         </div>
         <div class="scrolling-arrows">
             <div class="scroll-left" @click="previousImage" v-if="!firstImage">
