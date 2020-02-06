@@ -195,12 +195,13 @@
 
             },
             downloadOtherImage() {
-                let link       = document.createElement('a');
-                let imageName  = this.viewerImage.image.preview.split('/').slice(-1)
-                                     .pop() || camelCase(this.viewerImage.image.title);
+                let link      = document.createElement('a');
+                let imageName = this.viewerImage.image.preview.split('/').slice(-1)
+                                    .pop().split('.').slice(0, -1)
+                                    .join('') || camelCase(this.viewerImage.image.title);
+
                 let downloader = axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
                                       .then(response => {
-                                          console.log(response);
                                           if (response.status === 200 &&
                                               response.data instanceof Blob &&
                                               response.data.type.startsWith('image/')) {
