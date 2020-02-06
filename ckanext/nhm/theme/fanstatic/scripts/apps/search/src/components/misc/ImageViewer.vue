@@ -195,22 +195,12 @@
 
             },
             downloadOtherImage() {
-                let link      = document.createElement('a');
-                let imageName = this.viewerImage.image.preview.split('/').slice(-1)
-                                    .pop() || camelCase(this.viewerImage.image.title);
-                let downloader;
-
-                const regx = /\.[A-Za-z]{3,4}$/gm;
-                if (regx.test(this.viewerImage.image.preview)) {
-                    downloader = new Promise(resolve => resolve()).then(() => {
-                        link.href     = this.viewerImage.image.preview;
-                        link.download = imageName;
-                    });
-
-                }
-                else {
-                    downloader = axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
+                let link       = document.createElement('a');
+                let imageName  = this.viewerImage.image.preview.split('/').slice(-1)
+                                     .pop() || camelCase(this.viewerImage.image.title);
+                let downloader = axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
                                       .then(response => {
+                                          console.log(response);
                                           if (response.status === 200 &&
                                               response.data instanceof Blob &&
                                               response.data.type.startsWith('image/')) {
@@ -223,7 +213,6 @@
                                               throw Error;
                                           }
                                       });
-                }
 
 
                 downloader.then(() => {
