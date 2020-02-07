@@ -33,7 +33,7 @@ let display = {
                 'osd_conformance':  'not reviewed',
                 'domain_data':      'False',
                 'title':            'Licence not specified',
-                'url':              '',
+                'url':              'https://opensource.org/licenses',
                 'is_generic':       'True',
                 'is_okd_compliant': false,
                 'is_osi_compliant': false,
