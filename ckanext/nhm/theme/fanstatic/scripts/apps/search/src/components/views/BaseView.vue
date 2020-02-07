@@ -18,6 +18,7 @@
             ...mapState('results', ['resultData', 'page']),
             ...mapState('results/display', ['headers']),
             ...mapGetters('results', ['total', 'records']),
+            ...mapGetters('results/display', ['licenceFromId']),
             ...mapGetters('results/query/resources', ['resourceDetails'])
         },
         methods:  {
@@ -33,19 +34,27 @@
                     resourceUrl,
                     titleField: resourceDetails.raw._title_field || '_id',
                     imageField: resourceDetails.raw._image_field,
-                    imageDelimiter: resourceDetails.raw._image_delimiter || ''
+                    imageDelimiter: resourceDetails.raw._image_delimiter || '',
+                    imageLicence: this.licenceFromId(resourceDetails.raw._image_licence)
                 }
             },
             getImages(item, first) {
                 let images;
+
+                let resourceDetails = this.getDetails(item.resource);
+
                 if (item.data.associatedMedia !== undefined) {
                     try {
                         images = item.data.associatedMedia.map((img) => {
+                            let imgLicence = img.license === resourceDetails.imageLicence.url ?
+                                resourceDetails.imageLicence :
+                                {title: img.license, url: img.license};
                             return {
                                 preview: img.identifier,
                                 thumb:   img.identifier.replace('preview', 'thumbnail'),
                                 title:   img.title,
-                                id:      img.assetID
+                                id:      img.assetID,
+                                licence: imgLicence
                             };
                         });
                     } catch (e) {
@@ -54,7 +63,6 @@
                 }
                 else {
                     try {
-                        let resourceDetails = this.getDetails(item.resource);
                         let imageFieldValue = item.data[resourceDetails.imageField];
                         if (imageFieldValue === undefined) {
                             images = [];
@@ -70,7 +78,8 @@
                                 preview: img,
                                 thumb:   img,
                                 title:   item.data[resourceDetails.titleField],
-                                id:      `${item.data._id}_${ix}`
+                                id:      `${item.data._id}_${ix}`,
+                                licence: resourceDetails.imageLicence
                             }
                         });
                     } catch (e) {

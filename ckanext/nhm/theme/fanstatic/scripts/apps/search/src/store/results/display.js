@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import * as d3 from 'd3-collection';
-import {post} from '../utils';
+import {get, post} from '../utils';
 
 let display = {
     namespaced: true,
     state:      {
         view:              'Table',
         headers:           [],
+        licences:          {},
         viewerImageIndex:  0,
         viewerImagePage:   [],
         showImage:         false,
@@ -22,6 +23,30 @@ let display = {
         },
         filteredRecordHeader: (state) => (recordCount) => {
             return `${recordCount.toLocaleString('en-GB')} ${state.filteredRecordTag.replace('$', recordCount === 1 ? '' : 's')}`
+        },
+        licenceFromId:        (state) => (licenceId) => {
+            const noLicence = {
+                'status':           'active',
+                'maintainer':       '',
+                'od_conformance':   'not reviewed',
+                'family':           '',
+                'osd_conformance':  'not reviewed',
+                'domain_data':      'False',
+                'title':            'Licence not specified',
+                'url':              '',
+                'is_generic':       'True',
+                'is_okd_compliant': false,
+                'is_osi_compliant': false,
+                'domain_content':   'False',
+                'domain_software':  'False',
+                'id':               'notspecified'
+            };
+
+            if (state.licences.length === 0) {
+                return noLicence;
+            }
+
+            return state.licences[licenceId] || noLicence;
         }
     },
     mutations:  {
@@ -85,6 +110,20 @@ let display = {
                     });
                 });
         },
+        getLicences(context) {
+            get('license_list').then(data => {
+                if (data.success) {
+                    context.state.licences = d3.nest()
+                                               .key(l => l.id)
+                                               .rollup(l => {
+                                                   let licence = l[0];
+                                                   licence.url = licence.url === '' ? 'https://opensource.org/licenses' : licence.url;
+                                                   return licence;
+                                               })
+                                               .object(data.result)
+                }
+            })
+        }
     }
 };
 

@@ -85,7 +85,12 @@
              :alt="viewerImage.image.title"
              class="main-image" :class="{loading: loading}">
         <Loading v-if="loading"></Loading>
-
+        <div class="flex-container flex-center image-viewer-footer">
+            <small>Licence:</small>
+            <a :href="viewerImage.image.licence.url">
+                <small>{{ viewerImage.image.licence.title }}</small>
+            </a>
+        </div>
     </div>
 </template>
 
@@ -141,7 +146,7 @@
             },
             nextImage() {
                 if (!this.lastImage) {
-                    this.changeImage(this.viewerImageIndex + 1)
+                    this.changeImage(this.viewerImageIndex + 1);
                 }
             },
             changeImage(index) {

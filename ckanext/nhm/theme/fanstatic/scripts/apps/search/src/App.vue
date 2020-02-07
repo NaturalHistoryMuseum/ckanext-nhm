@@ -118,6 +118,7 @@
         created:    function () {
             this.getSchema();
             this.getPackageList();
+            this.getLicences();
         },
         methods:    {
             ...mapMutations('results/query', ['setSearch']),
@@ -125,6 +126,7 @@
             ...mapMutations('results/query/filters', ['resetFilters']),
             ...mapActions(['getSchema']),
             ...mapActions('results', ['runSearch', 'invalidate', 'reset']),
+            ...mapActions('results/display', ['getLicences']),
             ...mapActions('results/query', ['setRequestBody']),
             ...mapActions('results/query/resources', ['getPackageList'])
         },
