@@ -136,15 +136,17 @@
             ...mapMutations('results/display', ['hideImage', 'setViewerImage']),
             previousImage() {
                 if (!this.firstImage) {
-                    this.loading = true;
-                    this.setViewerImage(this.viewerImageIndex - 1);
+                    this.changeImage(this.viewerImageIndex - 1);
                 }
             },
             nextImage() {
                 if (!this.lastImage) {
-                    this.loading = true;
-                    this.setViewerImage(this.viewerImageIndex + 1);
+                    this.changeImage(this.viewerImageIndex + 1)
                 }
+            },
+            changeImage(index) {
+                this.loading = this.viewerImage.image.preview !== this.viewerImagePage[index].image.preview;
+                this.setViewerImage(index);
             },
             keyListener(event) {
                 if (event.key === 'ArrowRight') {
