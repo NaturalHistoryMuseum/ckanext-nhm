@@ -9,13 +9,11 @@ from flask import Blueprint
 from ckan.plugins import toolkit
 
 # bbcm = big butterfly count map :)
-# create a flask blueprint with a prefix
-blueprint = Blueprint(name=u'big-butterfly-count-map', import_name=__name__,
-                      url_prefix=u'/big-butterfly-count-map')
+# create a flask blueprint
+blueprint = Blueprint(name=u'big-butterfly-count-map', import_name=__name__)
 
 
-@blueprint.route(u'')
-@blueprint.route(u'/')
+@blueprint.route(u'/big-butterfly-count-map')
 def bbcm():
     '''
     Render the big butterfly count map page.
