@@ -1,3 +1,5 @@
+const baseUrl = window.location.origin;
+
 // these are the species we're going to show on the map
 const names = [
     'Pieris brassicae',
@@ -97,8 +99,8 @@ const params = {
 };
 
 // the tile and utf grid urls
-const tile_url = 'https://data.nhm.ac.uk/tiles/{z}/{x}/{y}.png?';
-const utf_grid_url = 'https://data.nhm.ac.uk/tiles/{z}/{x}/{y}.grid.json?';
+const tile_url = baseUrl + '/tiles/{z}/{x}/{y}.png?';
+const utf_grid_url = baseUrl + '/tiles/{z}/{x}/{y}.grid.json?';
 
 // build the query string
 let params_as_string = '';
@@ -140,7 +142,7 @@ utfGridLayer.on('click', function (event) {
             event.data.geo_filter['coordinates'][0].forEach(pair => {
                 points.push({'lat': pair[1], 'lon': pair[0]});
             });
-            fetch('https://data.nhm.ac.uk/api/3/action/datastore_search_raw', {
+            fetch(baseUrl + '/api/3/action/datastore_search_raw', {
                 method: 'post',
                 headers: {
                     'Accept': 'application/json',
@@ -213,7 +215,7 @@ function createPopup(latlng, specs) {
             popupContent += '<span class="commonName">' + commonName + '</span><br />';
         }
         popupContent += '<span class="scientificName">' + specimen.name + '</span><br /><br />';
-        popupContent += '<a target="_blank" href="https://data.nhm.ac.uk/object/' + specimen.occurrenceID + '/' + version.toString() + '">View on the Data Portal</a>';
+        popupContent += '<a target="_blank" href="' + baseUrl + '/object/' + specimen.occurrenceID + '/' + version.toString() + '">View on the Data Portal</a>';
         popupContent += '</div>';
 
         if (!!specimen.media) {
