@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "multisearch ui",
   "dependencies": {
-    "@babel/runtime": "^7.7.7",
+    "@babel/runtime": "^7.8.7",
     "axios": "^0.19.2",
     "core-js": "^3.4.7",
     "d3-collection": "^1.0.7",
@@ -18,9 +18,9 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.3",
+    "@babel/core": "^7.8.7",
     "@babel/plugin-transform-runtime": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-env": "^7.8.7",
     "babel-loader": "^8.0.6",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-preset-minify": "^0.5.1",
