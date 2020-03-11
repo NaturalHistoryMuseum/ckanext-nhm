@@ -423,14 +423,14 @@ body .default-text a:focus {
 .nowrap {
   white-space: nowrap;
 }
-.pad-children-h > * {
+.space-children-h > * {
   padding-left: 5px;
   padding-right: 5px;
 }
-.pad-children-h > *:first-child {
+.space-children-h > *:first-child {
   padding-left: 0;
 }
-.pad-children-h > *:last-child {
+.space-children-h > *:last-child {
   padding-right: 0;
 }
 .space-children-v > * {
@@ -442,6 +442,14 @@ body .default-text a:focus {
 }
 .space-children-v > *:last-child {
   margin-bottom: 0;
+}
+.pad-v {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.pad-h {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .pagination-wrapper .pagination {
   border: none !important;
