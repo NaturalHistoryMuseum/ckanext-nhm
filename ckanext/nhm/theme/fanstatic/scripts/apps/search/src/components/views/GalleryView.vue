@@ -1,7 +1,7 @@
 <template>
     <div class="view-component">
-        <Loading v-if="loading && imageRecords.length > 0"><h3>Loading {{ nLoaded }} of {{
-                                                               imageRecords.length }} images...</h3>
+        <Loading v-if="loading && loadedImageRecords.length > 0"><h3>Loading {{ nLoaded }} of {{
+                                                               loadedImageRecords.length }} images...</h3>
         </Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="flex-container flex-right">
@@ -11,7 +11,7 @@
              v-images-loaded:on.progress="loadImages"
              :class="{'processing': loading || loadError}">
             <div class="gallery-column-sizer"></div>
-            <div v-for="(record, recordIndex) in imageRecords"
+            <div v-for="(record, recordIndex) in loadedImageRecords"
                  :key="record.id"
                  class="gallery-tile">
                 <img @click="setViewerImage(recordIndex)"
@@ -22,7 +22,19 @@
                                                    record.imageTotal }}</small>
             </div>
         </div>
-
+        <div class="flex-container flex-column flex-center pad-v space-children-v" v-if="brokenImageRecords.length > 0">
+            <p>{{ brokenImageRecords.length }} thumbnail{{brokenImageRecords.length > 1 ? 's' : ''}} could not be loaded.</p>
+            <small>View <i class="fas" :class="showBroken ? 'fa-caret-square-up' : 'fa-caret-square-down'" @click="showBroken = !showBroken"></i></small>
+        </div>
+        <div class="full-width flex-container flex-wrap flex-between tiling-gallery" v-if="showBroken">
+            <div v-for="(record, recordIndex) in brokenImageRecords"
+                 :key="record.id" class="gallery-tile gallery-tile-tiny">
+                <img :src="record.image.thumb" :alt="record.image.preview"> <small class="gallery-tile-title">
+                <a :href="record.recordUrl">{{ record.recordTitle }}</a> </small>
+                <small class="gallery-tile-number">{{ record.recordImageIndex + 1 }} / {{
+                                                   record.imageTotal }}</small>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -50,7 +62,8 @@
                         hidden: true,
                         temp:   true
                     }
-                }
+                },
+                showBroken: false
             }
         },
         components: {
@@ -85,6 +98,18 @@
 
                 return imgRecords;
             },
+            loadedImageRecords() {
+                return this.imageRecords.filter(r => !r.image.isBroken);
+            },
+            brokenImageRecords() {
+                return this.imageRecords.filter(r => r.image.isBroken).map(r => {
+                    if (r.record.data.collectionCode !== undefined) {
+                        let collectionCode = r.record.data.collectionCode === 'BMNH(E)' ? 'ent' : r.record.data.collectionCode.toLowerCase();
+                        r.image.thumb = '/images/icons/' + collectionCode + '.svg';
+                    }
+                    return r;
+                })
+            }
         },
         methods:    {
             ...mapMutations('results/display', ['setViewerImage', 'addPageImages', 'setFilteredRecordTag']),
@@ -116,10 +141,12 @@
                 }
             });
             this.setFilteredRecordTag(this.recordTag + '$ with images');
-            this.addPageImages(this.imageRecords);
+            this.addPageImages(this.loadedImageRecords);
             setTimeout(() => {
                 this.loadTimeout = true;
             }, 1000)
+
+            this.loading = this.loadedImageRecords.length > 0;
         }
     }
 </script>

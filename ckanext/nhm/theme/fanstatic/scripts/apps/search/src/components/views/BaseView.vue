@@ -6,6 +6,8 @@
 
 <script>
     import {mapGetters, mapMutations, mapState} from 'vuex';
+    import axios from 'axios';
+    import SparkMD5 from 'spark-md5';
 
     export default {
         name:     'BaseView',
@@ -32,14 +34,17 @@
                 return {
                     packageUrl,
                     resourceUrl,
-                    titleField: resourceDetails.raw._title_field || '_id',
-                    imageField: resourceDetails.raw._image_field,
+                    titleField:     resourceDetails.raw._title_field || '_id',
+                    imageField:     resourceDetails.raw._image_field,
                     imageDelimiter: resourceDetails.raw._image_delimiter || '',
-                    imageLicence: this.licenceFromId(resourceDetails.raw._image_licence)
+                    imageLicence:   this.licenceFromId(resourceDetails.raw._image_licence)
                 }
             },
             getImages(item, first) {
                 let images;
+                const noImageSize = 1164;
+                const noImageHash = 'b67da4c749bc536ddf27339cb0ec4e63';
+
 
                 let resourceDetails = this.getDetails(item.resource);
 
@@ -49,12 +54,24 @@
                             let imgLicence = img.license === resourceDetails.imageLicence.url ?
                                 resourceDetails.imageLicence :
                                 {title: img.license, url: img.license};
+                            let imgThumb   = img.identifier.replace('preview', 'thumbnail');
+                            let isBroken   = false;
+                            axios.get(imgThumb, {responseType: 'blob'}).then(d => {
+                                if (d.data.size === noImageSize) {
+                                    let fileReader = new FileReader();
+                                    fileReader.onloadend = function () {
+                                        isBroken = SparkMD5.ArrayBuffer.hash(fileReader.result) === noImageHash;
+                                    }
+                                    fileReader.readAsArrayBuffer(d.data);
+                                }
+                            })
                             return {
-                                preview: img.identifier,
-                                thumb:   img.identifier.replace('preview', 'thumbnail'),
-                                title:   img.title,
-                                id:      img.assetID,
-                                licence: imgLicence
+                                preview:  img.identifier,
+                                thumb:    imgThumb,
+                                title:    img.title,
+                                id:       img.assetID,
+                                licence:  imgLicence,
+                                isBroken: isBroken
                             };
                         });
                     } catch (e) {
@@ -75,11 +92,12 @@
                         }
                         images = images.map((img, ix) => {
                             return {
-                                preview: img,
-                                thumb:   img,
-                                title:   item.data[resourceDetails.titleField],
-                                id:      `${item.data._id}_${ix}`,
-                                licence: resourceDetails.imageLicence
+                                preview:  img,
+                                thumb:    img,
+                                title:    item.data[resourceDetails.titleField],
+                                id:       `${item.data._id}_${ix}`,
+                                licence:  resourceDetails.imageLicence,
+                                isBroken: false
                             }
                         });
                     } catch (e) {

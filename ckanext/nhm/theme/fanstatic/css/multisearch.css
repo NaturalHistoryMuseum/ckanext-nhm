@@ -607,6 +607,9 @@
   transform: scale(1.1);
   z-index: 100;
 }
+.tiling-gallery .gallery-tile-tiny {
+  width: 75px;
+}
 .tiling-gallery .gallery-tile-title {
   position: absolute;
   bottom: 5px;
