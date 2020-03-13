@@ -58,7 +58,7 @@ let results = {
             return getters.records.map(r => r.resource);
         },
         pageParam:         (state) => {
-            return Buffer.from(pako.deflate(JSON.stringify(state._after))).toString('base64');
+            return Buffer.from(pako.deflate(JSON.stringify(state._after), {to: 'array'})).toString('base64');
         },
         after: (state, getters) => {
             return state._after.map(a => {
