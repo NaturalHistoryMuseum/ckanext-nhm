@@ -19,7 +19,7 @@ let results = {
         doi:             null,
         download:        null,
         queryParams:     null,
-        _after:           [],
+        _after:          [],
         page:            0,
         status:          {
             resultData: {
@@ -58,9 +58,26 @@ let results = {
             return getters.records.map(r => r.resource);
         },
         pageParam:         (state) => {
-            return Buffer.from(pako.deflate(JSON.stringify(state._after), {to: 'array'})).toString('base64');
+            function compressString(arr) {
+                let str = JSON.stringify(arr);
+                let compressedString   = Buffer.from(pako.deflate(str, {to: 'array'}))
+                                               .toString('base64');
+                let decompressedString = pako.inflate(Buffer.from(compressedString, 'base64'), {to: 'string'});
+                if (str !== decompressedString) {
+                    console.error(decompressedString);
+                    if (arr.length === 1) {
+                        return '';
+                    }
+                    else {
+                        return compressString(arr.slice(0, arr.length - 1))
+                    }
+                }
+                return compressedString;
+            }
+
+            return compressString(state._after.slice(0, state.page + 1));
         },
-        after: (state, getters) => {
+        after:             (state, getters) => {
             return state._after.map(a => {
                 return [a[0], a[1], getters['query/resources/sortedResources'][a[2]]]
             })

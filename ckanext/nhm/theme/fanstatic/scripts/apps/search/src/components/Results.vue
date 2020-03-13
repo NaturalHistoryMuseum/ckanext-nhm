@@ -66,7 +66,7 @@
                                 <span :style="{minWidth: ((22 + slug.length) * 9.6) + 'px', width: '100%', wordBreak: 'break-all'}">{{ shareUrl }}</span>
                             </Copyable>
                             <div class="form-row flex-container flex-wrap flex-around">
-                                <div>
+                                <div v-if="page > 0">
                                     <label for="chkSharePage">Include page</label>
                                     <input type="checkbox" id="chkSharePage" v-model="includeSharePage">
                                 </div>
@@ -264,7 +264,7 @@
                 if (this.includeShareView) {
                     params.push(`view=${this.view.toLowerCase()}`);
                 }
-                if (this.includeSharePage) {
+                if (this.includeSharePage && this.pageParam !== '') {
                     params.push(`page=${this.pageParam}`);
                 }
                 if (params.length > 0) {
