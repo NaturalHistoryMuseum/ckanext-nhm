@@ -1408,6 +1408,11 @@ iframe {
   color: #5B5B5B;
   font-size: 12px;
 }
+input[type="radio"],
+input[type="checkbox"] {
+  position: relative;
+  top: 3px;
+}
 .privacy-warning {
   text-align: left;
   padding: 10px 0 5px 0;
