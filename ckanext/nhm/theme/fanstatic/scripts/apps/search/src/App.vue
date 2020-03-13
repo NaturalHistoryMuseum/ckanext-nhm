@@ -116,6 +116,9 @@
             }
         },
         created:    function () {
+            if (this.$route.params !== undefined){
+                this.$store.dispatch('resolveUrl', this.$route);
+            }
             this.getSchema();
             this.getPackageList();
             this.getLicences();

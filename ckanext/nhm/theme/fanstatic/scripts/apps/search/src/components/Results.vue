@@ -63,8 +63,18 @@
                         <div v-if="slug !== null">
                             <p>Share this search:</p>
                             <Copyable :copy-text="'https://' + shareUrl" :display-text="shareUrl">
-                                <span class="nowrap">{{ shareUrl }}</span>
+                                <span :style="{minWidth: ((22 + slug.length) * 9.6) + 'px', width: '100%', wordBreak: 'break-all'}">{{ shareUrl }}</span>
                             </Copyable>
+                            <div class="form-row flex-container flex-wrap flex-around">
+                                <div>
+                                    <label for="chkSharePage">Include page</label>
+                                    <input type="checkbox" id="chkSharePage" v-model="includeSharePage">
+                                </div>
+                                <div>
+                                    <label for="chkShareView">Include view</label>
+                                    <input type="checkbox" id="chkShareView" v-model="includeShareView">
+                                </div>
+                            </div>
                             <small class="alert-warning">This link is for social sharing
                                 <em>only</em>. If you are intending to reference this search in a
                                                          publication, <a href="#"
@@ -178,7 +188,7 @@
         </div>
 
         <div class="pagination-wrapper"
-             v-if="after.length > 0 && !invalidated"
+             v-if="_after.length > 0 && !invalidated"
              :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
@@ -190,7 +200,7 @@
                 <li class="active">
                     <a href="#">{{ page + 1 }}</a>
                 </li>
-                <li v-if="after.length > page">
+                <li v-if="_after.length > page">
                     <a href="#" @click="runSearch(page + 1)">{{ page + 2}}</a>
                 </li>
             </ul>
@@ -225,6 +235,8 @@
                 showCite:     false,
                 showShare:    false,
                 showFields:   false,
+                includeSharePage: false,
+                includeShareView: false,
                 views:        ['Table', 'List', 'Gallery'],
                 doiForm:      {
                     email_address: null
@@ -238,15 +250,27 @@
             }
         },
         computed:   {
-            ...mapState('results', ['resultData', 'page', 'after', 'status', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
+            ...mapState('results', ['resultData', 'page', '_after', 'status', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
             ...mapState('results/display', ['view', 'headers']),
-            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds', 'records']),
+            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds', 'records', 'pageParam']),
             ...mapGetters('results/display', ['recordHeader', 'filteredRecordHeader']),
             viewComponent() {
                 return this.view + 'View';
             },
             shareUrl() {
-                return `data.nhm.ac.uk/search/${this.slug}`;
+                let Url = `data.nhm.ac.uk/search/${this.slug}`;
+
+                let params = []
+                if (this.includeShareView) {
+                    params.push(`view=${this.view.toLowerCase()}`);
+                }
+                if (this.includeSharePage) {
+                    params.push(`page=${this.pageParam}`);
+                }
+                if (params.length > 0) {
+                    Url += `?${params.join('&')}`
+                }
+                return Url;
             }
         },
         methods:    {
@@ -264,7 +288,7 @@
             citeNotShare() {
                 this.showShare = false;
                 this.showCite  = true;
-            }
+            },
         },
         watch:      {
             slug() {

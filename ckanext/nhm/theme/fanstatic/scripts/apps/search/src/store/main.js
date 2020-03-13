@@ -4,6 +4,8 @@ import results from './results/main';
 import $RefParser from 'json-schema-ref-parser';
 import * as d3 from 'd3-collection';
 import {post} from './utils';
+import pako from 'pako';
+import router from '../router';
 
 Vue.use(Vuex);
 
@@ -57,7 +59,10 @@ const store = new Vuex.Store(
                               context.state.appError   = true;
                           });
             },
-            resolveSlug(context, slug) {
+            resolveUrl(context, route) {
+                let slug      = route.params.slug;
+                let pageParam = route.query.page;
+                let viewParam = route.query.view;
                 if (slug === undefined || slug === '') {
                     context.commit('results/query/filters/resetFilters');
                     return;
@@ -67,7 +72,23 @@ const store = new Vuex.Store(
                 }).then(data => {
                     if (data.success) {
                         context.dispatch('results/query/setRequestBody', data.result);
-                        context.dispatch('results/runSearch', 0);
+
+                        let page = 0;
+                        if (pageParam !== undefined) {
+                            let compressedString = Buffer.from(pageParam, 'base64');
+                            let afterList        = JSON.parse(pako.inflate(compressedString, {to: 'string'}));
+                            if (afterList.length > 1) {
+                                afterList.forEach(a => {
+                                    context.commit('results/addPage', a)
+                                })
+                                page = afterList.length - 1;
+                            }
+                        }
+                        if (viewParam !== undefined){
+                            context.commit('results/display/setView', viewParam);
+                        }
+                        router.replace({query: {}, params: {}, path: '/search'})
+                        context.dispatch('results/runSearch', page);
                     }
                     else {
                         throw Error;

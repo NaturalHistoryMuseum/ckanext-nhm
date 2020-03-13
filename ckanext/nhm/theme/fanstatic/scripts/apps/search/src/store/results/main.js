@@ -2,6 +2,7 @@ import display from './display';
 import query from '../query/main';
 import {post} from '../utils';
 import Vue from 'vue';
+import pako from 'pako';
 
 let results = {
     // would rather not namespace this but there's a vuex bug with non-namespaced states
@@ -17,7 +18,8 @@ let results = {
         slug:            null,
         doi:             null,
         download:        null,
-        after:           [],
+        queryParams:     null,
+        _after:           [],
         page:            0,
         status:          {
             resultData: {
@@ -54,12 +56,20 @@ let results = {
         },
         resultResourceIds: (state, getters) => {
             return getters.records.map(r => r.resource);
+        },
+        pageParam:         (state) => {
+            return Buffer.from(pako.deflate(JSON.stringify(state._after))).toString('base64');
+        },
+        after: (state, getters) => {
+            return state._after.map(a => {
+                return [a[0], getters['query/resources/sortedResources'][a[1]]]
+            })
         }
     },
     mutations:  {
         addPage(state, after) {
-            if (state.after.indexOf(after) < 0) {
-                state.after.push(after);
+            if (state._after.indexOf(after) < 0) {
+                state._after.push(after);
             }
         },
         setPage(state, page) {
@@ -73,7 +83,7 @@ let results = {
             Vue.set(context.state.status.resultData, 'loading', true);
             Vue.set(context.state.status.resultData, 'failed', false);
             if (page === 0) {
-                context.state.after = [];
+                context.state._after = [];
             }
             context.commit('setPage', page);
             context.dispatch('display/getHeaders', {
@@ -81,7 +91,7 @@ let results = {
                 request: context.getters['query/requestBody'](false)
             });
 
-            context.commit('query/setAfter', context.state.after[context.state.page - 1]);
+            context.commit('query/setAfter', context.getters.after[context.state.page - 1]);
 
             let tempFilters = context.getters['query/filters/temporaryFilters'];
 
@@ -90,7 +100,9 @@ let results = {
                     context.state.resultData = data;
 
                     if (data.success && data.result.after !== null) {
-                        context.commit('addPage', data.result.after);
+                        let afterToAdd = [data.result.after[0], context.getters['query/resources/sortedResources']
+                            .indexOf(data.result.after[1].replace('nhm-', ''))]
+                        context.commit('addPage', afterToAdd);
                     }
                     if (!data.success) {
                         throw Error;
