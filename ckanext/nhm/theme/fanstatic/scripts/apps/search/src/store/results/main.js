@@ -62,7 +62,7 @@ let results = {
         },
         after: (state, getters) => {
             return state._after.map(a => {
-                return [a[0], getters['query/resources/sortedResources'][a[1]]]
+                return [a[0], a[1], getters['query/resources/sortedResources'][a[2]]]
             })
         }
     },
@@ -100,8 +100,8 @@ let results = {
                     context.state.resultData = data;
 
                     if (data.success && data.result.after !== null) {
-                        let afterToAdd = [data.result.after[0], context.getters['query/resources/sortedResources']
-                            .indexOf(data.result.after[1].replace('nhm-', ''))]
+                        let afterToAdd = [data.result.after[0], data.result.after[1], context.getters['query/resources/sortedResources']
+                            .indexOf(data.result.after[2].replace('nhm-', ''))]
                         context.commit('addPage', afterToAdd);
                     }
                     if (!data.success) {
