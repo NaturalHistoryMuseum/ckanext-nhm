@@ -119,6 +119,7 @@ let results = {
                 })
                 .catch(error => {
                     Vue.set(context.state.status.resultData, 'failed', true);
+                    console.error(error);
                 })
                 .finally(() => {
                     Vue.set(context.state.status.resultData, 'loading', false);
