@@ -75,16 +75,20 @@ const store = new Vuex.Store(
 
                         let page = 0;
                         if (pageParam !== undefined) {
-                            let compressedString = Buffer.from(pageParam, 'base64');
-                            let afterList        = JSON.parse(pako.inflate(compressedString, {to: 'string'}));
-                            if (afterList.length > 1) {
-                                afterList.forEach(a => {
-                                    context.commit('results/addPage', a)
-                                })
-                                page = afterList.length - 1;
+                            try {
+                                let compressedString = Buffer.from(pageParam, 'base64');
+                                let afterList        = JSON.parse(pako.inflate(compressedString, {to: 'string'}));
+                                if (afterList.length > 1) {
+                                    afterList.forEach(a => {
+                                        context.commit('results/addPage', a)
+                                    })
+                                    page = afterList.length - 1;
+                                }
+                            } catch (error) {
+                                console.log(error);
                             }
                         }
-                        if (viewParam !== undefined){
+                        if (viewParam !== undefined) {
                             context.commit('results/display/setView', viewParam);
                         }
                         router.replace({query: {}, params: {}, path: '/search'})
