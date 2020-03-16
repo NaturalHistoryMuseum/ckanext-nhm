@@ -250,8 +250,9 @@
             }
         },
         computed:   {
-            ...mapState('results', ['resultData', 'page', '_after', 'status', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
+            ...mapState('results', ['resultData', 'page', '_after', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
             ...mapState('results/display', ['view', 'headers']),
+            ...mapState('appState', ['status']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds', 'records', 'pageParam']),
             ...mapGetters('results/display', ['recordHeader', 'filteredRecordHeader']),
             viewComponent() {

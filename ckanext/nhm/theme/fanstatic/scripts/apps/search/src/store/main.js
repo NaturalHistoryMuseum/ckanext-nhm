@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VuexPersist from 'vuex-persist';
 import results from './results/main';
+import appState from './appState';
 import $RefParser from 'json-schema-ref-parser';
 import * as d3 from 'd3-collection';
 import {post} from './utils';
@@ -9,15 +11,24 @@ import router from '../router';
 
 Vue.use(Vuex);
 
+const stateStorage = new VuexPersist({
+                                         key:             'nhm-data-portal',
+                                         storage:         window.sessionStorage,
+                                         reducer:         state => ({
+                                             results: state.results
+                                         }),
+                                         supportCircular: true
+                                     })
+
 const store = new Vuex.Store(
     {
         modules:   {
-            results
+            results,
+            appState
         },
+        plugins:   [stateStorage.plugin],
         state:     {
-            appLoading: false,
-            appError:   false,
-            schema:     {
+            schema: {
                 groups: [],
                 terms:  {},
                 raw:    {}
@@ -35,9 +46,9 @@ const store = new Vuex.Store(
         mutations: {},
         actions:   {
             getSchema(context) {
-                context.state.appLoading = true;
-                context.state.appError   = false;
-                let schemaPath           = '/querySchemas/v1.0.0/v1.0.0.json';
+                context.state.appState.app.loading = true;
+                context.state.appState.app.error   = false;
+                let schemaPath                     = '/querySchemas/v1.0.0/v1.0.0.json';
                 $RefParser.dereference(schemaPath, {resolve: {http: {timeout: 2000}}})
                           .then(data => {
                               let groups = d3.keys(data.definitions.group.properties);
@@ -52,11 +63,11 @@ const store = new Vuex.Store(
                               };
                           })
                           .then(schema => {
-                              context.state.schema     = schema;
-                              context.state.appLoading = false;
+                              context.state.schema               = schema;
+                              context.state.appState.app.loading = false;
                           }, error => {
-                              context.state.appLoading = false;
-                              context.state.appError   = true;
+                              context.state.appState.app.loading = false;
+                              context.state.appState.app.error   = true;
                           });
             },
             resolveUrl(context, route) {

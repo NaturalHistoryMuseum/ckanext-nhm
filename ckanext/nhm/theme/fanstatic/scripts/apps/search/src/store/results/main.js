@@ -20,25 +20,7 @@ let results = {
         download:        null,
         queryParams:     null,
         _after:          [],
-        page:            0,
-        status:          {
-            resultData: {
-                loading: false,
-                failed:  false
-            },
-            slug:       {
-                loading: false,
-                failed:  false
-            },
-            doi:        {
-                loading: false,
-                failed:  false
-            },
-            download:   {
-                loading: false,
-                failed:  false
-            }
-        }
+        page:            0
     },
     getters:    {
         hasResult:         (state) => {
@@ -97,8 +79,8 @@ let results = {
     actions:    {
         runSearch(context, page) {
             page = page || 0;
-            Vue.set(context.state.status.resultData, 'loading', true);
-            Vue.set(context.state.status.resultData, 'failed', false);
+            Vue.set(context.rootState.appState.status.resultData, 'loading', true);
+            Vue.set(context.rootState.appState.status.resultData, 'failed', false);
             if (page === 0) {
                 context.state._after = [];
             }
@@ -135,11 +117,11 @@ let results = {
                     }
                 })
                 .catch(error => {
-                    Vue.set(context.state.status.resultData, 'failed', true);
+                    Vue.set(context.rootState.appState.status.resultData, 'failed', true);
                     console.error(error);
                 })
                 .finally(() => {
-                    Vue.set(context.state.status.resultData, 'loading', false);
+                    Vue.set(context.rootState.appState.status.resultData, 'loading', false);
                     context.state.invalidated = false;
                 });
 
@@ -164,8 +146,8 @@ let results = {
             }
         },
         getMetadata(context, payload) {
-            Vue.set(context.state.status[payload.meta], 'loading', true);
-            Vue.set(context.state.status[payload.meta], 'failed', false);
+            Vue.set(context.rootState.appState.status[payload.meta], 'loading', true);
+            Vue.set(context.rootState.appState.status[payload.meta], 'failed', false);
 
             let body = context.getters['query/requestBody'](false);
             if (payload.formData !== undefined) {
@@ -183,10 +165,10 @@ let results = {
                 })
                 .catch(error => {
                     context.state[payload.meta] = null;
-                    Vue.set(context.state.status[payload.meta], 'failed', true);
+                    Vue.set(context.rootState.appState.status[payload.meta], 'failed', true);
                 })
                 .finally(() => {
-                    Vue.set(context.state.status[payload.meta], 'loading', false);
+                    Vue.set(context.rootState.appState.status[payload.meta], 'loading', false);
                 });
         },
         getSlug(context) {

@@ -1,9 +1,9 @@
 <template>
     <div>
-        <Loading v-if="appLoading"></Loading>
-        <LoadError v-if="appError"></LoadError>
+        <Loading v-if="app.loading"></Loading>
+        <LoadError v-if="app.error"></LoadError>
         <ImageViewer v-if="showImage"></ImageViewer>
-        <div class="search-form multisearch-form" v-if="!appLoading && !appError">
+        <div class="search-form multisearch-form" v-if="!app.loading && !app.error">
             <div class="multisearch-simple flex-container flex-stretch-first flex-smallwrap space-children-v flex-right">
                 <div class="search-input control-group search-giant">
                     <label for="all" class="sr-only">Search</label> <input type="text"
@@ -99,7 +99,7 @@
             }
         },
         computed:   {
-            ...mapState(['appLoading', 'appError']),
+            ...mapState('appState', ['app']),
             ...mapGetters('results/query', ['requestBody']),
             ...mapState('results/query/resources', ['packageList', 'resourceIds']),
             ...mapState('results/display', ['showImage']),

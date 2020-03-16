@@ -9,11 +9,6 @@ let query = {
         filters
     },
     state:      {
-        parsingError: {
-            unknown:     false,
-            resourceIds: null,
-            queryBody:   null
-        },
         search:       null,
         after:        null
     },
@@ -54,16 +49,16 @@ let query = {
     },
     actions:    {
         setRequestBody(context, newBody) {
-            Vue.set(context.state.parsingError, 'resourceIds', context.getters['resources/invalidResourceIds'](newBody.resource_ids));
-            if (context.state.parsingError.resourceIds === null) {
+            Vue.set(context.rootState.appState.query.parsingError, 'resourceIds', context.getters['resources/invalidResourceIds'](newBody.resource_ids));
+            if (context.rootState.appState.query.parsingError.resourceIds === null) {
                 context.commit('resources/setResourceIds', newBody.resource_ids);
             }
             else {
                 return;
             }
             context.commit('filters/setFromQuery', newBody.query || {});
-            Vue.set(context.state.parsingError, 'queryBody', context.state.filters.parsingError);
-            if (context.state.parsingError.queryBody !== null) {
+            Vue.set(context.rootState.appState.query.parsingError, 'queryBody', context.state.filters.parsingError);
+            if (context.rootState.appState.query.parsingError.queryBody !== null) {
                 return;
             }
 
