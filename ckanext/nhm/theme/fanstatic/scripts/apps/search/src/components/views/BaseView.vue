@@ -56,20 +56,15 @@
                                 {title: img.license, url: img.license};
                             let imgThumb   = img.identifier.replace('preview', 'thumbnail');
                             let isBroken   = false;
-                            try {
-                                axios.get(imgThumb, {responseType: 'blob'}).then(d => {
-                                    if (d.data.size === noImageSize) {
-                                        let fileReader       = new FileReader();
-                                        fileReader.onloadend = function () {
-                                            isBroken = SparkMD5.ArrayBuffer.hash(fileReader.result) === noImageHash;
-                                        }
-                                        fileReader.readAsArrayBuffer(d.data);
+                            axios.get(imgThumb, {responseType: 'blob'}).then(d => {
+                                if (d.data.size === noImageSize) {
+                                    let fileReader       = new FileReader();
+                                    fileReader.onloadend = function () {
+                                        isBroken = SparkMD5.ArrayBuffer.hash(fileReader.result) === noImageHash;
                                     }
-                                })
-                            }
-                            catch (e) {
-                                // just assume it's fine I guess
-                            }
+                                    fileReader.readAsArrayBuffer(d.data);
+                                }
+                            }).catch(e => {})
                             return {
                                 preview:  img.identifier,
                                 thumb:    imgThumb,
