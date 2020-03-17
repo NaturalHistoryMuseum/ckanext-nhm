@@ -15,7 +15,7 @@ nhmgit = 'git+https://github.com/NaturalHistoryMuseum/'
 
 dependencies = {'ckanext-spatial': 'git+https://github.com/ckan/ckanext-spatial.git#egg=ckanext-spatial',
 'ckanext-viewhelpers': 'git+https://github.com/ckan/ckanext-viewhelpers.git#egg=ckanext_viewhelpers',
-'ckanext-dcat': 'git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext_dcat',
+'ckanext-dcat': 'git+https://github.com/ckan/ckanext-dcat.git@v1.0.0#egg=ckanext_dcat',
 'ckanext-pdfview': 'git+https://github.com/ckan/ckanext-pdfview.git#egg=ckanext_pdfview',
 'ckanext-contact': nhmgit + 'ckanext-contact.git#egg=ckanext-contact',
 'ckanext-doi': nhmgit + 'ckanext-doi.git#egg=ckanext-doi',
