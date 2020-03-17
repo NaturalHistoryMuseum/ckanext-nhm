@@ -1,0 +1,72 @@
+@import "variables";
+
+.load-fonts();
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: @font-title;
+}
+
+html, body, #map {
+    height: 100%;
+    width: 100%;
+}
+
+.specimen_popup {
+    height: 500px;
+    overflow-y: auto;
+    width: 500px;
+}
+
+.specimen_popup_small {
+    height: 100%;
+}
+
+.specimen {
+    display: flex;
+    border-bottom: #d8d0d0 1px solid;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    width: 470px;
+}
+
+.specimenDetails {
+    flex: 50%;
+    font-family: @font-title;
+}
+
+.scientificName {
+    font-style: italic;
+}
+
+.commonName {
+    font-weight: bold;
+}
+
+.specimenMedia {
+    flex: 50%;
+}
+
+.specimen img {
+    width: 250px;
+}
+
+#details {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    width: 325px;
+    border: solid 1px black;
+    padding: 0 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2000;
+    margin: 10px;
+    font-size: 0.9em;
+}
+
+#logo {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

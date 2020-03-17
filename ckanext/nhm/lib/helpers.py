@@ -446,7 +446,7 @@ def get_map_styles():
     '''New map config overriding the marker point img'''
     return {
         u'point': {
-            u'iconUrl': u'/images/leaflet/marker.png',
+            u'iconUrl': u'/images/leaflet/marker-icon.png',
             u'iconSize': [20, 34],
             u'iconAnchor': [12, 30]
             }
