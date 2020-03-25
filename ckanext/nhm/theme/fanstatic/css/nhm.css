@@ -3099,3 +3099,6 @@ select,
   margin-left: auto;
   margin-right: auto;
 }
+.help_available_formats {
+  background-color: transparent !important;
+}
