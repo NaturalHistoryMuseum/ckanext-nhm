@@ -33,6 +33,7 @@ nhm_extensions = [
     u'ckanext-gallery',
     u'ckanext-gbif',
     u'ckanext-graph',
+    u'ckanext-iiif',
     u'ckanext-ldap',
     u'ckanext-list',
     u'ckanext-query-dois',
