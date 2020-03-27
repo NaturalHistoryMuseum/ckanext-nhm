@@ -10,6 +10,11 @@
         components: {
             FieldsDropdown
         },
-        props: ['data', 'comparison']
+        props: ['data', 'comparison'],
+        computed: {
+            showName() {
+                return this.data.display.name !== '' && this.data.display.name !== undefined;
+            }
+        }
     }
 </script>

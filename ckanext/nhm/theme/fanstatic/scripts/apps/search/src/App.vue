@@ -1,9 +1,10 @@
 <template>
     <div>
-        <Loading v-if="loading"></Loading>
-        <LoadError v-if="loadError"></LoadError>
-        <div class="search-form multisearch-form" v-if="!loading && !loadError">
-            <div class="multisearch-simple flex-container flex-stretch-first">
+        <Loading v-if="app.loading"></Loading>
+        <LoadError v-if="app.error"></LoadError>
+        <ImageViewer v-if="showImage"></ImageViewer>
+        <div class="search-form multisearch-form" v-if="!app.loading && !app.error">
+            <div class="multisearch-simple flex-container flex-stretch-first flex-smallwrap space-children-v flex-right">
                 <div class="search-input control-group search-giant">
                     <label for="all" class="sr-only">Search</label> <input type="text"
                                                                            class="search"
@@ -18,47 +19,52 @@
                         <i class="fas fa-search"></i> <span class="sr-only">Search</span>
                     </button>
                 </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="/help/search" target="_blank" class="collapse-to-icon"> Help
-                        <i class="fas inline-icon-right fa-question"></i> </a>
+                <div class="flex-container flex-nowrap">
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="/help/search" target="_blank" class="collapse-to-icon"> Help <i
+                            class="fas inline-icon-right fa-question"></i> </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
+                            Advanced <i class="fas inline-icon-right"
+                                        :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
+                        </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon"> Query
+                            <i class="inline-icon-right fas"
+                               :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#" @click="reset" class="collapse-to-icon"> Reset
+                            <i class="inline-icon-right fas fa-trash"></i> </a>
+                    </div>
+                    <div class="text-right nowrap" style="margin-left: 10px;">
+                        <a href="#"
+                           @click="showResources = !showResources"
+                           id="btnResources"
+                           class="collapse-to-icon"> Resources
+                            <i class="fas fa-list inline-icon-right"></i> </a>
+                    </div>
+                    <transition name="slidedown">
+                        <ResourceList v-if="showResources"
+                                      v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}"></ResourceList>
+                    </transition>
                 </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showAdvanced = !showAdvanced" class="collapse-to-icon">
-                        Advanced <i class="fas inline-icon-right"
-                                    :class="showAdvanced ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
-                    </a>
-                </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon"> Query <i
-                        class="inline-icon-right fas"
-                        :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
-                </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#" @click="resetFilters" class="collapse-to-icon"> Reset
-                        <i class="inline-icon-right fas fa-trash"></i> </a>
-                </div>
-                <div class="text-right" style="margin-left: 10px;">
-                    <a href="#"
-                       @click="showResources = !showResources"
-                       id="btnResources"
-                       class="collapse-to-icon"> Resources
-                        <i class="fas fa-list inline-icon-right"></i> </a>
-                </div>
-                <transition name="slidedown">
-                    <ResourceList v-if="showResources"
-                                  v-dismiss="{switch: 'showResources', ignore: ['#btnResources']}"></ResourceList>
-                </transition>
+
             </div>
             <transition name="slidedown">
                 <div class="multisearch-advanced flex-container" v-if="showAdvanced">
-                    <FilterGroup filter-id="group_1" v-bind:nest-level="0" key="root"></FilterGroup>
+                    <FilterGroup filter-id="group_root"
+                                 v-bind:nest-level="0"
+                                 key="root"></FilterGroup>
                 </div>
             </transition>
             <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery">
-                <pre>{{ requestBody }}</pre>
+                <pre>{{ requestBody(false) }}</pre>
             </Copyable>
 
-            <Results v-if="hasResult"></Results>
+            <Results></Results>
         </div>
     </div>
 </template>
@@ -69,7 +75,8 @@
     import FilterGroup from './components/FilterGroup.vue';
     import Results from './components/Results.vue';
     import Copyable from './components/misc/Copyable.vue';
-    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
+    import ImageViewer from './components/misc/ImageViewer.vue';
+    import {mapActions, mapMutations, mapState, mapGetters} from 'vuex';
 
     const ResourceList = import('./components/ResourceList.vue');
 
@@ -81,7 +88,8 @@
             LoadError,
             FilterGroup,
             Results,
-            Copyable
+            Copyable,
+            ImageViewer
         },
         data:       function () {
             return {
@@ -91,39 +99,51 @@
             }
         },
         computed:   {
-            ...mapState('constants', ['loading', 'loadError', 'packageList']),
-            ...mapGetters(['query', 'requestBody']),
-            ...mapState(['resourceIds']),
-            ...mapGetters('results', ['hasResult']),
+            ...mapState('appState', ['app']),
+            ...mapGetters('results/query', ['requestBody']),
+            ...mapState('results/query/resources', ['packageList', 'resourceIds']),
+            ...mapState('results/display', ['showImage']),
             search: {
                 get() {
-                    return this.$store.state.search;
+                    return this.$store.state.results.query.search;
                 },
                 set(value) {
-                    this.$store.commit('setSearch', value)
+                    this.setSearch(value);
                 }
+            },
+            watchedRequestBody() {
+                return this.requestBody(false);
             }
         },
         created:    function () {
-            this.$store.dispatch('constants/getSchema');
-            this.$store.dispatch('constants/getPackageList');
+            if (this.$route.params !== undefined){
+                this.$store.dispatch('resolveUrl', this.$route);
+            }
+            this.getSchema();
+            this.getPackageList();
+            this.getLicences();
         },
         methods:    {
-            ...mapActions('results', ['runSearch']),
-            ...mapMutations('filters', ['resetFilters']),
-            ...mapMutations('results', ['invalidateResults'])
+            ...mapMutations('results/query', ['setSearch']),
+            ...mapMutations('results/query/resources', ['selectAllResources']),
+            ...mapMutations('results/query/filters', ['resetFilters']),
+            ...mapActions(['getSchema']),
+            ...mapActions('results', ['runSearch', 'invalidate', 'reset']),
+            ...mapActions('results/display', ['getLicences']),
+            ...mapActions('results/query', ['setRequestBody']),
+            ...mapActions('results/query/resources', ['getPackageList'])
         },
         watch:      {
             packageList: function (newList, oldList) {
                 // if no resource ids are pre-selected,
                 // select all resource ids once the package list loads
                 if (oldList.length === 0 && this.resourceIds.length === 0) {
-                    this.$store.commit('selectAllResources');
+                    this.selectAllResources();
                 }
             },
-            requestBody: {
+            watchedRequestBody: {
                 handler() {
-                    this.invalidateResults();
+                    this.invalidate();
                 },
                 deep: true
             }

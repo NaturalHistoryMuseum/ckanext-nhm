@@ -1,21 +1,26 @@
 import Vue from 'vue';
-import App from './App.vue';
-import VueClipboard from 'vue-clipboard2'
+import VueRouter from 'vue-router';
+import VueClipboard from 'vue-clipboard2';
 import store from './store/main';
+import router from './router';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
 // for bundling purposes
 require('leaflet/dist/leaflet.css');
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
 
 // bundle leaflet images
 function importFolder(context) {
     context.keys().forEach(context);
 }
+
 importFolder(require.context('leaflet/dist/images/', true, /\.(png|jpe?g|gif)$/i));
 
+// plugins
 Vue.use(VueClipboard);
+Vue.use(VueRouter);
 
+// directives
 let outsideClick = {};
 Vue.directive('dismiss', {
     bind(el, binding, vnode) {
@@ -46,11 +51,13 @@ Vue.directive('dismiss', {
     }
 });
 
+// routes
+const RouterWrapper = { template: '<router-view></router-view>'}
+
+// app
 new Vue({
             el:      '#searchApp',
             store,
-            created: function () {
-                this.$store.dispatch('resolveSlug', $(this.$options.el).data('slug'));
-            },
-            render:  createElement => createElement(App),
+            render:  createElement => createElement(RouterWrapper),
+            router
         });

@@ -1,29 +1,30 @@
 <template>
     <pre>
-        {{ $store.state.results.current.result }}
+        {{ resultData.result }}
     </pre>
 </template>
 
 <script>
-    import {mapGetters, mapState, mapMutations} from 'vuex';
+    import {mapGetters, mapMutations, mapState} from 'vuex';
+    import axios from 'axios';
+    import SparkMD5 from 'spark-md5';
 
     export default {
         name:     'BaseView',
         data:     function () {
             return {
-                showFields:    false
+                showFields: false
             }
         },
-        mounted:  function () {
-            this.updateView();
-        },
         computed: {
-            ...mapState('results', ['current', 'headers', 'page']),
-            ...mapGetters('constants', ['resourceDetails']),
-            ...mapGetters('results', ['total', 'records'])
+            ...mapState('results', ['resultData', 'page']),
+            ...mapState('results/display', ['headers']),
+            ...mapGetters('results', ['total', 'records']),
+            ...mapGetters('results/display', ['licenceFromId']),
+            ...mapGetters('results/query/resources', ['resourceDetails'])
         },
         methods:  {
-            ...mapMutations('results', ['removeHeader', 'moveHeader']),
+            ...mapMutations('results/display', ['removeHeader', 'moveHeader']),
             getDetails(resourceId) {
                 let resourceDetails = this.resourceDetails[resourceId];
 
@@ -33,30 +34,86 @@
                 return {
                     packageUrl,
                     resourceUrl,
-                    titleField: resourceDetails.raw._title_field || '_id',
-                    imageField: resourceDetails.raw._image_field
+                    titleField:     resourceDetails.raw._title_field || '_id',
+                    imageField:     resourceDetails.raw._image_field,
+                    imageDelimiter: resourceDetails.raw._image_delimiter || '',
+                    imageLicence:   this.licenceFromId(resourceDetails.raw._image_licence)
                 }
             },
-            getImage(item) {
-                if (item.resource === '05ff2255-c38a-40c9-b657-4ccb55ab2feb') {
+            getImages(item, first) {
+                let images;
+                const noImageSize = 1164;
+                const noImageHash = 'b67da4c749bc536ddf27339cb0ec4e63';
+
+
+                let resourceDetails = this.getDetails(item.resource);
+
+                if (item.data.associatedMedia !== undefined) {
                     try {
-                        return item.data.associatedMedia[0].identifier.replace('preview', 'thumbnail');
-                    }
-                    catch (e) {
-                        return null;
+                        images = item.data.associatedMedia.map((img) => {
+                            let imgLicence = img.license === resourceDetails.imageLicence.url ?
+                                resourceDetails.imageLicence :
+                                {title: img.license, url: img.license};
+                            let imgThumb   = img.identifier.replace('preview', 'thumbnail');
+                            let isBroken   = false;
+                            axios.get(imgThumb, {responseType: 'blob'}).then(d => {
+                                if (d.data.size === noImageSize) {
+                                    let fileReader       = new FileReader();
+                                    fileReader.onloadend = function () {
+                                        isBroken = SparkMD5.ArrayBuffer.hash(fileReader.result) === noImageHash;
+                                    }
+                                    fileReader.readAsArrayBuffer(d.data);
+                                }
+                            }).catch(e => {})
+                            return {
+                                preview:  img.identifier,
+                                thumb:    imgThumb,
+                                title:    img.title,
+                                id:       img.assetID,
+                                licence:  imgLicence,
+                                isBroken: isBroken
+                            };
+                        });
+                    } catch (e) {
+                        images = [];
                     }
                 }
                 else {
                     try {
-                        return item.data[this.getDetails(item.resource).imageField][0];
+                        let imageFieldValue = item.data[resourceDetails.imageField];
+                        if (imageFieldValue === undefined) {
+                            images = [];
+                        }
+                        else if (resourceDetails.imageDelimiter !== '') {
+                            images = imageFieldValue.split(resourceDetails.imageDelimiter);
+                        }
+                        else {
+                            images = [imageFieldValue]
+                        }
+                        images = images.map((img, ix) => {
+                            return {
+                                preview:  img,
+                                thumb:    img,
+                                title:    item.data[resourceDetails.titleField],
+                                id:       `${item.data._id}_${ix}`,
+                                licence:  resourceDetails.imageLicence,
+                                isBroken: false
+                            }
+                        });
+                    } catch (e) {
+                        images = [];
                     }
-                    catch (e) {
-                        return null;
-                    }
+                }
+
+                if (first) {
+                    return images.length > 0 ? images[0] : null;
+                }
+                else {
+                    return images;
                 }
             },
             getValue(item, field) {
-                let v = {...item};
+                let v         = {...item};
                 let subFields = field.split('.');
 
                 let subItems = (parentItem, subField) => {
@@ -71,23 +128,11 @@
                 for (let i = 0; i < subFields.length; i++) {
                     try {
                         v = subItems(v, subFields[i])
-                    }
-                    catch (e) {
+                    } catch (e) {
                         break;
                     }
                 }
                 return v;
-            },
-            updateView() {
-                //
-            }
-        },
-        watch:    {
-            current: {
-                handler() {
-                    this.updateView();
-                },
-                deep: true
             }
         }
     }

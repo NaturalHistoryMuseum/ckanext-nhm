@@ -1,113 +1,117 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import VuexPersist from 'vuex-persist';
+import results from './results/main';
+import appState from './appState';
+import $RefParser from 'json-schema-ref-parser';
 import * as d3 from 'd3-collection';
-import constants from './constants';
-import results from './results';
-import filters from './filters';
+import {post} from './utils';
+import pako from 'pako';
+import router from '../router';
 
 Vue.use(Vuex);
 
+const stateStorage = new VuexPersist({
+                                         key:             'nhm-data-portal',
+                                         storage:         window.sessionStorage,
+                                         reducer:         state => ({
+                                             results: state.results
+                                         }),
+                                         supportCircular: true
+                                     })
+
 const store = new Vuex.Store(
     {
+        modules:   {
+            results,
+            appState
+        },
+        plugins:   [stateStorage.plugin],
         state:     {
-            search:      '',
-            resourceIds: []
+            schema: {
+                groups: [],
+                terms:  {},
+                raw:    {}
+            }
         },
         getters:   {
-            query:           (state, getters) => {
-                let q = {};
-                if (state.search !== null && state.search !== '') {
-                    q.search = state.search;
-                }
-                if (d3.values(state.filters.items).some((f) => f.parent !== null)) {
-                    q.filters = getters['filters/queryfy']('group_1');
-                }
-                return q;
-            },
-            requestBody:     (state, getters) => {
+            getGroup: state => groupId => {
                 return {
-                    query:        getters.query,
-                    resource_ids: getters.sortedResources
-                };
+                    'and': 'ALL OF',
+                    'or':  'ANY OF',
+                    'not': 'NONE OF'
+                }[groupId];
             },
-            sortedResources: (state) => {
-                return state.resourceIds.sort();
-            },
-            post:            () => (action, body) => {
-                return fetch('/api/3/action/' + action, {
-                    method:      'POST',
-                    mode:        'cors',
-                    cache:       'no-cache',
-                    credentials: 'same-origin',
-                    headers:     {
-                        'Content-Type': 'application/json'
-                    },
-                    redirect:    'follow',
-                    referrer:    'no-referrer',
-                    body:        JSON.stringify(body)
-                }).then(response => {
-                    return response.json();
-                });
-            }
         },
-        mutations: {
-            setSearch(state, searchString) {
-                state.search = searchString;
-            },
-            setResourceIds(state, resourceIds) {
-                state.resourceIds = resourceIds;
-            },
-            selectAllResources(state) {
-                let resourceIds = [];
-                state.constants.packageList.forEach((pkg) => {
-                    resourceIds = resourceIds.concat(pkg.resourceIds)
-                });
-                state.resourceIds = resourceIds;
-            },
-            togglePackageResources(state, packageIx) {
-                let pkg           = state.constants.packageList[packageIx];
-                let isInResources = pkg.resourceIds.some((r) => {
-                    return state.resourceIds.includes(r);
-                });
-                if (isInResources) {
-                    state.resourceIds = state.resourceIds.filter((resourceId) => {
-                        return !pkg.resourceIds.includes(resourceId);
-                    });
-                }
-                else {
-                    state.resourceIds = state.resourceIds.concat(pkg.resourceIds.filter((x) => {
-                        return !state.resourceIds.includes(x);
-                    }));
-                }
-            }
-        },
+        mutations: {},
         actions:   {
-            resolveSlug(context, slug) {
+            getSchema(context) {
+                context.state.appState.app.loading = true;
+                context.state.appState.app.error   = false;
+                let schemaPath                     = '/querySchemas/v1.0.0/v1.0.0.json';
+                $RefParser.dereference(schemaPath, {resolve: {http: {timeout: 2000}}})
+                          .then(data => {
+                              let groups = d3.keys(data.definitions.group.properties);
+                              let terms  = d3.nest()
+                                             .key(t => t.key.includes('_') ? t.key.split('_')[0] : 'other')
+                                             .rollup(leaves => leaves.map((l) => l.key.slice(l.key.indexOf('_') + 1) || ''))
+                                             .object(d3.entries(data.definitions.term.properties));
+                              return {
+                                  groups: groups,
+                                  terms:  terms,
+                                  raw:    data
+                              };
+                          })
+                          .then(schema => {
+                              context.state.schema               = schema;
+                              context.state.appState.app.loading = false;
+                          }, error => {
+                              context.state.appState.app.loading = false;
+                              context.state.appState.app.error   = true;
+                          });
+            },
+            resolveUrl(context, route) {
+                let slug      = route.params.slug;
+                let pageParam = route.query.page;
+                let viewParam = route.query.view;
                 if (slug === undefined || slug === '') {
-                    context.commit('filters/resetFilters');
+                    context.commit('results/query/filters/resetFilters');
                     return;
                 }
-                context.getters.post('datastore_resolve_slug', {
+                post('datastore_resolve_slug', {
                     slug: slug
                 }).then(data => {
                     if (data.success) {
-                        context.commit('setResourceIds', data.result.resource_ids);
-                        if (data.result.query.search !== undefined) {
-                            context.commit('setSearch', data.result.query.search)
+                        context.dispatch('results/query/setRequestBody', data.result);
+
+                        let page = 0;
+                        if (pageParam !== undefined) {
+                            try {
+                                let compressedString = Buffer.from(pageParam, 'base64');
+                                let afterList        = JSON.parse(pako.inflate(compressedString, {to: 'string'}));
+                                if (afterList.length > 1) {
+                                    afterList.forEach(a => {
+                                        context.commit('results/addPage', a)
+                                    })
+                                    page = afterList.length - 1;
+                                }
+                            } catch (error) {
+                                console.log(error);
+                            }
                         }
-                        context.commit('filters/setFromQuery', data.result.query);
-                        context.dispatch('results/runSearch', 0);
+                        if (viewParam !== undefined) {
+                            context.commit('results/display/setView', viewParam);
+                        }
+                        router.replace({query: {}, params: {}, path: '/search'})
+                        context.dispatch('results/runSearch', page);
                     }
                     else {
-                        context.commit('filters/resetFilters');
+                        throw Error;
                     }
+                }).catch(error => {
+                    context.commit('results/query/filters/resetFilters');
                 });
-            }
-        },
-        modules:   {
-            constants: constants,
-            results:   results,
-            filters:   filters
+            },
         }
     }
 );

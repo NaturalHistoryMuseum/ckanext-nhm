@@ -1,8 +1,11 @@
 <template>
-    <div class="flex-container">
-        <FieldsDropdown v-bind:fields="data.fields"></FieldsDropdown>
-        <span>{{ comparison === 'contains' ? '~' : '=' }}</span>
-        <span>{{ data.value }}</span>
+    <div class="filter-term filter-term-text">
+        <span v-if="showName" class="filter-term-name">{{data.display.name}}</span>
+        <div class="flex-container" v-if="!showName">
+            <FieldsDropdown v-bind:fields="data.content.fields"></FieldsDropdown>
+            <span>{{ comparison === 'contains' ? '~' : '=' }}</span>
+            <span>{{ data.content.value }}</span>
+        </div>
     </div>
 </template>
 
@@ -11,6 +14,6 @@
 
     export default {
         extends: BaseTerm,
-        name: 'TextTerm'
+        name:    'TextTerm'
     }
 </script>

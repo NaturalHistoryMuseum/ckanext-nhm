@@ -1,5 +1,5 @@
 <template>
-    <div class="term-editor floating flex-container flex-nowrap flex-stretch-height">
+    <div class="term-editor floating flex-container flex-smallwrap flex-stretch-height">
         <i class="fas fa-caret-square-left" @click="closeDialog"></i>
         <div class="term-editor-fields space-children-v" v-if="fieldType !== 'geo'">
             <div class="flex-container flex-wrap flex-wrap-spacing">
@@ -41,8 +41,12 @@
                                v-on:set-query-values="setQueryValues"></component>
                 </keep-alive>
             </div>
+            <div class="flex-container flex-column flex-stretch-height">
+                <span>Name (optional):</span>
+                <input type="text" v-model="termName">
+            </div>
             <div class="query-submit">
-                <button @click="submitTerm" class="btn btn-primary">Save</button>
+                <button @click="submitTerm" class="btn btn-primary no-icon">Save</button>
             </div>
         </div>
     </div>
@@ -50,7 +54,7 @@
 
 <script>
     import * as d3 from 'd3-collection';
-    import {mapMutations, mapState} from 'vuex'
+    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
     import TextEditor from './editors/TextEditor.vue';
     import NumberEditor from './editors/NumberEditor.vue';
     import GeoEditor from './editors/GeoEditor.vue';
@@ -72,6 +76,7 @@
                 newFields:          [],
                 fieldType:          'string',
                 comparisonType:     'equals',
+                termName:           null,
                 queryValues:        {},
                 readableFieldTypes: {
                     string: 'Text',
@@ -82,17 +87,19 @@
             };
 
             if (this.existingTermId !== undefined) {
-                let existing        = this.$store.getters['filters/getFilterById'](this.existingTermId);
+                let existing        = this.$store.getters['results/query/filters/getFilterById'](this.existingTermId);
                 data.newFields      = [...(existing.content.fields || [])];
                 data.fieldType      = existing.key.includes('_') ? existing.key.split('_')[0] : 'other';
                 data.comparisonType = existing.key.slice(existing.key.indexOf('_') + 1);
+                data.termName       = existing.display.name;
             }
 
             return data;
         },
         computed:   {
-            ...mapState('constants', ['schema']),
-            ...mapState(['resourceIds']),
+            ...mapState(['schema']),
+            ...mapState('results/query', ['resourceIds']),
+            ...mapGetters('results/query/filters', ['getFilterById']),
             terms:     function () {
                 let schemaTerms = this.schema.terms[this.fieldType];
                 let emptyTerms  = schemaTerms.length === 1 && (schemaTerms[0] === '' || schemaTerms[0] === null);
@@ -124,7 +131,8 @@
             }
         },
         methods:    {
-            ...mapMutations('filters', ['changeKey', 'changeContent', 'addTerm']),
+            ...mapMutations('results/query/filters', ['changeKey', 'changeContent', 'changeName']),
+            ...mapActions('results/query/filters', ['addTerm']),
             setQueryValues: function (queryValues) {
                 this.queryValues = queryValues;
             },
@@ -141,15 +149,31 @@
                 if (this.existingTermId !== undefined) {
                     this.changeKey({key: this.queryType, id: this.existingTermId});
                     this.changeContent({content: this.query, id: this.existingTermId});
+                    this.changeName({name: this.termName, id: this.existingTermId});
                 }
                 else {
                     this.addTerm({
-                                     parentId: this.parentId,
-                                     key:      this.queryType,
-                                     content:  this.query
+                                     parent:  this.parentId,
+                                     key:     this.queryType,
+                                     content: this.query,
+                                     display: {
+                                         name:    this.termName
+                                     }
+
                                  })
                 }
                 this.closeDialog();
+            },
+            resetQuery:     function () {
+                this.queryValues = {};
+            }
+        },
+        watch:      {
+            fieldType() {
+                this.resetQuery();
+            },
+            comparisonType() {
+                this.resetQuery();
             }
         }
     }

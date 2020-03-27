@@ -1,5 +1,5 @@
 <template>
-    <div style="position: relative;">
+    <div class="table-view view-component" style="position: relative;">
         <div class="scrolling-arrows">
             <div class="scroll-left"
                  @click="tableScroll(-100)"
@@ -42,17 +42,18 @@
 
             <template v-for="(item, ix) in records">
                 <div class="td small-column">{{ (page * 100) + ix + 1 }}</div>
-                <div class="td small-column"><a :href="getDetails(item.resource).packageUrl"> {{
-                                                                                              resourceDetails[item.resource].package_name
-                                                                                              }} </a>
+                <div class="td small-column"><a :href="getDetails(item.resource).packageUrl"
+                                                :title="resourceDetails[item.resource].package_name">{{ resourceDetails[item.resource].package_name }}</a>
                 </div>
-                <div class="td small-column"><a :href="getDetails(item.resource).resourceUrl"> {{
-                                                                                               resourceDetails[item.resource].name
-                                                                                               }} </a>
+                <div class="td small-column"><a :href="getDetails(item.resource).resourceUrl"
+                                                :title="resourceDetails[item.resource].name">
+                    {{ resourceDetails[item.resource].name }}
+                </a>
                 </div>
                 <div class="td small-column">
-                    <a :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`">
-                        {{ item.data._id }} </a></div>
+                    <a :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`"
+                       :title="item.data._id"><i class="fas fa-eye inline-icon-left"></i>View</a>
+                </div>
                 <div class="td" v-for="headerGroup in headers" :key="headerGroup.id">
                     <span v-for="header in headerGroup" :key="header.id" class="term-group">
                         {{ getValue(item.data, header) || '--' }}
@@ -86,6 +87,9 @@
                 this.scrollable();
             },
             scrollable() {
+                if (this.$refs.tableGrid === undefined) {
+                    return;
+                }
                 this.scrollableLeft  = this.tableGrid.scrollLeft() > 0;
                 let fullWidth        = this.$refs.tableGrid.scrollWidth;
                 let viewWidth        = this.tableGrid.width();

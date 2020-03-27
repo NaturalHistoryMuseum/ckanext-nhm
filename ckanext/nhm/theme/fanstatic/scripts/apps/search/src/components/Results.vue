@@ -1,13 +1,21 @@
 <template>
-    <div id="result" :class="{disabled: resultsInvalid}">
-        <div class="flex-container flex-center flex-column alert-error full-width" v-if="failed">
+    <div id="result">
+        <Loading v-if="status.resultData.loading"></Loading>
+        <LoadError v-if="status.resultData.failed">
             <h3>Something went wrong!</h3>
             <p>Please check your query and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
-        </div>
-        <div class="flex-container flex-left flex-stretch-first" v-if="hasResult">
-            <h3>{{ total.toLocaleString('en-GB') }} records</h3>
-            <div style="position: relative;">
+        </LoadError>
+        <div class="flex-container flex-left flex-stretch-first results-header"
+             v-if="hasResult"
+             :class="{disabled: invalidated}">
+            <div class="records-total">
+                <h3>{{ recordHeader(unfilteredTotal) }}</h3>
+                <small class="filtered-total">
+                    showing {{ (page * 100) + 1 }}-{{ (page * 100) + records.length }} of {{ filteredRecordHeader(total) }}
+                </small>
+            </div>
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup doi-popup"
                          v-if="showCite"
@@ -16,7 +24,7 @@
                         <Copyable :copy-text="'https://doi.org/' + doi" v-if="doi !== null">
                             <span class="nowrap">{{ doi }}</span>
                         </Copyable>
-                        <p class="alert-error" v-if="doiFailed">
+                        <p class="alert-error" v-if="status.doi.failed">
                             Failed to retrieve DOI. Please try again later. </p>
                         <div class="form-row" v-if="doi === null">
                             <label for="doi-email" class="control-label">
@@ -39,7 +47,7 @@
                                @click="getDOI(doiForm)"
                                class="btn btn-primary"
                                v-if="doi === null"><i class="fas"
-                                                      :class="doiLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
+                                                      :class="status.doi.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
                                 Create a DOI </a>
                         </div>
                     </div>
@@ -47,7 +55,7 @@
                 <a href="#" @click="showCite = !showCite" class="btn btn-disabled" id="show-cite">
                     <i class="fas fa-book"></i>Cite </a>
             </div>
-            <div style="position: relative;">
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup"
                          v-if="showShare"
@@ -55,8 +63,18 @@
                         <div v-if="slug !== null">
                             <p>Share this search:</p>
                             <Copyable :copy-text="'https://' + shareUrl" :display-text="shareUrl">
-                                <span class="nowrap">{{ shareUrl }}</span>
+                                <span :style="{minWidth: ((22 + slug.length) * 9.6) + 'px', width: '100%', wordBreak: 'break-all'}">{{ shareUrl }}</span>
                             </Copyable>
+                            <div class="form-row flex-container flex-wrap flex-around">
+                                <div v-if="page > 0">
+                                    <label for="chkSharePage">Include page</label>
+                                    <input type="checkbox" id="chkSharePage" v-model="includeSharePage">
+                                </div>
+                                <div>
+                                    <label for="chkShareView">Include view</label>
+                                    <input type="checkbox" id="chkShareView" v-model="includeShareView">
+                                </div>
+                            </div>
                             <small class="alert-warning">This link is for social sharing
                                 <em>only</em>. If you are intending to reference this search in a
                                                          publication, <a href="#"
@@ -64,16 +82,16 @@
                                                                          id="use-a-doi">use a
                                                                                         DOI</a>.</small>
                         </div>
-                        <p class="alert-error" v-if="slugFailed">
+                        <p class="alert-error" v-if="status.slug.failed">
                             Failed to retrieve link. Please try again later. </p>
                     </div>
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled" id="show-share">
                     <i class="fas"
-                       :class="slugLoading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
+                       :class="status.slug.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
                 </a>
             </div>
-            <div style="position: relative;">
+            <div class="info-popup-button">
                 <transition name="slidedown">
                     <div class="floating info-popup download-popup"
                          v-if="showDownload"
@@ -81,7 +99,7 @@
                         <p v-if="download !== null">
                             Success! You should receive an email at <b>{{ downloadForm.email_address
                                                                        }}</b> soon. </p>
-                        <p class="alert-error" v-if="downloadFailed">
+                        <p class="alert-error" v-if="status.download.failed">
                             The download request failed. Please try again later. </p>
                         <div v-if="download === null">
                             <p>The data will be extracted, with current filters applied, and sent to
@@ -128,8 +146,8 @@
                         <div class="text-right" v-if="download === null">
                             <a href="#"
                                class="btn btn-primary text-right"
-                               @click="requestDownload(downloadForm)"> <i class="fas"
-                                                                          :class="downloadProcessing ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                               @click="getDownload(downloadForm)"> <i class="fas"
+                                                                      :class="status.download.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
                                 Request Download </a>
                         </div>
                     </div>
@@ -141,13 +159,13 @@
                    id="show-download"> <i class="fas fa-cloud-download-alt"></i>Download </a>
             </div>
         </div>
-        <div>
+        <div v-if="hasResult" :class="{disabled: invalidated}">
             <div class="flex-container flex-stretch-first flex-center">
                 <ul class="nav nav-tabs">
                     <li v-for="viewTab in views"
                         :key="viewTab.id"
-                        :class="{active: currentView === viewTab}"
-                        @click="currentView = viewTab">
+                        :class="{active: view === viewTab}"
+                        @click="setView(viewTab)">
                         <a>{{ viewTab }}</a>
                     </li>
                 </ul>
@@ -164,11 +182,14 @@
                 </div>
             </div>
 
-
-            <component :is="viewComponent" v-if="hasRecords"></component>
+            <div>
+                <component :is="viewComponent" v-if="hasRecords"></component>
+            </div>
         </div>
 
-        <div class="pagination-wrapper" v-if="after.length > 0 && !resultsInvalid">
+        <div class="pagination-wrapper"
+             v-if="_after.length > 0 && !invalidated"
+             :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
                     <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>
@@ -179,7 +200,7 @@
                 <li class="active">
                     <a href="#">{{ page + 1 }}</a>
                 </li>
-                <li v-if="after.length > page">
+                <li v-if="_after.length > page">
                     <a href="#" @click="runSearch(page + 1)">{{ page + 2}}</a>
                 </li>
             </ul>
@@ -190,9 +211,12 @@
 <script>
     import TableView from './views/TableView.vue';
     import ListView from './views/ListView.vue';
+    import GalleryView from './views/GalleryView.vue';
     import FieldPicker from './misc/FieldPicker.vue';
     import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
     import Copyable from './misc/Copyable.vue';
+    import Loading from './Loading.vue';
+    import LoadError from './LoadError.vue'
 
     export default {
         name:       'Results',
@@ -200,7 +224,10 @@
             Copyable,
             TableView,
             ListView,
-            FieldPicker
+            GalleryView,
+            FieldPicker,
+            LoadError,
+            Loading
         },
         data:       function () {
             return {
@@ -208,8 +235,9 @@
                 showCite:     false,
                 showShare:    false,
                 showFields:   false,
-                views:        ['Table', 'List'],
-                currentView:  'Table',
+                includeSharePage: false,
+                includeShareView: false,
+                views:        ['Table', 'List', 'Gallery'],
                 doiForm:      {
                     email_address: null
                 },
@@ -222,21 +250,34 @@
             }
         },
         computed:   {
-            ...mapState('results', ['page', 'after', 'current', 'slug', 'failed',
-                                    'resultsLoading', 'slugLoading', 'resultsInvalid', 'doi',
-                                    'doiLoading', 'slugFailed', 'doiFailed', 'download',
-                                    'downloadProcessing', 'downloadFailed']),
-            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds']),
+            ...mapState('results', ['resultData', 'page', '_after', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
+            ...mapState('results/display', ['view', 'headers']),
+            ...mapState('appState', ['status']),
+            ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds', 'records', 'pageParam']),
+            ...mapGetters('results/display', ['recordHeader', 'filteredRecordHeader']),
             viewComponent() {
-                return this.currentView + 'View';
+                return this.view + 'View';
             },
             shareUrl() {
-                return `data.nhm.ac.uk/search/${this.slug}`;
+                let Url = `data.nhm.ac.uk/search/${this.slug}`;
+
+                let params = []
+                if (this.includeShareView) {
+                    params.push(`view=${this.view.toLowerCase()}`);
+                }
+                if (this.includeSharePage && this.pageParam !== '') {
+                    params.push(`page=${this.pageParam}`);
+                }
+                if (params.length > 0) {
+                    Url += `?${params.join('&')}`
+                }
+                return Url;
             }
         },
         methods:    {
-            ...mapMutations('results', ['addCustomHeader']),
-            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'requestDownload']),
+            ...mapMutations('results/display', ['addCustomHeader', 'setView', 'resetFilteredRecordTag']),
+            ...mapActions('results/query/filters', ['deleteTemporaryFilters']),
+            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'getDownload']),
             shareSearch() {
                 if (!this.showShare && this.slug === null) {
                     this.getSlug();
@@ -248,7 +289,7 @@
             citeNotShare() {
                 this.showShare = false;
                 this.showCite  = true;
-            }
+            },
         },
         watch:      {
             slug() {
@@ -258,7 +299,15 @@
                 if (fail) {
                     this.showShare = true;
                 }
+            },
+            view() {
+                this.deleteTemporaryFilters().then((deleteCount) => {
+                    if (deleteCount > 0) {
+                        this.runSearch(this.page);
+                    }
+                });
+                this.resetFilteredRecordTag();
             }
-        }
+        },
     }
 </script>
