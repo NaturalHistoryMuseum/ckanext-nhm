@@ -11,7 +11,7 @@ from ckan.lib.search import make_connection
 from ckan.plugins import toolkit
 from ckanext.nhm.lib.helpers import get_record_stats
 from flask import Blueprint
-from sqlalchemy import func
+from sqlalchemy import func, false
 
 # create a flask blueprint with a prefix
 blueprint = Blueprint(name=u'statistics', import_name=__name__,
@@ -142,6 +142,7 @@ def contributors():
     # package_search action doesn't allow the pivot options to be passed through
     solr = make_connection()
     results = solr.search(u'*:*', **{
+        u'fq': u'+capacity:public +state:active',
         u'facet': u'true',
         u'facet.pivot': u'id,author',
         u'facet.pivot.mincount': 1,
@@ -153,6 +154,8 @@ def contributors():
     # retrieve the packages in the database ordered by creation time. We need this because we can't
     # order the solr facets by created date
     order = list(model.Session.query(model.Package.id, model.Package.metadata_created)
+                 .filter(model.Package.private == false())
+                 .filter(model.Package.state == model.State.ACTIVE)
                  .order_by(model.Package.metadata_created))
 
     # only do stuff if we have some packages
