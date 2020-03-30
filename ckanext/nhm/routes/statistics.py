@@ -180,6 +180,6 @@ def contributors():
             toolkit.c.graph_data.append([i, total])
             toolkit.c.graph_options[u'xaxis'][u'ticks'].append([i, formatted_date])
 
-    return toolkit.render(u'stats/resources.html', {
+    return toolkit.render(u'stats/contributors.html', {
         u'title': u'Contributor statistics'
     })
