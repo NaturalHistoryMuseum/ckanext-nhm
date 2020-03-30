@@ -3,16 +3,15 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+from collections import OrderedDict
+from datetime import datetime
 
-from datetime import datetime, timedelta
-import time
-
+import ckan.model as model
+from ckan.lib.search import make_connection
+from ckan.plugins import toolkit
 from ckanext.nhm.lib.helpers import get_record_stats
 from flask import Blueprint
 from sqlalchemy import func
-
-import ckan.model as model
-from ckan.plugins import toolkit
 
 # create a flask blueprint with a prefix
 blueprint = Blueprint(name=u'statistics', import_name=__name__,
@@ -111,3 +110,63 @@ def records():
     return toolkit.render(u'stats/records.html', {
         u'title': u'Record statistics'
         })
+
+
+@blueprint.route(u'/contributors')
+def contributors():
+    '''
+    Render the contributors statistics page.
+    '''
+    solr = make_connection()
+    results = solr.search(u'*:*', **{
+        u'facet': u'true',
+        u'facet.pivot': u'id,author',
+        u'facet.pivot.mincount': 1,
+        u'facet.limit': -1,
+    }).facets.get(u'facet_pivot', {}).get(u'id,author', [])
+
+    counts = {hit[u'value']: len(hit[u'pivot']) for hit in results}
+    order = list(model.Session.query(model.Package.id, model.Package.metadata_created)
+                 .order_by(model.Package.metadata_created))
+
+    delta = datetime.now() - order[0][1]
+    # if we have data for more than 10 days, we'll show by month; otherwise segment by day
+    extraction_format = u'%b %Y' if delta.days > 10 else u'%d/%m/%y'
+
+    grouped_ordered_data = OrderedDict()
+    for package_id, created in order:
+        if package_id not in counts:
+            continue
+        key = created.strftime(extraction_format)
+        if key not in grouped_ordered_data:
+            grouped_ordered_data[key] = 0
+        grouped_ordered_data[key] += counts[package_id]
+
+    toolkit.c.graph_options = {
+        u'series': {
+            u'lines': {
+                u'show': True
+            },
+            u'points': {
+                u'show': True
+            }
+        },
+        u'xaxis': {
+            u'mode': u'time',
+            u'ticks': []
+        },
+        u'yaxis': {
+            u'tickDecimals': 0
+        }
+    }
+    toolkit.c.graph_data = []
+    total = 0
+
+    for i, (formatted_date, count) in enumerate(grouped_ordered_data.items()):
+        total += count
+        toolkit.c.graph_data.append([i, total])
+        toolkit.c.graph_options[u'xaxis'][u'ticks'].append([i, formatted_date])
+
+    return toolkit.render(u'stats/resources.html', {
+        u'title': u'Contributor statistics'
+    })
