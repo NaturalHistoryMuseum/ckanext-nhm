@@ -117,6 +117,9 @@ def contributors():
     '''
     Render the contributors statistics page.
     '''
+    # we use solr to get the number of authors for the front page statistics so we'll use it again
+    # here to get a per-package authors count. We have to use solr directly to do this because the
+    # package_search action doesn't allow the pivot options to be passed through
     solr = make_connection()
     results = solr.search(u'*:*', **{
         u'facet': u'true',
@@ -125,22 +128,28 @@ def contributors():
         u'facet.limit': -1,
     }).facets.get(u'facet_pivot', {}).get(u'id,author', [])
 
+    # turn the counts into a lookup from package_id -> number of authors
     counts = {hit[u'value']: len(hit[u'pivot']) for hit in results}
+    # retrieve the packages in the database ordered by creation time. We need this because we can't
+    # order the solr facets by created date
     order = list(model.Session.query(model.Package.id, model.Package.metadata_created)
                  .order_by(model.Package.metadata_created))
 
+    # get the earliest package creation date
     delta = datetime.now() - order[0][1]
     # if we have data for more than 10 days, we'll show by month; otherwise segment by day
     extraction_format = u'%b %Y' if delta.days > 10 else u'%d/%m/%y'
 
+    # sum the counts by package creation time based on the extraction format we chose
     grouped_ordered_data = OrderedDict()
     for package_id, created in order:
+        # just in case the database isn't up to date with the solr index
         if package_id not in counts:
             continue
-        key = created.strftime(extraction_format)
-        if key not in grouped_ordered_data:
-            grouped_ordered_data[key] = 0
-        grouped_ordered_data[key] += counts[package_id]
+        date_group = created.strftime(extraction_format)
+        if date_group not in grouped_ordered_data:
+            grouped_ordered_data[date_group] = 0
+        grouped_ordered_data[date_group] += counts[package_id]
 
     toolkit.c.graph_options = {
         u'series': {
@@ -162,6 +171,7 @@ def contributors():
     toolkit.c.graph_data = []
     total = 0
 
+    # run through the data, adding up a total as we go and adding the data to the graph
     for i, (formatted_date, count) in enumerate(grouped_ordered_data.items()):
         total += count
         toolkit.c.graph_data.append([i, total])
