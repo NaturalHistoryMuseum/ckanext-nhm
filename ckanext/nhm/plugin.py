@@ -557,7 +557,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 u'include_urls' in original_data_dict:
             for hit in result.hits:
                 if u'occurrenceID' in hit.data:
-                    hit.data.permanentUrl = url_for(u'object_view', uuid=hit.data.occurrenceID)
+                    hit.data.permanentUrl = toolkit.url_for(u'object_view',
+                                                            uuid=hit.data.occurrenceID)
 
         return result
 
