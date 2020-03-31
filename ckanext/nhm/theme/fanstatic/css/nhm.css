@@ -1,3 +1,47 @@
+@-webkit-keyframes colourShift {
+  0% {
+    background-position: 0% 82%;
+  }
+  50% {
+    background-position: 100% 19%;
+  }
+  100% {
+    background-position: 0% 82%;
+  }
+}
+@-moz-keyframes colourShift {
+  0% {
+    background-position: 0% 82%;
+  }
+  50% {
+    background-position: 100% 19%;
+  }
+  100% {
+    background-position: 0% 82%;
+  }
+}
+@-o-keyframes colourShift {
+  0% {
+    background-position: 0% 82%;
+  }
+  50% {
+    background-position: 100% 19%;
+  }
+  100% {
+    background-position: 0% 82%;
+  }
+}
+@keyframes colourShift {
+  0% {
+    background-position: 0% 82%;
+  }
+  50% {
+    background-position: 100% 19%;
+  }
+  100% {
+    background-position: 0% 82%;
+  }
+}
 .fa-arrows:before {
   content: '\f338' !important;
 }
@@ -1036,7 +1080,12 @@ iframe {
   margin-right: 10px;
 }
 .toolbar {
-  background: #BBEDA9;
+  background: linear-gradient(45deg, #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC);
+  background-size: 300% 300%;
+  -webkit-animation: colourShift 18s linear infinite;
+  -z-animation: colourShift 18s linear infinite;
+  -o-animation: colourShift 18s linear infinite;
+  animation: colourShift 18s linear infinite;
   padding: 0;
   margin: 0;
 }
