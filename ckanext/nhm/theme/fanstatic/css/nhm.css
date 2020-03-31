@@ -1,45 +1,9 @@
-@-webkit-keyframes colourShift {
-  0% {
-    background-position: 0% 82%;
-  }
-  50% {
-    background-position: 100% 19%;
-  }
-  100% {
-    background-position: 0% 82%;
-  }
-}
-@-moz-keyframes colourShift {
-  0% {
-    background-position: 0% 82%;
-  }
-  50% {
-    background-position: 100% 19%;
-  }
-  100% {
-    background-position: 0% 82%;
-  }
-}
-@-o-keyframes colourShift {
-  0% {
-    background-position: 0% 82%;
-  }
-  50% {
-    background-position: 100% 19%;
-  }
-  100% {
-    background-position: 0% 82%;
-  }
-}
 @keyframes colourShift {
-  0% {
-    background-position: 0% 82%;
+  from {
+    background-position: 0 0;
   }
-  50% {
-    background-position: 100% 19%;
-  }
-  100% {
-    background-position: 0% 82%;
+  to {
+    background-position: 150% 0;
   }
 }
 .fa-arrows:before {
@@ -754,18 +718,36 @@ iframe {
 .masthead .logo {
   padding-left: 0;
   margin-right: 15px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
+}
+.masthead .logo svg {
+  mask-image: url('/images/nhm_logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url('/images/nhm_logo.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  background: linear-gradient(90deg, #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC, #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC);
+  background-size: 300% 300%;
+  -webkit-animation: colourShift 10s linear infinite;
+  -z-animation: colourShift 10s linear infinite;
+  -o-animation: colourShift 10s linear infinite;
+  animation: colourShift 10s linear infinite;
+  height: 60px;
+  width: 129px;
 }
 @media (min-width: 576px) and (max-width: 991px) {
-  .extended-masthead .masthead .logo img {
+  .extended-masthead .masthead .logo svg {
     height: 92px !important;
     max-height: unset;
+    width: 197px;
   }
 }
 @media (min-width: 992px) {
-  .extended-masthead .masthead .logo img {
+  .extended-masthead .masthead .logo svg {
     height: 98px !important;
     max-height: unset;
+    width: 210px;
   }
 }
 .masthead .navigation {
@@ -1080,12 +1062,12 @@ iframe {
   margin-right: 10px;
 }
 .toolbar {
-  background: linear-gradient(45deg, #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC);
+  background: linear-gradient(90deg, #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC, #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC);
   background-size: 300% 300%;
-  -webkit-animation: colourShift 18s linear infinite;
-  -z-animation: colourShift 18s linear infinite;
-  -o-animation: colourShift 18s linear infinite;
-  animation: colourShift 18s linear infinite;
+  -webkit-animation: colourShift 10s linear infinite;
+  -z-animation: colourShift 10s linear infinite;
+  -o-animation: colourShift 10s linear infinite;
+  animation: colourShift 10s linear infinite;
   padding: 0;
   margin: 0;
 }

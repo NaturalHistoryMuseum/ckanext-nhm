@@ -108,62 +108,25 @@
 }
 
 
-@-webkit-keyframes colourShift {
-  0% {
-    background-position: 0% 82%
-  }
-  50% {
-    background-position: 100% 19%
-  }
-  100% {
-    background-position: 0% 82%
-  }
-}
-
-@-moz-keyframes colourShift {
-  0% {
-    background-position: 0% 82%
-  }
-  50% {
-    background-position: 100% 19%
-  }
-  100% {
-    background-position: 0% 82%
-  }
-}
-
-@-o-keyframes colourShift {
-  0% {
-    background-position: 0% 82%
-  }
-  50% {
-    background-position: 100% 19%
-  }
-  100% {
-    background-position: 0% 82%
-  }
-}
-
 @keyframes colourShift {
-  0% {
-    background-position: 0% 82%
+  from {
+    background-position: 0 0;
   }
-  50% {
-    background-position: 100% 19%
-  }
-  100% {
-    background-position: 0% 82%
+  to {
+    background-position: 150% 0;
   }
 }
 
 .prideBg(@palette){
-  background: linear-gradient(45deg, @palette);
+  background: linear-gradient(90deg, @palette, @palette);
   background-size: 300% 300%;
 
-  -webkit-animation: colourShift 18s linear infinite;
-  -z-animation: colourShift 18s linear infinite;
-  -o-animation: colourShift 18s linear infinite;
-  animation: colourShift 18s linear infinite;
+  @animation: colourShift 10s linear infinite;
+
+  -webkit-animation: @animation;
+  -z-animation: @animation;
+  -o-animation: @animation;
+  animation: @animation;
 }
 
 @rainbowFlag: #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D;
