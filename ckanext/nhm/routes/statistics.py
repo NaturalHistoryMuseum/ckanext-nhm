@@ -156,7 +156,7 @@ def contributors():
     seen_authors = set()
     for hit in results:
         package_id = hit[u'value']
-        package_authors = set(hit[u'pivot'].keys())
+        package_authors = set(author[u'value'] for author in hit[u'pivot'])
         # figure out which authors have not been counted yet
         unseen_authors = package_authors.difference(seen_authors)
         counts[package_id] = len(unseen_authors)
