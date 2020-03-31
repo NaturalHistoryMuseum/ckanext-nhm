@@ -149,8 +149,19 @@ def contributors():
         u'facet.limit': -1,
     }).facets.get(u'facet_pivot', {}).get(u'id,author', [])
 
-    # turn the counts into a lookup from package_id -> number of authors
-    counts = {hit[u'value']: len(hit[u'pivot']) for hit in results}
+    # turn the counts into a lookup from package_id -> number of authors. Note that the number of
+    # authors only includes authors we haven't seen before to avoid counting authors of multiple
+    # packages more than once
+    counts = {}
+    seen_authors = set()
+    for hit in results:
+        package_id = hit[u'value']
+        package_authors = set(hit[u'pivot'].keys())
+        # figure out which authors have not been counted yet
+        unseen_authors = package_authors.difference(seen_authors)
+        counts[package_id] = len(unseen_authors)
+        seen_authors.update(unseen_authors)
+
     # retrieve the packages in the database ordered by creation time. We need this because we can't
     # order the solr facets by created date
     order = list(model.Session.query(model.Package.id, model.Package.metadata_created)
