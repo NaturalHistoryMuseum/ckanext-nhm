@@ -106,3 +106,28 @@
 
   .palette-sidebar-links(@switch);
 }
+
+
+@keyframes colourShift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 150% 0;
+  }
+}
+
+.prideBg(@palette){
+  background: linear-gradient(90deg, @palette, @palette);
+  background-size: 300% 300%;
+
+  @animation: colourShift 10s linear infinite;
+
+  -webkit-animation: @animation;
+  -z-animation: @animation;
+  -o-animation: @animation;
+  animation: @animation;
+}
+
+@rainbowFlag: #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D;
+@transFlag: #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC;

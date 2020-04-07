@@ -1,3 +1,11 @@
+@keyframes colourShift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 150% 0;
+  }
+}
 .fa-arrows:before {
   content: '\f338' !important;
 }
@@ -723,18 +731,31 @@ iframe {
 .masthead .logo {
   padding-left: 0;
   margin-right: 15px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
+}
+.masthead .logo svg {
+  mask-image: url('/images/nhm_logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url('/images/nhm_logo.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  background: #FFFFFF;
+  height: 60px;
+  width: 129px;
 }
 @media (min-width: 576px) and (max-width: 991px) {
-  .extended-masthead .masthead .logo img {
+  .extended-masthead .masthead .logo svg {
     height: 92px !important;
     max-height: unset;
+    width: 197px;
   }
 }
 @media (min-width: 992px) {
-  .extended-masthead .masthead .logo img {
+  .extended-masthead .masthead .logo svg {
     height: 98px !important;
     max-height: unset;
+    width: 210px;
   }
 }
 .masthead .navigation {
@@ -1958,7 +1979,7 @@ select,
   left: 0;
   width: 100%;
   height: 100%;
-  background: url('/images/mapHeat.png') no-repeat center center !important;
+  background: url('/images/mapHeat.jpg') no-repeat center center !important;
   background-size: cover !important;
   -webkit-filter: opacity(60%);
   filter: opacity(60%);
@@ -2805,4 +2826,7 @@ select,
   right: 0;
   margin-left: auto;
   margin-right: auto;
+}
+.help_available_formats {
+  background-color: transparent !important;
 }

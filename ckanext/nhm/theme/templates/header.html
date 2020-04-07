@@ -15,10 +15,9 @@
                 {% block header_logo %}
 
                     {% if g.site_logo %}
-                        <a class="logo" href="{{ h.url_for('home.index') }}"><img
-                                src="/images/nhm_logo.svg"
-                                alt="{{ g.site_title }}" title="{{ g.site_title }}"
-                                role="button" aria-label="Home"/></a>
+                        <a class="logo" href="{{ h.url_for('home.index') }}" title="{{ g.site_title }}">
+                            <svg role="button" aria-label="Home"></svg>
+                        </a>
                     {% endif %}
                 {% endblock %}
 

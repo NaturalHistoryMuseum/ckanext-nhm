@@ -1,0 +1,40 @@
+<section class="module module-narrow module-shallow">
+    <h2 class="module-heading"><i class="fa fa-info-circle"></i> {{ _('Help') }}</h2>
+    <div class="module-content">
+        <p>
+            {% trans %}
+                A resource can be any file or link to a file containing useful data.
+            {% endtrans %}
+        </p>
+        <p>
+            {# the ckan.max_resource_size is always in MB and we assume showing it in GB is best #}
+            {% set max_size = config.get('ckan.max_resource_size') | int / 1024 %}
+            {% trans max_size=max_size %}
+                Files can either be uploaded directly to the Data Portal or they can be linked via
+                a URL.
+                The maximum file upload size is {{ max_size }} GB. Linked files can be larger.
+            {% endtrans %}
+        </p>
+        <p>
+            {% trans %}
+                Any file type can be uploaded/linked but resources with files containing tabular
+                data such as CSVs will be indexed and made searchable.
+
+                Data from uploaded/linked files is indexed based on the format field, not the file
+                extension. If a file is uploaded/linked without a specified format, the Data Portal
+                will attempt to fill the format field automatically when the resource is
+                created/updated.
+            {% endtrans %}
+        </p>
+        <p>
+            {% trans %}
+                The formats that can be indexed and made searchable are:
+            {% endtrans %}
+        </p>
+        <ul class="help_available_formats">
+            {% for format in h.get_available_formats() %}
+                <li>{{ format }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
