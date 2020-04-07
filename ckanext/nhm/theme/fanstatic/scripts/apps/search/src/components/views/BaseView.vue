@@ -58,13 +58,20 @@
                             let isBroken   = false;
                             axios.get(imgThumb.replace('media-store', 'media-store1'), {responseType: 'blob'}).then(d => {
                                 if (d.data.size === noImageSize) {
+                                    console.log(imgThumb)
                                     let fileReader       = new FileReader();
                                     fileReader.onloadend = function () {
-                                        isBroken = SparkMD5.ArrayBuffer.hash(fileReader.result) === noImageHash;
+                                        let imageHash = SparkMD5.ArrayBuffer.hash(fileReader.result);
+                                        isBroken = imageHash === noImageHash;
+                                        if (!isBroken) {
+                                            console.log(imageHash)
+                                        }
                                     }
                                     fileReader.readAsArrayBuffer(d.data);
                                 }
-                            }).catch(e => {})
+                            }).catch(e => {
+                                console.log(e)
+                            })
                             return {
                                 preview:  img.identifier,
                                 thumb:    imgThumb,
