@@ -56,7 +56,7 @@
                                 {title: img.license, url: img.license};
                             let imgThumb   = img.identifier.replace('preview', 'thumbnail');
                             let isBroken   = false;
-                            axios.get(imgThumb, {responseType: 'blob'}).then(d => {
+                            axios.get(imgThumb.replace('media-store', 'media-store1'), {responseType: 'blob'}).then(d => {
                                 if (d.data.size === noImageSize) {
                                     let fileReader       = new FileReader();
                                     fileReader.onloadend = function () {
