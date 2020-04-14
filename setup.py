@@ -35,6 +35,7 @@ dependencies = {
     'ckanext-versioned-datastore': nhmgit + 'ckanext-versioned-datastore.git#egg=ckanext_versioned_datastore',
     'ckanext-versioned-tiledmap': nhmgit + 'ckanext-versioned-tiledmap.git#egg=ckanext_versioned_tiledmap',
     'ckanext-query-dois': nhmgit + 'ckanext-query-dois.git#egg=ckanext_query_dois',
+    'ckanext-iiif': nhmgit + 'ckanext-iiif.git#egg=ckanext_iiif',
 }
 
 setup(
