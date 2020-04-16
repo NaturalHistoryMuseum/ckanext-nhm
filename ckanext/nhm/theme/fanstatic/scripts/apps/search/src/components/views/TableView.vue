@@ -92,7 +92,7 @@
                 }
                 this.scrollableLeft  = this.tableGrid.scrollLeft() > 0;
                 let fullWidth        = this.$refs.tableGrid.scrollWidth;
-                let viewWidth        = this.tableGrid.width();
+                let viewWidth        = Math.ceil(this.tableGrid.width());
                 this.scrollableRight = fullWidth > viewWidth && this.tableGrid.scrollLeft() < (fullWidth - viewWidth);
             }
         },

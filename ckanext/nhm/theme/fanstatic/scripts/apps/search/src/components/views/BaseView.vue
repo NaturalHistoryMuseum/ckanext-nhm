@@ -63,9 +63,7 @@
                                     fileReader.onloadend = function () {
                                         let imageHash = SparkMD5.ArrayBuffer.hash(fileReader.result);
                                         isBroken = imageHash === noImageHash;
-                                        if (!isBroken) {
-                                            console.log(imageHash)
-                                        }
+
                                     }
                                     fileReader.readAsArrayBuffer(d.data);
                                 }
