@@ -2,10 +2,11 @@
     <div>
         <div class="col-sm-3">
             <Filters :query="baseQuery" v-on:barcode-change="onBarcodeChange"
-                     v-on:collections-change="onCollectionsChange"/>
+                     v-on:collections-change="onCollectionsChange" :resourceId="resourceId" />
         </div>
         <div class="col-sm-9 col-xs-12">
-            <OpenSeadragonView width="100%" height="550px" :currentRecord="currentRecord"/>
+            <OpenSeadragonView width="100%" height="550px" :currentRecord="currentRecord"
+                               :resourceId="resourceId"/>
             <ThumbnailCarousel :records="records" :moreRecordsAvailable="moreRecordsAvailable"
                                :total="total" :thumbnailSize="150" @slide-change="onSlideChange"
                                @get-more-records="onMoreRecordsRequest"/>
@@ -24,6 +25,7 @@
         name: 'App',
         data() {
             return {
+                resourceId: '79531dfa-783b-410a-8553-8f426d00ffea',
                 filterQuery: null,
                 records: [],
                 total: 0,
@@ -62,7 +64,7 @@
                     const query = JSON.parse(JSON.stringify(this.baseQuery));
                     query.filters.and.push(this.filterQuery);
                     const body = {
-                        resource_ids: ['79531dfa-783b-410a-8553-8f426d00ffea'],
+                        resource_ids: [this.resourceId],
                         query: query,
                         size: 15
                     };

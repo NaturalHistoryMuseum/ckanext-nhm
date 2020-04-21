@@ -1,6 +1,11 @@
 <template>
     <div>
-        <div :id="viewerId" :style="viewerStyle"></div>
+        <div :id="viewerId" class="viiif-osd-viewer" :style="viewerStyle">
+            <a class="viiif-osd-manifest-link" v-if="currentRecord !== null" target="_blank"
+               :href="`/iiif/resource/${this.resourceId}/record/${this.currentRecord._id}`">
+                View IIIF Manifest <i class="fas fa-link inline-icon-right"></i>
+            </a>
+        </div>
     </div>
 </template>
 
@@ -12,6 +17,10 @@
         props: {
             currentRecord: {
                 type: Object
+            },
+            resourceId: {
+                type: String,
+                required: true
             },
             viewerId: {
                 default: 'osd_viewer'
@@ -35,7 +44,7 @@
                     width: this.width,
                     height: this.height
                 }
-            },
+            }
         },
         watch: {
             currentRecord(newRecord) {

@@ -171,3 +171,14 @@
 .viiif-thumbnail-label .viiif-thumbnail-label-collection {
   font-style: italic;
 }
+.viiif-osd-viewer {
+  position: relative;
+}
+.viiif-osd-manifest-link {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 10px;
+  background-color: #F2F2F2;
+  z-index: 1;
+}

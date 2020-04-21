@@ -62,6 +62,10 @@
     export default {
         name: "Filters",
         props: {
+            resourceId: {
+                type: String,
+                required: true
+            },
             query: {
                 type: Object,
                 default: {}
@@ -78,7 +82,7 @@
         },
         created() {
             axios.post('/api/3/action/datastore_multisearch', {
-                resource_ids: ['79531dfa-783b-410a-8553-8f426d00ffea'],
+                resource_ids: [this.resourceId],
                 query: this.query,
                 // we know that the number of records in this resource is 400 so we can just get
                 // them all straight up
