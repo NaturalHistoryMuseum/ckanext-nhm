@@ -72,7 +72,7 @@
         },
         methods: {
             getRecordThumbnail(image) {
-                return `/iiif_images/${image}/full/${this.thumbnailSize},/0/default.jpg`
+                return `/iiif_images/vfactor:${image}/full/${this.thumbnailSize},/0/default.jpg`
             },
             onMouseDown(event) {
                 this.isDown = true;

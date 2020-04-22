@@ -49,7 +49,7 @@
         watch: {
             currentRecord(newRecord) {
                 if (newRecord != null) {
-                    this.viewer.open(`/iiif_images/${newRecord['Image']}/info.json`);
+                    this.viewer.open(`/iiif_images/vfactor:${newRecord['Image']}/info.json`);
                 } else {
                     this.viewer.close();
                 }
