@@ -303,6 +303,16 @@ def get_artefact_resource_id():
     return toolkit.config.get(u'ckanext.nhm.artefact_resource_id')
 
 
+def get_vfactor_resource_id():
+    '''
+    Get the ID for the vfactor resource.
+
+    :return: the resource id
+    '''
+    value = toolkit.config.get(u'ckanext.nhm.vfactor_resource_id')
+    return unicode(value) if value is not None else None
+
+
 @cache_region(u'permanent', u'collection_stats')
 def collection_stats():
     '''Get collection stats, including collection codes and collection totals.'''

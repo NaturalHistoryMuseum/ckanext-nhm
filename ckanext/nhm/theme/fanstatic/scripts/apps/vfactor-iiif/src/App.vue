@@ -23,9 +23,14 @@
 
     export default {
         name: 'App',
+        props: {
+            resourceId: {
+                type: String,
+                required: true
+            }
+        },
         data() {
             return {
-                resourceId: '79531dfa-783b-410a-8553-8f426d00ffea',
                 filterQuery: null,
                 records: [],
                 total: 0,

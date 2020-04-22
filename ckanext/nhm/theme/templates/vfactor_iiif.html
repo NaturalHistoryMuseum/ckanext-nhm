@@ -14,6 +14,6 @@
 
 {% block primary %}
     {% resource 'ckanext-nhm/vfactor-iiif' %}
-    <div id="vfactor-iiif-app">
+    <div id="vfactor-iiif-app" data-resource-id="{{ h.get_vfactor_resource_id() }}">
     </div>
 {% endblock %}
