@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="col-sm-3">
+        <div class="secondary col-sm-3">
             <Filters :query="baseQuery" v-on:barcode-change="onBarcodeChange"
                      v-on:collections-change="onCollectionsChange" :resourceId="resourceId" />
         </div>

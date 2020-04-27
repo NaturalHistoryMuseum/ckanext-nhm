@@ -99,9 +99,24 @@
   content: '';
 }
 .viiif-filter-collection-actions {
-  display: flex;
-  justify-content: space-between;
   margin-top: 5px;
+  display: flex;
+}
+@media (max-width: 767px), (min-width: 1200px) {
+  .viiif-filter-collection-actions {
+    justify-content: space-between;
+  }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .viiif-filter-collection-actions {
+    flex-direction: column;
+  }
+  .viiif-filter-collection-actions > * {
+    vertical-align: center;
+  }
+  .viiif-filter-collection-actions * {
+    margin-bottom: 5px;
+  }
 }
 .viiif-filter-collection-selectors {
   display: flex;
@@ -134,14 +149,27 @@
 .viiif-filter-barcode-body {
   display: flex;
 }
-.viiif-filter-barcode-body:not(.flex-reverse) > *:first-child {
-  flex-grow: 1;
+@media (max-width: 767px), (min-width: 1200px) {
+  .viiif-filter-barcode-body:not(.flex-reverse) > *:first-child {
+    flex-grow: 1;
+  }
+  .viiif-filter-barcode-body.flex-reverse > *:last-child {
+    flex-grow: 1;
+  }
+  .viiif-filter-barcode-body *:first-child {
+    margin-right: 10px;
+  }
 }
-.viiif-filter-barcode-body.flex-reverse > *:last-child {
-  flex-grow: 1;
-}
-.viiif-filter-barcode-body *:first-child {
-  margin-right: 10px;
+@media (min-width: 768px) and (max-width: 1199px) {
+  .viiif-filter-barcode-body {
+    flex-direction: column;
+  }
+  .viiif-filter-barcode-body > * {
+    vertical-align: center;
+  }
+  .viiif-filter-barcode-body * {
+    margin-bottom: 10px;
+  }
 }
 .viiif-thumbnail-header {
   padding: 10px 0;
