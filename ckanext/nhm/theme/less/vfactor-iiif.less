@@ -75,6 +75,9 @@
 .viiif-filter-barcode-body {
   .mixin-flex-container();
 
+  // if the page width is beyond xl or less than md - 1, show everything on the same line. When the
+  // page width is less than md - 1 the secondary panel fills the page width and therefore we have
+  // room to show the buttons next to each other
   @media (max-width: @md - 1), (min-width: @xl) {
     .mixin-flex-stretch-first();
 
@@ -83,6 +86,7 @@
     }
   }
 
+  // if the page width is between md and xl - 1 show the buttons stacked
   @media (min-width: @md) and (max-width: @xl - 1) {
     .mixin-flex-column();
 
