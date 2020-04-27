@@ -176,6 +176,8 @@
   margin: 10px 0;
   border-top: 1px solid black;
   border-bottom: 1px solid #9A9A9A;
+  display: flex;
+  justify-content: space-between;
 }
 .viiif-thumbnail-track {
   cursor: pointer;
@@ -198,15 +200,4 @@
 }
 .viiif-thumbnail-label .viiif-thumbnail-label-collection {
   font-style: italic;
-}
-.viiif-osd-viewer {
-  position: relative;
-}
-.viiif-osd-manifest-link {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  padding: 10px;
-  background-color: #F2F2F2;
-  z-index: 1;
 }

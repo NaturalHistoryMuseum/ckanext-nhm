@@ -1,7 +1,12 @@
 <template>
     <div>
         <div class="viiif-thumbnail-header">
-            Showing {{ records.length }} of {{ total }} total thumbnails
+            <span>
+                Showing {{ records.length }} of {{ total }} total thumbnails
+            </span>
+            <a v-if="manifestLink" target="_blank" :href="manifestLink">
+                View IIIF Manifest <i class="fas fa-link inline-icon-right"></i>
+            </a>
         </div>
         <div class="viiif-thumbnail-track" @mousedown="onMouseDown" @mouseleave="onMouseLeave"
              @mouseup="onMouseUp" @mousemove="onMouseMove" @scroll="onScroll"
@@ -71,6 +76,15 @@
                     this.$refs.track.scrollLeft = 0;
                     this.goto(0);
                 }
+            }
+        },
+        computed: {
+            manifestLink() {
+                if (!!this.records[this.currentIndex] &&
+                    !!this.manifests[this.records[this.currentIndex]._id]) {
+                    return this.manifests[this.records[this.currentIndex]._id].id;
+                }
+                return false;
             }
         },
         methods: {
