@@ -73,8 +73,9 @@
 }
 
 .viiif-filter-barcode-body {
+  .mixin-flex-container();
+
   @media (max-width: @md - 1), (min-width: @xl) {
-    .mixin-flex-container();
     .mixin-flex-stretch-first();
 
     *:first-child {
@@ -83,7 +84,6 @@
   }
 
   @media (min-width: @md) and (max-width: @xl - 1) {
-    .mixin-flex-container();
     .mixin-flex-column();
 
     * {
