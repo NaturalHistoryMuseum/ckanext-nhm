@@ -9,7 +9,7 @@
             <div :class="{'viiif-thumbnail-container': true, 'active': currentIndex === index}"
                  v-for="(record, index) in records"
                  :key="record._id" :data-thumbnail-index="index" ref="container">
-                <img class="viiif-thumbnail-image" :src="getRecordThumbnail(record.Image)"
+                <img class="viiif-thumbnail-image" :src="getRecordThumbnail(record)"
                      :width="`${thumbnailSize}px`" draggable="false"/>
                 <div class="viiif-thumbnail-label">
                     <div class="viiif-thumbnail-label-barcode">
@@ -31,6 +31,9 @@
             records: {
                 type: Array,
                 required: true
+            },
+            manifests: {
+                type: Object
             },
             moreRecordsAvailable: {
                 type: Boolean,
@@ -71,8 +74,15 @@
             }
         },
         methods: {
-            getRecordThumbnail(image) {
-                return `/iiif_images/vfactor:${image}/full/${this.thumbnailSize},/0/default.jpg`
+            getRecordThumbnail(record) {
+                const iiifManifest = this.manifests[record._id];
+                if (!!iiifManifest) {
+                    const infoUrl = iiifManifest.items[0].items[0].items[0].body.id;
+                    // 10 is the length of "info.json"
+                    const baseUrl = infoUrl.slice(0, infoUrl.length - 10);
+                    return `${baseUrl}/full/${this.thumbnailSize},/0/default.jpg`
+                }
+                return '';
             },
             onMouseDown(event) {
                 this.isDown = true;

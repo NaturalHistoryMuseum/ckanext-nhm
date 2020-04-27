@@ -2,13 +2,14 @@
     <div>
         <div class="secondary col-sm-3">
             <Filters :query="baseQuery" v-on:barcode-change="onBarcodeChange"
-                     v-on:collections-change="onCollectionsChange" :resourceId="resourceId" />
+                     v-on:collections-change="onCollectionsChange" :resourceId="resourceId"/>
         </div>
         <div class="col-sm-9 col-xs-12">
             <OpenSeadragonView width="100%" height="550px" :currentRecord="currentRecord"
-                               :resourceId="resourceId"/>
+                               :resourceId="resourceId" :manifests="manifests"/>
             <ThumbnailCarousel :records="records" :moreRecordsAvailable="moreRecordsAvailable"
-                               :total="total" :thumbnailSize="150" @slide-change="onSlideChange"
+                               :total="total" :thumbnailSize="150" :manifests="manifests"
+                               @slide-change="onSlideChange"
                                @get-more-records="onMoreRecordsRequest"/>
         </div>
     </div>
@@ -33,6 +34,7 @@
             return {
                 filterQuery: null,
                 records: [],
+                manifests: {},
                 total: 0,
                 currentRecord: null,
                 after: null,
@@ -95,7 +97,10 @@
                 }
             },
             onRecordsChange(newRecords, isMoreRequest = false) {
-                const records = newRecords.map((record) => record.data);
+                const records = newRecords.map((record) => {
+                    this.manifests[record.data._id] = record.iiif;
+                    return record.data;
+                });
                 if (isMoreRequest) {
                     this.records.push(...records);
                 } else {

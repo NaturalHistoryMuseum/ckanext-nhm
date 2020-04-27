@@ -22,6 +22,9 @@
                 type: String,
                 required: true
             },
+            manifests: {
+                type: Object
+            },
             viewerId: {
                 default: 'osd_viewer'
             },
@@ -48,8 +51,10 @@
         },
         watch: {
             currentRecord(newRecord) {
-                if (newRecord != null) {
-                    this.viewer.open(`/iiif_images/vfactor:${newRecord['Image']}/info.json`);
+                if (newRecord != null && !!this.manifests[newRecord._id]) {
+                    const iiifManifest = this.manifests[newRecord._id];
+                    // only deal with the first image in the manifest
+                    this.viewer.open(iiifManifest.items[0].items[0].items[0].body.id);
                 } else {
                     this.viewer.close();
                 }
