@@ -62,11 +62,22 @@
 }
 
 .viiif-filter-barcode-body {
-  .mixin-flex-container();
-  .mixin-flex-stretch-first();
+  @media (max-width: @md - 1), (min-width: @xl) {
+    .mixin-flex-container();
+    .mixin-flex-stretch-first();
 
-  *:first-child {
-    margin-right: 10px;
+    *:first-child {
+      margin-right: 10px;
+    }
+  }
+
+  @media (min-width: @md) and (max-width: @xl - 1) {
+    .mixin-flex-container();
+    .mixin-flex-column();
+
+    * {
+      margin-bottom: 10px;
+    }
   }
 }
 

@@ -131,17 +131,31 @@
 .viiif-filter-barcode-label:after {
   content: '';
 }
-.viiif-filter-barcode-body {
-  display: flex;
+@media (max-width: 767px), (min-width: 1200px) {
+  .viiif-filter-barcode-body {
+    display: flex;
+  }
+  .viiif-filter-barcode-body:not(.flex-reverse) > *:first-child {
+    flex-grow: 1;
+  }
+  .viiif-filter-barcode-body.flex-reverse > *:last-child {
+    flex-grow: 1;
+  }
+  .viiif-filter-barcode-body *:first-child {
+    margin-right: 10px;
+  }
 }
-.viiif-filter-barcode-body:not(.flex-reverse) > *:first-child {
-  flex-grow: 1;
-}
-.viiif-filter-barcode-body.flex-reverse > *:last-child {
-  flex-grow: 1;
-}
-.viiif-filter-barcode-body *:first-child {
-  margin-right: 10px;
+@media (min-width: 768px) and (max-width: 1199px) {
+  .viiif-filter-barcode-body {
+    display: flex;
+    flex-direction: column;
+  }
+  .viiif-filter-barcode-body > * {
+    vertical-align: center;
+  }
+  .viiif-filter-barcode-body * {
+    margin-bottom: 10px;
+  }
 }
 .viiif-thumbnail-header {
   padding: 10px 0;
