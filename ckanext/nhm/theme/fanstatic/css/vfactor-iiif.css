@@ -99,9 +99,24 @@
   content: '';
 }
 .viiif-filter-collection-actions {
-  display: flex;
-  justify-content: space-between;
   margin-top: 5px;
+  display: flex;
+}
+@media (max-width: 767px), (min-width: 1200px) {
+  .viiif-filter-collection-actions {
+    justify-content: space-between;
+  }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .viiif-filter-collection-actions {
+    flex-direction: column;
+  }
+  .viiif-filter-collection-actions > * {
+    vertical-align: center;
+  }
+  .viiif-filter-collection-actions * {
+    margin-bottom: 5px;
+  }
 }
 .viiif-filter-collection-selectors {
   display: flex;

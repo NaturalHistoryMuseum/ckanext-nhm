@@ -27,9 +27,20 @@
 }
 
 .viiif-filter-collection-actions {
-  .mixin-flex-container();
-  .mixin-flex-between();
   margin-top: 5px;
+  .mixin-flex-container();
+
+  @media (max-width: @md - 1), (min-width: @xl) {
+    .mixin-flex-between();
+  }
+
+  @media (min-width: @md) and (max-width: @xl - 1) {
+    .mixin-flex-column();
+
+    * {
+      margin-bottom: 5px;
+    }
+  }
 }
 
 .viiif-filter-collection-selectors {
