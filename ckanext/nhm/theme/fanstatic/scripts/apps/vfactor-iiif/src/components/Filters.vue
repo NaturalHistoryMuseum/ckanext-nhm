@@ -97,6 +97,10 @@
                 }
                 this.barcodes.sort();
                 this.collectionNames.sort();
+
+                // start off with everything selected
+                this.selectAll();
+                this.changeCollections();
             }).catch(error => {
                 console.log(error);
             });
