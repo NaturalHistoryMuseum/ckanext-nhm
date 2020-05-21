@@ -4,7 +4,7 @@
 # dev overrides/additional libraries
 -e git+https://github.com/ckan/ckanext-spatial.git#egg=ckanext-spatial
 -e git+https://github.com/ckan/ckanext-viewhelpers.git#egg=ckanext_viewhelpers
--e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext_dcat
+-e git+https://github.com/ckan/ckanext-dcat.git@v1.0.0#egg=ckanext_dcat
 -e git+https://github.com/ckan/ckanext-pdfview.git#egg=ckanext_pdfview
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-contact.git#egg=ckanext-contact
 -e git+https://github.com/NaturalHistoryMuseum/ckanext-doi.git#egg=ckanext-doi
