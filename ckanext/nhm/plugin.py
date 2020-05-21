@@ -339,31 +339,28 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata
         '''
         metadata_dict[u'resource_type'] = pkg_dict.get(u'dataset_category', None)
-        if isinstance(metadata_dict[u'resource_type'], list) and metadata_dict[
-            u'resource_type']:
+        if isinstance(metadata_dict[u'resource_type'], list) and metadata_dict[u'resource_type']:
             metadata_dict[u'resource_type'] = metadata_dict[u'resource_type'][0]
         contributors = pkg_dict.get(u'contributors', None)
         if contributors:
             contributors = contributors.split(u'\n')
-            metadata_dict[u'contributors'] = []
-            for contributor in contributors:
-                if contributor:
-                    contributor = contributor.replace(u'\r', u'').encode(u'unicode-escape')
-                    m = re.search(r'(.*?)\s?\((.*)\)', contributor)
-                    try:
-                        metadata_dict[u'contributors'].append(
-                            {
-                                u'contributorName': m.group(1),
-                                u'affiliation': m.group(2),
+            found_contributors = []
+            # iterate over the non-blank contributors in the list
+            for contributor in filter(None, map(lambda c: c.strip(), contributors)):
+                contributor = contributor.encode(u'unicode-escape')
+                match = re.search(r'(.*?)\s?\((.*)\)', contributor)
+                if match:
+                    found_contributors.append({
+                        u'contributorName': match.group(1),
+                        u'affiliation': match.group(2),
+                    })
+                else:
+                    found_contributors.append({
+                        u'contributorName': contributor
+                    })
+            if found_contributors:
+                metadata_dict[u'contributors'] = found_contributors
 
-                                }
-                            )
-                    except AttributeError:
-                        metadata_dict[u'contributors'].append(
-                            {
-                                u'contributorName': contributor
-                                }
-                            )
         affiliation = pkg_dict.get(u'affiliation', None)
         if affiliation:
             metadata_dict[u'affiliation'] = affiliation.encode(u'unicode-escape')
