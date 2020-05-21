@@ -347,22 +347,23 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             contributors = contributors.split(u'\n')
             metadata_dict[u'contributors'] = []
             for contributor in contributors:
-                contributor = contributor.replace(u'\r', u'').encode(u'unicode-escape')
-                m = re.search(r'(.*?)\s?\((.*)\)', contributor)
-                try:
-                    metadata_dict[u'contributors'].append(
-                        {
-                            u'contributorName': m.group(1),
-                            u'affiliation': m.group(2),
+                if contributor:
+                    contributor = contributor.replace(u'\r', u'').encode(u'unicode-escape')
+                    m = re.search(r'(.*?)\s?\((.*)\)', contributor)
+                    try:
+                        metadata_dict[u'contributors'].append(
+                            {
+                                u'contributorName': m.group(1),
+                                u'affiliation': m.group(2),
 
-                            }
-                        )
-                except AttributeError:
-                    metadata_dict[u'contributors'].append(
-                        {
-                            u'contributorName': contributor
-                            }
-                        )
+                                }
+                            )
+                    except AttributeError:
+                        metadata_dict[u'contributors'].append(
+                            {
+                                u'contributorName': contributor
+                                }
+                            )
         affiliation = pkg_dict.get(u'affiliation', None)
         if affiliation:
             metadata_dict[u'affiliation'] = affiliation.encode(u'unicode-escape')
