@@ -19,7 +19,8 @@ Renders a citation for a resource
         {% endblock %}
 
         {% block citation_status %}
-            <p>Retrieved: {{ h.render_datetime(h.now(), date_format='%d %b %Y %H:%M') }} (GMT)</p>
+            <br />
+            <p>Retrieved: {{ h.render_datetime(h.now(), date_format='%d %b %Y %H:%M:%S') }} (UTC)</p>
         {% endblock %}
     </div>
 </section>
