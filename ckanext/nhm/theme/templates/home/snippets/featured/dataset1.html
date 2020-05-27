@@ -2,6 +2,7 @@
 
 {% set id = 'collection-indexlots' %}
 {% set title = "Index lots" %}
+{% set url = h.url_for('resource.read', id=id, resource_id=h.get_indexlot_resource_id()) %}
 
 {% block image %}
     <div class="featured-image" style="background-image: url('/images/BeetlesSmall.jpg')"
