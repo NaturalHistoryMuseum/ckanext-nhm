@@ -2,16 +2,36 @@
 Renders a citation for a resource
 #}
 
+{% set latest = h.get_object_url(res.id, g.record_dict['occurrenceID'], include_version=False) %}
+{% set versioned = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version) %}
+{% set retrieved = h.render_datetime(h.now(), date_format='%d %b %Y %H:%M:%S') %}
+
+{% resource 'ckanext-nhm/record-citation' %}
+
 <section class="module additional-info">
     <div class="module-content citation">
-        <h3>{{ _('Cite this as') }}</h3>
-        {% block citation_link %}
-            <p>Permanent URL:<p>
-            <p>{{ h.link_to(citation_url, citation_url) }}</p>
-        {% endblock %}
+        <h3>{{ _('Cite this as') }} <i id="citation-info" class="fa fa-question-circle"></i></h3>
+        <div id="citation-info-popup">
+            <p>We track changes to records and therefore you have a choice of citation options:</p>
+            <p>To cite the most up to date record data use the <span class="badge citation-badge">Latest</span> URL.</p>
+            <p>Or to cite this specific version of a record's data, ensuring any followers of the
+                link see the same data every time they visit the link, use the <span class="badge citation-badge">Version</span> URL.</p>
+        </div>
 
-        {% block citation_status %}
-            <p>Retrieved: {{ h.render_datetime(h.now(), date_format='%d %b %Y %H:%M') }} (GMT)</p>
+        <div class="citation_link">
+        {% block citation_link_versioned %}
+            <p><span class="badge citation-badge">Version</span> Permanent URL for this version of the record data:</p>
+            <p><i class="fa fa-link"></i> {{ h.link_to(versioned, versioned) }}</p>
+            <p>Retrieved: {{ retrieved }} (UTC)</p>
         {% endblock %}
+        </div>
+
+        <div class="citation_link">
+        {% block citation_link_latest %}
+            <p><span class="badge citation-badge">Latest</span> Permanent URL for the most up to date record data:</p>
+            <p><i class="fa fa-link"></i> {{ h.link_to(latest, latest) }}</p>
+            <p>Retrieved: {{ retrieved }} (UTC)</p>
+        {% endblock %}
+        </div>
     </div>
 </section>
