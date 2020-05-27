@@ -18,8 +18,7 @@
 
 {% block record_additional_information %}
     {% if g.record_dict['occurrenceID']%}
-        {% set citation_url = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version) %}
-        {% snippet "doi/snippets/record_citation.html", pkg_dict=g.pkg, res=res, citation_url=citation_url %}
+        {% snippet "doi/snippets/record_citation.html", pkg_dict=g.pkg, res=res %}
     {% endif %}
     {{ super() }}
 {% endblock %}
