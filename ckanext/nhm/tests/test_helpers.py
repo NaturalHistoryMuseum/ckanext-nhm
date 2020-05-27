@@ -5,7 +5,8 @@
 # Created by the Natural History Museum in London, UK
 
 import nose
-from ckanext.nhm.lib.helpers import dataset_author_truncate
+from mock import MagicMock, patch
+from ckanext.nhm.lib.helpers import dataset_author_truncate, get_object_url
 from ckantest.models import TestBase
 
 
@@ -36,3 +37,50 @@ class TestAuthorTruncate(TestBase):
         and contains unicode characters'''
         author = u', '.join([u'Dr. Someoné'] * 10)
         dataset_author_truncate(author)
+
+
+class TestGetObjectURL(TestBase):
+    '''Tests for the get_object_url helper function.'''
+    plugins = [u'nhm']
+
+    def test_get_object_url_default(self):
+        mock_rounded_version = 10
+        mock_datastore_get_rounded_version = MagicMock(return_value=mock_rounded_version)
+        mock_get_action = MagicMock(return_value=mock_datastore_get_rounded_version)
+        mock_url_for = MagicMock()
+        mock_toolkit = MagicMock(get_action=mock_get_action, url_for=mock_url_for)
+        with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
+            get_object_url(u'a resource', u'a guid')
+            mock_get_action.assert_called_once_with(u'datastore_get_rounded_version')
+            mock_datastore_get_rounded_version.assert_called_once_with({}, {
+                u'resource_id': u'a resource',
+                u'version': None,
+            })
+            mock_url_for.assert_called_once_with(u'object.view', uuid=u'a guid', qualified=True,
+                                                 version=mock_rounded_version)
+
+    def test_get_object_url_passed_version(self):
+        mock_rounded_version = 10
+        mock_datastore_get_rounded_version = MagicMock(return_value=mock_rounded_version)
+        mock_get_action = MagicMock(return_value=mock_datastore_get_rounded_version)
+        mock_url_for = MagicMock()
+        mock_toolkit = MagicMock(get_action=mock_get_action, url_for=mock_url_for)
+        with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
+            get_object_url(u'a resource', u'a guid', version=15)
+            mock_get_action.assert_called_once_with(u'datastore_get_rounded_version')
+            mock_datastore_get_rounded_version.assert_called_once_with({}, {
+                u'resource_id': u'a resource',
+                u'version': None,
+            })
+            mock_url_for.assert_called_once_with(u'object.view', uuid=u'a guid', qualified=True,
+                                                 version=mock_rounded_version)
+
+    def test_get_object_url_no_version(self):
+        mock_get_action = MagicMock()
+        mock_url_for = MagicMock()
+        mock_toolkit = MagicMock(get_action=mock_get_action, url_for=mock_url_for)
+        with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
+            get_object_url(u'a resource', u'a guid', version=15, include_version=False)
+            mock_get_action.assert_not_called()
+            mock_url_for.assert_called_once_with(u'object.view', uuid=u'a guid', qualified=True,
+                                                 version=None)
