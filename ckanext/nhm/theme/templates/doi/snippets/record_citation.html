@@ -2,12 +2,20 @@
 Renders a citation for a resource
 #}
 
+{% set latest = h.get_object_url(res.id, g.record_dict['occurrenceID'], include_version=False) %}
+{% set versioned = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version) %}
+
 <section class="module additional-info">
     <div class="module-content citation">
         <h3>{{ _('Cite this as') }}</h3>
-        {% block citation_link %}
-            <p>Permanent URL:<p>
-            <p>{{ h.link_to(citation_url, citation_url) }}</p>
+        {% block citation_link_latest %}
+            <p>Permanent URL for latest record data:<p>
+            <p>{{ h.link_to(latest, latest) }}</p>
+        {% endblock %}
+
+        {% block citation_link_versioned %}
+            <p>Permanent URL for this version of the record data:<p>
+            <p>{{ h.link_to(versioned, versioned) }}</p>
         {% endblock %}
 
         {% block citation_status %}

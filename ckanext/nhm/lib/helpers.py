@@ -1301,27 +1301,29 @@ def render_epoch(epoch_timestamp, in_milliseconds=True,
     return datetime.utcfromtimestamp(epoch_timestamp).strftime(date_format)
 
 
-def get_object_url(resource_id, guid, version=None):
+def get_object_url(resource_id, guid, version=None, include_version=True):
     '''
-    Retrieves the object url for the given guid in the given resource with the given
-    version. If the
+    Retrieves the object url for the given guid in the given resource with the given version. If the
     version is None then the latest version of the resource is used.
 
-    The version passed (if one is passed) is not used verbatim, a call to the
-    versioned search
-    extension is put in to retrieve the rounded version of the resource so that the
-    object url we
+    The version passed (if one is passed) is not used verbatim, a call to the versioned search
+    extension is put in to retrieve the rounded version of the resource so that the object url we
     create is always correct.
 
     :param resource_id: the resource id
     :param guid: the guid of the object
-    :param version: the version (optional, default is None which means latest version)
+    :param version: the version (default: None which means use the latest version)
+    :param include_version: whether to include the version in the object URL or not. If this is
+                            False the version parameter is ignored (default: True)
     :return: the object url
     '''
-    rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
-        u'resource_id': resource_id,
-        u'version': version,
+    if include_version:
+        rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
+            u'resource_id': resource_id,
+            u'version': version,
         })
+    else:
+        rounded_version = None
     return toolkit.url_for(u'object.view', uuid=guid, qualified=True, version=rounded_version)
 
 
