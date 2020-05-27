@@ -70,7 +70,7 @@ class TestGetObjectURL(TestBase):
             mock_get_action.assert_called_once_with(u'datastore_get_rounded_version')
             mock_datastore_get_rounded_version.assert_called_once_with({}, {
                 u'resource_id': u'a resource',
-                u'version': None,
+                u'version': 15,
             })
             mock_url_for.assert_called_once_with(u'object.view', uuid=u'a guid', qualified=True,
                                                  version=mock_rounded_version)
