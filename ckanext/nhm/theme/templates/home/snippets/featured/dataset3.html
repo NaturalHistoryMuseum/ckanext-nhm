@@ -1,16 +1,16 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set id = "the-2016-release-of-the-predicts-database" %}
-{% set title = "PREDICTS" %}
+{% set id = 'collection-indexlots' %}
+{% set title = "Index lots" %}
+{% set url = h.url_for('resource.read', id=id, resource_id=h.get_indexlot_resource_id()) %}
 
 {% block image %}
-    <div class="featured-image"
-            style="background-image:url('/images/geoffrey-baumbach-lY-4oM_xFXk-unsplash_small.jpg')"
-            alt="{{ title }}"
-            title="'The magical colors of nature' from Geoffrey Baumbach on unsplash.com"></div>
+    <div class="featured-image" style="background-image: url('/images/BeetlesSmall.jpg')"
+            title="Beetles collected in the Malay Archipelago by Alfred Russel Wallace">
+    </div>
 {% endblock %}
 
 {% block description %}
-    A dataset of over 3.2 million terrestrial biodiversity samples from 94 countries representing
-    over 45,000 species, collated by the PREDICTS project.
+    Access the catalogue of index lot records, used to record the presence of some entomological and
+    zoological species in the Museum collection.
 {% endblock %}
