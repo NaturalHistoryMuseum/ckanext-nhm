@@ -1380,3 +1380,23 @@ def build_nav_main(*args):
     '''
     from_core = core_helpers.build_nav_main(*args)
     return _add_nav_item_class(from_core)
+
+
+def get_specimen_jsonld(uuid, version=None):
+    '''
+    Returns the rdf representation of the given specimen uuid. The returned data is a string of
+    json-ld data. If something goes wrong, an empty string is returned.
+
+    :param uuid: the uuid of the specimen record
+    :param version: optional version for the record data
+    :return: string of dumped json-ld data
+    '''
+    data_dict = {
+        u'uuid': uuid,
+        u'format': u'json-ld',
+        u'version': version,
+    }
+    try:
+        return toolkit.get_action(u'object_rdf')({}, data_dict)
+    except toolkit.ValidationError, e:
+        return u''
