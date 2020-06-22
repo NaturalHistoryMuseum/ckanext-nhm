@@ -727,12 +727,7 @@ iframe {
   -webkit-mask-image: url('/images/nhm_logo.svg');
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
-  background: linear-gradient(90deg, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D);
-  background-size: 300% 300%;
-  -webkit-animation: colourShift 10s linear infinite;
-  -z-animation: colourShift 10s linear infinite;
-  -o-animation: colourShift 10s linear infinite;
-  animation: colourShift 10s linear infinite;
+  background: #FFFFFF;
   height: 60px;
   width: 129px;
 }
@@ -1062,12 +1057,7 @@ iframe {
   margin-right: 10px;
 }
 .toolbar {
-  background: linear-gradient(90deg, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D);
-  background-size: 300% 300%;
-  -webkit-animation: colourShift 10s linear infinite;
-  -z-animation: colourShift 10s linear infinite;
-  -o-animation: colourShift 10s linear infinite;
-  animation: colourShift 10s linear infinite;
+  background: #BBEDA9;
   padding: 0;
   margin: 0;
 }
