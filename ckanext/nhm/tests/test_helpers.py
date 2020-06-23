@@ -103,7 +103,8 @@ class TestGetSpecimenJSONLD(TestBase):
         with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
             uuid = u'beans'
             get_specimen_jsonld(uuid)
-            mock_get_action.assert_called_once_with({}, {
+            mock_get_action.assert_called_once_with(u'object_rdf')
+            mock_get_action(u'object_rdf').assert_called_once_with({}, {
                 u'uuid': uuid,
                 u'format': u'json-ld',
                 u'version': None
@@ -116,7 +117,8 @@ class TestGetSpecimenJSONLD(TestBase):
             uuid = u'beans'
             version = 327947382
             get_specimen_jsonld(uuid, version)
-            mock_get_action.assert_called_once_with({}, {
+            mock_get_action.assert_called_once_with(u'object_rdf')
+            mock_get_action(u'object_rdf').assert_called_once_with({}, {
                 u'uuid': uuid,
                 u'format': u'json-ld',
                 u'version': 327947382
