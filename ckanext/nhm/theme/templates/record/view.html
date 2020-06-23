@@ -2,9 +2,10 @@
 
 {% set rec = g.record_dict %}{% set res = g.resource %}{% set filterable_fields = h.resource_view_get_filterable_fields(res) %}
 
-{% block head_extras -%}{{ super() }}
-<meta property="og:title"
-      content="{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} - {{ g.site_title }}">{% endblock -%}
+{% block head_extras -%}
+    {{ super() }}
+    <meta property="og:title" content="{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} - {{ g.site_title }}">
+{% endblock -%}
 
 {% block subtitle %}{{ h.dataset_display_name(g.package) }} - {{ h.resource_display_name(res) }} - {{ g.record_title }} {% endblock %}
 

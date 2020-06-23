@@ -8,14 +8,14 @@ import itertools
 import json
 import logging
 import operator
-import time
-import urllib
-from collections import OrderedDict, defaultdict
-from operator import itemgetter
-
 import os
 import re
+import time
+import urllib
 from beaker.cache import cache_region
+from ckan import model
+from ckan.lib import helpers as core_helpers
+from ckan.plugins import toolkit
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
@@ -24,14 +24,12 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from collections import OrderedDict, defaultdict
 from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree, html
+from operator import itemgetter
 from webhelpers.html import literal
-
-from ckan import model
-from ckan.lib import helpers as core_helpers
-from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
 
@@ -1382,3 +1380,23 @@ def build_nav_main(*args):
     '''
     from_core = core_helpers.build_nav_main(*args)
     return _add_nav_item_class(from_core)
+
+
+def get_specimen_jsonld(uuid, version=None):
+    '''
+    Returns the rdf representation of the given specimen uuid. The returned data is a string of
+    json-ld data. If something goes wrong, an empty string is returned.
+
+    :param uuid: the uuid of the specimen record
+    :param version: optional version for the record data
+    :return: string of dumped json-ld data
+    '''
+    data_dict = {
+        u'uuid': uuid,
+        u'format': u'json-ld',
+        u'version': version,
+    }
+    try:
+        return toolkit.get_action(u'object_rdf')({}, data_dict)
+    except toolkit.ValidationError, e:
+        return u''
