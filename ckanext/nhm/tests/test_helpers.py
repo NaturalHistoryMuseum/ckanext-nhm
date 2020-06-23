@@ -5,8 +5,9 @@
 # Created by the Natural History Museum in London, UK
 
 import nose
+from ckan.plugins import toolkit
 from mock import MagicMock, patch
-from ckanext.nhm.lib.helpers import dataset_author_truncate, get_object_url
+from ckanext.nhm.lib.helpers import dataset_author_truncate, get_object_url, get_specimen_jsonld
 from ckantest.models import TestBase
 
 
@@ -84,3 +85,39 @@ class TestGetObjectURL(TestBase):
             mock_get_action.assert_not_called()
             mock_url_for.assert_called_once_with(u'object.view', uuid=u'a guid', qualified=True,
                                                  version=None)
+
+
+class TestGetSpecimenJSONLD(TestBase):
+    '''Tests for the get_specimen_jsonld helper function.'''
+    plugins = [u'nhm']
+
+    def test_error(self):
+        mock_get_action = MagicMock(side_effect=toolkit.ValidationError(u'test'))
+        mock_toolkit = MagicMock(get_action=mock_get_action)
+        with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
+            nose.tools.assert_raises(toolkit.ValidationException, get_specimen_jsonld, MagicMock())
+
+    def test_normal(self):
+        mock_get_action = MagicMock()
+        mock_toolkit = MagicMock(get_action=mock_get_action)
+        with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
+            uuid = u'beans'
+            get_specimen_jsonld(uuid)
+            mock_get_action.assert_called_once_with({}, {
+                u'uuid': uuid,
+                u'format': u'json-ld',
+                u'version': None
+            })
+
+    def test_normal_with_version(self):
+        mock_get_action = MagicMock()
+        mock_toolkit = MagicMock(get_action=mock_get_action)
+        with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
+            uuid = u'beans'
+            version = 327947382
+            get_specimen_jsonld(uuid, version)
+            mock_get_action.assert_called_once_with({}, {
+                u'uuid': uuid,
+                u'format': u'json-ld',
+                u'version': 327947382
+            })
