@@ -95,7 +95,7 @@ class TestGetSpecimenJSONLD(TestBase):
         mock_get_action = MagicMock(side_effect=toolkit.ValidationError(u'test'))
         mock_toolkit = MagicMock(get_action=mock_get_action)
         with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
-            nose.tools.assert_raises(toolkit.ValidationException, get_specimen_jsonld, MagicMock())
+            nose.tools.assert_raises(toolkit.ValidationError, get_specimen_jsonld, MagicMock())
 
     def test_normal(self):
         mock_get_action = MagicMock()
