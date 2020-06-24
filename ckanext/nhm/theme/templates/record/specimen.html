@@ -2,7 +2,7 @@
 
 {% block head_extras -%}
     {{ super() }}
-    {% set canonical_url = h.get_object_url(res.id, g.record_dict['occurrenceID'], include_version=False) %}
+    {% set canonical_url = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version, include_version=g.version is not none) %}
     <meta property="og:url" content="{{ canonical_url }}">
     <link rel="canonical" href="{{ canonical_url }}" />
 
