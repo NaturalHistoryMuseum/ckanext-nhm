@@ -2449,11 +2449,41 @@ select,
     width: unset;
   }
 }
-.citation {
-  margin-bottom: 20px;
+.citation #citation-info {
+  margin-left: 10px;
 }
-.citation p {
-  margin: 4px 6px;
+.citation #citation-info-popup {
+  background-color: white;
+  border-radius: 4px;
+  border: black 1px solid;
+  box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: none;
+  position: absolute;
+  padding: 5px;
+}
+@media (max-width: 575px) {
+  .citation #citation-info-popup {
+    width: 250px;
+  }
+}
+@media (min-width: 576px) {
+  .citation #citation-info-popup {
+    width: 400px;
+  }
+}
+.citation #citation-info-popup p:last-of-type {
+  margin: 0;
+}
+.citation .citation-badge {
+  background-color: #59B200;
+  border-radius: 4px;
+}
+.citation .citation_link {
+  padding-bottom: 20px;
+}
+.citation .citation_link:last-of-type {
+  padding-bottom: 0;
 }
 .ckanext-datapreview {
   padding-top: 0;

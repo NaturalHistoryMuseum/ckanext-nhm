@@ -1,15 +1,13 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set id = 'collection-indexlots' %}
-{% set title = "Index lots" %}
+{% set url = "/vfactor_iiif" %}
+{% set title = "Beetle drawers" %}
 
 {% block image %}
-    <div class="featured-image" style="background-image: url('/images/BeetlesSmall.jpg')"
-            title="Beetles collected in the Malay Archipelago by Alfred Russel Wallace">
-    </div>
+    <div class="featured-image" style="background-image:url('/images/iiif_drawer.jpg')"></div>
 {% endblock %}
 
 {% block description %}
-    Access the catalogue of index lot records, used to record the presence of some entomological and
-    zoological species in the Museum collection.
+    An interactive image viewer allowing users to zoom in on a selection of detailed drawer scans
+    from our Coleoptera collections.
 {% endblock %}

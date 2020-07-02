@@ -8,14 +8,14 @@ import itertools
 import json
 import logging
 import operator
-import time
-import urllib
-from collections import OrderedDict, defaultdict
-from operator import itemgetter
-
 import os
 import re
+import time
+import urllib
 from beaker.cache import cache_region
+from ckan import model
+from ckan.lib import helpers as core_helpers
+from ckan.plugins import toolkit
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
@@ -24,14 +24,12 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from collections import OrderedDict, defaultdict
 from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree, html
+from operator import itemgetter
 from webhelpers.html import literal
-
-from ckan import model
-from ckan.lib import helpers as core_helpers
-from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
 
@@ -301,6 +299,16 @@ def get_artefact_resource_id():
     @return:  ID for artefact resource
     '''
     return toolkit.config.get(u'ckanext.nhm.artefact_resource_id')
+
+
+def get_vfactor_resource_id():
+    '''
+    Get the ID for the vfactor resource.
+
+    :return: the resource id
+    '''
+    value = toolkit.config.get(u'ckanext.nhm.vfactor_resource_id')
+    return unicode(value) if value is not None else None
 
 
 @cache_region(u'permanent', u'collection_stats')
@@ -1291,27 +1299,29 @@ def render_epoch(epoch_timestamp, in_milliseconds=True,
     return datetime.utcfromtimestamp(epoch_timestamp).strftime(date_format)
 
 
-def get_object_url(resource_id, guid, version=None):
+def get_object_url(resource_id, guid, version=None, include_version=True):
     '''
-    Retrieves the object url for the given guid in the given resource with the given
-    version. If the
+    Retrieves the object url for the given guid in the given resource with the given version. If the
     version is None then the latest version of the resource is used.
 
-    The version passed (if one is passed) is not used verbatim, a call to the
-    versioned search
-    extension is put in to retrieve the rounded version of the resource so that the
-    object url we
+    The version passed (if one is passed) is not used verbatim, a call to the versioned search
+    extension is put in to retrieve the rounded version of the resource so that the object url we
     create is always correct.
 
     :param resource_id: the resource id
     :param guid: the guid of the object
-    :param version: the version (optional, default is None which means latest version)
+    :param version: the version (default: None which means use the latest version)
+    :param include_version: whether to include the version in the object URL or not. If this is
+                            False the version parameter is ignored (default: True)
     :return: the object url
     '''
-    rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
-        u'resource_id': resource_id,
-        u'version': version,
+    if include_version:
+        rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
+            u'resource_id': resource_id,
+            u'version': version,
         })
+    else:
+        rounded_version = None
     return toolkit.url_for(u'object.view', uuid=guid, qualified=True, version=rounded_version)
 
 
@@ -1370,3 +1380,23 @@ def build_nav_main(*args):
     '''
     from_core = core_helpers.build_nav_main(*args)
     return _add_nav_item_class(from_core)
+
+
+def get_specimen_jsonld(uuid, version=None):
+    '''
+    Returns the rdf representation of the given specimen uuid. The returned data is a string of
+    json-ld data. If something goes wrong, an empty string is returned.
+
+    :param uuid: the uuid of the specimen record
+    :param version: optional version for the record data
+    :return: string of dumped json-ld data
+    '''
+    data_dict = {
+        u'uuid': uuid,
+        u'format': u'json-ld',
+        u'version': version,
+    }
+    try:
+        return toolkit.get_action(u'object_rdf')({}, data_dict).decode(u'utf-8')
+    except toolkit.ValidationError, e:
+        return u''

@@ -1,0 +1,19 @@
+{% extends "page.html" %}
+
+{% block title %}
+    {{ _('V-Factor IIIF') }}
+{% endblock %}
+
+{% block breadcrumb_content %}
+    <li class="active">V-Factor IIIF</li>
+{% endblock %}
+
+{# no secondary block here, we render it in the vue app instead #}
+{% block secondary %}
+{% endblock %}
+
+{% block primary %}
+    {% resource 'ckanext-nhm/vfactor-iiif' %}
+    <div id="vfactor-iiif-app" data-resource-id="{{ h.get_vfactor_resource_id() }}">
+    </div>
+{% endblock %}

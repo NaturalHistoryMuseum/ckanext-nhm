@@ -1,0 +1,137 @@
+@import "variables";
+@import "mixins";
+@import "flex";
+
+.load-fonts();
+
+.viiif-intro-text-lower {
+  margin-top: 15px;
+}
+
+.viiif-filter {
+  padding: 5px;
+  border-radius: 5px;
+
+  &.active {
+    background-color: @primary6;
+  }
+}
+
+.viiif-filter-collection-label {
+  font-weight: normal;
+  margin-left: 10px;
+
+  &:after {
+    content: ''
+  }
+}
+
+.viiif-filter-collection-actions {
+  margin-top: 5px;
+  .mixin-flex-container();
+
+  @media (max-width: @md - 1), (min-width: @xl) {
+    .mixin-flex-between();
+  }
+
+  @media (min-width: @md) and (max-width: @xl - 1) {
+    .mixin-flex-column();
+
+    * {
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.viiif-filter-collection-selectors {
+  .mixin-flex-container();
+  .mixin-flex-row();
+  .mixin-flex-center();
+
+  *:first-child {
+    border-right: 1px black solid;
+  }
+}
+
+.viiif-filter-collection-selector {
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.viiif-filter-collection-label-header {
+  margin-bottom: 15px;
+}
+
+.viiif-filter-barcode-label {
+  font-weight: normal;
+  margin-bottom: 15px;
+
+  &:after {
+    content: ''
+  }
+}
+
+.viiif-filter-barcode-body {
+  .mixin-flex-container();
+
+  // if the page width is beyond xl or less than md - 1, show everything on the same line. When the
+  // page width is less than md - 1 the secondary panel fills the page width and therefore we have
+  // room to show the buttons next to each other
+  @media (max-width: @md - 1), (min-width: @xl) {
+    .mixin-flex-stretch-first();
+
+    *:first-child {
+      margin-right: 10px;
+    }
+  }
+
+  // if the page width is between md and xl - 1 show the buttons stacked
+  @media (min-width: @md) and (max-width: @xl - 1) {
+    .mixin-flex-column();
+
+    * {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.viiif-thumbnail-header {
+  padding: 10px 0;
+  margin: 10px 0;
+  border-top: 1px solid black;
+  border-bottom: 1px solid @grey5;
+
+  .mixin-flex-container();
+  .mixin-flex-between();
+}
+
+.viiif-thumbnail-track {
+  cursor: pointer;
+  display: flex;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.viiif-thumbnail-container {
+  text-align: center;
+  padding: 10px;
+
+  &.active {
+    background-color: @primary6;
+  }
+}
+
+.viiif-thumbnail-image {
+  padding: 0 10px;
+}
+
+.viiif-thumbnail-label {
+  .viiif-thumbnail-label-barcode {
+    font-weight: bold;
+  }
+
+  .viiif-thumbnail-label-collection {
+    font-style: italic;
+  }
+}
