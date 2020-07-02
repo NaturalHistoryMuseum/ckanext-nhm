@@ -70,8 +70,10 @@ ABYSSLINE_UUIDS = [u'bc03fc1a-3613-41a2-b1f1-bf905e0fa6d0',
                    u'e9f38ce3-5ed5-49f3-8713-c26de2eefd2b',
                    u'f263bc90-6307-462c-9e02-7b87d20e2840']
 
-# create a flask blueprint with a prefix
-blueprint = Blueprint(name=u'object', import_name=__name__)
+# this is the main record citation blueprint, use this in url_fors etc
+blueprint = Blueprint(name=u'object', import_name=__name__, url_prefix=u'/object')
+# this blueprint is here for the old citation urls, don't use it in url_fors etc
+specimen_blueprint = Blueprint(name=u'specimen', import_name=__name__, url_prefix=u'/specimen')
 
 
 def _context():
@@ -81,10 +83,10 @@ def _context():
         }
 
 
-@blueprint.route(u'/object/<uuid>.<_format>', defaults={
-    u'version': None
-    })
-@blueprint.route(u'/object/<uuid>/<int:version>.<_format>')
+@specimen_blueprint.route(u'/<uuid>.<_format>', defaults={u'version': None})
+@specimen_blueprint.route(u'/<uuid>/<int:version>.<_format>')
+@blueprint.route(u'/<uuid>.<_format>', defaults={u'version': None})
+@blueprint.route(u'/<uuid>/<int:version>.<_format>')
 def rdf(uuid, _format, version):
     '''
     Return RDF view of object.
@@ -107,10 +109,10 @@ def rdf(uuid, _format, version):
         toolkit.abort(409, str(e))
 
 
-@blueprint.route(u'/object/<uuid>', defaults={
-    u'version': None
-    })
-@blueprint.route(u'/object/<uuid>/<int:version>')
+@specimen_blueprint.route(u'/<uuid>', defaults={u'version': None})
+@specimen_blueprint.route(u'/<uuid>/<int:version>')
+@blueprint.route(u'/<uuid>', defaults={u'version': None})
+@blueprint.route(u'/<uuid>/<int:version>')
 def view(uuid, version):
     '''View object. If this is normal HTTP request, this will redirect to the record,
     otherwise if
@@ -184,8 +186,3 @@ def abyssline_object_redirect(uuid, version):
                             record_id=record[u'_id'], version=version)
 
     toolkit.abort(404, toolkit._(u'Record not found'))
-
-
-@blueprint.route('/specimen/<url>')
-def specimen_redirect(url):
-    return view(url)
