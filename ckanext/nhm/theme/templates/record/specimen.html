@@ -9,7 +9,7 @@
     <!-- this isn't right as we're not matching up to a schema.org @context but until we
          decide how to deal with this, here's the rdf version of this specimen in jsonld -->
     <script type="application/ld+json">
-        {{ h.get_specimen_jsonld(g.record_dict['occurrenceID']) | indent(8) | safe }}
+        {{ h.get_specimen_jsonld(g.record_dict['occurrenceID'], g.version) | indent(8) | safe }}
     </script>
 {% endblock -%}
 
