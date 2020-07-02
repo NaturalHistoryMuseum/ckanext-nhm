@@ -38,3 +38,5 @@ def get_record_by_uuid(uuid, version=None):
             pass
         else:
             return record, resource
+
+    return None, None
