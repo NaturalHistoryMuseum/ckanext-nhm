@@ -41,7 +41,7 @@ let results = {
         },
         pageParam:         (state) => {
             function compressString(arr) {
-                let str = JSON.stringify(arr);
+                let str                = JSON.stringify(arr);
                 let compressedString   = Buffer.from(pako.deflate(str, {to: 'array'}))
                                                .toString('base64');
                 let decompressedString = pako.inflate(Buffer.from(compressedString, 'base64'), {to: 'string'});
@@ -118,7 +118,6 @@ let results = {
                 })
                 .catch(error => {
                     Vue.set(context.rootState.appState.status.resultData, 'failed', true);
-                    console.error(error);
                 })
                 .finally(() => {
                     Vue.set(context.rootState.appState.status.resultData, 'loading', false);
@@ -207,6 +206,10 @@ let results = {
             context.commit('query/setAfter', null);
             context.commit('query/filters/resetFilters');
             context.commit('query/resources/selectAllResources');
+            context.commit('display/setView', 'Table')
+            context.state.resultData = {}
+            Vue.set(context.rootState.appState.status.resultData, 'loading', false);
+            Vue.set(context.rootState.appState.status.resultData, 'failed', false);
             context.dispatch('invalidate');
         },
         invalidate(context) {

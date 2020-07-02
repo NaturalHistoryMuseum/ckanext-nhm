@@ -64,7 +64,7 @@
                 <pre>{{ requestBody(false) }}</pre>
             </Copyable>
 
-            <Results></Results>
+            <Results @show-query="showQuery = true" @reset="reset"></Results>
         </div>
     </div>
 </template>

@@ -36,7 +36,7 @@ let dynamicPresets = {
                 }
             });
 
-            return {
+            let preset = {
                 key:     'exists',
                 content: {
                     fields: imageFields
@@ -46,6 +46,12 @@ let dynamicPresets = {
                     name:   state.hasImage.name
                 }
             };
+
+            if (imageFields.length === 0) {
+                preset.content.error = 'The selected datasets do not have image fields.';
+            }
+
+            return preset;
         }
     }
 };

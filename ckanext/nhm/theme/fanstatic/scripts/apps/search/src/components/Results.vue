@@ -3,7 +3,7 @@
         <Loading v-if="status.resultData.loading"></Loading>
         <LoadError v-if="status.resultData.failed">
             <h3>Something went wrong!</h3>
-            <p>Please check your query and <a href="/contact">contact us</a> if you think you've
+            <p>Please <a href="#" @click="$emit('show-query')">check your query</a>, <a href="#" @click="$emit('reset')">try resetting</a>, and <a href="/contact">contact us</a> if you think you've
                found a problem.</p>
         </LoadError>
         <div class="flex-container flex-left flex-stretch-first results-header"
