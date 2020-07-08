@@ -1,6 +1,6 @@
 <template>
     <div class="filter-add">
-        <span v-if="showText" class="filter-add-help-text">Add</span>
+        <span v-if="showText" class="filter-add-help-text">Add filters</span>
         <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"
             :id="'show-choice-' + _uid"></i>
         <transition name="slidedown">

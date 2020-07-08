@@ -697,9 +697,14 @@
   width: 100%;
   height: 100%;
 }
-.record-item .record-body > img {
-  width: 200px;
-  height: 200px;
+.record-item .record-body .tiny-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 5px;
+}
+.record-item .record-body .tiny-grid > img {
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   object-position: 50% 50%;
   border-radius: 5px;

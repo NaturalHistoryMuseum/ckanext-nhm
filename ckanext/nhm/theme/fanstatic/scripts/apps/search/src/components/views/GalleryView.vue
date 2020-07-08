@@ -76,31 +76,6 @@
         computed:   {
             ...mapState('results/display', ['recordTag']),
             ...mapGetters('results/query/filters', ['hasFilter']),
-            imageRecords() {
-                let imgRecords = [];
-
-                this.records.forEach((r, rix) => {
-                    let resourceDetails = this.getDetails(r.resource);
-                    let recordUrl       = `${resourceDetails.resourceUrl}/record/${r.data._id}`;
-                    let recordTitle     = r.data[resourceDetails.titleField] || r.data._id;
-                    this.getImages(r, false).forEach((i, iix, ia) => {
-                        imgRecords.push({
-                                            record:           r,
-                                            image:            i,
-                                            recordImageIndex: iix,
-                                            recordIndex:      rix,
-                                            imageTotal:       ia.length,
-                                            recordUrl,
-                                            recordTitle
-                                        })
-                    })
-                });
-
-                return imgRecords;
-            },
-            loadedImageRecords() {
-                return this.imageRecords.filter(r => !r.image.isBroken);
-            },
             brokenImageRecords() {
                 return this.imageRecords.filter(r => r.image.isBroken).map(r => {
                     if (r.record.data.collectionCode !== undefined) {
@@ -112,7 +87,7 @@
             }
         },
         methods:    {
-            ...mapMutations('results/display', ['setViewerImage', 'addPageImages', 'setFilteredRecordTag']),
+            ...mapMutations('results/display', ['setFilteredRecordTag']),
             ...mapActions('results', ['runSearch']),
             ...mapActions('results/query/filters', ['addPreset']),
             relayout(loadFinished) {

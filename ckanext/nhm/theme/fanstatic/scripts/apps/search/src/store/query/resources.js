@@ -86,12 +86,20 @@ let resources = {
                         let resources = pkg.resources.filter(r => {
                             return r.datastore_active;
                         }).map(r => {
+                            let packageUrl  = `/dataset/${pkg.id}`;
+                            let resourceUrl = packageUrl + `/resource/${r.id}`;
                             return {
+                                raw:          r,
                                 name:         r.name,
                                 id:           r.id,
                                 package_id:   r.package_id,
                                 package_name: pkg.title,
-                                raw:          r
+                                titleField:     r._title_field || '_id',
+                                imageField:     r._image_field,
+                                imageDelimiter: r._image_delimiter || '',
+                                imageLicence:   context.rootGetters['results/display/licenceFromId'](r._image_licence),
+                                packageUrl,
+                                resourceUrl
                             }
                         });
                         return {

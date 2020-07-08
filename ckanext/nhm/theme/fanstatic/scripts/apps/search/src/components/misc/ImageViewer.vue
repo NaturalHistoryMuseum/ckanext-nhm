@@ -131,7 +131,7 @@
                 return this.viewerImageIndex === 0;
             },
             lastImage() {
-                return this.viewerImagePage.length < (this.viewerImageIndex + 1);
+                return this.viewerImagePage.length <= (this.viewerImageIndex + 1);
             },
             isMAM() {
                 return this.viewerImage.image.preview.startsWith('https://www.nhm.ac.uk/services/media-store/asset/')

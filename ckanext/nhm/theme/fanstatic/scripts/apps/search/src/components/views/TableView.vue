@@ -42,16 +42,16 @@
 
             <template v-for="(item, ix) in records">
                 <div class="td small-column">{{ (page * 100) + ix + 1 }}</div>
-                <div class="td small-column"><a :href="getDetails(item.resource).packageUrl"
+                <div class="td small-column"><a :href="resourceDetails[item.resource].packageUrl"
                                                 :title="resourceDetails[item.resource].package_name">{{ resourceDetails[item.resource].package_name }}</a>
                 </div>
-                <div class="td small-column"><a :href="getDetails(item.resource).resourceUrl"
+                <div class="td small-column"><a :href="resourceDetails[item.resource].resourceUrl"
                                                 :title="resourceDetails[item.resource].name">
                     {{ resourceDetails[item.resource].name }}
                 </a>
                 </div>
                 <div class="td small-column">
-                    <a :href="`${getDetails(item.resource).resourceUrl}/record/${item.data._id}`"
+                    <a :href="`${resourceDetails[item.resource].resourceUrl}/record/${item.data._id}`"
                        :title="item.data._id"><i class="fas fa-eye inline-icon-left"></i>View</a>
                 </div>
                 <div class="td" v-for="headerGroup in headers" :key="headerGroup.id">

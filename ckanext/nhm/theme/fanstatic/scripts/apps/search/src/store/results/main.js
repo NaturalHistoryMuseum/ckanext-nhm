@@ -1,5 +1,6 @@
 import display from './display';
 import query from '../query/main';
+import images from './images';
 import {post} from '../utils';
 import Vue from 'vue';
 import pako from 'pako';
@@ -9,7 +10,8 @@ let results = {
     namespaced: true,
     modules:    {
         display,
-        query
+        query,
+        images
     },
     state:      {
         invalidated:     false,
@@ -35,6 +37,20 @@ let results = {
         },
         records:           (state, getters) => {
             return getters.hasResult ? state.resultData.result.records : [];
+        },
+        imageRecords:      (state, getters) => {
+            let imgRecords = [];
+
+            getters.records.forEach((r, rix) => {
+                getters['images/getItemImages'](r, false, rix).forEach((i) => {
+                    imgRecords.push(i)
+                })
+            });
+
+            return imgRecords;
+        },
+        loadedImageRecords: (state, getters) => {
+            return getters.imageRecords.filter(r => !r.image.isBroken);
         },
         resultResourceIds: (state, getters) => {
             return getters.records.map(r => r.resource);
