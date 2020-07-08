@@ -241,8 +241,8 @@
   &.filter-term {
     background-color: @grey10;
     border: @lighter-borders;
-    align-self: stretch;
-    height: auto !important;
+    align-self: flex-start;
+    height: 4em !important;
     padding-top: 15px;
 
     & .filter-fields {
@@ -306,6 +306,17 @@
     }
   }
 
+  &.filter-group-root {
+    background: transparent !important;
+    padding: 0 !important;
+    margin-left: 0;
+    margin-right: 0;
+
+    & > .filter-add {
+      padding: 0;
+    }
+  }
+
   &.filter-type-and {
     &, & > .group-type {
       background-color: @primary6;
@@ -327,6 +338,14 @@
 
 .filter-add {
   text-align: right;
+}
+
+.filter-add-help-text {
+  margin-right: 1em;
+  text-transform: uppercase;
+  font-family: @font-title;
+  font-weight: bold;
+  color: @grey1;
 }
 
 .filter-add-choice {

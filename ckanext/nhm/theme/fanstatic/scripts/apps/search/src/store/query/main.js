@@ -34,7 +34,10 @@ let query = {
             }
 
             if (getters['filters/count'](ignoreTemp) > 1) {
-                body.filters = getters['filters/queryfy']('group_root', ignoreTemp)
+                let filters = getters['filters/queryfy']('group_root', ignoreTemp);
+                if (Object.keys(filters).length > 0) {
+                    body.filters = filters;
+                }
             }
             return body;
         }

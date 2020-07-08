@@ -69,7 +69,13 @@ let filters = {
                 let children        = getters.getChildren(id, true)
                                              .filter(c => ignoreTemp ? !c.value.display.temp : true);
                 if (children.length > 0) {
-                    queryData[data.key] = children.map(c => getters.queryfy(c.key, ignoreTemp));
+                    let childData = children.map(c => getters.queryfy(c.key, ignoreTemp)).filter(c => c !== undefined);
+                    if (childData.length > 0) {
+                        queryData[data.key] = childData;
+                    }
+                }
+                else {
+                    return;
                 }
             }
             return queryData;

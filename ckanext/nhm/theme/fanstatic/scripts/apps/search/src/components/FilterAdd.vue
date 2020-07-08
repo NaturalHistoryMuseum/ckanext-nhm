@@ -1,5 +1,6 @@
 <template>
     <div class="filter-add">
+        <span v-if="showText" class="filter-add-help-text">Add</span>
         <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"
             :id="'show-choice-' + _uid"></i>
         <transition name="slidedown">
@@ -39,7 +40,7 @@
 
     export default {
         name:       'FilterAdd',
-        props:      ['parentId'],
+        props:      ['parentId', 'showText'],
         components: {
             TermEditor: () => ({component: TermEditor, loading: Loading, error: LoadError}),
         },
@@ -56,7 +57,7 @@
                 return this.getNestLevel(this.parentId);
             },
             canAddGroups: function () {
-                return this.nestLevel === 0;
+                return this.nestLevel <= 1;
             },
             canAddTerms:  function () {
                 return true;

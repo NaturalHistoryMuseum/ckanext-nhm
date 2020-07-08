@@ -100,7 +100,9 @@ let display = {
                         headers = headers.concat(data.result.map(f => d3.keys(f.fields)));
                     }
                 })
-                .catch()
+                .catch(e => {
+                    console.log(e);
+                })
                 .finally(() => {
                     headers.forEach(h => {
                         if (!context.state.headers.map(x => JSON.stringify(x))
