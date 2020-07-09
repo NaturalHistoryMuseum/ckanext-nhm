@@ -13,6 +13,7 @@ blueprint = Blueprint(name=u'help', import_name=__name__, url_prefix=u'/help')
 
 
 @blueprint.route('/')
+@blueprint.route('')
 def index():
     '''Render the help index.'''
     return toolkit.render(u'help/index.html', {

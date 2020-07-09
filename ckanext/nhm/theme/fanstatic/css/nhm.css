@@ -2340,6 +2340,10 @@ select,
 .help-section img {
   margin: 20px;
 }
+.help-img {
+  border: 2px dashed #DDDDDD;
+  padding: 5px;
+}
 .label[data-format=dwc],
 .label[data-format*=dwc] {
   background-color: #71C85B;
