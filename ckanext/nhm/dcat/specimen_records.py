@@ -214,8 +214,9 @@ class RecordGraphBuilder(object):
             yield (self.record_ref, self.namespaces.dwc.countryCode,
                    self._get_value(u'countryCode', source=self.gbif_record))
 
-        yield (self.record_ref, self.namespaces.dc.created,
-               Literal(epoch_to_datetime(self.record.get(u'created'))))
+        if self.record.get(u'created', None) is not None:
+            yield (self.record_ref, self.namespaces.dc.created,
+                   Literal(epoch_to_datetime(self.record[u'created'])))
         yield self.record_ref, self.namespaces.dc.publisher, URIRef(u'https://nhm.ac.uk')
 
     def _images(self):
@@ -299,13 +300,15 @@ class RecordGraphBuilder(object):
             yield self.record_ref, self.namespaces.dwc.associatedMedia, \
                   Literal(as_dwc_list(map(itemgetter(u'identifier'), media)))
 
-        # yield the created date in the correct format
-        yield (self.record_ref, self.namespaces.dc.created,
-               Literal(epoch_to_datetime(self.record.get(u'created'))))
+        if self.record.get(u'created', None) is not None:
+            # yield the created date in the correct format
+            yield (self.record_ref, self.namespaces.dc.created,
+                   Literal(epoch_to_datetime(self.record[u'created'])))
 
-        # yield the modified date in the correct format
-        yield (self.record_ref, self.namespaces.dwc.modified,
-               Literal(epoch_to_datetime(self.record.get(u'modified'))))
+        if self.record.get(u'modified', None) is not None:
+            # yield the modified date in the correct format
+            yield (self.record_ref, self.namespaces.dwc.modified,
+                   Literal(epoch_to_datetime(self.record[u'modified'])))
 
     def _version_info(self):
         '''
