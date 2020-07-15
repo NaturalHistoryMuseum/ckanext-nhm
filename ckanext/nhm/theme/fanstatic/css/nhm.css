@@ -814,6 +814,9 @@ iframe {
 .module-narrow {
   padding: 0 !important;
 }
+.no-margin {
+  margin: 0 !important;
+}
 .no-pad-h {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -2338,7 +2341,7 @@ select,
   margin-top: 50px;
 }
 .help-section img {
-  margin: 20px;
+  margin: 20px 0;
 }
 .help-img {
   border: 2px dashed #DDDDDD;

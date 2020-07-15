@@ -8,11 +8,9 @@
     {% set stats = h.get_site_statistics() %}
     {% set specimens_url = h.url_for_collection_view() %}
 
-    <p>This is the help page for our
-        <em>Integrated Search</em>
-       feature. Access it
+    <p>This is the help page for our <em>Integrated Search</em> feature. Access it
         <a href="{{ url_for('search.view') }}">here</a>
-       .
+        .
     </p>
 
     <div class="help-section">
@@ -23,9 +21,7 @@
             </a>
             , but there are {{ h.SI_number_span(stats.dataset_count - 1) }} more. Previously, you
             could only search in one resource (one file within a dataset) at a time, but integrated
-            search allows you to search
-            <em>multiple</em>
-            resources at the same time.
+            search allows you to search <em>multiple</em> resources at the same time.
         </p>
         <p>
             We've also made the search a lot more powerful by adding advanced features such as
@@ -34,7 +30,7 @@
 
         <h3>The old search</h3>
         <p>If you still want to use the old search, we haven't removed anything. Just view the
-           resource you want to search in and everything should be exactly the same as before.</p>
+            resource you want to search in and everything should be exactly the same as before.</p>
     </div>
 
     <div class="help-section">
@@ -161,7 +157,7 @@
         <h2>2. Constructing a search</h2>
         <h3>2.1. Selecting resources</h3>
         <p>The integrated search can search across multiple resources (individual sets of records
-           within datasets) simultaneously.</p>
+            within datasets) simultaneously.</p>
         <p>
             Clicking on <b>Resources</b>
             <i class="fas fa-list"></i>
@@ -169,10 +165,10 @@
         </p>
         <img src="/images/help/search-resources.png" class="img-responsive help-img">
         <p>To include a resource in your search, tick the box next to its name. You can
-           select/deselect all the resources within a dataset by clicking the dataset name in green
-           above it, and select/deselect all resources in the list using the "select all" checkbox
-           at the top of the list. To deselect everything <em>except</em> the resources in one
-           particular dataset, hold the <code>alt</code> key and click the dataset name.
+            select/deselect all the resources within a dataset by clicking the dataset name in green
+            above it, and select/deselect all resources in the list using the "select all" checkbox
+            at the top of the list. To deselect everything <em>except</em> the resources in one
+            particular dataset, hold the <code>alt</code> key and click the dataset name.
         </p>
         <p>
             To dismiss the dialog and save your changes, click outside the box. </p>
@@ -190,10 +186,10 @@
 
         <h3>2.3. Filters</h3>
         <p>
-            Below the free-text search is the filter builder. <em>Filter</em>
-            can refer to any part of this: a whole group of multiple items, or a single item. Each
-            of the smallest items are referred to as <em>terms</em>, and they are linked together in
-            <em>groups</em>. For example:
+            Below the free-text search is the filter builder. <em>Filter</em> can refer to any part
+            of this: a whole group of multiple items, or a single item. Each of the smallest items
+            are referred to as <em>terms</em>, and they are linked together in <em>groups</em>. For
+            example:
         </p>
         <div class="flex-container no-padding">
             <img src="/images/help/search-filters.png"
@@ -222,43 +218,44 @@
 
         <h4>2.3.1. Filter Terms</h4>
         <p>A <em>term</em> filters on field names (i.e. it will be applied to every field with that
-           name in every resource in the query - case-insensitively). Terms are the basic units of
-           filtering.
+            name in every resource in the query - case-insensitively). Terms are the basic units of
+            filtering.
         </p>
         <p>To add a new term, click the
             <i class="fas fa-plus-square"></i>
-           icon and click "new term". This will bring up the term editor.
+            icon and click "new term". This will bring up the term editor.
         </p>
         <img src="/images/help/search-term-editor.png" class="img-responsive help-img">
         <p>On the left side, select the fields to search in. Typing in the textbox will filter the
-           list; you can then select a field by clicking on it. To remove a field name, click the <i
+            list; you can then select a field by clicking on it. To remove a field name, click the
+            <i
                     class="fas fa-times-circle"></i> icon.
         </p>
         <img src="/images/help/search-term-editor-fields.png"
              class="img-responsive help-img">
 
         <p>On the right side, specify the details of your query: field type, comparison type, and
-           values.</p>
+            values.</p>
         <div class="flex-container flex-stretch-last">
-            <img src="/images/help/search-term-editor-query-text.png"
-                 class="img-responsive help-img">
+            <div style="min-width: 40%;max-width: max-content;">
+                <img src="/images/help/search-term-editor-query-text.png"
+                     class="img-responsive help-img">
+            </div>
             <div>
                 <p><b>Field type</b> is the data type that the field will be read as. Most queries
-                                     will use the default "Text" type, but more complex queries may
-                                     use the "Number" or "Geo" types. A fourth type, "Any", only has
-                                     one comparison type ("exists") and just checks if the field has
-                                     any content at all.
+                    will use the default "Text" type, but more complex queries may use the "Number"
+                    or "Geo" types. A fourth type, "Any", only has one comparison type ("exists")
+                    and just checks if the field has any content at all.
                 </p>
                 <p><b>Comparison type</b> describes how the field value will be compared to the
-                                          query/comparison value. Each field type has different
-                                          comparison types available.
+                    query/comparison value. Each field type has different comparison types
+                    available.
                 </p>
                 <p><b>Comparison value</b> is the value to which the field values will be compared.
                 </p>
                 <p><b>Display name</b> is entirely optional, but may be useful for especially
-                                       complex queries with many terms: it allows you to set a
-                                       "friendly" display name for the term, so it will be shown in
-                                       a more memorable way.
+                    complex queries with many terms: it allows you to set a "friendly" display name
+                    for the term, so it will be shown in a more memorable way.
                 </p>
             </div>
 
@@ -268,22 +265,22 @@
                 <img src="/images/help/search-term-editor-query-number.png"
                      class=" help-img">
                 <p>A number range query: matching fields will contain a number between one and five.
-                   (Click the angle brackets to toggle equality comparisons).</p>
+                    (Click the angle brackets to toggle equality comparisons).</p>
             </div>
             <div style="width: min-content;">
                 <img src="/images/help/search-term-editor-query-geo.png"
                      class="help-img">
                 <p>A geo point query: matching records will have coordinates within five miles of
-                   the specified coordinates.</p>
+                    the specified coordinates.</p>
                 <p>NB: geo queries <em>do not use field names</em>. They are based on longitude and
-                   latitude points that are set elsewhere by the resource maintainer.
+                    latitude points that are set elsewhere by the resource maintainer.
                 </p>
             </div>
             <div style="width: min-content;">
                 <img src="/images/help/search-term-editor-query-geo2.png"
                      class="help-img">
                 <p>A geo polygon query: matching records will have coordinates inside the specified
-                   area.</p>
+                    area.</p>
             </div>
         </div>
 
@@ -294,10 +291,10 @@
 
         <h4>2.3.2. Filter Groups</h4>
         <p><em>Groups</em> allow you to link terms and use some boolean logic in your queries. You
-                           can have three types of group: AND (aka 'all of'), OR (aka 'any of'), and
-                           NOT (aka 'none of'). To change the group type, click the name in the top
-                           left corner. In the groups below, the terms are the same but the group
-                           type has changed. This drastically changes the records found.
+            can have three types of group: AND (aka 'all of'), OR (aka 'any of'), and NOT (aka 'none
+            of'). To change the group type, click the name in the top left corner. In the groups
+            below, the terms are the same but the group type has changed. This drastically changes
+            the records found.
         </p>
         <div class="flex-container flex-top flex-equal">
             <img src="/images/help/search-groups-and.png" class="img-responsive help-img">
@@ -306,36 +303,135 @@
         </div>
         <ol>
             <li>
-                In the first group, each record must match
-                <em>all of</em>
-                the terms; so each record must have collectionCode=BOT
-                <b>and</b>
-                year=2000.
+                In the first group, each record must match <em>all of</em> the terms; so each record
+                must have collectionCode=BOT <b>and</b> year=2000.
             </li>
-            <li>In the second group, each record can match
-                <em>any of</em>
-                the terms; so each record must have collectionCode=BOT
-                <b>or</b>
-                year=2000 (or both!).
+            <li>In the second group, each record can match <em>any of</em> the terms; so each record
+                must have collectionCode=BOT <b>or</b> year=2000 (or both!).
             </li>
-            <li>In the third group, each record must
-                <b>not</b>
-                match any of the terms; so the records match neither collectionCode=BOT nor
-                year=2000.
+            <li>In the third group, each record must <b>not</b> match any of the terms; so the
+                records match neither collectionCode=BOT nor year=2000.
             </li>
         </ol>
         <p>Groups can also be nested under the top level:</p>
         <img src="/images/help/search-nested-groups.png" class="img-responsive help-img">
-        <p>This query would search for
-            <em>either</em>
-           botany records from 2000
-            <em>or</em>
-           palaeontology records from 2008.
+        <p>This query would search for <em>either</em> botany records from 2000 <em>or</em>
+            palaeontology records from 2008.
         </p>
-        <p><b>NB</b>: when you're using the user interface, the whole query is wrapped in a hidden "and" group.</p>
+        <p><b>NB</b>: when you're using the user interface, the whole query is wrapped in a hidden
+            "and" group.
+        </p>
 
         <h4>2.3.3. Presets</h4>
-        <p></p>
+        <p><em>Presets</em> are predefined filter terms that are commonly used and/or need to be
+            dynamically set. There are currently very few of these, but more can be added later.
+            Please {% link_for _('contact us'), named_route='contact.form' %} if you need one of
+            these presets added.
+        </p>
+        <p>There are two types of presets: static and dynamic. These are both found in the same
+            place, so the difference is explained here for interest/clarity's sake more than
+            anything else.</p>
+        <p>A <em>static</em> preset contains the same information every time, e.g. the <em> Birdwing
+            Butterfly Digitisation</em> will always add a term where <code>project = Birdwing
+            Butterfly Digitisation</code> .
+        </p>
+        <img src="/images/help/search-presets-birdwing.png"
+             class="img-responsive help-img"
+             alt="The term editor for the Birdwing Butterfly Digitisation preset. The project field is selected, the field type is 'text', the comparison type is 'equals', and the comparison value is 'Birdwing Butterfly Digitisation'.">
+        <p><em>Dynamic</em> presets change their value dependent on other factors in the query <b>at
+            the time they are added</b>. Once added, they act like every other filter term, so try
+            to add these last if possible. An example is the <em>Has Image</em> preset, which
+            extracts image fields from the current list of resources and adds an
+            "<code>exists</code>" term that checks if these fields have content in them.
+        </p>
+        <div class="flex-container flex-equal flex-top">
+            <div>
+                <img src="/images/help/search-presets-hasimage-1.png"
+                     class="img-responsive help-img"
+                     alt="The term editor for the Has Image preset. Two fields are selected: media and associatedMedia. The field type is 'any' and the comparison type is 'exists'.">
+                <p>
+                    In this example, multiple resources with an image field are being searched, so
+                    multiple image fields are added to the term. Not every resource will have an
+                    image field set, and those that do may share field names with other resources,
+                    so the list is likely to be much shorter than the actual list of resources.
+                </p>
+            </div>
+
+            <div>
+                <img src="/images/help/search-presets-hasimage-2.png"
+                     class="img-responsive help-img"
+                     alt="The term editor for the Has Image preset. Only one field is selected: associatedMedia. The field type is 'any' and the comparison type is 'exists'.">
+                <p>In contrast to the previous image, in this example only one resource with an
+                    image field is being searched (or, all the resources being searched have the
+                    same image field name), so only one field is selected.</p>
+            </div>
+
+        </div>
+
     </div>
+
+    <div class="help-section">
+        <h2>3. Results</h2>
+        <h3>3.1. Views</h3>
+        <p>
+            The results of a search can be displayed in different ways, termed "views". To change
+            the <em>view</em>, click the name of the view above the results (see <em>Result View
+            Switcher</em> in <b>1. UI Overview</b>).
+        </p>
+        <p>The fields shown in some views (i.e. Table and List) are dynamically selected via an API
+            method that attempts to guess the "most relevant" fields.</p>
+        <h4>3.1.1. Table View</h4>
+        <p>The table view is the default view. It displays the results in tabular form.</p>
+        <img src="/images/help/search-results-table.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the table results view.">
+        <h4>3.1.2. List View</h4>
+        <p>The list view displays a short summary of each record individually, along with thumbnails
+            of any associated images (if there are any).</p>
+        <p>Clicking on an image brings up the viewer overlay, which displays a larger version and
+            offers an option to download the image.</p>
+        <img src="/images/help/search-results-list.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the list results view.">
+        <h4>3.1.2. Gallery View</h4>
+        <p>The gallery view displays all the images associated with records in the search. It does
+            not show records separately, but simply lists out all available images for each page of
+            results.</p>
+        <p>Clicking on an image brings up the viewer overlay, which displays a larger version and
+            offers an option to download the image.</p>
+        <img src="/images/help/search-results-gallery.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the gallery results view.">
+        <img src="/images/help/search-results-imageviewer.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the image viewer overlay.">
+
+        <h3>3.2. Buttons</h3>
+        <img src="/images/help/search-results-buttons.png"
+             class="img-responsive help-img"
+             alt="The three buttons at the top right of the results view: cite, share, and download.">
+        <h4>3.2.1. Cite</h4>
+        <p>The <em>cite</em> button generates a digital object identifier (DOI) for the search,
+            allowing you to easily cite the results in publications.</p>
+        <h4>3.2.2. Share</h4>
+        <p>Similarly to the cite button, the <em>share</em> button also generates a link to the
+            search; but it is intended for more informal use, such as when sharing a search with a
+            colleague. It uses three random words to create a memorable short link (with the option
+            to include the page and view) that can then be shared.</p>
+        <img src="/images/help/search-results-share.png"
+             class="img-responsive help-img"
+             alt="The 'share' button popup, showing a link to https://data.nhm.ac.uk/search/future-expensive-pelican.">
+        <h4>3.2.3. Download</h4>
+        <p>The download button allows you to request a full download of the set of results in CSV
+            format. The record data will be automatically packaged up and sent to your email address
+            when ready.</p>
+    </div>
+    <br>
+    <p>As always, if you have any further questions or suggestions,
+        please {% link_for _('contact us'), named_route='contact.form' %}. We are also available on
+        <a href="https://gitter.im/nhm-data-portal" class="external">Gitter</a>
+        and
+        <a href="https://twitter.com/nhm_data" class="external">Twitter</a>.
+    </p>
 
 {% endblock %}
