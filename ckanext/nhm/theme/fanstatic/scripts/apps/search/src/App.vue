@@ -99,7 +99,7 @@
             }
         },
         computed:   {
-            ...mapState('appState', ['app']),
+            ...mapGetters('appState', ['app']),
             ...mapGetters('results/query', ['requestBody']),
             ...mapState('results/query/resources', ['packageList', 'resourceIds']),
             ...mapState('results/display', ['showImage']),
