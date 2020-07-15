@@ -19,7 +19,7 @@
             The Data Portal hosts many different datasets. The largest and most commonly used is our
             <a href="{{ url_for('dataset.read', id='collection-specimens') }}">Specimens Collection
             </a>
-            , but there are {{ h.SI_number_span(stats.dataset_count - 1) }} more. Previously, you
+            , but there are {{ h.SI_number_span(stats.dataset_count - 1) }} others. Previously, you
             could only search in one resource (one file within a dataset) at a time, but integrated
             search allows you to search <em>multiple</em> resources at the same time.
         </p>
@@ -35,7 +35,9 @@
 
     <div class="help-section">
         <h2>1. UI Overview</h2>
-        <img src="/images/help/search-overview-labelled.png" class="img-responsive help-img">
+        <img src="/images/help/search-overview-labelled.png"
+             class="img-responsive help-img"
+             alt="A labelled screenshot of the whole UI interface.">
 
         <table class="blocks-table">
             <tr>
@@ -163,7 +165,9 @@
             <i class="fas fa-list"></i>
             will bring up a dialog similar to this one:
         </p>
-        <img src="/images/help/search-resources.png" class="img-responsive help-img">
+        <img src="/images/help/search-resources.png"
+             class="img-responsive help-img"
+             alt="The resources popup dialog, with three datasets shown. Each dataset contains one resource.">
         <p>To include a resource in your search, tick the box next to its name. You can
             select/deselect all the resources within a dataset by clicking the dataset name in green
             above it, and select/deselect all resources in the list using the "select all" checkbox
@@ -204,16 +208,22 @@
             filter builder, then select the option you need.
         </p>
         <div class="flex-container flex-between no-padding">
-            <img src="/images/help/search-filter-add-1.png"
-                 class="img-responsive help-img"
-                 alt="The 'add filter' icon when no filters are currently applied. It is just below the free-text search and if prefixed by the text 'ADD FILTERS'.">
-            <b>or</b>
-            <img src="/images/help/search-filter-add-2.png"
-                 class="img-responsive help-img"
-                 alt="The 'add filter' icons inside and outside of a filter group. These are just a plus symbol and have no preceding text.">
-            <b>then</b>
-            <img src="/images/help/search-empty-filter.png" class="img-responsive help-img"
-                 alt="The dropdown list of options for a new filter.">
+            <div>
+                <img src="/images/help/search-filter-add-1.png"
+                     class="img-responsive help-img"
+                     alt="The 'add filter' icon when no filters are currently applied. It is just below the free-text search and if prefixed by the text 'ADD FILTERS'.">
+            </div>
+            <div><b>or</b></div>
+            <div>
+                <img src="/images/help/search-filter-add-2.png"
+                     class="img-responsive help-img"
+                     alt="The 'add filter' icons inside and outside of a filter group. These are just a plus symbol and have no preceding text.">
+            </div>
+            <div><b>then</b></div>
+            <div>
+                <img src="/images/help/search-empty-filter.png" class="img-responsive help-img"
+                     alt="The dropdown list of options for a new filter.">
+            </div>
         </div>
 
         <h4>2.3.1. Filter Terms</h4>
@@ -225,21 +235,24 @@
             <i class="fas fa-plus-square"></i>
             icon and click "new term". This will bring up the term editor.
         </p>
-        <img src="/images/help/search-term-editor.png" class="img-responsive help-img">
+        <img src="/images/help/search-term-editor.png"
+             class="img-responsive help-img"
+             alt="The term editor, as it appears when first shown.">
         <p>On the left side, select the fields to search in. Typing in the textbox will filter the
             list; you can then select a field by clicking on it. To remove a field name, click the
-            <i
-                    class="fas fa-times-circle"></i> icon.
+            <i class="fas fa-times-circle"></i> icon.
         </p>
         <img src="/images/help/search-term-editor-fields.png"
-             class="img-responsive help-img">
+             class="img-responsive help-img"
+             alt="The left side of the term editor, showing a list of fields filtered by the search term 'collection'. 'collectionCode' has already been selected.">
 
         <p>On the right side, specify the details of your query: field type, comparison type, and
             values.</p>
         <div class="flex-container flex-stretch-last">
             <div style="min-width: 40%;max-width: max-content;">
                 <img src="/images/help/search-term-editor-query-text.png"
-                     class="img-responsive help-img">
+                     class="img-responsive help-img"
+                     alt="A labelled screenshot of the right side of the term editor.">
             </div>
             <div>
                 <p><b>Field type</b> is the data type that the field will be read as. Most queries
@@ -263,13 +276,14 @@
         <div class="flex-container flex-between flex-wrap flex-top">
             <div style="width: min-content;">
                 <img src="/images/help/search-term-editor-query-number.png"
-                     class=" help-img">
+                     class=" help-img"
+                     alt="The right side of the term editor, showing a number range query.">
                 <p>A number range query: matching fields will contain a number between one and five.
                     (Click the angle brackets to toggle equality comparisons).</p>
             </div>
             <div style="width: min-content;">
                 <img src="/images/help/search-term-editor-query-geo.png"
-                     class="help-img">
+                     class="help-img" alt="The term editor, showing a geo point query.">
                 <p>A geo point query: matching records will have coordinates within five miles of
                     the specified coordinates.</p>
                 <p>NB: geo queries <em>do not use field names</em>. They are based on longitude and
@@ -278,7 +292,7 @@
             </div>
             <div style="width: min-content;">
                 <img src="/images/help/search-term-editor-query-geo2.png"
-                     class="help-img">
+                     class="help-img" alt="The term editor, showing a geo polygon query.">
                 <p>A geo polygon query: matching records will have coordinates inside the specified
                     area.</p>
             </div>
@@ -297,9 +311,21 @@
             the records found.
         </p>
         <div class="flex-container flex-top flex-equal">
-            <img src="/images/help/search-groups-and.png" class="img-responsive help-img">
-            <img src="/images/help/search-groups-or.png" class="img-responsive help-img">
-            <img src="/images/help/search-groups-not.png" class="img-responsive help-img">
+            <div>
+                <img src="/images/help/search-groups-and.png"
+                     class="img-responsive help-img"
+                     alt="An 'AND' filter group, containing two filter terms. The background is green and the text at the top says 'all of'.">
+            </div>
+            <div>
+                <img src="/images/help/search-groups-or.png"
+                     class="img-responsive help-img"
+                     alt="An 'OR' filter group, containing two filter terms. The background is blue and the text at the top says 'any of'.">
+            </div>
+            <div>
+                <img src="/images/help/search-groups-not.png"
+                     class="img-responsive help-img"
+                     alt="A 'NOT' filter group, containing two filter terms. The background is red and the text at the top says 'none of'.">
+            </div>
         </div>
         <ol>
             <li>
@@ -314,7 +340,9 @@
             </li>
         </ol>
         <p>Groups can also be nested under the top level:</p>
-        <img src="/images/help/search-nested-groups.png" class="img-responsive help-img">
+        <img src="/images/help/search-nested-groups.png"
+             class="img-responsive help-img"
+             alt="Two 'all of' groups nested within a 'any of' group. 'All of' group one is searching for 'collectionCode = BOT' and 'year = 2000', while 'all of' group 2 is searching for 'collectionCode = PAL' and 'year = 2008'.">
         <p>This query would search for <em>either</em> botany records from 2000 <em>or</em>
             palaeontology records from 2008.
         </p>
@@ -426,12 +454,32 @@
             format. The record data will be automatically packaged up and sent to your email address
             when ready.</p>
     </div>
+    <div class="help-section">
+        <h2>4. Troubleshooting</h2>
+        <h3>4.1. Resetting</h3>
+        <p>This is a good place to start for fixing any UI issues, e.g. menus not loading or popup
+            boxes dismissing as soon as you click them.</p>
+        <ol>
+            <li>
+                If you're able to, get a sharing link (see <b>3.2.2. Share</b>);
+            </li>
+            <li>
+                Either go to the sharing link (if you have one) <b>or</b> hard-refresh the page with
+                <code>CTRL</code>+<code>F5</code>.
+            </li>
+            <li>
+                If that still doesn't work, <b>Reset</b> <i class="fas fa-trash"></i> your query,
+                refresh, and start again.
+            </li>
+        </ol>
+    </div>
     <br>
-    <p>As always, if you have any further questions or suggestions,
+    <p>As always, if you have any further issues, questions, or suggestions,
         please {% link_for _('contact us'), named_route='contact.form' %}. We are also available on
         <a href="https://gitter.im/nhm-data-portal" class="external">Gitter</a>
         and
-        <a href="https://twitter.com/nhm_data" class="external">Twitter</a>.
+        <a href="https://twitter.com/nhm_data" class="external">Twitter</a>
+        .
     </p>
 
 {% endblock %}
