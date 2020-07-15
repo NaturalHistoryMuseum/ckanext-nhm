@@ -14,8 +14,8 @@
         },
         props: ['filterId'],
         computed: {
-            ...mapState('constants', ['schema']),
-            ...mapGetters('filters', ['getFilterById', 'getNestLevel']),
+            ...mapState(['schema']),
+            ...mapGetters('results/query/filters', ['getFilterById', 'getNestLevel']),
             filterItem() {
                 return this.getFilterById(this.filterId);
             },
@@ -27,7 +27,7 @@
             }
         },
         methods: {
-            ...mapMutations('filters', ['deleteFilter']),
+            ...mapMutations('results/query/filters', ['deleteFilter']),
             deleteSelf() {
                 this.deleteFilter(this.filterId);
             }

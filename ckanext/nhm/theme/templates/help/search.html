@@ -9,121 +9,323 @@
     {% set specimens_url = h.url_for_collection_view() %}
 
     <p>This is the help page for our <em>Integrated Search</em> feature. Access it
-        <a href="{{ url_for('search.view') }}">here</a>.</p>
+        <a href="{{ url_for('search.view') }}">here</a>
+        .
+    </p>
 
     <div class="help-section">
-        <h4>What is integrated search?</h4>
+        <h3>What is integrated search?</h3>
         <p>
             The Data Portal hosts many different datasets. The largest and most commonly used is our
-            <a href="{{ url_for('dataset.read', id='collection-specimens') }}">Specimens
-                                                                               Collection</a>, but
-            there are {{ h.SI_number_span(stats.dataset_count - 1) }} more. Previously, you could
-            only search in one resource (one file within a dataset) at a time, but integrated search
-            allows you to search <em>multiple</em> resources at the same time. </p>
+            <a href="{{ url_for('dataset.read', id='collection-specimens') }}">Specimens Collection
+            </a>
+            , but there are {{ h.SI_number_span(stats.dataset_count - 1) }} others. Previously, you
+            could only search in one resource (one file within a dataset) at a time, but integrated
+            search allows you to search <em>multiple</em> resources at the same time.
+        </p>
         <p>
             We've also made the search a lot more powerful by adding advanced features such as
             boolean logic (AND, OR, and NOT) and number-based range queries (greater than, less
             than), with more planned in the future. </p>
 
-        <h4>The old search</h4>
+        <h3>The old search</h3>
         <p>If you still want to use the old search, we haven't removed anything. Just view the
-           resource you want to search in and everything should be exactly the same as before.</p>
+            resource you want to search in and everything should be exactly the same as before.</p>
     </div>
 
     <div class="help-section">
-        <h3>Using the integrated search</h3>
-        <h4>UI Overview</h4>
-        <img src="/images/help/search-overview-labelled.png" class="img-responsive">
-        <ul class="fa-ul">
-            <li>
-                <span class="fa-li"><i class="fas fa-question"></i></span> <b>Help</b>: takes you to
-                                                                                      this help
-                                                                                      page.
-            </li>
-            <li>
-                <span class="fa-li"><i class="fas fa-minus-circle"></i></span> <b>Advanced</b>:
-                                                                                              hides/shows
-                                                                                              the
-                                                                                              filters
-                                                                                              (shown
-                                                                                              by
-                                                                                              default).
-            </li>
-            <li>
-                <span class="fa-li"><i class="fas fa-eye"></i></span> <b>Query</b>: shows the JSON
-                                                                                  query that will be
-                                                                                  submitted to the
-                                                                                  API; useful if you
-                                                                                  need to
-                                                                                  troubleshoot or
-                                                                                  want to use the
-                                                                                  search
-                                                                                  programmatically.
-            </li>
-            <li>
-                <span class="fa-li"><i class="fas fa-trash"></i></span> <b>Reset</b>: clears all the
-                                                                                    filters and
-                                                                                    free-text
-                                                                                    search.
-            </li>
-            <li>
-                <span class="fa-li"><i class="fas fa-list"></i></span> <b>Resources</b>: view/edit
-                                                                                       the list of
-                                                                                       resources
-                                                                                       being
-                                                                                       searched by
-                                                                                       the current
-                                                                                       query.
-            </li>
-        </ul>
+        <h2>1. UI Overview</h2>
+        <img src="/images/help/search-overview-labelled.png"
+             class="img-responsive help-img"
+             alt="A labelled screenshot of the whole UI interface.">
 
-        <h4>Selecting resources</h4>
+        <table class="blocks-table">
+            <tr>
+                <th class="blocks-table-header">
+                    Free-text search
+                </th>
+                <td class="blocks-table-cell">
+                    Search all fields for the specified text.
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Search button
+                </th>
+                <td class="blocks-table-cell">
+                    Run the current query.
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Helpful buttons (search)
+                </th>
+                <td class="flex-container flex-wrap flex-wrap-spacing">
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-question inline-icon-left"></i>
+                            <b>Help</b>: takes you to this help page.
+                        </span>
+                    </div>
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-minus-circle inline-icon-left"></i>
+                            <b>Advanced</b>: hides/shows the filters (shown by default).
+                        </span>
+                    </div>
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-eye inline-icon-left"></i>
+                            <b>Query</b>: shows the JSON query that will be submitted to the API; useful if you
+                            need to troubleshoot or want to use the search programmatically.
+                        </span>
+                    </div>
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-trash inline-icon-left"></i>
+                            <b>Reset</b>: clears all the filters and free-text search.
+                        </span>
+                    </div>
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-list inline-icon-left"></i>
+                            <b>Resources</b>: view/edit the list of resources being searched by the current query.
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Helpful buttons (results)
+                </th>
+                <td class="flex-container flex-wrap flex-wrap-spacing">
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-book inline-icon-left"></i>
+                            <b>Cite</b>: generates a DOI for this search.
+                        </span>
+                    </div>
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-share inline-icon-left"></i>
+                            <b>Share</b>: generates a memorable link for social sharing.
+                        </span>
+                    </div>
+                    <div class="blocks-table-cell">
+                        <span>
+                            <i class="fas fa-cloud-download-alt inline-icon-left"></i>
+                            <b>Download</b>: download the results.
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Filter terms
+                </th>
+                <td class="blocks-table-cell">
+                    Filters on specific fields.
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Filter group
+                </th>
+                <td class="blocks-table-cell">
+                    Groups of filter terms (useful for advanced logic, e.g. OR or NOT queries).
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Result view switcher
+                </th>
+                <td class="blocks-table-cell">
+                    Change how the results are displayed; defaults to table.
+                </td>
+            </tr>
+            <tr>
+                <th class="blocks-table-header">
+                    Results
+                </th>
+                <td class="blocks-table-cell">
+                    Records matching the current query, displayed using the current view type (e.g.
+                    table, list, or gallery).
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="help-section">
+        <h2>2. Constructing a search</h2>
+        <h3>2.1. Selecting resources</h3>
+        <p>The integrated search can search across multiple resources (individual sets of records
+            within datasets) simultaneously.</p>
         <p>
-            Clicking on <b>Resources</b> <i class="fas fa-list"></i> will bring up a dialog similar
-            to this one:</p>
-        <img src="/images/help/search-resources.png" class="img-responsive">
+            Clicking on <b>Resources</b>
+            <i class="fas fa-list"></i>
+            will bring up a dialog similar to this one:
+        </p>
+        <img src="/images/help/search-resources.png"
+             class="img-responsive help-img"
+             alt="The resources popup dialog, with three datasets shown. Each dataset contains one resource.">
         <p>To include a resource in your search, tick the box next to its name. You can
-           select/deselect all the resources within a dataset by clicking the dataset name in green
-           above it, and select/deselect all resources in the list using the "select all" checkbox
-           at the top of the list. </p>
+            select/deselect all the resources within a dataset by clicking the dataset name in green
+            above it, and select/deselect all resources in the list using the "select all" checkbox
+            at the top of the list. To deselect everything <em>except</em> the resources in one
+            particular dataset, hold the <code>alt</code> key and click the dataset name.
+        </p>
         <p>
             To dismiss the dialog and save your changes, click outside the box. </p>
 
-        <h4>Free-text search</h4>
+        <h3>2.2. Free-text search</h3>
         <p>
             The free-text search box allows you to search all fields in your chosen resource list.
             For example, the free-text search "<em>linnaeus</em>" will find records where "Linnaeus"
-            is in <em>scientificName</em> and those where "Linnaeus" is in
-            <em>determinationNames</em>. </p>
+            is in <em>scientificName</em> and those where "Linnaeus" is in <em>
+            determinationNames</em>.
+        </p>
         <img src="/images/help/search-freetext.png"
-             class="img-responsive"
+             class="img-responsive help-img"
              alt="The integrated search UI with 'linnaeus' written in the free-text search field. Six rows of results are shown.">
 
-        <h4>Filters: Terms + Groups</h4>
+        <h3>2.3. Filters</h3>
         <p>
             Below the free-text search is the filter builder. <em>Filter</em> can refer to any part
             of this: a whole group of multiple items, or a single item. Each of the smallest items
             are referred to as <em>terms</em>, and they are linked together in <em>groups</em>. For
-            example:</p>
+            example:
+        </p>
         <div class="flex-container no-padding">
             <img src="/images/help/search-filters.png"
-                 class="img-responsive"
+                 class="img-responsive help-img"
                  alt="Two terms (kingdom=animalia and collectionCode=zoo) grouped together in a green box. The words 'all of' are in the top right corner.">
-            <p>There are two <em>terms</em> in this filter: <b>kingdom = animalia</b> and <b>collectionCode
-                                                                                             =
-                                                                                             zoo</b>.
-               They are linked together in an AND (all) <em>group</em>.</p>
+            <p>There are two <em>terms</em> in this filter: <b>kingdom = animalia</b> and <b>
+                collectionCode = zoo</b>. They are linked together in an AND (all) <em>group</em>.
+            </p>
+        </div>
+        <p>
+            To add a filter term or group, click the <i class="fas fa-plus-square"></i> icon in the
+            filter builder, then select the option you need.
+        </p>
+        <div class="flex-container flex-between no-padding">
+            <div>
+                <img src="/images/help/search-filter-add-1.png"
+                     class="img-responsive help-img"
+                     alt="The 'add filter' icon when no filters are currently applied. It is just below the free-text search and if prefixed by the text 'ADD FILTERS'.">
+            </div>
+            <div><b>or</b></div>
+            <div>
+                <img src="/images/help/search-filter-add-2.png"
+                     class="img-responsive help-img"
+                     alt="The 'add filter' icons inside and outside of a filter group. These are just a plus symbol and have no preceding text.">
+            </div>
+            <div><b>then</b></div>
+            <div>
+                <img src="/images/help/search-empty-filter.png" class="img-responsive help-img"
+                     alt="The dropdown list of options for a new filter.">
+            </div>
         </div>
 
-        <h4>Groups</h4>
-        <p>Groups allow you to use some boolean logic in your queries. You can have three types of
-           group: AND (aka 'all of'), OR (aka 'any of'), and NOT (aka 'none of'). To change the
-           group type, click the name in the top left corner. In the groups below, the terms are the
-           same but the group type has changed. This drastically changes the records found.</p>
-        <div class="flex-container flex-top">
-            <img src="/images/help/search-groups-and.png" class="img-responsive">
-            <img src="/images/help/search-groups-or.png" class="img-responsive">
-            <img src="/images/help/search-groups-not.png" class="img-responsive">
+        <h4>2.3.1. Filter Terms</h4>
+        <p>A <em>term</em> filters on field names (i.e. it will be applied to every field with that
+            name in every resource in the query - case-insensitively). Terms are the basic units of
+            filtering.
+        </p>
+        <p>To add a new term, click the
+            <i class="fas fa-plus-square"></i>
+            icon and click "new term". This will bring up the term editor.
+        </p>
+        <img src="/images/help/search-term-editor.png"
+             class="img-responsive help-img"
+             alt="The term editor, as it appears when first shown.">
+        <p>On the left side, select the fields to search in. Typing in the textbox will filter the
+            list; you can then select a field by clicking on it. To remove a field name, click the
+            <i class="fas fa-times-circle"></i> icon.
+        </p>
+        <img src="/images/help/search-term-editor-fields.png"
+             class="img-responsive help-img"
+             alt="The left side of the term editor, showing a list of fields filtered by the search term 'collection'. 'collectionCode' has already been selected.">
+
+        <p>On the right side, specify the details of your query: field type, comparison type, and
+            values.</p>
+        <div class="flex-container flex-stretch-last">
+            <div style="min-width: 40%;max-width: max-content;">
+                <img src="/images/help/search-term-editor-query-text.png"
+                     class="img-responsive help-img"
+                     alt="A labelled screenshot of the right side of the term editor.">
+            </div>
+            <div>
+                <p><b>Field type</b> is the data type that the field will be read as. Most queries
+                    will use the default "Text" type, but more complex queries may use the "Number"
+                    or "Geo" types. A fourth type, "Any", only has one comparison type ("exists")
+                    and just checks if the field has any content at all.
+                </p>
+                <p><b>Comparison type</b> describes how the field value will be compared to the
+                    query/comparison value. Each field type has different comparison types
+                    available.
+                </p>
+                <p><b>Comparison value</b> is the value to which the field values will be compared.
+                </p>
+                <p><b>Display name</b> is entirely optional, but may be useful for especially
+                    complex queries with many terms: it allows you to set a "friendly" display name
+                    for the term, so it will be shown in a more memorable way.
+                </p>
+            </div>
+
+        </div>
+        <div class="flex-container flex-between flex-wrap flex-top">
+            <div style="width: min-content;">
+                <img src="/images/help/search-term-editor-query-number.png"
+                     class=" help-img"
+                     alt="The right side of the term editor, showing a number range query.">
+                <p>A number range query: matching fields will contain a number between one and five.
+                    (Click the angle brackets to toggle equality comparisons).</p>
+            </div>
+            <div style="width: min-content;">
+                <img src="/images/help/search-term-editor-query-geo.png"
+                     class="help-img" alt="The term editor, showing a geo point query.">
+                <p>A geo point query: matching records will have coordinates within five miles of
+                    the specified coordinates.</p>
+                <p>NB: geo queries <em>do not use field names</em>. They are based on longitude and
+                    latitude points that are set elsewhere by the resource maintainer.
+                </p>
+            </div>
+            <div style="width: min-content;">
+                <img src="/images/help/search-term-editor-query-geo2.png"
+                     class="help-img" alt="The term editor, showing a geo polygon query.">
+                <p>A geo polygon query: matching records will have coordinates inside the specified
+                    area.</p>
+            </div>
+        </div>
+
+        <p>You can continue adding as many terms as necessary to your query:</p>
+        <img src="/images/help/search-terms.png"
+             class="img-responsive help-img"
+             alt="Three example terms: a text comparison on the field 'collectionCode', a number range comparison on the field 'year', and a term using the display name 'My Complicated Filter'.">
+
+        <h4>2.3.2. Filter Groups</h4>
+        <p><em>Groups</em> allow you to link terms and use some boolean logic in your queries. You
+            can have three types of group: AND (aka 'all of'), OR (aka 'any of'), and NOT (aka 'none
+            of'). To change the group type, click the name in the top left corner. In the groups
+            below, the terms are the same but the group type has changed. This drastically changes
+            the records found.
+        </p>
+        <div class="flex-container flex-top flex-equal">
+            <div>
+                <img src="/images/help/search-groups-and.png"
+                     class="img-responsive help-img"
+                     alt="An 'AND' filter group, containing two filter terms. The background is green and the text at the top says 'all of'.">
+            </div>
+            <div>
+                <img src="/images/help/search-groups-or.png"
+                     class="img-responsive help-img"
+                     alt="An 'OR' filter group, containing two filter terms. The background is blue and the text at the top says 'any of'.">
+            </div>
+            <div>
+                <img src="/images/help/search-groups-not.png"
+                     class="img-responsive help-img"
+                     alt="A 'NOT' filter group, containing two filter terms. The background is red and the text at the top says 'none of'.">
+            </div>
         </div>
         <ol>
             <li>
@@ -138,25 +340,58 @@
             </li>
         </ol>
         <p>Groups can also be nested under the top level:</p>
-        <img src="/images/help/search-nested-groups.png" class="img-responsive">
+        <img src="/images/help/search-nested-groups.png"
+             class="img-responsive help-img"
+             alt="Two 'all of' groups nested within a 'any of' group. 'All of' group one is searching for 'collectionCode = BOT' and 'year = 2000', while 'all of' group 2 is searching for 'collectionCode = PAL' and 'year = 2008'.">
         <p>This query would search for <em>either</em> botany records from 2000 <em>or</em>
-           palaeontology records from 2008.</p>
+            palaeontology records from 2008.
+        </p>
+        <p><b>NB</b>: when you're using the user interface, the whole query is wrapped in a hidden
+            "and" group.
+        </p>
 
-        <h4>Terms</h4>
-        <p>To add a new term, click the <i class="fas fa-plus-square"></i> symbol at the right hand
-           side of a group.</p>
-        <img src="/images/help/search-empty-filter.png" class="img-responsive">
-        <p>This will bring up the term editor.</p>
-        <div class="flex-container flex-around">
-            <div style="width: 20%;">
-                <p>On the left side, select the fields to search in. You can use the textbox to
-                   search the list of fields. Double click a field name to add it to the query.</p>
-                <img src="/images/help/search-term-editor-fields.png" class="img-responsive">
+        <h4>2.3.3. Presets</h4>
+        <p><em>Presets</em> are predefined filter terms that are commonly used and/or need to be
+            dynamically set. There are currently very few of these, but more can be added later.
+            Please {% link_for _('contact us'), named_route='contact.form' %} if you need one of
+            these presets added.
+        </p>
+        <p>There are two types of presets: static and dynamic. These are both found in the same
+            place, so the difference is explained here for interest/clarity's sake more than
+            anything else.</p>
+        <p>A <em>static</em> preset contains the same information every time, e.g. the <em> Birdwing
+            Butterfly Digitisation</em> will always add a term where <code>project = Birdwing
+            Butterfly Digitisation</code> .
+        </p>
+        <img src="/images/help/search-presets-birdwing.png"
+             class="img-responsive help-img"
+             alt="The term editor for the Birdwing Butterfly Digitisation preset. The project field is selected, the field type is 'text', the comparison type is 'equals', and the comparison value is 'Birdwing Butterfly Digitisation'.">
+        <p><em>Dynamic</em> presets change their value dependent on other factors in the query <b>at
+            the time they are added</b>. Once added, they act like every other filter term, so try
+            to add these last if possible. An example is the <em>Has Image</em> preset, which
+            extracts image fields from the current list of resources and adds an
+            "<code>exists</code>" term that checks if these fields have content in them.
+        </p>
+        <div class="flex-container flex-equal flex-top">
+            <div>
+                <img src="/images/help/search-presets-hasimage-1.png"
+                     class="img-responsive help-img"
+                     alt="The term editor for the Has Image preset. Two fields are selected: media and associatedMedia. The field type is 'any' and the comparison type is 'exists'.">
+                <p>
+                    In this example, multiple resources with an image field are being searched, so
+                    multiple image fields are added to the term. Not every resource will have an
+                    image field set, and those that do may share field names with other resources,
+                    so the list is likely to be much shorter than the actual list of resources.
+                </p>
             </div>
-            <img src="/images/help/search-term-editor.png" class="img-responsive">
-            <div style="width: 20%;">
-                <p>On the right side, specify the details of your query: field type, comparison type,
-               and values.</p>
+
+            <div>
+                <img src="/images/help/search-presets-hasimage-2.png"
+                     class="img-responsive help-img"
+                     alt="The term editor for the Has Image preset. Only one field is selected: associatedMedia. The field type is 'any' and the comparison type is 'exists'.">
+                <p>In contrast to the previous image, in this example only one resource with an
+                    image field is being searched (or, all the resources being searched have the
+                    same image field name), so only one field is selected.</p>
             </div>
 
         </div>
@@ -164,8 +399,87 @@
     </div>
 
     <div class="help-section">
-        <p>Please note this help page is a work in progress and more information will be added
-           soon.</p>
+        <h2>3. Results</h2>
+        <h3>3.1. Views</h3>
+        <p>
+            The results of a search can be displayed in different ways, termed "views". To change
+            the <em>view</em>, click the name of the view above the results (see <em>Result View
+            Switcher</em> in <b>1. UI Overview</b>).
+        </p>
+        <p>The fields shown in some views (i.e. Table and List) are dynamically selected via an API
+            method that attempts to guess the "most relevant" fields.</p>
+        <h4>3.1.1. Table View</h4>
+        <p>The table view is the default view. It displays the results in tabular form.</p>
+        <img src="/images/help/search-results-table.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the table results view.">
+        <h4>3.1.2. List View</h4>
+        <p>The list view displays a short summary of each record individually, along with thumbnails
+            of any associated images (if there are any).</p>
+        <p>Clicking on an image brings up the viewer overlay, which displays a larger version and
+            offers an option to download the image.</p>
+        <img src="/images/help/search-results-list.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the list results view.">
+        <h4>3.1.2. Gallery View</h4>
+        <p>The gallery view displays all the images associated with records in the search. It does
+            not show records separately, but simply lists out all available images for each page of
+            results.</p>
+        <p>Clicking on an image brings up the viewer overlay, which displays a larger version and
+            offers an option to download the image.</p>
+        <img src="/images/help/search-results-gallery.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the gallery results view.">
+        <img src="/images/help/search-results-imageviewer.png"
+             class="img-responsive help-img"
+             alt="Labelled screenshot of the image viewer overlay.">
+
+        <h3>3.2. Buttons</h3>
+        <img src="/images/help/search-results-buttons.png"
+             class="img-responsive help-img"
+             alt="The three buttons at the top right of the results view: cite, share, and download.">
+        <h4>3.2.1. Cite</h4>
+        <p>The <em>cite</em> button generates a digital object identifier (DOI) for the search,
+            allowing you to easily cite the results in publications.</p>
+        <h4>3.2.2. Share</h4>
+        <p>Similarly to the cite button, the <em>share</em> button also generates a link to the
+            search; but it is intended for more informal use, such as when sharing a search with a
+            colleague. It uses three random words to create a memorable short link (with the option
+            to include the page and view) that can then be shared.</p>
+        <img src="/images/help/search-results-share.png"
+             class="img-responsive help-img"
+             alt="The 'share' button popup, showing a link to https://data.nhm.ac.uk/search/future-expensive-pelican.">
+        <h4>3.2.3. Download</h4>
+        <p>The download button allows you to request a full download of the set of results in CSV
+            format. The record data will be automatically packaged up and sent to your email address
+            when ready.</p>
     </div>
+    <div class="help-section">
+        <h2>4. Troubleshooting</h2>
+        <h3>4.1. Resetting</h3>
+        <p>This is a good place to start for fixing any UI issues, e.g. menus not loading or popup
+            boxes dismissing as soon as you click them.</p>
+        <ol>
+            <li>
+                If you're able to, get a sharing link (see <b>3.2.2. Share</b>);
+            </li>
+            <li>
+                Either go to the sharing link (if you have one) <b>or</b> hard-refresh the page with
+                <code>CTRL</code>+<code>F5</code>.
+            </li>
+            <li>
+                If that still doesn't work, <b>Reset</b> <i class="fas fa-trash"></i> your query,
+                refresh, and start again.
+            </li>
+        </ol>
+    </div>
+    <br>
+    <p>As always, if you have any further issues, questions, or suggestions,
+        please {% link_for _('contact us'), named_route='contact.form' %}. We are also available on
+        <a href="https://gitter.im/nhm-data-portal" class="external">Gitter</a>
+        and
+        <a href="https://twitter.com/nhm_data" class="external">Twitter</a>
+        .
+    </p>
 
 {% endblock %}

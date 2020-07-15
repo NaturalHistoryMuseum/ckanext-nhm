@@ -11,7 +11,6 @@ __version__ = u'1.0.0-alpha'
 with open(u'README.md', u'r') as f:
     __long_description__ = f.read()
 
-nhmgit = 'git+https://github.com/NaturalHistoryMuseum/'
 
 dependencies = {
     'ckanext-spatial': 'git+https://github.com/ckan/ckanext-spatial.git#egg=ckanext-spatial',
@@ -38,6 +37,35 @@ dependencies = {
     'ckanext-iiif': nhmgit + 'ckanext-iiif.git#egg=ckanext_iiif',
 }
 
+
+dependencies = {
+    u'ckanext-spatial': u'git+https://github.com/ckan/ckanext-spatial.git#egg=ckanext-spatial',
+    u'ckanext-viewhelpers': u'git+https://github.com/ckan/ckanext-viewhelpers.git#egg=ckanext-viewhelpers',
+    u'ckanext-dcat': u'git+https://github.com/ckan/ckanext-dcat.git@v1.0.0#egg=ckanext-dcat',
+    u'ckanext-pdfview': u'git+https://github.com/ckan/ckanext-pdfview.git#egg=ckanext-pdfview',
+}
+nhm_extensions = [
+    u'ckanext-ckanpackager',
+    u'ckanext-contact',
+    u'ckanext-doi',
+    u'ckanext-gallery',
+    u'ckanext-gbif',
+    u'ckanext-graph',
+    u'ckanext-iiif',
+    u'ckanext-ldap',
+    u'ckanext-list',
+    u'ckanext-query-dois',
+    u'ckanext-sketchfab',
+    u'ckanext-statistics',
+    u'ckanext-status',
+    u'ckanext-twitter',
+    u'ckanext-userdatasets',
+    u'ckanext-versioned-datastore',
+    u'ckanext-versioned-tiledmap',
+    u'ckanext-video',
+]
+dependencies.update({extension: nhm(extension) for extension in nhm_extensions})
+
 setup(
     name=u'ckanext-nhm',
     version=__version__,
@@ -58,17 +86,17 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'PyYAML==5.1',
-        'amqp==1.4.9',
-        'anyjson==0.3.3',
-        'billiard==3.3.0.13',
-        'celery==3.1.7',
-        'pytz>=2016.7',
-        'python-memcached==1.53',
-        'lxml>=3.4.4',
-        'Shapely<1.3',
-        'raven==6.0.0',
-        'elasticsearch-dsl==6.2.1',
+        u'PyYAML==5.1',
+        u'amqp==1.4.9',
+        u'anyjson==0.3.3',
+        u'billiard==3.3.0.13',
+        u'celery==3.1.7',
+        u'pytz>=2016.7',
+        u'python-memcached==1.53',
+        u'lxml>=3.4.4',
+        u'Shapely<1.3',
+        u'raven==6.0.0',
+        u'elasticsearch-dsl==6.2.1',
         ] + [u'{0} @ {1}'.format(k, v) for k, v in dependencies.items()],
     dependency_links=dependencies.values(),
     entry_points= \

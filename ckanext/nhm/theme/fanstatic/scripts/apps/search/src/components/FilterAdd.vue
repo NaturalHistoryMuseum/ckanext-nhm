@@ -1,5 +1,6 @@
 <template>
     <div class="filter-add">
+        <span v-if="showText" class="filter-add-help-text">Add filters</span>
         <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"
             :id="'show-choice-' + _uid"></i>
         <transition name="slidedown">
@@ -20,7 +21,7 @@
             <div v-if="showPresets" class="floating preset-picker"
                 v-dismiss="{switch: 'showPresets', ignore: ['#show-editor-presets-' + _uid]}">
                 <select size="5">
-                    <option v-for="(presetName, presetKey) in presetKeys" v-bind:key="presetKey"
+                    <option v-for="(presetName, presetKey) in presets" v-bind:key="presetKey"
                         @dblclick="newPreset(presetKey)">
                         {{ presetName }}
                     </option>
@@ -33,13 +34,13 @@
 <script>
     import Loading from './Loading.vue';
     import LoadError from './LoadError.vue';
-    import {mapGetters, mapMutations} from 'vuex';
+    import {mapGetters, mapActions} from 'vuex';
 
     const TermEditor = import('./TermEditor.vue');
 
     export default {
         name:       'FilterAdd',
-        props:      ['parentId'],
+        props:      ['parentId', 'showText'],
         components: {
             TermEditor: () => ({component: TermEditor, loading: Loading, error: LoadError}),
         },
@@ -51,25 +52,25 @@
             }
         },
         computed:   {
-            ...mapGetters('filters', ['getNestLevel', 'presetKeys']),
+            ...mapGetters('results/query/filters', ['getNestLevel', 'presets']),
             nestLevel() {
                 return this.getNestLevel(this.parentId);
             },
             canAddGroups: function () {
-                return this.nestLevel === 0;
+                return this.nestLevel <= 1;
             },
             canAddTerms:  function () {
                 return true;
             }
         },
         methods:    {
-            ...mapMutations('filters', ['addGroup', 'addPreset']),
+            ...mapActions('results/query/filters', ['addGroup', 'addPreset']),
             newGroup: function () {
                 this.showChoice = false;
-                this.addGroup(this.$parent.filterId);
+                this.addGroup({parent: this.$parent.filterId});
             },
             newPreset(presetKey) {
-                this.addPreset({key: presetKey, parentId: this.parentId});
+                this.addPreset({key: presetKey, parent: this.parentId});
                 this.showPresets = false;
             },
         },
