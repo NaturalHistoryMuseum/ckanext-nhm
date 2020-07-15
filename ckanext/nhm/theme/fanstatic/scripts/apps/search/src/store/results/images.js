@@ -8,6 +8,9 @@ let images = {
             let images;
 
             let resourceDetails = rootGetters['results/query/resources/resourceDetails'][item.resource];
+            if (resourceDetails === undefined) {
+                console.log(item);
+            }
             let recordUrl       = `${resourceDetails.resourceUrl}/record/${item.data._id}`;
             let recordTitle     = item.data[resourceDetails.titleField] || item.data._id;
 
