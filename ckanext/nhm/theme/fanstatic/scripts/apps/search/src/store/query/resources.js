@@ -1,5 +1,6 @@
 import {get} from '../utils'
 import * as d3 from 'd3-collection';
+import Vue from 'vue';
 
 let resources = {
     namespaced: true,
@@ -27,7 +28,6 @@ let resources = {
                 });
             }
             return resourceDetails.map(r => r.value);
-
         },
         sortedResources:        (state) => {
             return state.resourceIds.sort();
@@ -80,6 +80,8 @@ let resources = {
     },
     actions:    {
         getPackageList(context) {
+            Vue.set(context.rootState.appState.status.resources, 'loading', true);
+            Vue.set(context.rootState.appState.status.resources, 'failed', false);
             get('current_package_list_with_resources?limit=10000')
                 .then(data => {
                     context.state.packageList = data.result.map(pkg => {
@@ -109,6 +111,12 @@ let resources = {
                             resourceIds: resources.map(r => r.id)
                         }
                     }).filter(pkg => pkg.resources.length > 0);
+                })
+                .catch(() => {
+                    Vue.set(context.rootState.appState.status.resources, 'failed', true);
+                })
+                .finally(() => {
+                    Vue.set(context.rootState.appState.status.resources, 'loading', false);
                 });
         }
     }

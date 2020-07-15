@@ -28,6 +28,18 @@ let appState = {
             download:   {
                 loading: false,
                 failed:  false
+            },
+            resources: {
+                loading: false,
+                failed: false
+            }
+        }
+    },
+    getters: {
+        app: (state) => {
+            return {
+                loading: state.app.loading || state.status.resources.loading,
+                failed: state.app.error || state.status.resources.failed
             }
         }
     }
