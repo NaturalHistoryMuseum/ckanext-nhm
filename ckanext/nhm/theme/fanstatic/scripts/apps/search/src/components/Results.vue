@@ -3,8 +3,14 @@
         <Loading v-if="status.resultData.loading"></Loading>
         <LoadError v-if="status.resultData.failed">
             <h3>Something went wrong!</h3>
-            <p>Please <a href="#" @click="$emit('show-query')">check your query</a>, <a href="#" @click="$emit('reset')">try resetting</a>, and <a href="/contact">contact us</a> if you think you've
-               found a problem.</p>
+            <p>Please
+                <a href="#" @click="$emit('show-query')">check your query</a>
+                ,
+                <a href="#" @click="$emit('reset')">try resetting</a>
+                , and
+                <a href="/contact">contact us</a>
+                if you think you've found a problem.
+            </p>
         </LoadError>
         <div class="flex-container flex-left flex-stretch-first results-header"
              v-if="hasResult"
@@ -12,7 +18,8 @@
             <div class="records-total">
                 <h3>{{ recordHeader(unfilteredTotal) }}</h3>
                 <small class="filtered-total">
-                    showing {{ (page * 100) + 1 }}-{{ (page * 100) + records.length }} of {{ filteredRecordHeader(total) }}
+                    showing {{ (page * 100) + 1 }}-{{ (page * 100) + records.length }} of {{
+                    filteredRecordHeader(total) }}
                 </small>
             </div>
             <div class="info-popup-button">
@@ -28,7 +35,9 @@
                             Failed to retrieve DOI. Please try again later. </p>
                         <div class="form-row" v-if="doi === null">
                             <label for="doi-email" class="control-label">
-                                <span class="control-required">*</span>Your email </label>
+                                <span class="control-required">*</span>
+                                Your email
+                            </label>
                             <input id="doi-email"
                                    type="text"
                                    class="full-width"
@@ -38,8 +47,10 @@
                         <div class="privacy-warning">
                             <p><i>Data Protection</i></p>
                             <p>The Natural History Museum will use your personal data in accordance
-                               with data protection legislation to process your requests. For more
-                               information please read our <a href="/privacy">privacy notice</a>.
+                                with data protection legislation to process your requests. For more
+                                information please read our
+                                <a href="/privacy">privacy notice</a>
+                                .
                             </p>
                         </div>
                         <div class="text-right">
@@ -48,12 +59,14 @@
                                class="btn btn-primary"
                                v-if="doi === null"><i class="fas"
                                                       :class="status.doi.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-pen']"></i>
-                                Create a DOI </a>
+                                Create a DOI
+                            </a>
                         </div>
                     </div>
                 </transition>
                 <a href="#" @click="showCite = !showCite" class="btn btn-disabled" id="show-cite">
-                    <i class="fas fa-book"></i>Cite </a>
+                    <i class="fas fa-book"></i>Cite
+                </a>
             </div>
             <div class="info-popup-button">
                 <transition name="slidedown">
@@ -68,19 +81,26 @@
                             <div class="form-row flex-container flex-wrap flex-around">
                                 <div v-if="page > 0">
                                     <label for="chkSharePage">Include page</label>
-                                    <input type="checkbox" id="chkSharePage" v-model="includeSharePage">
+                                    <input type="checkbox"
+                                           id="chkSharePage"
+                                           v-model="includeSharePage">
                                 </div>
                                 <div>
                                     <label for="chkShareView">Include view</label>
-                                    <input type="checkbox" id="chkShareView" v-model="includeShareView">
+                                    <input type="checkbox"
+                                           id="chkShareView"
+                                           v-model="includeShareView">
                                 </div>
                             </div>
                             <small class="alert-warning">This link is for social sharing
                                 <em>only</em>. If you are intending to reference this search in a
-                                                         publication, <a href="#"
-                                                                         @click="citeNotShare"
-                                                                         id="use-a-doi">use a
-                                                                                        DOI</a>.</small>
+                                publication,
+                                <a href="#"
+                                   @click="citeNotShare"
+                                   id="use-a-doi">use a DOI
+                                </a>
+                                .
+                            </small>
                         </div>
                         <p class="alert-error" v-if="status.slug.failed">
                             Failed to retrieve link. Please try again later. </p>
@@ -88,7 +108,8 @@
                 </transition>
                 <a href="#" @click="shareSearch" class="btn btn-disabled" id="show-share">
                     <i class="fas"
-                       :class="status.slug.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>Share
+                       :class="status.slug.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-share-alt']"></i>
+                    Share
                 </a>
             </div>
             <div class="info-popup-button">
@@ -98,15 +119,17 @@
                          v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
                         <p v-if="download !== null">
                             Success! You should receive an email at <b>{{ downloadForm.email_address
-                                                                       }}</b> soon. </p>
+                            }}</b> soon. </p>
                         <p class="alert-error" v-if="status.download.failed">
                             The download request failed. Please try again later. </p>
                         <div v-if="download === null">
                             <p>The data will be extracted, with current filters applied, and sent to
-                               the given email address shortly.</p>
+                                the given email address shortly.</p>
                             <div class="form-row">
                                 <label for="download-email" class="control-label">
-                                    <span class="control-required">*</span>Your email </label>
+                                    <span class="control-required">*</span>
+                                    Your email
+                                </label>
                                 <input id="download-email"
                                        type="text"
                                        class="full-width"
@@ -123,10 +146,11 @@
                             </div>
                             <div class="form-row flex-container flex-wrap flex-between">
                                 <div>
-                                    <label for="download-sep">One file per resource</label> <input
-                                    id="download-sep"
-                                    type="checkbox"
-                                    v-model="downloadForm.separate_files">
+                                    <label for="download-sep">One file per resource</label>
+                                    <input
+                                        id="download-sep"
+                                        type="checkbox"
+                                        v-model="downloadForm.separate_files">
                                 </div>
                                 <div>
                                     <label for="download-empty">Skip empty columns</label>
@@ -139,16 +163,19 @@
                         <div class="privacy-warning">
                             <p><i>Data Protection</i></p>
                             <p>The Natural History Museum will use your personal data in accordance
-                               with data protection legislation to process your requests. For more
-                               information please read our <a href="/privacy">privacy notice</a>.
+                                with data protection legislation to process your requests. For more
+                                information please read our
+                                <a href="/privacy">privacy notice</a>
+                                .
                             </p>
                         </div>
                         <div class="text-right" v-if="download === null">
                             <a href="#"
                                class="btn btn-primary text-right"
-                               @click="getDownload(downloadForm)"> <i class="fas"
-                                                                      :class="status.download.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
-                                Request Download </a>
+                               @click="getDownload(downloadForm)"><i class="fas"
+                                                                     :class="status.download.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
+                                Request Download
+                            </a>
                         </div>
                     </div>
                 </transition>
@@ -156,7 +183,8 @@
                    v-if="total > 0"
                    @click="showDownload = !showDownload"
                    class="btn btn-disabled"
-                   id="show-download"> <i class="fas fa-cloud-download-alt"></i>Download </a>
+                   id="show-download"><i class="fas fa-cloud-download-alt"></i>Download
+                </a>
             </div>
         </div>
         <div v-if="hasResult" :class="{disabled: invalidated}">
@@ -170,8 +198,11 @@
                     </li>
                 </ul>
                 <div class="text-right">
-                    <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid"> <i
-                        class="fas fa-plus-circle"></i> </a>
+                    <a href="#"
+                       @click="showFields = !showFields"
+                       :id="'show-fields-' + _uid"
+                       v-if="view === 'Table'"><i
+                        class="fas fa-plus-circle"></i></a>
                     <transition name="slidedown">
                         <FieldPicker v-if="showFields"
                                      :callback="addCustomHeader"
@@ -231,17 +262,17 @@
         },
         data:       function () {
             return {
-                showDownload: false,
-                showCite:     false,
-                showShare:    false,
-                showFields:   false,
+                showDownload:     false,
+                showCite:         false,
+                showShare:        false,
+                showFields:       false,
                 includeSharePage: false,
                 includeShareView: false,
-                views:        ['Table', 'List', 'Gallery'],
-                doiForm:      {
+                views:            ['Table', 'List', 'Gallery'],
+                doiForm:          {
                     email_address: null
                 },
-                downloadForm: {
+                downloadForm:     {
                     email_address:       null,
                     format:              'csv',
                     separate_files:      true,
