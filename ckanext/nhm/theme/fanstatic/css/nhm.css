@@ -1215,6 +1215,7 @@ iframe {
   border-radius: 5px;
   margin-bottom: 0 !important;
   margin-right: 5px;
+  cursor: pointer;
 }
 .nav-tabs li a,
 .nav-tabs li a:hover {
