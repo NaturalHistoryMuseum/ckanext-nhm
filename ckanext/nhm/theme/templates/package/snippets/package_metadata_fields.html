@@ -20,15 +20,15 @@ won't work. #}
 
     {{ form.input('affiliation', label=_('Affiliation(s)'), id='field-affiliation', placeholder=_('Natural History Museum'), value=data.affiliation, error=errors.affiliation, classes=['control-medium']) }}
     {{ form.info("Enter a list of additional contributors, one per line. If you wish to add affiliations, please include in parenthesis.", inline=True) }}
-    {{ form.textarea('contributors', label=_('Contributors(s)'), id='field-contributors', placeholder=_('Ben Scott (Natural History Museum)'), value=data.contributors, error=errors.contributors, classes=['control-medium']) }}
+    {{ form.textarea('contributors', label=_('Contributors'), id='field-contributors', placeholder=_('Ben Scott (Natural History Museum)'), value=data.contributors, error=errors.contributors, classes=['control-medium']) }}
 
-    {{ form.info("What time period does this dataset cover? If inappliable, leave blank.", inline=True) }}
+    {{ form.info("What time period does this dataset cover? If not applicable, leave blank.", inline=True) }}
     {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('1970 - 1985'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
 
     {{ form.select('update_frequency', label=_('Update frequency'), id='field-update-frequency', options=h.form_select_update_frequency_options(), selected=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
     {#  TODO: Add map to pick spatial extent - hidden for non sysadmin until then  #}
     {% if h.is_sysadmin() %}
-       {{ form.input('spatial', label=_('Spatial extent'), id='field-spatial', placeholder=_('{"type": "Point", "coordinates": [-3.145,53.078]}'), value=data.spatial, error=errors.spatial, classes=['control-medium']) }}
+       {{ form.input('spatial', label=_('Spatial extent'), id='field-spatial', placeholder=('{"type": "Point", "coordinates": [-3.145,53.078]}'), value=data.spatial, error=errors.spatial, classes=['control-medium']) }}
     {% endif %}
 
     {# Only show promoted checkbox to sysadmin users #}

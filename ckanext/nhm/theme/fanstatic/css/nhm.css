@@ -1409,6 +1409,9 @@ iframe {
 .dataset-form #field-temporal-extent {
   width: 200px;
 }
+.dataset-form div[class$="-group"] {
+  margin-bottom: 30px;
+}
 .form-actions {
   margin: 10px 0;
   padding: 20px 0;
