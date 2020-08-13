@@ -1215,6 +1215,7 @@ iframe {
   border-radius: 5px;
   margin-bottom: 0 !important;
   margin-right: 5px;
+  cursor: pointer;
 }
 .nav-tabs li a,
 .nav-tabs li a:hover {
@@ -1407,6 +1408,9 @@ iframe {
 }
 .dataset-form #field-temporal-extent {
   width: 200px;
+}
+.dataset-form div[class$="-group"] {
+  margin-bottom: 30px;
 }
 .form-actions {
   margin: 10px 0;
