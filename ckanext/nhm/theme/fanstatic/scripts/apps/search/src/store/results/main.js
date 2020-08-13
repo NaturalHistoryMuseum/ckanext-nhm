@@ -166,7 +166,7 @@ let results = {
 
             let body = context.getters['query/requestBody'](false);
             if (payload.formData !== undefined) {
-                body = $.extend(payload.formData);
+                body = Object.assign(body, payload.formData);
             }
 
             post(payload.action, body)
