@@ -29,15 +29,27 @@
                     <div class="module-content">
                         <div class="flex-container flex-stretch-first flex-nowrap pre-search">
                             <div>
-                                <h3 id="specimens-title">Search <a
-                                        href="/search/specimens">{{ h.delimit_number(collection_stats['specimens']) }}</a>
-                                    of the Museum's 80 million specimens.</h3>
-                                <h3 id="collections-title" style="display: none">Search <a
-                                        href="/search/collections">{{ h.delimit_number(collection_stats['total']) }}</a>
-                                    of the Museum's 80 million objects.</h3>
-                                <h3 id="everything-title" style="display: none">Search <a
-                                        href="/search/everything">{{ h.delimit_number(stats.record_count) }}</a>
-                                    records from the Museum's collections and research datasets.</h3>
+                                <h3 id="specimens-title">
+                                    Search
+                                    <a href="/search/specimens" aria-labelledby="specimens-title">
+                                        {{ h.delimit_number(collection_stats['specimens']) }}
+                                    </a>
+                                    of the Museum's 80 million specimens.
+                                </h3>
+                                <h3 id="collections-title" style="display: none">
+                                    Search
+                                    <a href="/search/collections" aria-labelledby="collections-title">
+                                        {{ h.delimit_number(collection_stats['total']) }}
+                                    </a>
+                                    of the Museum's 80 million objects.
+                                </h3>
+                                <h3 id="everything-title" style="display: none">
+                                    Search
+                                    <a href="/search/everything" aria-labelledby="everything-title">
+                                        {{ h.delimit_number(stats.record_count) }}
+                                    </a>
+                                    records from the Museum's collections and research datasets.
+                                </h3>
                             </div>
                             <div class="no-pad-h stats-container">
                                 {% block stats %}
