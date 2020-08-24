@@ -14,7 +14,7 @@
         <div class="flex-container flex-smallwrap flex-bottom no-pad-h">
             {% block header_logo %}
             {% if g.site_logo %}
-            <a class="logo" href="{{ h.url_for('home.index') }}" title="{{ g.site_title }}">
+            <a class="logo" href="{{ h.url_for('home.index') }}" title="{{ g.site_title }}" aria-label="Home">
                 <svg role="button" aria-label="Home"></svg>
             </a>
             {% endif %}
