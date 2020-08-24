@@ -2165,6 +2165,9 @@ select,
 .featured .box-text {
   flex-grow: 1;
 }
+.featured .view-dataset-link {
+  color: #195D0D;
+}
 .featured-image {
   background-size: cover;
   background-repeat: no-repeat;
