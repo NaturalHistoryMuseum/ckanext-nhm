@@ -117,13 +117,7 @@ h1.site-title {
 h2 {
   font-size: 38px;
 }
-h3 {
-  font-size: 32px;
-}
-h4 {
-  font-size: 26px;
-}
-h4.welcome {
+h2.welcome {
   margin: 0 !important;
   line-height: 1.2;
   color: #F2F2F2;
@@ -132,12 +126,18 @@ h4.welcome {
   font-size: 24px;
 }
 @media (max-width: 991px) {
-  h4.welcome {
+  h2.welcome {
     font-size: 22px;
   }
 }
-.extended-masthead h4.welcome {
+.extended-masthead h2.welcome {
   display: block;
+}
+h3 {
+  font-size: 32px;
+}
+h4 {
+  font-size: 26px;
 }
 h5 {
   font-size: 30px;
