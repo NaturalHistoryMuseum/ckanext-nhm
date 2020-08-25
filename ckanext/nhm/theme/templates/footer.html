@@ -5,9 +5,10 @@
     <div class="col-md-2 col-sm-3 col-xs-12">
         <ul class="attribution list-unstyled">
             <li>
-                <a class="logo" href="{{ h.url_for('home.index') }}"><img
-                        src="{{ h.url_for_static_or_external(g.site_logo) }}"
-                        alt="{{ g.site_title }}" title="{{ g.site_title }}"/></a>
+                <a class="logo" href="{{ h.url_for('home.index') }}">
+                    <img src="{{ h.url_for_static_or_external(g.site_logo) }}"
+                         alt="{{ g.site_title }}"/>
+                </a>
             </li>
             <li>{% trans %}<strong>Powered by</strong> <a
                     class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{%
