@@ -2358,6 +2358,8 @@ select,
 .label {
   color: black;
   text-transform: uppercase;
+  font-size: 12px;
+  padding: 0.2em 0.6em;
 }
 .label[data-format=dwc],
 .label[data-format*=dwc] {
