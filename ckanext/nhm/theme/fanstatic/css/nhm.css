@@ -2397,6 +2397,9 @@ select,
 .package-list td:last-child {
   padding-right: 0;
 }
+.empty {
+  color: #656565;
+}
 .ckan-icon-flame {
   display: none !important;
 }
