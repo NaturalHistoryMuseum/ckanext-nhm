@@ -2264,9 +2264,29 @@ select, .select2-choice {
 // DATASET LIST ------------------------------------------------------------------------------------
 
 .label { // format label for datasets
+  // default to black text because most of the labels have an acceptable contrast with black text
+  // rather than white. Ones that need white are overidden below.
+  color: black;
+  text-transform: uppercase;
+
   &[data-format=dwc], &[data-format*=dwc] {
     background-color: @primary5;
-    text-transform: uppercase;
+  }
+
+  &[data-format=rdf], &[data-format*=rdf], &[data-format*=nquad], &[data-format*=ntriples],
+  &[data-format*=turtle] {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
+  }
+
+  &[data-format=zip], &[data-format*=zip] {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
+  }
+
+  &[data-format=pdf], &[data-format*=pdf] {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
   }
 }
 

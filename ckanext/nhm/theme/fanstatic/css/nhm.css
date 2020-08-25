@@ -2355,10 +2355,28 @@ select,
   border: 2px dashed #DDDDDD;
   padding: 5px;
 }
+.label {
+  color: black;
+  text-transform: uppercase;
+}
 .label[data-format=dwc],
 .label[data-format*=dwc] {
   background-color: #71C85B;
-  text-transform: uppercase;
+}
+.label[data-format=rdf],
+.label[data-format*=rdf],
+.label[data-format*=nquad],
+.label[data-format*=ntriples],
+.label[data-format*=turtle] {
+  color: white;
+}
+.label[data-format=zip],
+.label[data-format*=zip] {
+  color: white;
+}
+.label[data-format=pdf],
+.label[data-format*=pdf] {
+  color: white;
 }
 .package-list th,
 .package-list td {
