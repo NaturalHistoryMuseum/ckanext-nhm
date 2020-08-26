@@ -223,16 +223,26 @@
              :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
-                    <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>
+                    <a href="#" aria-label="Show first results page" @click="runSearch(0)">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
                 </li>
                 <li v-if="page > 0">
-                    <a href="#" @click="runSearch(page - 1)">{{ page }}</a>
+                    <a href="#" aria-label="Show previous results page"
+                       @click="runSearch(page - 1)">
+                        {{ page }}
+                    </a>
                 </li>
                 <li class="active">
-                    <a href="#">{{ page + 1 }}</a>
+                    <a href="#" aria-label="Go to the top of this results page">
+                        {{ page + 1 }}
+                    </a>
                 </li>
                 <li v-if="_after.length > page">
-                    <a href="#" @click="runSearch(page + 1)">{{ page + 2}}</a>
+                    <a href="#" aria-label="Show next results page"
+                       @click="runSearch(page + 1)">
+                        {{ page + 2}}
+                    </a>
                 </li>
             </ul>
         </div>
