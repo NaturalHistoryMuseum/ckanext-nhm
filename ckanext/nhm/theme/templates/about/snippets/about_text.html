@@ -6,7 +6,7 @@
 <h2>Museum collection</h2>
 
 <p>Our natural history collection is one of the most important in the world, documenting 4.5 billion years of life, the Earth and the solar system.  Almost all animal, plant, mineral and fossil groups are represented.</p>
-<p>The portal's main dataset consists of specimens from the Museum's collection database, with <a href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> records from the Museum’s
+<p id="about_text_specimens">The portal's main dataset consists of specimens from the Museum's collection database, with <a aria-labelledby="about_text_specimens" href="{{ h.url_for_collection_view() }}">{{ h.delimit_number(collection_stats['total']) }}</a> records from the Museum’s
 
 {% for collection_code in collection_codes %}
     {% set dept = h.get_department(collection_code) %}
