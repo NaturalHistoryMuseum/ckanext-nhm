@@ -1338,6 +1338,8 @@ iframe {
 }
 .control-required {
   display: inline !important;
+  color: #af5f62;
+  font-weight: bold;
 }
 .contact-form {
   display: flex;
