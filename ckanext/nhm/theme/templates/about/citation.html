@@ -8,10 +8,6 @@
 {% endblock %}
 
 {% block about_content %}
-
-    {% set api_link = h.link_to(_('API'), h.url_for('api.get_api', ver=3)) %}
-    {% set api_doc_link = h.api_doc_link() %}
-
     <h1 class="page-heading">{{ title }}</h1>
 
     <p>If you use our data, we strongly encourage you to cite or reference this work as you would any other scientific research (even if the license does not explicitly require you to).</p>
@@ -27,7 +23,5 @@
             <h4>Preferred citation format</h4>
             <p class="about-doi">Scott, B., &amp; Smith , V. (2014): Dataset title data.nhm.ac.uk. https://doi.org/10.5072/1</p>
         </div>
-
     </div>
-
 {% endblock %}
