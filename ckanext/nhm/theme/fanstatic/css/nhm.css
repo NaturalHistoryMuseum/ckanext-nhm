@@ -1394,6 +1394,9 @@ iframe {
     min-width: 30em;
   }
 }
+.editor .editor-info-block a {
+  color: #007491 !important;
+}
 .ckanpackager-form {
   padding: 10px !important;
   background: #DDDDDD;
