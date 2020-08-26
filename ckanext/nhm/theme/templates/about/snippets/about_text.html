@@ -16,22 +16,22 @@
 </p>
 <p id="about_text_specimens">
     The portal's main dataset consists of specimens from the Museum's collection database, with
-    <a aria-labelledby="about_text_specimens" href="{{ h.url_for_collection_view() }}">
+    <a aria-labelledby="about_text_specimens" href="/search/specimens">
         {{ h.delimit_number(collection_stats['total']) }}</a>
     records from the Museum’s
 
     {% for collection_code in collection_codes %}
         {% set dept = h.get_department(collection_code) %}
-        {% set key = loop.index0 %}
-        <a title="{{ dept }} specimens" href="{{ h.url_for_collection_view(filters={'collectionCode': collection_code}) }}">{{ dept }}</a>{% if key == (collection_codes.__len__() - 2) %} and {% elif key < (collection_codes.__len__() - 2) %}, {% endif %}
+        {% set is_last = (collection_codes.index(collection_code) == (collection_codes.__len__() - 1)) %}
+        <a title="{{ dept }} specimens" href="/search/{{ dept | lower }}">{{ dept }}</a>{% if not is_last %}, {% endif %}
     {%  endfor %}
 
     collections.
 </p>
 <p>
     We also have
-    <a title="Index lots" href="{{ h.url_for_indexlot_view() }}">
-        {{ h.indexlot_count() }} species-level
+    <a title="Index lots" href="/search/indexlots">
+        {{ h.delimit_number(collection_stats['indexlots']) }} species-level
     </a>
     (index lot) records, which denote the presence of a taxon in the Museum collection.
 </p>
