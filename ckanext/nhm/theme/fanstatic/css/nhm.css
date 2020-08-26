@@ -1394,6 +1394,15 @@ iframe {
     min-width: 30em;
   }
 }
+.contact-form legend {
+  font-family: 'Elysio Regular', 'Open Sans', sans-serif;
+  font-size: 17px;
+  border-bottom: none;
+}
+.modal-body .contact-form .form-actions {
+  margin: 0;
+  padding: 0;
+}
 .editor .editor-info-block a {
   color: #007491 !important;
 }
