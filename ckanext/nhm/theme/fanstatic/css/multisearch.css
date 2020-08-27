@@ -133,6 +133,9 @@
 .doi-popup {
   min-width: 200px;
 }
+.share-popup .share-popup-warning {
+  padding: 5px;
+}
 .image-viewer {
   position: fixed;
   top: 0;
