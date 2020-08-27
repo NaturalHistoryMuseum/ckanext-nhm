@@ -3,7 +3,7 @@
         <slot></slot>
         <button v-clipboard:copy="copyText"
                 v-clipboard:success="onCopySuccess"
-                v-clipboard:error="onCopyError">
+                v-clipboard:error="onCopyError" aria-label="copy button">
             <i class="fas" :class="{'fa-check': copySuccess, 'fa-times': copyFailure, 'fa-clipboard': !copyAttempt}"></i></button>
     </p>
 </template>
