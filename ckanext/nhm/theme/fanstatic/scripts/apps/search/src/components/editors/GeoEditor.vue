@@ -1,12 +1,12 @@
 <template>
     <div class="flex-container flex-column flex-center">
         <div class="flex-container flex-center" v-if="comparisonType === 'point'">
-            <input type="text" v-model="values.point.latitude" size="3">
+            <input type="text" title="Latitude" v-model="values.point.latitude" size="3">
             <span>,</span>
-            <input type="text" v-model="values.point.longitude" size="3">
+            <input type="text" title="Longitude" v-model="values.point.longitude" size="3">
             <label for="radius">±</label>
-            <input type="number" v-model="values.point.radius" min="0" id="radius">
-            <select v-model="values.point.radius_unit">
+            <input type="number" title="Radius" v-model="values.point.radius" min="0" id="radius">
+            <select v-model="values.point.radius_unit" title="Radius units">
                 <option v-for="unit in radiusUnits" :key="unit.id">{{ unit }}
                 </option>
             </select>
@@ -19,11 +19,14 @@
                     </option>
                 </select>
             </span>
-            <select v-model="values.named_area[geoCategory]">
-                <option v-for="area in (namedAreas[geoCategory] || [])"
-                    :key="area.id">{{ area }}
-                </option>
-            </select>
+            <span>
+                <label for="geoName">Name</label>
+                <select id="geoName" :disabled="!geoCategory" v-model="values.named_area[geoCategory]">
+                    <option v-for="area in (namedAreas[geoCategory] || [])" :key="area.id">
+                        {{ area }}
+                    </option>
+                </select>
+            </span>
         </div>
         <div
             class="flex-container flex-center flex-column flex-stretch-height space-children-v full-width"
