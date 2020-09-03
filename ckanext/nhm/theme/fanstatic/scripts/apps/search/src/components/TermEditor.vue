@@ -17,6 +17,7 @@
         <div class="term-editor-query space-children-v">
             <div class="flex-container flex-nowrap flex-stretch-last">
                 <span>As:</span> <select v-model="fieldType"
+                                         title="Select what type to treat the field's contents as"
                                          @change="comparisonType = schema.terms[fieldType][0]">
                 <option v-for="(v, k) in readableFieldTypes" v-bind:key="v.id" :value="k">{{ v }}
                 </option>
@@ -42,8 +43,10 @@
                 </keep-alive>
             </div>
             <div class="flex-container flex-column flex-stretch-height">
-                <span>Name (optional):</span>
-                <input type="text" v-model="termName">
+                <span>
+                    <label for="termNameInput">Name (optional)</label>
+                    <input id="termNameInput" type="text" v-model="termName">
+                </span>
             </div>
             <div class="query-submit">
                 <button @click="submitTerm" class="btn btn-primary no-icon">Save</button>
