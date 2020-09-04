@@ -1,7 +1,9 @@
 <template>
     <div class="view-component">
-        <Loading v-if="loading && loadedImageRecords.length > 0"><h3>Loading {{ nLoaded }} of {{
-                                                               loadedImageRecords.length }} images...</h3>
+        <Loading v-if="loading && loadedImageRecords.length > 0">
+            <h3>
+                Loading {{ nLoaded }} of {{loadedImageRecords.length }} images...
+            </h3>
         </Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="flex-container flex-right">
