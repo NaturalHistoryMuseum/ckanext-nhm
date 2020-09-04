@@ -38,7 +38,8 @@
                     <i class="delete-field fas fa-times-circle fa-xs"
                         @click="deletePolygon(index)"></i>
                 </span>
-                <i class="fas fa-plus-square" @click="addPolygon" title="Add new polygon"></i>
+                <i class="fas fa-plus-square" @click="addPolygon" title="Add new polygon"
+                   role="button"></i>
             </div>
             <div class="flex-container">
                 <small>
