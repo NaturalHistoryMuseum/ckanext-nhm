@@ -698,6 +698,9 @@
 .record-item .record-header .record-name {
   align-self: start;
 }
+.record-item .record-header a {
+  color: #195D0D;
+}
 .record-item .record-body {
   padding-top: 10px;
   width: 100%;
