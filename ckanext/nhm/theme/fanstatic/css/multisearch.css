@@ -407,14 +407,10 @@
   font-weight: bold;
   color: #343434;
 }
-.filter-add-choice-button {
-  cursor: pointer;
-}
 .filter-add-choice {
   width: max-content;
 }
 .filter-add-choice span {
-  cursor: pointer;
   background-color: #FFFFFF;
   border-radius: 5px;
   border: 2px solid #9A9A9A;

@@ -1,7 +1,7 @@
 <template>
     <div class="filter-add">
         <span v-if="showText" class="filter-add-help-text">Add filters</span>
-        <i class="fas fa-plus-square fa-lg filter-add-choice-button" role="button"
+        <i class="fas fa-plus-square fa-lg" role="button"
            :aria-label="!showChoice ? 'Add a group or filter' : 'Close group or filter chooser'"
            @click="showChoice = !showChoice" :id="'show-choice-' + _uid"></i>
         <transition name="slidedown">
