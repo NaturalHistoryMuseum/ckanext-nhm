@@ -41,8 +41,11 @@
                 <i class="fas fa-plus-square" @click="addPolygon" title="Add new polygon"></i>
             </div>
             <div class="flex-container">
-                <small>Click on the map to add polygon points. Try <a href="https://geojson.net">geojson.net</a>
-                       for editing more complex MultiPolygon queries.</small>
+                <small>
+                    Click on the map to add polygon points.
+                    Try <a id="geojson-link" href="https://geojson.net">geojson.net</a> for editing
+                    more complex MultiPolygon queries.
+                </small>
                 <label for="useGeoJson">Paste GeoJSON</label>
                 <input type="checkbox" v-model="useGeoJson" id="useGeoJson">
             </div>

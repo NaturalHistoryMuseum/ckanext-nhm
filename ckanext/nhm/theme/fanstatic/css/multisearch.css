@@ -257,6 +257,9 @@
     border-radius: 5vw;
   }
 }
+#geojson-link {
+  color: #195D0D;
+}
 .slidedown-leave-active,
 .slidedown-enter-active,
 .slideright-leave-active,
