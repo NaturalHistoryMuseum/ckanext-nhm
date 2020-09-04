@@ -2477,6 +2477,9 @@ select,
 .tags .tag-list {
   padding-top: 0;
 }
+#nav-license a {
+  color: #195D0D;
+}
 .additional-info h3 {
   background: #F2F2F2;
   margin: 0 0 10px 0;
