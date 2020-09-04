@@ -17,7 +17,7 @@
                  :key="record.id"
                  class="gallery-tile">
                 <img @click="setViewerImage(recordIndex)" :src="record.image.thumb"
-                     :alt="record.image.preview" >
+                     :alt="`Image associated with record ${record.id}`" >
                 <small class="gallery-tile-title">
                     <a :href="record.recordUrl" :aria-label="`Go to record ${record.id}`">
                         {{ record.recordTitle }}
