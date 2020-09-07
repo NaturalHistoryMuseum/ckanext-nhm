@@ -50,14 +50,14 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
         // Allow hide on esc / clicking elsewhere on the page
         $('body').click(function (e) {
             if ($(e.target).closest('.resource-view-filters-wrapper').length === 0) {
-                hideFilterDisplay()
+                hideFilterDisplay();
             }
         });
 
         $(document).keyup(function (e) {
             // esc
             if (e.keyCode == 27) {
-                hideFilterDisplay()
+                hideFilterDisplay();
             }
         });
 
