@@ -1897,6 +1897,9 @@ tr.empty {
 .error-block {
   background-color: #890022;
 }
+.alert .close {
+  opacity: 0.8;
+}
 .select2-arrow {
   background-image: none !important;
   background-color: #FFFFFF !important;
