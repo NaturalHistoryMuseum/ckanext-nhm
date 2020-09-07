@@ -27,7 +27,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
                         $optGroup.append($('<option>', {value: fieldName}).text(fieldLabel));
                     }
                 });
-                self.$select.append($optGroup)
+                self.$select.append($optGroup);
             }
         }else{
             $.each(fields, function (i, fieldName) {
