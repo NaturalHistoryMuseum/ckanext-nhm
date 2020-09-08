@@ -50,7 +50,9 @@
                     <div class="filtered pill">
                         <div class="pill-txt">{{ pill.value }}</div>
                         <div class="pill-remove">
-                            <a href="{{ pill.href }}" class="remove" title="{{ _('Remove') }}"><i class="fas fa-times"></i></a>
+                            <a href="{{ pill.href }}" class="remove" title="{{ _('Remove') }}" aria-label="Remove filter">
+                                <i class="fas fa-times"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
