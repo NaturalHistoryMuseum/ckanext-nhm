@@ -14,7 +14,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
 
         var fields = self.options.fields,
             fieldGroups = self.options.fieldGroups;
-        self.$select = ($('<select name="field" />'));
+        self.$select = ($('<select aria-label="Select a field to filter" name="field" />'));
 
         // If we have field groups, separate the field select into option groups
         // Otherwise, just provide a long list of fields
@@ -35,7 +35,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
             });
         }
         self.$filtersWrapper.append(self.$select);
-        var $input = ($('<input type="text" name="value" />'));
+        var $input = ($('<input aria-label="Enter a filter value" type="text" name="value" />'));
         self.$filtersWrapper.append($input);
         self.el.append(self.$filtersWrapper);
 
@@ -69,7 +69,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
     }
 
     function hideFilterDisplay() {
-        self.el.removeClass('display-filter');
+        // self.el.removeClass('display-filter');
     }
 
     function clearDropdown($input) {
