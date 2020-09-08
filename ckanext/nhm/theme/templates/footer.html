@@ -63,11 +63,12 @@
             <li role="presentation"><a href="{{ h.url_for('legal.terms') }}">T&amp;C</a>
             </li>
             {% if g.userobj %}
-            <li role="presentation"><a
-                    href="{{ h.url_for('user.read', id=g.userobj.name) }}"
-                    title="My account">My account</a></li>
-            <li role="presentation"><a href="{{ h.url_for('user.logout') }}"
-                                       title="{{ _('Log out') }}">Log out</a></li>
+            <li role="presentation">
+                <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('My account') }}</a>
+            </li>
+            <li role="presentation">
+                <a href="{{ h.url_for('user.logout') }}">{{ _('Log out') }}</a>
+            </li>
             {% else %}
                 <li role="presentation"><a href="{{ h.url_for('user.login') }}">Login</a></li>
             {% endif %}
