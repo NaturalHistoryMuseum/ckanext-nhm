@@ -2844,6 +2844,7 @@ select,
   display: block;
   margin: 0 0 0 20px;
   line-height: 40px;
+  color: #195D0D;
 }
 @media (min-width: 992px) {
   .toggle-view-filters {
