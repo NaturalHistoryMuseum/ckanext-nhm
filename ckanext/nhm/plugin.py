@@ -432,7 +432,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 # Description of image in gallery view
                 u'description': literal(
                     u''.join([u'<span>%s</span>' % t for t in title])),
-                u'title': u' - '.join(title),
+                u'title': u' - '.join(map(str, title)),
                 u'record_id': record[u'_id']
                 })
         return images
