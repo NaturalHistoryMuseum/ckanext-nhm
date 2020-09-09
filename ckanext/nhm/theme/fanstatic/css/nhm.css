@@ -490,16 +490,17 @@ span.caret {
 }
 .stages .highlight {
   text-indent: 0 !important;
+  color: #656565;
 }
-.stages .active:after {
-  border-top-color: #71C85B;
-  border-bottom-color: #71C85B;
+.stages li.active:after {
+  border-top-color: #188100;
+  border-bottom-color: #188100;
 }
-.stages .active:before {
-  color: #71C85B;
+.stages li.active:before {
+  color: #188100;
 }
-.stages .active .highlight {
-  background: #71C85B;
+.stages li.active .highlight {
+  background: #188100;
 }
 .stats {
   padding-bottom: 5px;
