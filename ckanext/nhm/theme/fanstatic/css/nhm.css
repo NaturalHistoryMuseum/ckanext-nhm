@@ -2951,3 +2951,9 @@ select,
 .help_available_formats {
   background-color: transparent !important;
 }
+.table-actions button {
+  margin-right: 11px;
+}
+.table-actions button:last-child {
+  margin-right: 0;
+}
