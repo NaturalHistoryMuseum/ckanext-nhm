@@ -2928,6 +2928,9 @@ select,
 [data-module="dashboard"] {
   margin-top: 20px;
 }
+[data-module="dashboard"] .page-heading small {
+  color: #656565;
+}
 #followee-filter li.active a {
   background: #BBEDA9;
   color: #343434;
