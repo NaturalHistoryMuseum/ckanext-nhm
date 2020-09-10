@@ -322,9 +322,6 @@ body {
   .pad-right(li, 5px)
 }
 
-.label-dark {
-  background-color: @grey2;
-}
 
 .nowrap {
   white-space: nowrap;
@@ -2333,6 +2330,11 @@ select, .select2-choice {
   &[data-format=pdf], &[data-format*=pdf] {
     // wcag contrast requirement (the default color (black) is too low contrast)
     color: white;
+  }
+
+  &.label-dark {
+    background-color: @grey2;
+    color: @grey10;
   }
 }
 

@@ -425,9 +425,6 @@ body .default-text a:focus {
 .inline-list-pad li:last-child {
   padding-right: 0;
 }
-.label-dark {
-  background-color: #434343;
-}
 .nowrap {
   white-space: nowrap;
 }
@@ -2415,6 +2412,10 @@ select,
 .label[data-format=pdf],
 .label[data-format*=pdf] {
   color: white;
+}
+.label.label-dark {
+  background-color: #434343;
+  color: #FFFFFF;
 }
 .package-list th,
 .package-list td {
