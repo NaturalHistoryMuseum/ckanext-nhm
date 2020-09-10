@@ -15,7 +15,8 @@
                  v-for="(record, index) in records"
                  :key="record._id" :data-thumbnail-index="index" ref="container">
                 <img class="viiif-thumbnail-image" :src="getRecordThumbnail(record)"
-                     :width="`${thumbnailSize}px`" draggable="false"/>
+                     :width="`${thumbnailSize}px`" draggable="false"
+                     :alt="`Thumbnail image of ${record.Barcode} from record['Collection Name']`"/>
                 <div class="viiif-thumbnail-label">
                     <div class="viiif-thumbnail-label-barcode">
                         {{ record.Barcode }}
