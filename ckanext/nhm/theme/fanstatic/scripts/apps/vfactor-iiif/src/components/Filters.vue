@@ -23,7 +23,7 @@
                             {{ option }}
                         </option>
                     </select>
-                    <button class="btn btn-primary" :disabled="barcode == null"
+                    <button class="btn btn-primary viiif-button" :disabled="barcode == null"
                             @click="changeBarcode">View drawer
                     </button>
                 </div>
@@ -46,8 +46,8 @@
                         <span class="viiif-filter-collection-selector"
                               @click="deselectAll">Clear</span>
                     </div>
-                    <button class="btn btn-primary" :disabled="collections.length === 0"
-                            @click="changeCollections">
+                    <button class="btn btn-primary viiif-button"
+                            :disabled="collections.length === 0" @click="changeCollections">
                         {{'View collection' | pluralize(collections)}}
                     </button>
                 </div>
