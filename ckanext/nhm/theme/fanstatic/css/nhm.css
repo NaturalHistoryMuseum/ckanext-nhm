@@ -2417,6 +2417,11 @@ select,
   background-color: #434343;
   color: #FFFFFF;
 }
+.label.label-info {
+  background-color: #890022;
+  padding-top: 0.45em;
+  color: #FFFFFF;
+}
 .package-list th,
 .package-list td {
   width: 20%;
