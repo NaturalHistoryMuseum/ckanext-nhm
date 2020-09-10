@@ -1452,6 +1452,9 @@ iframe {
   color: #656565;
   font-size: 12px;
 }
+.form-group .info-block a {
+  color: #188100;
+}
 input[type="radio"],
 input[type="checkbox"] {
   position: relative;
