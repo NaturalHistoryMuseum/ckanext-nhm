@@ -76,11 +76,11 @@
                                     {% set filter = '%s:%s' % (field, g.record_dict[field]) %} {% endif %}
 
                                 {% if filter and field in filterable_fields %}
-
                                     <a title="View all records where {{ filter }}"
+                                        aria-label="View all records where {{ filter }}"
                                         href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id, filters=filter) }}">
-                                        <i class="fas fa-filter"></i> </a>
-
+                                        <i class="fas fa-filter"></i>
+                                    </a>
                                 {% endif %}
                             </td>
                         </tr>
