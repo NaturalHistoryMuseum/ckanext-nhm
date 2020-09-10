@@ -50,20 +50,36 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     template_dir = os.path.join(root_dir, u'ckanext', u'nhm', u'theme', u'templates')
 
-    implements(interfaces.IBlueprint, inherit=True)
-    implements(interfaces.IRoutes, inherit=True)
     implements(interfaces.IActions, inherit=True)
-    implements(interfaces.ITemplateHelpers, inherit=True)
+    implements(interfaces.IBlueprint, inherit=True)
     implements(interfaces.IConfigurer, inherit=True)
     implements(interfaces.IDatasetForm, inherit=True)
     implements(interfaces.IFacets, inherit=True)
     implements(interfaces.IPackageController, inherit=True)
     implements(interfaces.IResourceController, inherit=True)
+    implements(interfaces.IRoutes, inherit=True)
+    implements(interfaces.ITemplateHelpers, inherit=True)
+    implements(ICkanPackager)
     implements(IContact)
     implements(IDoi)
     implements(IGalleryImage)
-    implements(ICkanPackager)
     implements(IVersionedDatastore, inherit=True)
+
+    ## IActions
+    def get_actions(self):
+        '''
+        ..seealso:: ckan.plugins.interfaces.IActions.get_actions
+        '''
+        return {
+            u'record_show': nhm_action.record_show,
+            u'object_rdf': nhm_action.object_rdf,
+            u'download_image': nhm_action.download_original_image,
+            u'get_permanent_url': nhm_action.get_permanent_url,
+            }
+
+    ## IBlueprint
+    def get_blueprint(self):
+        return routes.blueprints
 
     ## IConfigurer
     def update_config(self, config):
@@ -74,7 +90,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # Add template directory - we manually add to extra_template_paths
         # rather than using add_template_directory to ensure it is always used
         # to override templates
-
         config[u'extra_template_paths'] = u','.join(
             [self.template_dir, config.get(u'extra_template_paths', u'')])
 
@@ -85,70 +100,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # be temporary, until DAMS
         toolkit.add_public_directory(config, u'files')
 
-    ## IBlueprint
-    def get_blueprint(self):
-        return routes.blueprints
-
-    ## IRoutes
-    def before_map(self, _map):
-        '''
-        ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
-        :param _map:
-        '''
-
-        # Dataset metrics
-        _map.connect(u'dataset_metrics', '/dataset/metrics/{id}',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'dataset_metrics', ckan_icon=u'bar-chart')
-        # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
-
-        # The DCAT plugin breaks these links if enable content negotiation is enabled
-        # because it maps to /dataset/{_id} without excluding these actions
-        # So we re=add them here to make sure it's working
-        # TODO: are these still broken?
-        # _map.connect(u'add dataset', u'/dataset/new', controller=u'dataset',
-        #              action=u'new')
-        _map.connect(u'/dataset/{action}',
-                     controller=u'dataset',
-                     requirements=dict(action=u'|'.join([
-                         u'list',
-                         u'autocomplete'
-                         ])))
-
-        return _map
-
-    # IActions
-    def get_actions(self):
-        '''
-        ..seealso:: ckan.plugins.interfaces.IActions.get_actions
-        '''
-        return {
-            u'record_show': nhm_action.record_show,
-            u'object_rdf': nhm_action.object_rdf,
-            u'download_image': nhm_action.download_original_image,
-            u'get_permanent_url': nhm_action.get_permanent_url,
-        }
-
-    # ITemplateHelpers
-    def get_helpers(self):
-        '''
-        ..seealso:: ckan.plugins.interfaces.ITemplateHelpers.get_helpers
-        '''
-
-        h = {}
-
-        #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
-        for helper in dir(helpers):
-            #  Exclude private
-            if not helper.startswith(u'_'):
-                func = getattr(helpers, helper)
-
-                #  Ensure it's a function
-                if hasattr(func, u'__call__'):
-                    h[helper] = func
-        return h
-
-    ## IDatasetForm - CKAN Metadata
+    ## IDatasetForm
     def package_types(self):
         '''
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.package_types
@@ -217,6 +169,103 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         pkg_dict[u'all_authors'] = pkg_dict[u'author']
         pkg_dict[u'author'] = helpers.dataset_author_truncate(pkg_dict[u'author'])
         return pkg_dict
+
+    def after_update(self, context, pkg_dict):
+        '''If this is the specimen resource, clear memcached
+
+        NB: Our version of ckan doesn't have the IResource after_update method
+        But updating a resource calls IPackageController.after_update
+        ..seealso:: ckan.plugins.interfaces.IPackageController.after_update
+        :param context:
+        :param pkg_dict:
+
+        '''
+        for resource in pkg_dict.get(u'resources', []):
+            # If this is the specimen resource ID, clear the collection stats
+            if u'id' in resource:
+                if resource[u'id'] in [helpers.get_specimen_resource_id(),
+                                       helpers.get_indexlot_resource_id()]:
+                    log.info(u'Clearing caches')
+                    # Quick and dirty, delete all caches when indexlot or specimens
+                    # are updated
+                    for _cache in cache_managers.values():
+                        _cache.clear()
+
+        # Clear the NGINX proxy cache
+        cache_clear_nginx_proxy()
+
+    ## IRoutes
+    def before_map(self, _map):
+        '''
+        ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
+        :param _map:
+        '''
+
+        # Dataset metrics
+        _map.connect(u'dataset_metrics', '/dataset/metrics/{id}',
+                     controller=u'ckanext.nhm.controllers.stats:StatsController',
+                     action=u'dataset_metrics', ckan_icon=u'bar-chart')
+        # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
+
+        # The DCAT plugin breaks these links if enable content negotiation is enabled
+        # because it maps to /dataset/{_id} without excluding these actions
+        # So we re=add them here to make sure it's working
+        # TODO: are these still broken?
+        # _map.connect(u'add dataset', u'/dataset/new', controller=u'dataset',
+        #              action=u'new')
+        _map.connect(u'/dataset/{action}',
+                     controller=u'dataset',
+                     requirements=dict(action=u'|'.join([
+                         u'list',
+                         u'autocomplete'
+                         ])))
+
+        return _map
+
+    ## ITemplateHelpers
+    def get_helpers(self):
+        '''
+        ..seealso:: ckan.plugins.interfaces.ITemplateHelpers.get_helpers
+        '''
+
+        h = {}
+
+        #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
+        for helper in dir(helpers):
+            #  Exclude private
+            if not helper.startswith(u'_'):
+                func = getattr(helpers, helper)
+
+                #  Ensure it's a function
+                if hasattr(func, u'__call__'):
+                    h[helper] = func
+        return h
+
+    ## ICkanPackager
+    def before_package_request(self, resource_id, package_id, packager_url, request_params):
+        '''
+        Modify the request params that are about to be sent through to the
+        ckanpackager backend so that an EML param is
+        included.
+
+        :param resource_id: the resource id of the resource that is about to be packaged
+        :param package_id: the package id of the resource that is about to be packaged
+        :param packager_url: the target url for this packaging request
+        :param request_params: a dict of parameters that will be sent with the request
+        :return: the url and the params as a tuple
+        '''
+        resource = toolkit.get_action(u'resource_show')(None, {
+            u'id': resource_id
+            })
+        package = toolkit.get_action(u'package_show')(None, {
+            u'id': package_id
+            })
+        if resource.get(u'datastore_active', False) and resource.get(u'format',
+                                                                     u'').lower() == \
+            u'dwc':
+            # if it's a datastore resource and it's in the DwC format, add EML
+            request_params[u'eml'] = generate_eml(package, resource)
+        return packager_url, request_params
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
@@ -308,31 +357,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             mail_dict[u'headers'][u'cc'] = u'data@nhm.ac.uk'
         return mail_dict
 
-    ## IPackageController
-    def after_update(self, context, pkg_dict):
-        '''If this is the specimen resource, clear memcached
-
-        NB: Our version of ckan doesn't have the IResource after_update method
-        But updating a resource calls IPackageController.after_update
-        ..seealso:: ckan.plugins.interfaces.IPackageController.after_update
-        :param context:
-        :param pkg_dict:
-
-        '''
-        for resource in pkg_dict.get(u'resources', []):
-            # If this is the specimen resource ID, clear the collection stats
-            if u'id' in resource:
-                if resource[u'id'] in [helpers.get_specimen_resource_id(),
-                                       helpers.get_indexlot_resource_id()]:
-                    log.info(u'Clearing caches')
-                    # Quick and dirty, delete all caches when indexlot or specimens
-                    # are updated
-                    for _cache in cache_managers.values():
-                        _cache.clear()
-
-        # Clear the NGINX proxy cache
-        cache_clear_nginx_proxy()
-
     ## IDoi
     def build_metadata(self, pkg_dict, metadata_dict):
         '''
@@ -387,7 +411,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         #         'affiliation']
         return xml_dict
 
-    # IGalleryImage
+    ## IGalleryImage
     def image_info(self):
         '''Return info for this plugin. If resource type is set, only dataset of that
         type will be available.
@@ -401,7 +425,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             u'field_type': [u'json']
             }
 
-    ## IGalleryImage
     def get_images(self, raw_images, record, data_dict):
         '''
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
@@ -437,34 +460,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 })
         return images
 
-    ## ICkanPackager
-    def before_package_request(self, resource_id, package_id, packager_url,
-                               request_params):
-        '''
-        Modify the request params that are about to be sent through to the
-        ckanpackager backend so that an EML param is
-        included.
-
-        :param resource_id: the resource id of the resource that is about to be packaged
-        :param package_id: the package id of the resource that is about to be packaged
-        :param packager_url: the target url for this packaging request
-        :param request_params: a dict of parameters that will be sent with the request
-        :return: the url and the params as a tuple
-        '''
-        resource = toolkit.get_action(u'resource_show')(None, {
-            u'id': resource_id
-            })
-        package = toolkit.get_action(u'package_show')(None, {
-            u'id': package_id
-            })
-        if resource.get(u'datastore_active', False) and resource.get(u'format',
-                                                                     u'').lower() == \
-                u'dwc':
-            # if it's a datastore resource and it's in the DwC format, add EML
-            request_params[u'eml'] = generate_eml(package, resource)
-        return packager_url, request_params
-
-    # IVersionedDatastore
+    ## IVersionedDatastore
     def datastore_modify_data_dict(self, context, data_dict):
         '''
         This function allows overriding of the data dict before datastore_search gets
@@ -522,7 +518,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         return data_dict
 
-    # IVersionedDatastore
     def datastore_modify_search(self, context, original_data_dict, data_dict, search):
         '''
         This function allows us to modify the search object itself before it is
@@ -548,7 +543,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             search = search.filter(filter_dsl)
         return search
 
-    # IVersionedDatastore
     def datastore_modify_result(self, context, original_data_dict, data_dict, result):
         # if there's the include_urls parameter then include the permanent url of each specimen
         if helpers.get_specimen_resource_id() == data_dict[u'resource_id'] and \
@@ -591,7 +585,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     field_def[u'sortable'] = False
         return fields
 
-    # IVersionedDatastore
     def datastore_is_read_only_resource(self, resource_id):
         # we don't want any of the versioned datastore ingestion and indexing code
         # modifying the
@@ -600,7 +593,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                                helpers.get_artefact_resource_id(),
                                helpers.get_indexlot_resource_id()}
 
-    # IVersionedDatastore
     def datastore_after_indexing(self, request, eevee_stats, stats_id):
         try:
             # whenever anything is indexed, we should clear the cache,

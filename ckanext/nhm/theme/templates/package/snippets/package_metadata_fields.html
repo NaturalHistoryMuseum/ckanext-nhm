@@ -13,10 +13,6 @@
 {% endblock %}
 
 {% block custom_fields %}
-    {# Remove 'free extras' from the package form. If you're using
-convert_to/from_extras() as we are with our 'custom_text' field below then
-you need to remove free extras from the form, or editing your custom field
-won't work. #}
 
     {{ form.input('affiliation', label=_('Affiliation(s)'), id='field-affiliation', placeholder=_('Natural History Museum'), value=data.affiliation, error=errors.affiliation, classes=['control-medium']) }}
     {{ form.info("Enter a list of additional contributors, one per line. If you wish to add affiliations, please include in parenthesis.", inline=True) }}
