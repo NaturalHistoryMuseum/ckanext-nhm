@@ -502,6 +502,18 @@ span.caret {
 .stages li.active .highlight {
   background: #188100;
 }
+.stages li.complete:after {
+  border-top-color: #F2F2F2;
+  border-bottom-color: #F2F2F2;
+}
+.stages li.complete:before {
+  background: #656565;
+  color: #FFFFFF;
+}
+.stages li.complete .highlight {
+  background: #F2F2F2;
+  color: #656565;
+}
 .stats {
   padding-bottom: 5px;
   margin-left: 15px;

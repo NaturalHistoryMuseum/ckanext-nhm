@@ -421,6 +421,23 @@ span.caret {
       background: @primary3;
     }
   }
+
+  & li.complete {
+    &:after {
+      border-top-color: @grey9;
+      border-bottom-color: @grey9;
+    }
+
+    &:before {
+      background: @grey4;
+      color: @grey10;
+    }
+
+    & .highlight {
+      background: @grey9;
+      color: @grey4;
+    }
+  }
 }
 
 .stats {
