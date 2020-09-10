@@ -10,7 +10,7 @@
                     {% for text, icon, links in external_links %}
                         <div class="external-link-parent">
                             <div class="external-link-name">
-                                <img width="16" height="16" src="{{ icon }}">&nbsp;<span>{{ text }}&nbsp;<i class="fas fa-caret-down"></i></span>
+                                <img width="16" height="16" src="{{ icon }}" alt="{{ text }} icon">&nbsp;<span>{{ text }}&nbsp;<i class="fas fa-caret-down"></i></span>
                             </div>
                             <ul>
                                 {% for link_text, link in links %}
