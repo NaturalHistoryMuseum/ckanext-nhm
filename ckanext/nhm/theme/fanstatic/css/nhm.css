@@ -1478,6 +1478,9 @@ input[type="checkbox"] {
   font-size: 75%;
   border-top: 1px solid #AFAFAF;
 }
+.privacy-warning a {
+  color: #195D0D !important;
+}
 .search-form {
   border-bottom: none;
   margin-bottom: 0;
