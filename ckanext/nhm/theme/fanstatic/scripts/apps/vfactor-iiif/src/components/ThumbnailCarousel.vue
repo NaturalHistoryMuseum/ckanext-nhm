@@ -12,7 +12,8 @@
              @mouseup="onMouseUp" @mousemove="onMouseMove" @scroll="onScroll"
              @contextmenu="onRightClick" ref="track">
             <div :class="{'viiif-thumbnail-container': true, 'active': currentIndex === index}"
-                 v-for="(record, index) in records"
+                 v-for="(record, index) in records" role="button"
+                 :aria-pressed="currentIndex === index ? 'true' : 'false'"
                  :key="record._id" :data-thumbnail-index="index" ref="container">
                 <img class="viiif-thumbnail-image" :src="getRecordThumbnail(record)"
                      :width="`${thumbnailSize}px`" draggable="false"
