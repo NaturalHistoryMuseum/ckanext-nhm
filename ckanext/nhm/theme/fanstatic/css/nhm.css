@@ -2961,3 +2961,6 @@ select,
 .add-member-or {
   color: #656565;
 }
+.media-item span.count {
+  color: #656565;
+}
