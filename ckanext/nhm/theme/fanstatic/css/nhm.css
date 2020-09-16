@@ -2414,6 +2414,9 @@ select,
 .label[data-format*=pdf] {
   color: white;
 }
+.label.dataset-private {
+  color: white;
+}
 .label.label-dark {
   background-color: #434343;
   color: #FFFFFF;

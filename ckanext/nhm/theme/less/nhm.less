@@ -2333,6 +2333,11 @@ select, .select2-choice {
     color: white;
   }
 
+  &.dataset-private {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
+  }
+
   &.label-dark {
     background-color: @grey2;
     color: @grey10;
