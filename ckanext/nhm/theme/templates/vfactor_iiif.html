@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block breadcrumb_content %}
-    <li class="active">V-Factor IIIF</li>
+    <li class="active">
+        <a class="active" href="{{ h.url_for('vfactor_iiif') }}">V-Factor IIIF</a>
+    </li>
 {% endblock %}
 
 {# no secondary block here, we render it in the vue app instead #}

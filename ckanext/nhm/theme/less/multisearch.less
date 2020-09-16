@@ -60,7 +60,13 @@
 }
 
 .doi-popup {
-  min-width: 200px;
+  min-width: 325px;
+}
+
+.share-popup {
+  .share-popup-warning {
+    padding: 5px;
+  }
 }
 
 .image-viewer {
@@ -180,6 +186,10 @@
       }
     }
   }
+}
+
+#geojson-link {
+  color: @primary2;
 }
 
 // TRANSITIONS -------------------------------------------------------------------------------------
@@ -331,7 +341,7 @@
 
   &.filter-type-not {
     &, & > .group-type {
-      background-color: @warning3;
+      background-color: @warning4;
     }
   }
 }
@@ -441,7 +451,6 @@
     width: 65px;
     padding-right: 0;
   }
-
 
   & .term-editor-query {
     @media (max-width: @md - 1) {
@@ -677,6 +686,10 @@
 
     & .record-res, & .record-name {
       align-self: start;
+    }
+
+    & a {
+      color: @primary2;
     }
   }
 

@@ -8,26 +8,36 @@
 {% endblock %}
 
 {% block about_content %}
-
-    {% set api_link = h.link_to(_('API'), h.url_for('api.get_api', ver=3)) %}
-    {% set api_doc_link = h.api_doc_link() %}
-
     <h1 class="page-heading">{{ title }}</h1>
 
-    <p>If you use our data, we strongly encourage you to cite or reference this work as you would any other scientific research (even if the license does not explicitly require you to).</p>
-    <p>Many of the datasets are the result of a huge amount of time and effort invested by Museum staff and collaborators. Some represent an individual’s work over many decades. Citing this data allows us to measure the impact of the research and encourages others to deposit their data into the portal.</p>
+    <p>
+        If you use our data, we strongly encourage you to cite or reference this work as you would
+        any other scientific research (even if the license does not explicitly require you to).
+    </p>
+    <p>
+        Many of the datasets are the result of a huge amount of time and effort invested by Museum
+        staff and collaborators. Some represent an individual’s work over many decades. Citing this
+        data allows us to measure the impact of the research and encourages others to deposit their
+        data into the portal.
+    </p>
 
     <img class="pull-right" id="datacite" src="/images/datacite.jpg" alt="Datacite" />
 
     <div class="row">
         <div class="col-md-6">
-            <h4>Digital Object Identifier (DOI)</h4>
-            <p>All of our datasets are assigned a DOI, a persistent digital identifier used to uniquely identify the dataset.  Our DOIs are provided by the <a target="_blank" href="http://www.bl.uk/aboutus/stratpolprog/digi/datasets/datacitefaq/faqhome.html" class="external">British Library's DataCite service.</a></p>
+            <h2>Digital Object Identifier (DOI)</h2>
+            <p>
+                All of our datasets are assigned a DOI, a persistent digital identifier used to
+                uniquely identify the dataset.  Our DOIs are provided by the
+                <a class="external" target="_blank" href="http://www.bl.uk/aboutus/stratpolprog/digi/datasets/datacitefaq/faqhome.html">
+                    British Library's DataCite service.
+                </a>
+            </p>
             <p>Please use the DOI in all citations.</p>
-            <h4>Preferred citation format</h4>
-            <p class="about-doi">Scott, B., &amp; Smith , V. (2014): Dataset title data.nhm.ac.uk. https://doi.org/10.5072/1</p>
+            <h2>Preferred citation format</h2>
+            <p class="about-doi">
+                Scott, B., &amp; Smith , V. (2014): Dataset title data.nhm.ac.uk. https://doi.org/10.5072/1
+            </p>
         </div>
-
     </div>
-
 {% endblock %}

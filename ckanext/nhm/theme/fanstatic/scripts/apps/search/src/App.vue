@@ -13,6 +13,7 @@
                                                                            value=""
                                                                            autocomplete="off"
                                                                            placeholder="Search all fields"
+                                                                           role="searchbox"
                                                                            v-model="search"
                                                                            @keyup.enter="runSearch(0)"/>
                     <button type="submit" @click="runSearch(0)">

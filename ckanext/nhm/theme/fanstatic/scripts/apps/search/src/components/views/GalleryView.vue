@@ -1,7 +1,9 @@
 <template>
     <div class="view-component">
-        <Loading v-if="loading && loadedImageRecords.length > 0"><h3>Loading {{ nLoaded }} of {{
-                                                               loadedImageRecords.length }} images...</h3>
+        <Loading v-if="loading && loadedImageRecords.length > 0">
+            <h3>
+                Loading {{ nLoaded }} of {{loadedImageRecords.length }} images...
+            </h3>
         </Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="flex-container flex-right">
@@ -14,12 +16,16 @@
             <div v-for="(record, recordIndex) in loadedImageRecords"
                  :key="record.id"
                  class="gallery-tile">
-                <img @click="setViewerImage(recordIndex)"
-                     :src="record.image.thumb"
-                     :alt="record.image.preview"> <small class="gallery-tile-title">
-                <a :href="record.recordUrl">{{ record.recordTitle }}</a> </small>
-                <small class="gallery-tile-number">{{ record.recordImageIndex + 1 }} / {{
-                                                   record.imageTotal }}</small>
+                <img @click="setViewerImage(recordIndex)" :src="record.image.thumb"
+                     :alt="`Image associated with record ${record.id}`" >
+                <small class="gallery-tile-title">
+                    <a :href="record.recordUrl" :aria-label="`Go to record ${record.id}`">
+                        {{ record.recordTitle }}
+                    </a>
+                </small>
+                <small class="gallery-tile-number">
+                    {{ record.recordImageIndex + 1 }} / {{record.imageTotal }}
+                </small>
             </div>
         </div>
         <div class="flex-container flex-column flex-center pad-v space-children-v" v-if="brokenImageRecords.length > 0">

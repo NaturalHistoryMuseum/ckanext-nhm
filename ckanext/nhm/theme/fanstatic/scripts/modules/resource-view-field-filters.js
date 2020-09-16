@@ -14,7 +14,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
 
         var fields = self.options.fields,
             fieldGroups = self.options.fieldGroups;
-        self.$select = ($('<select name="field" />'));
+        self.$select = ($('<select aria-label="Select a field to filter" name="field" />'));
 
         // If we have field groups, separate the field select into option groups
         // Otherwise, just provide a long list of fields
@@ -27,7 +27,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
                         $optGroup.append($('<option>', {value: fieldName}).text(fieldLabel));
                     }
                 });
-                self.$select.append($optGroup)
+                self.$select.append($optGroup);
             }
         }else{
             $.each(fields, function (i, fieldName) {
@@ -35,7 +35,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
             });
         }
         self.$filtersWrapper.append(self.$select);
-        var $input = ($('<input type="text" name="value" />'));
+        var $input = ($('<input aria-label="Enter a filter value" type="text" name="value" />'));
         self.$filtersWrapper.append($input);
         self.el.append(self.$filtersWrapper);
 
@@ -50,14 +50,14 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
         // Allow hide on esc / clicking elsewhere on the page
         $('body').click(function (e) {
             if ($(e.target).closest('.resource-view-filters-wrapper').length === 0) {
-                hideFilterDisplay()
+                hideFilterDisplay();
             }
         });
 
         $(document).keyup(function (e) {
             // esc
             if (e.keyCode == 27) {
-                hideFilterDisplay()
+                hideFilterDisplay();
             }
         });
 
@@ -69,7 +69,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
     }
 
     function hideFilterDisplay() {
-        self.el.removeClass('display-filter');
+        // self.el.removeClass('display-filter');
     }
 
     function clearDropdown($input) {

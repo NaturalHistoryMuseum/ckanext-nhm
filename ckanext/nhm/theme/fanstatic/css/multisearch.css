@@ -131,7 +131,10 @@
   width: 400px;
 }
 .doi-popup {
-  min-width: 200px;
+  min-width: 325px;
+}
+.share-popup .share-popup-warning {
+  padding: 5px;
 }
 .image-viewer {
   position: fixed;
@@ -253,6 +256,9 @@
     max-height: 5em;
     border-radius: 5vw;
   }
+}
+#geojson-link {
+  color: #195D0D;
 }
 .slidedown-leave-active,
 .slidedown-enter-active,
@@ -691,6 +697,9 @@
 .record-item .record-header .record-res,
 .record-item .record-header .record-name {
   align-self: start;
+}
+.record-item .record-header a {
+  color: #195D0D;
 }
 .record-item .record-body {
   padding-top: 10px;

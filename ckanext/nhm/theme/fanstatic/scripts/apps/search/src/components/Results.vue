@@ -70,7 +70,7 @@
             </div>
             <div class="info-popup-button">
                 <transition name="slidedown">
-                    <div class="floating info-popup"
+                    <div class="floating info-popup share-popup"
                          v-if="showShare"
                          v-dismiss="{switch: 'showShare', ignore: ['#show-share']}">
                         <div v-if="slug !== null">
@@ -92,15 +92,17 @@
                                            v-model="includeShareView">
                                 </div>
                             </div>
-                            <small class="alert-warning">This link is for social sharing
-                                <em>only</em>. If you are intending to reference this search in a
-                                publication,
-                                <a href="#"
-                                   @click="citeNotShare"
-                                   id="use-a-doi">use a DOI
-                                </a>
-                                .
-                            </small>
+                            <div class="alert-warning share-popup-warning">
+                                <small>This link is for social sharing
+                                    <em>only</em>. If you are intending to reference this search in
+                                    a publication,
+                                    <a href="#"
+                                       @click="citeNotShare"
+                                       id="use-a-doi">use a DOI
+                                    </a>
+                                    .
+                                </small>
+                            </div>
                         </div>
                         <p class="alert-error" v-if="status.slug.failed">
                             Failed to retrieve link. Please try again later. </p>
@@ -198,11 +200,10 @@
                     </li>
                 </ul>
                 <div class="text-right">
-                    <a href="#"
-                       @click="showFields = !showFields"
-                       :id="'show-fields-' + _uid"
-                       v-if="view === 'Table'"><i
-                        class="fas fa-plus-circle"></i></a>
+                    <a href="#" @click="showFields = !showFields" :id="'show-fields-' + _uid"
+                       v-if="view === 'Table'" aria-label="Add fields to results table">
+                        <i class="fas fa-plus-circle"></i>
+                    </a>
                     <transition name="slidedown">
                         <FieldPicker v-if="showFields"
                                      :callback="addCustomHeader"
@@ -223,16 +224,26 @@
              :class="{disabled: invalidated}">
             <ul class="pagination">
                 <li v-if="page > 0">
-                    <a href="#" @click="runSearch(0)"><i class="fas fa-angle-double-left"></i></a>
+                    <a href="#" aria-label="Show first results page" @click="runSearch(0)">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
                 </li>
                 <li v-if="page > 0">
-                    <a href="#" @click="runSearch(page - 1)">{{ page }}</a>
+                    <a href="#" aria-label="Show previous results page"
+                       @click="runSearch(page - 1)">
+                        {{ page }}
+                    </a>
                 </li>
                 <li class="active">
-                    <a href="#">{{ page + 1 }}</a>
+                    <a href="#" aria-label="Go to the top of this results page">
+                        {{ page + 1 }}
+                    </a>
                 </li>
                 <li v-if="_after.length > page">
-                    <a href="#" @click="runSearch(page + 1)">{{ page + 2}}</a>
+                    <a href="#" aria-label="Show next results page"
+                       @click="runSearch(page + 1)">
+                        {{ page + 2}}
+                    </a>
                 </li>
             </ul>
         </div>

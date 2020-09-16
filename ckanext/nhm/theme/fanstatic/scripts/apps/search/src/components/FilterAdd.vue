@@ -1,15 +1,17 @@
 <template>
     <div class="filter-add">
         <span v-if="showText" class="filter-add-help-text">Add filters</span>
-        <i class="fas fa-plus-square fa-lg" @click="showChoice = !showChoice"
-            :id="'show-choice-' + _uid"></i>
+        <i class="fas fa-plus-square fa-lg" role="button"
+           :aria-label="!showChoice ? 'Add a group or filter' : 'Close group or filter chooser'"
+           @click="showChoice = !showChoice" :id="'show-choice-' + _uid"></i>
         <transition name="slidedown">
             <div class="filter-add-choice floating" v-if="showChoice"
                 v-dismiss="{switch: 'showChoice', ignore: ['#show-choice-' + _uid]}">
-                <span v-if="canAddGroups" @click="newGroup" :id="'show-editor-groups-' + _uid">new group</span>
-                <div v-if="canAddTerms"><span @click="showEditor = true"
+                <span v-if="canAddGroups" @click="newGroup" role="button"
+                      :id="'show-editor-groups-' + _uid">new group</span>
+                <div v-if="canAddTerms"><span @click="showEditor = true" role="button"
                     :id="'show-editor-terms-' + _uid">new term</span>
-                <span @click="showPresets = true"
+                <span @click="showPresets = true" role="button"
                     :id="'show-editor-presets-' + _uid">presets</span></div>
             </div>
         </transition>

@@ -1,7 +1,7 @@
 {% set url = url | default(h.url_for('dataset.read', id=id)) %}
 
 <div class="col-md-4 box flex-container flex-between flex-stretch-last flex-top flex-stretch-height">
-    <a class="media-image" href="{{ url }}">
+    <a class="media-image" href="{{ url }}" aria-label="{{ title }}">
         {% block image %}{% endblock %}
     </a>
     <div class="module-content">
@@ -11,7 +11,7 @@
                 <p>{% block description %}{% endblock %}</p>
             </div>
 
-            <p class="text-right"><a class="no-underline" href="{{ url }}"
+            <p class="text-right"><a class="no-underline view-dataset-link" href="{{ url }}"
                     title="View dataset">View dataset <i
                     class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
         </section>
