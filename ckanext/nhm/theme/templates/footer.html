@@ -62,6 +62,11 @@
                     href="{{ h.url_for('legal.privacy') }}">Privacy notice</a></li>
             <li role="presentation"><a href="{{ h.url_for('legal.terms') }}">T&amp;C</a>
             </li>
+            <li role="presentation">
+                <a href="https://www.nhm.ac.uk/about-us/website-accessibility-statement.html">
+                    Website accessibility statement
+                </a>
+            </li>
             {% if g.userobj %}
             <li role="presentation">
                 <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('My account') }}</a>
