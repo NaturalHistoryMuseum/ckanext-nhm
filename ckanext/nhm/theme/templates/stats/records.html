@@ -8,7 +8,7 @@
 {% block stats_content %}
 
       <section id="stats-total-datasets">
-      <h4>{{ _('Total number of records') }}</h4>
+      <h2>{{ _('Total number of records') }}</h2>
 
       {% set xaxis = {'mode': 'time', 'timeformat': '%d-%m-%y'} %}
       {% set yaxis = {'min': 0, 'tickDecimals': 0} %}
@@ -31,7 +31,7 @@
     </section>
 
     <section id="stats-record-count">
-      <h4>{{ _('Records per dataset') }}</h4>
+      <h2>{{ _('Records per dataset') }}</h2>
 
       <table class="table table-chunky table-bordered table-striped">
         <thead>

@@ -34,14 +34,6 @@ h1 {
 
 h2 {
   font-size: @font-size-head-xl;
-}
-
-h3 {
-  font-size: @font-size-head-s;
-}
-
-h4 {
-  font-size: @font-size-head-xxs;
 
   &.welcome {
     margin: 0 !important;
@@ -59,6 +51,14 @@ h4 {
       display: block;
     }
   }
+}
+
+h3 {
+  font-size: @font-size-head-s;
+}
+
+h4 {
+  font-size: @font-size-head-xxs;
 }
 
 h5 {
@@ -322,9 +322,6 @@ body {
   .pad-right(li, 5px)
 }
 
-.label-dark {
-  background-color: @grey2;
-}
 
 .nowrap {
   white-space: nowrap;
@@ -404,20 +401,38 @@ span.caret {
 
   & .highlight {
     text-indent: 0 !important;
+    color: @grey4;
   }
 
-  & .active {
+  & li.active {
     &:after {
-      border-top-color: @primary5;
-      border-bottom-color: @primary5;
+      border-top-color: @primary3;
+      border-bottom-color: @primary3;
     }
 
     &:before {
-      color: @primary5;
+      color: @primary3;
     }
 
     & .highlight {
-      background: @primary5;
+      background: @primary3;
+    }
+  }
+
+  & li.complete {
+    &:after {
+      border-top-color: @grey9;
+      border-bottom-color: @grey9;
+    }
+
+    &:before {
+      background: @grey4;
+      color: @grey10;
+    }
+
+    & .highlight {
+      background: @grey9;
+      color: @grey4;
     }
   }
 }
@@ -892,6 +907,7 @@ iframe {
   bottom: 0;
   width: 100%;
   z-index: 0;
+  color: @grey6;
 
   .nav {
     margin: 20px 0;
@@ -1258,6 +1274,8 @@ iframe {
 
 .control-required {
   display: inline !important;
+  color: @warning3;
+  font-weight: bold;
 }
 
 .contact-form {
@@ -1294,7 +1312,20 @@ iframe {
     }
   }
 
+  legend {
+    font-family: @font-title;
+    font-size: @font-size-body-l;
+    border-bottom: none;
+  }
 
+  .modal-body & .form-actions {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.editor .editor-info-block a {
+  color: #007491 !important;
 }
 
 .ckanpackager-form {
@@ -1349,9 +1380,13 @@ iframe {
   margin: 5px 0;
 }
 
-.info-block {
-  color: @grey3;
+.form-group .info-block {
+  color: @grey4;
   font-size: @font-size-body-s;
+
+  a {
+    color: @primary3;
+  }
 }
 
 input[type="radio"], input[type="checkbox"] {
@@ -1364,6 +1399,10 @@ input[type="radio"], input[type="checkbox"] {
   padding: 10px 0 5px 0;
   font-size: 75%;
   border-top: 1px solid @grey6;
+
+  & a {
+    color: @primary2 !important;
+  }
 }
 
 .search-button(@button-size, @button-pad) {
@@ -1796,16 +1835,19 @@ tr.empty {
 // ALERTS ------------------------------------------------------------------------------------------
 
 .alert-danger, .alert-error {
-  background-color: @warning4;
+  background-color: @warning5;
   color: @warning2;
   padding: 3px;
-  border: 1px dashed @warning3;
+  border: 1px dashed @warning4;
 }
 
 .error-block {
   background-color: @warning2;
 }
 
+.alert .close {
+  opacity: 0.8;
+}
 
 // SELECT2 -----------------------------------------------------------------------------------------
 
@@ -1828,6 +1870,7 @@ tr.empty {
 .select2-choice {
   background-image: none !important;
   border: 1px solid @grey7 !important;
+  color: @grey4 !important;
 
   & abbr {
     background: none !important;
@@ -2067,6 +2110,10 @@ select, .select2-choice {
   .box-text {
     .flex-child-grow;
   }
+
+  .view-dataset-link {
+    color: @primary2;
+  }
 }
 
 .featured-image {
@@ -2259,9 +2306,42 @@ select, .select2-choice {
 // DATASET LIST ------------------------------------------------------------------------------------
 
 .label { // format label for datasets
+  // default to black text because most of the labels have an acceptable contrast with black text
+  // rather than white. Ones that need white are overidden below.
+  color: black;
+  text-transform: uppercase;
+  font-size: @font-size-body-s;
+  padding: .2em .6em;
+
   &[data-format=dwc], &[data-format*=dwc] {
     background-color: @primary5;
-    text-transform: uppercase;
+  }
+
+  &[data-format=rdf], &[data-format*=rdf], &[data-format*=nquad], &[data-format*=ntriples],
+  &[data-format*=turtle] {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
+  }
+
+  &[data-format=zip], &[data-format*=zip] {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
+  }
+
+  &[data-format=pdf], &[data-format*=pdf] {
+    // wcag contrast requirement (the default color (black) is too low contrast)
+    color: white;
+  }
+
+  &.label-dark {
+    background-color: @grey2;
+    color: @grey10;
+  }
+
+  &.label-info {
+    background-color: @warning2;
+    padding-top: 0.45em;
+    color: @grey10;
   }
 }
 
@@ -2286,6 +2366,9 @@ select, .select2-choice {
   }
 }
 
+.empty {
+  color: @grey4;
+}
 
 // RESOURCE LIST -----------------------------------------------------------------------------------
 
@@ -2363,6 +2446,9 @@ select, .select2-choice {
   }
 }
 
+#nav-license a, #nav-alerts a {
+  color: @primary2;
+}
 
 // RESOURCE VIEW -----------------------------------------------------------------------------------
 
@@ -2418,7 +2504,7 @@ select, .select2-choice {
   }
 
   .citation-badge {
-    background-color: @primary4;
+    background-color: @primary3;
     border-radius: 4px;
   }
 
@@ -2758,6 +2844,7 @@ select, .select2-choice {
   }
   margin: 0 0 0 20px;
   line-height: 40px;
+  color: @primary2;
 
   &:hover {
     text-decoration: none;
@@ -2810,10 +2897,18 @@ select, .select2-choice {
 
 .activity {
   margin-top: 30px;
+
+  .item .date {
+    color: @grey4;
+  }
 }
 
 [data-module="dashboard"] {
   margin-top: 20px;
+
+  & .page-heading small {
+    color: @grey4;
+  }
 }
 
 #followee-filter {
@@ -2846,6 +2941,27 @@ select, .select2-choice {
 
 .help_available_formats {
   background-color: transparent !important;
+}
+
+// ORGANISATION PAGES ------------------------------------------------------------------------------
+.table-actions {
+  & button {
+    margin-right: 11px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.add-member-or {
+  color: @grey4;
+}
+
+// GROUP PAGES -------------------------------------------------------------------------------------
+
+.media-item span.count {
+  color: @grey4;
 }
 
 // MULTISEARCH FORM VIEWS ------------------------------------------------------------------------

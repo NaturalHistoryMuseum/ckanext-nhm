@@ -1,13 +1,14 @@
 <template>
     <div class="space-children-v field-picker" :class="classes">
         <input type="text" class="full-width" name="fieldSearch"
-               id="fieldSearch"
+               id="fieldSearch" title="Search for a field by prefix"
                value="" autocomplete="off" placeholder="field name"
-               v-model="fieldSearch"/> <select class="full-width" size="10">
-        <option v-for="field in fieldList" v-bind:key="field.id"
-                @click="callback(field)">{{ field }}
-        </option>
-    </select>
+               v-model="fieldSearch"/>
+        <select class="full-width" size="10" title="Select a field">
+            <option v-for="field in fieldList" v-bind:key="field.id" @click="callback(field)">
+                {{ field }}
+            </option>
+        </select>
     </div>
 </template>
 

@@ -14,7 +14,7 @@
         <div class="flex-container flex-smallwrap flex-bottom no-pad-h">
             {% block header_logo %}
             {% if g.site_logo %}
-            <a class="logo" href="{{ h.url_for('home.index') }}" title="{{ g.site_title }}">
+            <a class="logo" href="{{ h.url_for('home.index') }}" title="{{ g.site_title }}" aria-label="Home">
                 <svg role="button" aria-label="Home"></svg>
             </a>
             {% endif %}
@@ -25,8 +25,9 @@
                     <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
                 </h1>
                 <header class="no-pad-h">
-                    <h4 class="welcome">Explore and download the Museum’s research and collections
-                        data.</h4>
+                    <h2 class="welcome">
+                        Explore and download the Museum’s research and collections data.
+                    </h2>
                 </header>
             </div>
         </div>

@@ -4,13 +4,16 @@
 <section class="module module-narrow module-shallow license">
     {% block license_title %}
     <div class="flex-container flex-between flex-stretch-first nav-simple-heading">
-        <h2 class="module-heading"><i class="fas fa-lock inline-icon-left"></i>{{ _('License') }}</h2>
+        <h2 class="module-heading">
+            <i class="fas fa-lock inline-icon-left"></i>{{ _('License') }}
+        </h2>
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                 data-target="#nav-license" aria-expanded="false">
             <span class="sr-only">expand</span>
         </button>
     </div>
-    {% endblock %} {% block license_content %}
+    {% endblock %}
+    {% block license_content %}
     <ul id="nav-license" class="nav nav-simple navbar-collapse collapse">
         <li class="nav-item">
             <div class="flex-container flex-stretch-last flex-wrap flex-wrap-spacing space-children-h">
@@ -18,6 +21,6 @@
             </div>
         </li>
     </ul>
-
     {% endblock %}
-</section>{% endblock %}
+</section>
+{% endblock %}

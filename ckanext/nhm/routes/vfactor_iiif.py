@@ -6,7 +6,7 @@
 from ckan.plugins import toolkit
 from flask import Blueprint
 
-blueprint = Blueprint(name=u'vfactor_iiif', import_name=__name__, url_prefix=u'/viiif')
+blueprint = Blueprint(name=u'vfactor_iiif', import_name=__name__, url_prefix=u'/vfactor_iiif')
 
 
 @blueprint.route(u'/')

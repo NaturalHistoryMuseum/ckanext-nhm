@@ -1,6 +1,6 @@
 <template>
     <div class="term-editor floating flex-container flex-smallwrap flex-stretch-height">
-        <i class="fas fa-caret-square-left" @click="closeDialog"></i>
+        <i class="fas fa-caret-square-left" @click="closeDialog" role="button"></i>
         <div class="term-editor-fields space-children-v" v-if="fieldType !== 'geo'">
             <div class="flex-container flex-wrap flex-wrap-spacing">
                             <span class="fields"
@@ -17,6 +17,7 @@
         <div class="term-editor-query space-children-v">
             <div class="flex-container flex-nowrap flex-stretch-last">
                 <span>As:</span> <select v-model="fieldType"
+                                         title="Select what type to treat the field's contents as"
                                          @change="comparisonType = schema.terms[fieldType][0]">
                 <option v-for="(v, k) in readableFieldTypes" v-bind:key="v.id" :value="k">{{ v }}
                 </option>
@@ -42,8 +43,10 @@
                 </keep-alive>
             </div>
             <div class="flex-container flex-column flex-stretch-height">
-                <span>Name (optional):</span>
-                <input type="text" v-model="termName">
+                <span>
+                    <label for="termNameInput">Name (optional)</label>
+                    <input id="termNameInput" type="text" v-model="termName">
+                </span>
             </div>
             <div class="query-submit">
                 <button @click="submitTerm" class="btn btn-primary no-icon">Save</button>

@@ -2,6 +2,27 @@
 
 {% import 'macros/form.html' as form %}
 
+{% block contact_form_legend_content %}
+    {% set package_id = h.get_request_param('package_id', None) %}
+    {% if not package_id %}
+        {# use the default legend text #}
+        {{ _('Questions? Comments? We are always glad to hear from you! If you want to contact a
+              specific department, use the Department selection box below, otherwise leave it on the
+              default option to contact the general Data Portal inbox.') }}
+    {% else %}
+        {% set package = h.get_package(package_id) %}
+        {% if package['name'] == 'collection-specimens' %}
+            {# show some special text if this is the specimens collection #}
+            {{ _('Use this form to contact the curator of this dataset. If you want to contact a
+                  specific department about this dataset, use the Department selection box below,
+                  otherwise leave it on the default option to contact the general Data Portal
+                  inbox.') }}
+        {% else %}
+            {{ _('Use this form to contact the curator of this dataset.') }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
 {% block contact_form_fields %}
 
     {{ form.input('name', label=_('Your name'), id='field-name', value=data.name, error=errors.name, classes=['control-medium'], is_required=true) }}

@@ -97,10 +97,13 @@
                     </td>
 
                     <td class="filterable">
-                        {% if field_name in filterable_fields %} <a
-                            title="View all records where {{ field_name }}={{ value }}"
-                            href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
-                        <i class="fas fa-filter"></i> </a> {% endif %}
+                        {% if field_name in filterable_fields %}
+                        <a title="View all records where {{ field_name }}={{ value }}"
+                           aria-label="View all records where {{ field_name }}={{ value }}"
+                           href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id, filters='%s:%s' % (field_name, value)) }}">
+                            <i class="fas fa-filter"></i>
+                        </a>
+                        {% endif %}
                     </td>
 
                 </tr>
