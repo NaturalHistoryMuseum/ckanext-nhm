@@ -633,8 +633,8 @@ iframe {
       -webkit-mask-image: url('@{images}/nhm_logo.svg');
       -webkit-mask-size: contain;
       -webkit-mask-repeat: no-repeat;
-      background: @grey10;
-      //.prideBg(@rainbowFlag);
+      //background: @grey10;
+      .prideBg(@transFlag);
       .extended-masthead & {
         @media (min-width: @sm) and (max-width: @lg - 1) {
           height: 92px !important;
@@ -996,8 +996,8 @@ iframe {
 }
 
 .toolbar {
-  background: @primary6;
-  //.prideBg(@rainbowFlag);
+  //background: @primary6;
+  .prideBgShift(@transFlag);
   .no-spacing;
 
   & .breadcrumb {

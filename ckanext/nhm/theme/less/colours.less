@@ -120,10 +120,15 @@
 }
 
 .prideBg(@palette){
-  background: linear-gradient(90deg, @palette, @palette);
-  background-size: 300% 300%;
+  background: linear-gradient(90deg, @palette);
+  background-size: 100%;
+}
 
-  @animation: colourShift 10s linear infinite;
+.prideBgShift(@palette){
+  background: linear-gradient(90deg, @palette, @palette);
+  background-size: 300%;
+
+  @animation: colourShift 30s linear infinite;
 
   -webkit-animation: @animation;
   -z-animation: @animation;
