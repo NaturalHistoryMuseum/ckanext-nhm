@@ -386,6 +386,18 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         except Exception:
             pass  # just ignore this one
 
+        try:
+            descriptions = metadata_dict.get(u'descriptions', [])
+            abstract = pkg_dict.get(u'notes', None)
+            for d in descriptions:
+                if d[u'description'] == abstract:
+                    d[u'descriptionType'] = u'Abstract'
+            metadata_dict[u'descriptions'] = descriptions
+            if u'descriptions' in errors:
+                del errors[u'descriptions']
+        except Exception as e:
+            pass
+
         return metadata_dict, errors
 
     ## IGalleryImage
