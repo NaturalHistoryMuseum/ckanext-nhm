@@ -61,7 +61,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(interfaces.ITemplateHelpers, inherit=True)
     implements(ICkanPackager)
     implements(IContact)
-    implements(IDoi)
+    implements(IDoi, inherit=True)
     implements(IGalleryImage)
     implements(IVersionedDatastore, inherit=True)
 
@@ -358,58 +358,35 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return mail_dict
 
     ## IDoi
-    def build_metadata(self, pkg_dict, metadata_dict):
+    def build_metadata_dict(self, pkg_dict, metadata_dict, errors):
         '''
-        ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata
+        ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata_dict
         '''
-        metadata_dict[u'resource_type'] = pkg_dict.get(u'dataset_category', None)
-        if isinstance(metadata_dict[u'resource_type'], list) and metadata_dict[u'resource_type']:
-            metadata_dict[u'resource_type'] = metadata_dict[u'resource_type'][0]
-        contributors = pkg_dict.get(u'contributors', None)
-        if contributors:
-            contributors = contributors.split(u'\n')
-            found_contributors = []
-            # iterate over the non-blank contributors in the list
-            for contributor in filter(None, map(lambda c: c.strip(), contributors)):
-                contributor = contributor.encode(u'unicode-escape')
-                match = re.search(r'(.*?)\s?\((.*)\)', contributor)
-                if match:
-                    found_contributors.append({
-                        u'contributorName': match.group(1),
-                        u'affiliation': match.group(2),
-                    })
-                else:
-                    found_contributors.append({
-                        u'contributorName': contributor
-                    })
-            if found_contributors:
-                metadata_dict[u'contributors'] = found_contributors
+        try:
+            category = pkg_dict.get(u'dataset_category', None)
+            if isinstance(category, list) and len(category) > 0:
+                category = category[0]
+            elif isinstance(category, list):
+                category = None
+            metadata_dict[u'resourceType'] = category
+            if u'resourceType' in errors:
+                del errors[u'resourceType']
+        except Exception as e:
+            errors[u'resourceType'] = e
 
-        affiliation = pkg_dict.get(u'affiliation', None)
-        if affiliation:
-            metadata_dict[u'affiliation'] = affiliation.encode(u'unicode-escape')
+        try:
+            affiliation = pkg_dict.get(u'affiliation', None)
+            if affiliation:
+                authors = metadata_dict.get(u'creators', [])
+                affiliated_authors = []
+                for a in authors:
+                    a[u'affiliations'] = affiliation.encode(u'unicode-escape')
+                    affiliated_authors.append(a)
+                metadata_dict[u'creators'] = affiliated_authors
+        except Exception:
+            pass  # just ignore this one
 
-        return metadata_dict
-
-    @staticmethod
-    def metadata_to_xml(xml_dict, metadata):
-        '''
-        ..seealso:: ckanext.doi.interfaces.IDoi.metadata_to_xml
-        '''
-        if u'contributors' in metadata:
-            xml_dict[u'resource'][u'contributors'] = {
-                u'contributor': [],
-                }
-            for contributor in metadata[u'contributors']:
-                contributor[u'@contributorType'] = u'Researcher'
-                xml_dict[u'resource'][u'contributors'][u'contributor'].append(
-                    contributor)
-
-        # FIXME - Datacite 3.1 isn't accepting affiliation in the creator field
-        # if 'affiliation' in metadata:
-        #     xml_dict['resource']['creators']['creator'][0]['affiliation'] = metadata[
-        #         'affiliation']
-        return xml_dict
+        return metadata_dict, errors
 
     ## IGalleryImage
     def image_info(self):
