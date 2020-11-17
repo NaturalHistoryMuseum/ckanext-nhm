@@ -81,6 +81,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_public_directory(config, u'theme/public')
         toolkit.add_resource(u'theme/fanstatic', u'ckanext-nhm')
 
+        # TODO: 2.9 - double check and then remove this
         # Add another public directory for dataset files - this will hopefully
         # be temporary, until DAMS
         toolkit.add_public_directory(config, u'files')
