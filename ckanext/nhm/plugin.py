@@ -363,11 +363,11 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata_dict
         '''
         try:
-            category = pkg_dict.get(u'dataset_category', None)
+            category = pkg_dict.get(u'dataset_category', pkg_dict.get(u'type', u'Dataset'))
             if isinstance(category, list) and len(category) > 0:
                 category = category[0]
             elif isinstance(category, list):
-                category = None
+                category = u'Dataset'
             metadata_dict[u'resourceType'] = category
             if u'resourceType' in errors:
                 del errors[u'resourceType']
