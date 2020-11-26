@@ -71,15 +71,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IConfigurer.update_config
         :param config:
         '''
-        # Add template directory - we manually add to extra_template_paths
-        # rather than using add_template_directory to ensure it is always used
-        # to override templates
-
-        config[u'extra_template_paths'] = u','.join(
-            [self.template_dir, config.get(u'extra_template_paths', u'')])
-
+        toolkit.add_template_directory(config, u'theme/templates')
         toolkit.add_public_directory(config, u'theme/public')
-        toolkit.add_resource(u'theme/fanstatic', u'ckanext-nhm')
+        toolkit.add_public_directory(config, u'theme/assets/vendor/fontawesome-free-5.14.0-web')
+        toolkit.add_resource(u'theme/assets', u'ckanext-nhm')
 
         # TODO: 2.9 - double check and then remove this
         # Add another public directory for dataset files - this will hopefully

@@ -1,0 +1,209 @@
+main-js:
+  output: ckanext-nhm/%(version)s_main.js
+  filters: rjsmin
+  extra:
+    preload:
+      - vendor/jquery
+  contents:
+    - scripts/tweaks.js
+
+main-css:
+  output: ckanext-nhm/%(version)s_main.css
+  filters:
+    - less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
+  contents:
+    - less/nhm.less
+    - less/leaflet.less
+  extra:
+    preload:
+      - ckanext-nhm/font-awesome-css
+
+font-awesome-css:
+  output: ckanext-nhm/%(version)s_fa.css
+  filters: cssrewrite
+  contents:
+    - vendor/fontawesome-free-5.14.0-web/css/all.css
+
+view-controls:
+  output: ckanext-nhm/%(version)s_view-controls.css
+  filters: less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
+  contents:
+    - less/view-controls.less
+
+slickgrid-css:
+  output: ckanext-nhm/%(version)s_slickgrid.css
+  contents:
+    # TODO: 2.9 - switch to less
+    - css/slickgrid.css
+
+slickgrid-js:
+  output: ckanext-nhm/%(version)s_slickgrid.js
+  filters: rjsmin
+  contents:
+    - scripts/slickgrid.js
+
+# TODO: 2.9 - switch to less
+map:
+  output: ckanext-nhm/%(version)s_map.css
+  contents:
+    - css/map.css
+
+resource-view-field-filters:
+  output: ckanext-nhm/%(version)s_resource-view-field-filters.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/resource-view-field-filters.js
+
+resource-view-filter-options:
+  output: ckanext-nhm/%(version)s_resource-view-filter-options.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/resource-view-filter-options.js
+
+grid-view-fullscreen:
+  output: ckanext-nhm/%(version)s_grid-view-fullscreen.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/grid-view-fullscreen.js
+
+iframe-resize:
+  output: ckanext-nhm/%(version)s_iframe-resize.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/iframe-resize.js
+
+toggle-empty-rows:
+  output: ckanext-nhm/%(version)s_toggle-empty-rows.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/toggle-empty-rows.js
+
+back-button:
+  output: ckanext-nhm/%(version)s_back-button.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/back-button.js
+
+toggle-select:
+  output: ckanext-nhm/%(version)s_toggle-select.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/toggle-select.js
+
+social:
+  output: ckanext-nhm/%(version)s_social.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/social.js
+
+mam:
+  output: ckanext-nhm/%(version)s_mam.js
+  filters: rjsmin
+  contents:
+    - scripts/mam.js
+    - scripts/vendor/mustache/0.5.0-dev/mustache.js
+
+expand-authors:
+  output: ckanext-nhm/%(version)s_expand-authors.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/expand-authors.js
+
+external-links:
+  output: ckanext-nhm/%(version)s_external-links.js
+  filters: rjsmin
+  contents:
+    - scripts/external-links.js
+
+record-citation:
+  output: ckanext-nhm/%(version)s_record-citation.js
+  filters: rjsmin
+  contents:
+    - scripts/record-citation.js
+
+search-css:
+  output: ckanext-nhm/%(version)s_multisearch.css
+  filters: less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
+  contents:
+    - less/multisearch.less
+
+search-js:
+  output: ckanext-nhm/%(version)s_search.js
+  filters: rjsmin
+  contents:
+    - scripts/apps/search/dist/search.js
+    - scripts/apps/search/dist/0.search.js
+    - scripts/apps/search/dist/1.search.js
+    - scripts/apps/search/dist/2.search.js
+    - scripts/apps/search/dist/3.search.js
+
+home-search:
+  output: ckanext-nhm/%(version)s_home-search.js
+  filters: rjsmin
+  extra:
+    preload:
+      - vendor/jquery
+  contents:
+    - scripts/home-search.js
+
+bbcm-css:
+  output: ckanext-nhm/%(version)s_bbcm.css
+  filters: less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
+  contents:
+    - less/bbcm.less
+
+bbcm-js:
+  output: ckanext-nhm/%(version)s_bbcm.js
+  filters: rjsmin
+  contents:
+    - scripts/vendor/leaflet.utfgrid.js
+    - scripts/bbcm.js
+
+vfactor-iiif-css:
+  output: ckanext-nhm/%(version)s_vfactor-iiif.css
+  filters: less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
+  contents:
+    - less/vfactor-iiif.less
+
+vfactor-iiif-js:
+  output: ckanext-nhm/%(version)s_vfactor-iiif.js
+  filters: rjsmin
+  contents:
+    - scripts/apps/vfactor-iiif/dist/vfactor-iiif.js

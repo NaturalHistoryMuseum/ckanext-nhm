@@ -6,7 +6,7 @@ Renders a citation for a resource
 {% set versioned = h.get_object_url(res.id, g.record_dict['occurrenceID'], g.version) %}
 {% set retrieved = h.render_datetime(h.now(), date_format='%d %b %Y %H:%M:%S') %}
 
-{% resource 'ckanext-nhm/record-citation' %}
+{% asset 'ckanext-nhm/record-citation' %}
 
 <section class="module additional-info">
     <div class="module-content citation">

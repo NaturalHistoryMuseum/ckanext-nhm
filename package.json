@@ -4,7 +4,7 @@
   "description": "Natural History Museum CKAN Plugin",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-nhm.git@ckan-upgrade-2.8.0a"
+    "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-nhm.git"
   },
   "author": "",
   "license": "ISC",
@@ -12,12 +12,7 @@
     "url": "https://github.com/NaturalHistoryMuseum/ckanext-nhm/issues"
   },
   "homepage": "http://data.nhm.ac.uk",
-  "devDependencies": {
-    "gulp-watch": "^4.3.11"
-  },
   "dependencies": {
-    "gulp": "^3.9.1",
-    "gulp-less": "^3.1.0",
-    "gulp-notify": "^3.2.0"
+    "less": "^3.12.2"
   }
 }
