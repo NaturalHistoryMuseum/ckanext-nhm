@@ -3,9 +3,7 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-
 from ckanext.nhm.logic.validators import string_max_length, uuid_validator
-from formencode.validators import OneOf
 
 from ckan.logic.schema import (default_create_package_schema,
                                default_show_package_schema,
@@ -18,6 +16,7 @@ not_missing = toolkit.get_validator(u'not_missing')
 resource_id_exists = toolkit.get_validator(u'resource_id_exists')
 int_validator = toolkit.get_validator(u'int_validator')
 boolean_validator = toolkit.get_validator(u'boolean_validator')
+one_of = toolkit.get_validator(u'one_of')
 
 DATASET_TYPE_VOCABULARY = u'dataset_category'
 
@@ -75,7 +74,7 @@ def update_package_schema():
 def _modify_schema(schema):
     '''
 
-    :param schema: 
+    :param schema:
 
     '''
     convert_from_tags = toolkit.get_converter(u'convert_to_tags')
@@ -92,7 +91,7 @@ def _modify_schema(schema):
     schema[u'affiliation'] = [ignore_missing, unicode, convert_to_extras]
     schema[u'contributors'] = [ignore_missing, unicode, convert_to_extras]
     schema[u'update_frequency'] = [ignore_missing,
-                                   OneOf([v[0] for v in UPDATE_FREQUENCIES]),
+                                   one_of([v[0] for v in UPDATE_FREQUENCIES]),
                                    convert_to_extras, unicode]
     schema[u'promoted'] = [ignore_missing, convert_to_extras, boolean_validator]
     schema[u'spatial'] = [ignore_missing, convert_to_extras]
