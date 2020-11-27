@@ -43,6 +43,10 @@ slickgrid-css:
 slickgrid-js:
   output: ckanext-nhm/%(version)s_slickgrid.js
   filters: rjsmin
+  extra:
+    preload:
+      - base/main
+      - base/ckan
   contents:
     - scripts/slickgrid.js
 
