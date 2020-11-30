@@ -9,8 +9,7 @@ main-js:
 
 main-css:
   output: ckanext-nhm/%(version)s_main.css
-  filters:
-    - less
+  filters: less
   config:
     LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
