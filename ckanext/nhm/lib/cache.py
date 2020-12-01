@@ -20,7 +20,7 @@ def cache_clear_nginx_proxy():
     req = requests.Request(u'PURGE', url)
     s = requests.Session()
     try:
-        r = s.send(req.prepare())
+        r = s.send(req.prepare(), timeout=0.5)
         r.raise_for_status()
     except:
         log.critical(u'Error clearing NGINX Cache')
