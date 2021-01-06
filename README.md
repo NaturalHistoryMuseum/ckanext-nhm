@@ -67,9 +67,9 @@ These are the options that can be specified in to configure this extension.
 Name|Description|Options
 --|--|--
 `ckanext.nhm.specimen_resource_id`|ID for the specimens dataset|
-`ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|  
-`ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|  
-`ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|  
+`ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|
+`ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|
+`ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|
 `ckanext.nhm.mam.username`|Username for the Museum's image server|
 `ckanext.nhm.mam.password`|Password for the Museum's image server|
 
@@ -134,44 +134,34 @@ toolkit.get_action('object_rdf')(
 
 ## Commands
 
-### `dataset-category`
-For managing dataset categories.
+### `create-dataset-vocabulary`
+Ensures the default dataset vocabulary and categories exists.
 
-1. `create-vocabulary`: create vocabulary for dataset categories
-    ```bash
-    paster --plugin=ckanext-nhm dataset-category create-vocabulary -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm create-dataset-vocabulary
+```
 
-2. `add-category`: add `$CATEGORY_NAME` to the vocabulary
-    ```bash
-    paster --plugin=ckanext-nhm dataset-category add-category $CATEGORY_NAME -c $CONFIG_FILE
-    ```
+### `add-dataset-category`
+Adds the given category to the dataset category vocabulary.
 
-3. `delete-category`: remove `$CATEGORY_NAME` from the vocabulary
-    ```bash
-    paster --plugin=ckanext-nhm dataset-category delete-category $CATEGORY_NAME -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm delete-dataset-category $NAME
+```
 
-### `datastore`
-For modifying CKAN datastore resources.
+### `delete-dataset-category`
+Deletes the given dataset category from the vocabulary.
 
-1. `purge-all`: delete all datasets and datastore tables
-    ```bash
-    paster --plugin=ckanext-nhm datastore purge-all -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm create-dataset-vocabulary $NAME
+```
 
-2. `replace`: replace a datastore table with another table by changing the name of `$RESOURCE_ID` to `$TABLE_NAME`
-    ```bash
-    paster --plugin=ckanext-nhm datastore replace -i $RESOURCE_ID -t $TABLE_NAME -c $CONFIG_FILE
-    ```
+### `replace-resource-file`
+Replaces the file associated with `$RESOURCE_ID` with `$PATH`, e.g. to replace a small dummy file
+with a large one that was too big to upload initially.
 
-### `file`
-For modifying files in the datastore.
-
-1. `replace`: replace the file `$RESOURCE_ID` with `$FILE_PATH`, e.g. to replace a small dummy file with a large one that was too big to upload initially.
-    ```bash
-    paster --plugin=ckanext-nhm file replace -r $RESOURCE_ID -p $FILE_PATH -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm replace-resource-file $RESOURCE_ID $PATH
+```
 
 
 # Testing
