@@ -83,7 +83,6 @@ setup(
             nhm=ckanext.nhm.plugin:NHMPlugin
 
         [paste.paster_command]
-            datastore=ckanext.nhm.commands.datastore:DatastoreCommand
             file=ckanext.nhm.commands.file:FileCommand
 
         [ckan.rdf.profiles]
