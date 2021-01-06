@@ -18,7 +18,7 @@ from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
-from ckanext.nhm import routes
+from ckanext.nhm import routes, cli
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import (get_site_statistics,
@@ -64,6 +64,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IDoi, inherit=True)
     implements(IGalleryImage)
     implements(IVersionedDatastore, inherit=True)
+    implements(interfaces.IClick)
 
     ## IActions
     def get_actions(self):
@@ -76,6 +77,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             u'download_image': nhm_action.download_original_image,
             u'get_permanent_url': nhm_action.get_permanent_url,
             }
+
+    ## IClick
+    def get_commands(self):
+        return cli.get_commands()
 
     ## IBlueprint
     def get_blueprint(self):

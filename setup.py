@@ -83,7 +83,6 @@ setup(
             nhm=ckanext.nhm.plugin:NHMPlugin
 
         [paste.paster_command]
-            dataset-category=ckanext.nhm.commands.dataset_category:DatasetCategoryCommand
             datastore=ckanext.nhm.commands.datastore:DatastoreCommand
             file=ckanext.nhm.commands.file:FileCommand
 
