@@ -74,7 +74,7 @@ setup(
         u'lxml>=3.4.4',
         u'Shapely<1.3',
         u'raven==6.0.0',
-        u'elasticsearch-dsl==6.2.1',
+        u'elasticsearch-dsl>=6.0.0,<7.0.0',
         ] + [u'{0} @ {1}'.format(k, v) for k, v in dependencies.items()],
     dependency_links=dependencies.values(),
     entry_points= \
