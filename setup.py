@@ -84,7 +84,6 @@ setup(
 
         [paste.paster_command]
             dataset-category=ckanext.nhm.commands.dataset_category:DatasetCategoryCommand
-            initdb=ckanext.nhm.commands.initdb:InitDBCommand
             datastore=ckanext.nhm.commands.datastore:DatastoreCommand
             file=ckanext.nhm.commands.file:FileCommand
 
