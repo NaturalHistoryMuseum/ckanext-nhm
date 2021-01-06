@@ -1,5 +1,9 @@
+import os
+import shutil
+
 import click
 
+from ckan.lib.uploader import ResourceUpload
 from ckan.plugins import toolkit
 from .logic.schema import DATASET_TYPE_VOCABULARY
 
@@ -140,3 +144,43 @@ def delete_dataset_category(name):
             data = {u'id': tag[u'id'], u'vocabulary_id': vocab[u'id']}
             toolkit.get_action(u'tag_delete')(context, data)
             success(u'Deleted tag named {} [id: {}]', name, tag[u'id'])
+
+
+@nhm.command(name=u'replace-resource-file')
+@click.argument(u'resource-id')
+@click.argument(u'path', type=click.Path(exists=True))
+def replace_resource_file(resource_id, path):
+    '''
+    Replace the file associated with the given RESOURCE_ID with the file at PATH. If you have a file
+    that is to big to upload, you can use this to replace a small dummy file with the large file.
+    '''
+    context = create_context()
+
+    try:
+        # check resource exists
+        resource = toolkit.get_action(u'resource_show')(context, {u'id': resource_id})
+    except toolkit.ObjectNotFound:
+        click.secho(u'Resource {} does not exist'.format(resource_id), fg=u'red')
+        raise click.Abort()
+
+    if resource[u'url_type'] != u'upload':
+        click.secho(u'No resource files available', fg=u'red')
+        raise click.Abort()
+
+    if resource.get(u'datastore_active', False):
+        click.secho(u'Resource has an active datastore - cannot replace the file', fg=u'red')
+        raise click.Abort()
+
+    # get the file path
+    upload = ResourceUpload(resource)
+    resource_path = upload.get_path(resource[u'id'])
+
+    resource_name = os.path.basename(resource_path)
+    backup_path = os.path.join(u'/tmp', resource_name)
+    # back up the file to be overwritten
+    shutil.copy(resource_path, backup_path)
+    # and then overwrite the file
+    shutil.copy(path, resource_path)
+    success(u'The download file for resource {} has been replaced with {}', resource_id, path)
+    click.secho(u'A copy of the original resource file has been made at {}'.format(backup_path),
+                fg=u'yellow')

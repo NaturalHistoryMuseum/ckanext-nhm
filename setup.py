@@ -82,9 +82,6 @@ setup(
         [ckan.plugins]
             nhm=ckanext.nhm.plugin:NHMPlugin
 
-        [paste.paster_command]
-            file=ckanext.nhm.commands.file:FileCommand
-
         [ckan.rdf.profiles]
             nhm_dcat=ckanext.nhm.dcat.profiles:NHMDCATProfile
         ''',
