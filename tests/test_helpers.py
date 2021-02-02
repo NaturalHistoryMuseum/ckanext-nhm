@@ -3,46 +3,47 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-
-import nose
+import pytest
 from ckan.plugins import toolkit
-from mock import MagicMock, patch
 from ckanext.nhm.lib.helpers import dataset_author_truncate, get_object_url, get_specimen_jsonld
-from ckantest.models import TestBase
+from mock import MagicMock, patch
 
 
-class TestAuthorTruncate(TestBase):
+class TestAuthorTruncate(object):
     '''Tests for the dataset_author_truncate helper function.'''
-    plugins = [u'nhm']
 
     def test_untruncated_author(self):
         '''dataset_author_truncate shouldn't truncate when the author is shorter
         than the max'''
         author = u'Dr. Someone'
-        nose.tools.assert_equal(author, dataset_author_truncate(author))
+        assert author == dataset_author_truncate(author)
 
     def test_untruncated_unicode_author(self):
         '''dataset_author_truncate shouldn't truncate when the author is shorter than
         the max and contains unicode characters'''
         author = u'Dr. Someoné'
-        nose.tools.assert_equal(author, dataset_author_truncate(author))
+        assert author, dataset_author_truncate(author)
 
     def test_truncated_author(self):
         '''dataset_author_truncate should truncate when the author is longer
         than the max'''
         author = u', '.join([u'Dr. Someone'] * 10)
-        dataset_author_truncate(author)
+
+        truncated = unicode(dataset_author_truncate(author))
+        assert truncated.startswith(u'Dr. Someone; Dr. Someone; Dr. Someone; Dr. Someone')
+        assert truncated.endswith(u'et al.</abbr>')
 
     def test_truncated_unicode_author(self):
         '''dataset_author_truncate should truncate when the author is longer than the max
         and contains unicode characters'''
         author = u', '.join([u'Dr. Someoné'] * 10)
-        dataset_author_truncate(author)
+        truncated = unicode(dataset_author_truncate(author))
+        assert truncated.startswith(u'Dr. Someoné; Dr. Someoné; Dr. Someoné; Dr. Someoné')
+        assert truncated.endswith(u'et al.</abbr>')
 
 
-class TestGetObjectURL(TestBase):
+class TestGetObjectURL(object):
     '''Tests for the get_object_url helper function.'''
-    plugins = [u'nhm']
 
     def test_get_object_url_default(self):
         mock_rounded_version = 10
@@ -87,15 +88,15 @@ class TestGetObjectURL(TestBase):
                                                  version=None)
 
 
-class TestGetSpecimenJSONLD(TestBase):
+class TestGetSpecimenJSONLD(object):
     '''Tests for the get_specimen_jsonld helper function.'''
-    plugins = [u'nhm']
 
     def test_error(self):
         mock_get_action = MagicMock(side_effect=toolkit.ValidationError(u'test'))
         mock_toolkit = MagicMock(get_action=mock_get_action)
         with patch(u'ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
-            nose.tools.assert_raises(toolkit.ValidationError, get_specimen_jsonld, MagicMock())
+            with pytest.raises(toolkit.ValidationError, match=u'test'):
+                get_specimen_jsonld(MagicMock())
 
     def test_normal(self):
         mock_get_action = MagicMock()

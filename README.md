@@ -4,7 +4,7 @@
 
 [![Travis](https://img.shields.io/travis/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://travis-ci.org/NaturalHistoryMuseum/ckanext-nhm)
 [![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
-[![CKAN](https://img.shields.io/badge/ckan-2.9.0a-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
+[![CKAN](https://img.shields.io/badge/ckan-2.9.1-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
 [![Specimen records](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=specimens&query=%24.result.total&suffix=%20records&url=https%3A%2F%2Fdata.nhm.ac.uk%2Fapi%2F3%2Faction%2Fdatastore_search%3Fresource_id%3D05ff2255-c38a-40c9-b657-4ccb55ab2feb&style=flat-square)](https://data.nhm.ac.uk/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb)
 
 _A CKAN extension for the Natural History Museum's Data Portal._
@@ -165,10 +165,24 @@ ckan -c $CONFIG_FILE nhm replace-resource-file $RESOURCE_ID $PATH
 
 
 # Testing
+_Test coverage is currently super duper extremely limited._
 
-_Test coverage is currently extremely limited._
+To run the tests in this extension, there is a Docker compose configuration available in this
+repository to make it easy.
 
-To run the tests, use nosetests inside your virtualenv. The `--nocapture` flag will allow you to see the debug statements.
+To run the tests against ckan 2.9.x on Python2:
+
+1. Build the required images
 ```bash
-nosetests --ckan --with-pylons=$TEST_CONFIG_FILE --where=$INSTALL_FOLDER/src/ckanext-nhm --nologcapture --nocapture
+docker-compose build
 ```
+
+2. Then run the tests.
+   The root of the repository is mounted into the ckan container as a volume by the Docker compose
+   configuration, so you should only need to rebuild the ckan image if you change the extension's
+   dependencies.
+```bash
+docker-compose run ckan
+```
+
+The ckan image uses the Dockerfile in the `docker/` folder which is based on `openknowledge/ckan-dev:2.9-py2`.
