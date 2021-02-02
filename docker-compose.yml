@@ -20,8 +20,6 @@ services:
   solr:
     build:
       context: https://github.com/okfn/docker-ckan.git#:solr
-    logging:
-      driver: none
 
   db:
     build:
@@ -32,22 +30,14 @@ services:
     environment:
       - DATASTORE_READONLY_PASSWORD=password
       - POSTGRES_PASSWORD=password
-    logging:
-      driver: none
 
   redis:
     image: redis:latest
-    logging:
-      driver: none
 
   elasticsearch:
     image: elasticsearch:6.8.13
     environment:
       discovery.type: single-node
-    logging:
-      driver: none
 
   mongodb:
     image: mongo:4.2
-    logging:
-      driver: none
