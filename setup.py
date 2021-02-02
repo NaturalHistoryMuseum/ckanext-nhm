@@ -18,6 +18,7 @@ def github(name, tag, org='NaturalHistoryMuseum'):
 
 
 ckan_extensions = OrderedDict([
+    # note that this version must be kept up to date with the version in the docker/Dockerfile
     github('ckanext-dcat', 'v1.1.0', org='ckan'),
     # the latest josh/ckan-upgrade-2.9 branch for each of these should be compatible with python3
     github('ckanext-ckanpackager', 'josh/ckan-upgrade-2.9'),

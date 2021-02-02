@@ -19,7 +19,11 @@ RUN python3 setup.py develop && \
     pip3 install -r requirements.txt && \
     pip3 install -r dev_requirements.txt
 
-# ultrahack
+# ultrahack - the ckanext-dcat extension doesn't bother to put its dependencies in its setup.py and
+# therefore installing it doesn't install its dependencies and it breaks. Great! Because we're
+# installing the extensions not in editable mode we can't get to the requirements.txt which means
+# we have this ultrahack. It works a treat but it feels real nasty. Note that the version here will
+# need to be kept up to date with the one in our setup.py.
 RUN curl -s "https://raw.githubusercontent.com/ckan/ckanext-dcat/v1.1.0/requirements.txt" | pip3 install -r /dev/stdin
 
 # this entrypoint ensures our service dependencies (postgresql, solr and redis) are running before
