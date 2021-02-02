@@ -21,13 +21,13 @@ def resource_view_get_view(resource):
 
     for cls in subclasses:
         # Does the resource ID match the record controller
-        if cls.resource_id == resource[u'id']:
+        if cls.resource_id == resource['id']:
             return cls()
 
     # Or do we have a controller for a particular format type (eg. DwC)
     # Run in separate loop so this is lower specificity
     for cls in subclasses:
-        if cls.format == resource[u'format']:
+        if cls.format == resource['format']:
             return cls()
 
     return nhm_views.DefaultView()

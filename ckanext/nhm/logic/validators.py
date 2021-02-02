@@ -12,7 +12,7 @@ from ckan.plugins import toolkit
 def string_max_length(max_length):
     '''Checks if a string is longer than a certain length
 
-    :param max_length: 
+    :param max_length:
 
     '''
 
@@ -25,16 +25,14 @@ def string_max_length(max_length):
         '''
 
         if len(value) > max_length:
-            raise toolkit.Invalid(
-                    toolkit._(u'Length must be less than {0} characters').format(
-                            max_length))
+            raise toolkit.Invalid(toolkit._(f'Length must be less than {max_length} characters'))
 
         return value
 
     return callable
 
 
-uuid_re = re.compile(u'^[\w]{40}$')
+uuid_re = re.compile(r'^[\w]{40}$')
 
 
 def uuid_validator(value, context):
@@ -42,10 +40,10 @@ def uuid_validator(value, context):
     assets ids aren't valid UUIDs.
 
     :param value:
-    :param context: 
+    :param context:
 
     '''
     if uuid_re.match(value):
         return value
     else:
-        raise toolkit.Invalid(toolkit._(u'Invalid Asset ID'))
+        raise toolkit.Invalid(toolkit._('Invalid Asset ID'))

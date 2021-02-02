@@ -16,7 +16,7 @@ def object_uri(uuid, version=None):
     Returns an URI for an object
     :return:
     '''
-    return toolkit.url_for(u'object.view', uuid=uuid, version=version, qualified=True)
+    return toolkit.url_for('object.view', uuid=uuid, version=version, qualified=True)
 
 
 def rdf_resources():
@@ -35,7 +35,7 @@ def as_dwc_list(objects):
     :param objects: the objects
     :return: a | separated string
     '''
-    return u' | '.join(objects)
+    return ' | '.join(objects)
 
 
 def epoch_to_datetime(epoch_timestamp):
@@ -62,30 +62,30 @@ class Namespaces:
 
         self.bound = set()
         self.known_namespaces = {
-            u'adms': namespace.Namespace(u'http://www.w3.org/ns/adms#'),
-            u'aiiso': namespace.Namespace(u'http://purl.org/vocab/aiiso/schema#'),
-            u'cc': namespace.Namespace(u'http://creativecommons.org/ns#'),
-            u'dc': namespace.DCTERMS,
-            u'dcat': namespace.Namespace(u'http://www.w3.org/ns/dcat#'),
-            u'dqv': namespace.Namespace(u'http://www.w3.org/ns/dqv#'),
-            u'dwc': namespace.Namespace(u'http://rs.tdwg.org/dwc/terms/'),
-            u'foaf': namespace.FOAF,
-            u'locn': namespace.Namespace(u'http://www.w3.org/ns/locn#'),
-            u'gsp': namespace.Namespace(u'http://www.opengis.net/ont/geosparql#'),
-            u'mads': namespace.Namespace(u'http://www.loc.gov/mads/rdf/v1#'),
-            u'org': namespace.Namespace(u'http://www.w3.org/TR/vocab-org/#'),
-            u'owl': namespace.OWL,
-            u'rdf': namespace.RDF,
-            u'rdfs': namespace.RDFS,
-            u'schema': namespace.Namespace(u'http://schema.org/'),
-            u'sdmx_code': namespace.Namespace(u'http://purl.org/linked-data/sdmx/2009/code#'),
-            u'sdwc': namespace.Namespace(u'http://rs.tdwg.org/dwc/xsd/simpledarwincore#'),
-            u'skos': namespace.SKOS,
-            u'tdwgi': namespace.Namespace(u'http://rs.tdwg.org/ontology/voc/Institution#'),
-            u'time': namespace.Namespace(u'http://www.w3.org/2006/time'),
-            u'vcard': namespace.Namespace(u'http://www.w3.org/2006/vcard/ns#'),
-            u'void': namespace.VOID,
-            }
+            'adms': namespace.Namespace('http://www.w3.org/ns/adms#'),
+            'aiiso': namespace.Namespace('http://purl.org/vocab/aiiso/schema#'),
+            'cc': namespace.Namespace('http://creativecommons.org/ns#'),
+            'dc': namespace.DCTERMS,
+            'dcat': namespace.Namespace('http://www.w3.org/ns/dcat#'),
+            'dqv': namespace.Namespace('http://www.w3.org/ns/dqv#'),
+            'dwc': namespace.Namespace('http://rs.tdwg.org/dwc/terms/'),
+            'foaf': namespace.FOAF,
+            'locn': namespace.Namespace('http://www.w3.org/ns/locn#'),
+            'gsp': namespace.Namespace('http://www.opengis.net/ont/geosparql#'),
+            'mads': namespace.Namespace('http://www.loc.gov/mads/rdf/v1#'),
+            'org': namespace.Namespace('http://www.w3.org/TR/vocab-org/#'),
+            'owl': namespace.OWL,
+            'rdf': namespace.RDF,
+            'rdfs': namespace.RDFS,
+            'schema': namespace.Namespace('http://schema.org/'),
+            'sdmx_code': namespace.Namespace('http://purl.org/linked-data/sdmx/2009/code#'),
+            'sdwc': namespace.Namespace('http://rs.tdwg.org/dwc/xsd/simpledarwincore#'),
+            'skos': namespace.SKOS,
+            'tdwgi': namespace.Namespace('http://rs.tdwg.org/ontology/voc/Institution#'),
+            'time': namespace.Namespace('http://www.w3.org/2006/time'),
+            'vcard': namespace.Namespace('http://www.w3.org/2006/vcard/ns#'),
+            'void': namespace.VOID,
+        }
 
     def __getattr__(self, prefix):
         '''
@@ -103,4 +103,4 @@ class Namespaces:
             return ns
         else:
             # if you get this error, just add it above!
-            raise ValueError(u'No known namespace with prefix {}'.format(prefix))
+            raise ValueError(f'No known namespace with prefix {prefix}')

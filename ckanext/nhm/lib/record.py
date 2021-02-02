@@ -4,10 +4,10 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from ckanext.nhm.dcat.utils import rdf_resources
-
 import ckan.model as model
 from ckan.plugins import toolkit
+
+from ckanext.nhm.dcat.utils import rdf_resources
 
 
 def get_record_by_uuid(uuid, version=None):
@@ -17,7 +17,7 @@ def get_record_by_uuid(uuid, version=None):
 
     '''
 
-    context = {u'user': toolkit.c.user or toolkit.c.author}
+    context = {'user': toolkit.c.user or toolkit.c.author}
     for resource_id in rdf_resources():
         try:
             # load the resource via model so we have access to get_package_id
@@ -25,15 +25,15 @@ def get_record_by_uuid(uuid, version=None):
 
             # then search for the record
             search_data_dict = {
-                u'resource_id': resource_id,
-                u'filters': {
-                    u'occurrenceID': uuid,
+                'resource_id': resource_id,
+                'filters': {
+                    'occurrenceID': uuid,
                 },
-                u'version': version,
+                'version': version,
             }
             # retrieve datastore record
-            search_result = toolkit.get_action(u'datastore_search')(context, search_data_dict)
-            record = search_result[u'records'][0]
+            search_result = toolkit.get_action('datastore_search')(context, search_data_dict)
+            record = search_result['records'][0]
         except:
             pass
         else:

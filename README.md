@@ -5,6 +5,7 @@
 [![Travis](https://img.shields.io/travis/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://travis-ci.org/NaturalHistoryMuseum/ckanext-nhm)
 [![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
 [![CKAN](https://img.shields.io/badge/ckan-2.9.1-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
+[![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg?style=flat-square)](https://www.python.org/)
 [![Specimen records](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=specimens&query=%24.result.total&suffix=%20records&url=https%3A%2F%2Fdata.nhm.ac.uk%2Fapi%2F3%2Faction%2Fdatastore_search%3Fresource_id%3D05ff2255-c38a-40c9-b657-4ccb55ab2feb&style=flat-square)](https://data.nhm.ac.uk/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb)
 
 _A CKAN extension for the Natural History Museum's Data Portal._
@@ -170,7 +171,7 @@ _Test coverage is currently super duper extremely limited._
 To run the tests in this extension, there is a Docker compose configuration available in this
 repository to make it easy.
 
-To run the tests against ckan 2.9.x on Python2:
+To run the tests against ckan 2.9.x on Python3:
 
 1. Build the required images
 ```bash
@@ -185,4 +186,4 @@ docker-compose build
 docker-compose run ckan
 ```
 
-The ckan image uses the Dockerfile in the `docker/` folder which is based on `openknowledge/ckan-dev:2.9-py2`.
+The ckan image uses the Dockerfile in the `docker/` folder which is based on `openknowledge/ckan-dev:2.9`.

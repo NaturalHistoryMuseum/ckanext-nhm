@@ -12,11 +12,19 @@ import os
 import re
 import time
 import urllib
+from collections import OrderedDict, defaultdict
+from datetime import datetime
+from operator import itemgetter
+
 from beaker.cache import cache_region
 from ckan import model
 from ckan.lib import helpers as core_helpers
+from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
 from ckanext.gbif.lib.errors import GBIF_ERRORS
+from jinja2.filters import do_truncate
+from lxml import etree, html
+
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
@@ -24,16 +32,10 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from collections import OrderedDict, defaultdict
-from datetime import datetime
-from jinja2.filters import do_truncate
-from lxml import etree, html
-from operator import itemgetter
-from webhelpers.html import literal
 
 log = logging.getLogger(__name__)
 
-re_dwc_field_label = re.compile(u'([A-Z]+)')
+re_dwc_field_label = re.compile('([A-Z]+)')
 
 re_url_validation = re.compile(r'^(?:http)s?://'  # http:// or https://
                                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:['
@@ -48,55 +50,55 @@ AUTHOR_MAX_LENGTH = 100
 def get_site_statistics():
     '''Get statistics for the site.'''
     stats = dict()
-    stats[u'dataset_count'] = get_dataset_count()
-    stats[u'contributor_count'] = get_contributor_count()
-    stats[u'record_count'] = get_record_count()
+    stats['dataset_count'] = get_dataset_count()
+    stats['contributor_count'] = get_contributor_count()
+    stats['record_count'] = get_record_count()
     return stats
 
 
-@cache_region(u'permanent', u'contributor_count')
+@cache_region('permanent', 'contributor_count')
 def get_contributor_count():
     '''Get the total number of authors listed on packages, calculated using Solr facets.'''
-    query = toolkit.get_action(u'package_search')({}, {u'facet.field': [u'author'], u'facet.limit': -1})
-    return len(query.get(u'facets', {}).get(u'author', {}).keys())
+    query = toolkit.get_action('package_search')({}, {'facet.field': ['author'], 'facet.limit': -1})
+    return len(query.get('facets', {}).get('author', {}).keys())
 
 
-@cache_region(u'permanent', u'dataset_count')
+@cache_region('permanent', 'dataset_count')
 def get_dataset_count():
-    return toolkit.get_action(u'package_search')({}, {
-        u'rows': 1
-        })[
-        u'count']
+    return toolkit.get_action('package_search')({}, {
+        'rows': 1
+    })[
+        'count']
 
 
-@cache_region(u'permanent', u'record_count')
+@cache_region('permanent', 'record_count')
 def get_record_count():
     '''Get the current total number of records in the collections dataset.'''
     record_count = 0
     try:
-        dataset_statistics = _get_action(u'dataset_statistics', {})
-        record_count = dataset_statistics.get(u'total', 0)
+        dataset_statistics = _get_action('dataset_statistics', {})
+        record_count = dataset_statistics.get('total', 0)
     except Exception as _e:
         # if there was a problem getting the stats return 0 and log an exception
-        log.exception(u'Could not gather dataset statistics')
+        log.exception('Could not gather dataset statistics')
     return record_count
 
 
-@cache_region(u'permanent', u'record_stats')
+@cache_region('permanent', 'record_stats')
 def get_record_stats():
     start_version = 1501545600
     end_version = int(time.time())
-    count_action = toolkit.get_action(u'datastore_count')
+    count_action = toolkit.get_action('datastore_count')
 
     record_stats = []
 
     for v in range(start_version, end_version, 604800):
         record_stats.append({
-            u'date': datetime.fromtimestamp(v),
-            u'count': count_action({}, {
-                u'version': v * 1000
-                })
+            'date': datetime.fromtimestamp(v),
+            'count': count_action({}, {
+                'version': v * 1000
             })
+        })
 
     return record_stats
 
@@ -109,9 +111,9 @@ def _get_action(action, params):
 
     '''
     context = {
-        u'ignore_auth': True,
-        u'for_view': True
-        }
+        'ignore_auth': True,
+        'for_view': True
+    }
 
     try:
         return toolkit.get_action(action)(context, params)
@@ -127,9 +129,9 @@ def get_package(package_id):
     :param package_id: the ID of the package
 
     '''
-    return _get_action(u'package_show', {
-        u'id': package_id
-        })
+    return _get_action('package_show', {
+        'id': package_id
+    })
 
 
 def get_resource(resource_id):
@@ -138,9 +140,9 @@ def get_resource(resource_id):
     :param resource_id: the ID of the resource
 
     '''
-    return _get_action(u'resource_show', {
-        u'id': resource_id
-        })
+    return _get_action('resource_show', {
+        'id': resource_id
+    })
 
 
 def get_record(resource_id, record_id):
@@ -150,12 +152,12 @@ def get_record(resource_id, record_id):
     :param record_id: the ID of the record
 
     '''
-    record = _get_action(u'record_show',
+    record = _get_action('record_show',
                          {
-                             u'resource_id': resource_id,
-                             u'record_id': record_id
-                             })
-    return record.get(u'data', None)
+                             'resource_id': resource_id,
+                             'record_id': record_id
+                         })
+    return record.get('data', None)
 
 
 def form_select_update_frequency_options():
@@ -182,10 +184,10 @@ def dataset_categories():
 
     '''
     try:
-        return toolkit.get_action(u'tag_list')(
+        return toolkit.get_action('tag_list')(
             data_dict={
-                u'vocabulary_id': DATASET_TYPE_VOCABULARY
-                })
+                'vocabulary_id': DATASET_TYPE_VOCABULARY
+            })
     except toolkit.ObjectNotFound:
         return []
 
@@ -224,9 +226,9 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
     '''
 
     try:
-        views = toolkit.get_action(u'resource_view_list')({}, {
-            u'id': resource_id
-            })
+        views = toolkit.get_action('resource_view_list')({}, {
+            'id': resource_id
+        })
     except toolkit.ObjectNotFound:
         return None
     else:
@@ -237,31 +239,31 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
             view = views[0]
         else:
             for view in views:
-                if view[u'view_type'] == view_type:
+                if view['view_type'] == view_type:
                     break
 
-        filters = u'|'.join([u'%s:%s' % (k, v) for k, v in filters.items()])
+        filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
 
-        return toolkit.url_for(u'resource.read',
-                               id=view[u'package_id'], resource_id=view[u'resource_id'],
-                               view_id=view[u'id'], filters=filters)
+        return toolkit.url_for('resource.read',
+                               id=view['package_id'], resource_id=view['resource_id'],
+                               view_id=view['id'], filters=filters)
 
 
-@cache_region(u'permanent', u'collection_stats')
+@cache_region('permanent', 'collection_stats')
 def indexlot_count():
     '''Get the total number of index lots.'''
     resource_id = get_indexlot_resource_id()
 
     if not resource_id:
-        log.error(u'Please configure index lot resource ID')
+        log.error('Please configure index lot resource ID')
 
     context = {
-        u'user': toolkit.c.user
-        }
+        'user': toolkit.c.user
+    }
 
     search_params = dict(resource_id=resource_id, limit=1, )
-    search = toolkit.get_action(u'datastore_search')(context, search_params)
-    return delimit_number(search.get(u'total', 0))
+    search = toolkit.get_action('datastore_search')(context, search_params)
+    return delimit_number(search.get('total', 0))
 
 
 def get_nhm_organisation_id():
@@ -270,8 +272,8 @@ def get_nhm_organisation_id():
     :returns: ID for the NHM organisation
 
     '''
-    value = toolkit.config.get(u'ldap.organization.id')
-    return unicode(value) if value is not None else None
+    value = toolkit.config.get('ldap.organization.id')
+    return str(value) if value is not None else None
 
 
 def get_specimen_resource_id():
@@ -280,8 +282,8 @@ def get_specimen_resource_id():
     :returns: ID for the specimen resource
 
     '''
-    value = toolkit.config.get(u'ckanext.nhm.specimen_resource_id')
-    return unicode(value) if value is not None else None
+    value = toolkit.config.get('ckanext.nhm.specimen_resource_id')
+    return str(value) if value is not None else None
 
 
 def get_indexlot_resource_id():
@@ -290,15 +292,15 @@ def get_indexlot_resource_id():
     :returns: ID for indexlot resource
 
     '''
-    value = toolkit.config.get(u'ckanext.nhm.indexlot_resource_id')
-    return unicode(value) if value is not None else None
+    value = toolkit.config.get('ckanext.nhm.indexlot_resource_id')
+    return str(value) if value is not None else None
 
 
 def get_artefact_resource_id():
     '''
     @return:  ID for artefact resource
     '''
-    return toolkit.config.get(u'ckanext.nhm.artefact_resource_id')
+    return toolkit.config.get('ckanext.nhm.artefact_resource_id')
 
 
 def get_vfactor_resource_id():
@@ -307,53 +309,53 @@ def get_vfactor_resource_id():
 
     :return: the resource id
     '''
-    value = toolkit.config.get(u'ckanext.nhm.vfactor_resource_id')
-    return unicode(value) if value is not None else None
+    value = toolkit.config.get('ckanext.nhm.vfactor_resource_id')
+    return str(value) if value is not None else None
 
 
-@cache_region(u'permanent', u'collection_stats')
+@cache_region('permanent', 'collection_stats')
 def collection_stats():
     '''Get collection stats, including collection codes and collection totals.'''
     stats = {}
     collections = [
-        (u'artefacts', get_artefact_resource_id()),
-        (u'indexlots', get_indexlot_resource_id()),
-        (u'specimens', get_specimen_resource_id())
+        ('artefacts', get_artefact_resource_id()),
+        ('indexlots', get_indexlot_resource_id()),
+        ('specimens', get_specimen_resource_id())
     ]
 
     collections_total = 0
     for name, resource_id in collections:
         params = {
-            u'resource_id': resource_id,
-            u'limit': 0,
+            'resource_id': resource_id,
+            'limit': 0,
         }
-        stats[name] = toolkit.get_action(u'datastore_search')({}, params)[u'total']
+        stats[name] = toolkit.get_action('datastore_search')({}, params)['total']
         collections_total += stats[name]
-    stats[u'total'] = collections_total
+    stats['total'] = collections_total
 
     collection_code_counts = []
-    for collection_code in (u'PAL', u'MIN', u'BMNH(E)', u'ZOO', u'BOT'):
+    for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
         params = {
-            u'resource_id': get_specimen_resource_id(),
-            u'limit': 0,
-            u'query': {
-                u'filters': {
-                    u'and': [
+            'resource_id': get_specimen_resource_id(),
+            'limit': 0,
+            'query': {
+                'filters': {
+                    'and': [
                         {
-                            u'string_equals': {
-                                u'fields': [u'collectionCode'],
-                                u'value': collection_code
+                            'string_equals': {
+                                'fields': ['collectionCode'],
+                                'value': collection_code
                             }
                         }
                     ]
                 }
             }
         }
-        total = toolkit.get_action(u'datastore_multisearch')({}, params)[u'total']
+        total = toolkit.get_action('datastore_multisearch')({}, params)['total']
         collection_code_counts.append((collection_code, total))
 
     collection_code_counts.sort(key=operator.itemgetter(1), reverse=True)
-    stats[u'collectionCodes'] = OrderedDict(collection_code_counts)
+    stats['collectionCodes'] = OrderedDict(collection_code_counts)
 
     return stats
 
@@ -366,12 +368,12 @@ def get_department(collection_code):
 
     '''
     departments = {
-        u'bmnh(e)': u'Entomology',
-        u'bot': u'Botany',
-        u'min': u'Mineralogy',
-        u'pal': u'Palaeontology',
-        u'zoo': u'Zoology',
-        }
+        'bmnh(e)': 'Entomology',
+        'bot': 'Botany',
+        'min': 'Mineralogy',
+        'pal': 'Palaeontology',
+        'zoo': 'Zoology',
+    }
 
     return departments[collection_code.lower()]
 
@@ -382,26 +384,26 @@ def delimit_number(num):
     :param num:
 
     '''
-    return u'{:,}'.format(num)
+    return '{:,}'.format(num)
 
 
 def api_doc_link():
     '''Link to API documentation.'''
     attr = {
-        u'class': u'external',
-        u'target': u'_blank'
-        }
-    return toolkit.h.link_to(toolkit._(u'API guide'),
-                             u'http://docs.ckan.org/en/latest/api/index.html', **attr)
+        'class': 'external',
+        'target': '_blank'
+    }
+    return toolkit.h.link_to(toolkit._('API guide'),
+                             'http://docs.ckan.org/en/latest/api/index.html', **attr)
 
 
 def get_google_analytics_config():
     '''Get Google Analytic configuration.'''
 
     return {
-        u'id': toolkit.config.get(u'googleanalytics.id'),
-        u'domain': toolkit.config.get(u'googleanalytics.domain', u'auto')
-        }
+        'id': toolkit.config.get('googleanalytics.id'),
+        'domain': toolkit.config.get('googleanalytics.domain', 'auto')
+    }
 
 
 def persistent_follow_button(obj_type, obj_id):
@@ -419,16 +421,16 @@ def persistent_follow_button(obj_type, obj_id):
 
     if toolkit.c.user:
         context = {
-            u'user': toolkit.c.user
-            }
-        action = u'am_following_%s' % obj_type
+            'user': toolkit.c.user
+        }
+        action = 'am_following_%s' % obj_type
         following = toolkit.get_action(action)(context, {
-            u'id': obj_id
-            })
-        return toolkit.h.snippet(u'snippets/follow_button.html', following=following,
+            'id': obj_id
+        })
+        return toolkit.h.snippet('snippets/follow_button.html', following=following,
                                  obj_id=obj_id, obj_type=obj_type)
 
-    return toolkit.h.snippet(u'snippets/anon_follow_button.html', obj_id=obj_id,
+    return toolkit.h.snippet('snippets/anon_follow_button.html', obj_id=obj_id,
                              obj_type=obj_type)
 
 
@@ -441,8 +443,8 @@ def filter_and_format_resource_items(resource):
     :return: a list of made up of 2-tuples containing formatted keys and values from
     the resource
     '''
-    blacklist = {u'_image_field', u'_title_field', u'datastore_active', u'has_views',
-                 u'on_same_domain', u'resource_group_id', u'revision_id', u'url_type'}
+    blacklist = {'_image_field', '_title_field', 'datastore_active', 'has_views',
+                 'on_same_domain', 'resource_group_id', 'revision_id', 'url_type'}
     items = []
     for key, value in resource.items():
         if key not in blacklist:
@@ -453,12 +455,12 @@ def filter_and_format_resource_items(resource):
 def get_map_styles():
     '''New map config overriding the marker point img'''
     return {
-        u'point': {
-            u'iconUrl': u'/images/leaflet/marker-icon.png',
-            u'iconSize': [20, 34],
-            u'iconAnchor': [12, 30]
-            }
+        'point': {
+            'iconUrl': '/images/leaflet/marker-icon.png',
+            'iconSize': [20, 34],
+            'iconAnchor': [12, 30]
         }
+    }
 
 
 def get_query_params():
@@ -471,7 +473,7 @@ def get_query_params():
     '''
     params = dict()
 
-    for key in [u'q', u'filters']:
+    for key in ['q', 'filters']:
         value = toolkit.request.params.get(key)
         if value:
             params[key] = value
@@ -512,23 +514,23 @@ def get_resource_fields(resource, version=None, use_request_version=False):
                                 filters (default: False)
     :return: a list of field names
     '''
-    if not resource.get(u'datastore_active'):
+    if not resource.get('datastore_active'):
         return []
 
     data = {
-        u'resource_id': resource[u'id'],
-        u'limit': 0
-        }
+        'resource_id': resource['id'],
+        'limit': 0
+    }
 
     if version is not None:
-        data[u'version'] = version
+        data['version'] = version
     elif use_request_version:
         filters = parse_request_filters()
-        if u'__version__' in filters:
-            data[u'version'] = int(filters[u'__version__'][0])
+        if '__version__' in filters:
+            data['version'] = int(filters['__version__'][0])
 
-    result = toolkit.get_action(u'datastore_search')({}, data)
-    return [field[u'id'] for field in result.get(u'fields', [])]
+    result = toolkit.get_action('datastore_search')({}, data)
+    return [field['id'] for field in result.get('fields', [])]
 
 
 # Resource view and filters
@@ -547,7 +549,7 @@ def resource_view_state(resource_view_json, resource_json):
     # Initiate the resource view
     view = resource_view_get_view(resource)
     # And get the state
-    resource_view[u'state'] = view.get_slickgrid_state()
+    resource_view['state'] = view.get_slickgrid_state()
 
     # there is an annoying feature/bug in slickgrid that if fitColumns=True and grid is wider than
     # available viewport, slickgrid columns cannot be resized until fitColumns is deactivated. So to
@@ -557,15 +559,15 @@ def resource_view_state(resource_view_json, resource_json):
     col_width = 100
     fit_columns = (len(fields) * col_width) < viewport_max_width
     # TODO: This can be merged into get_slickgrid_state
-    resource_view[u'state'][u'fitColumns'] = fit_columns
+    resource_view['state']['fitColumns'] = fit_columns
 
     # ID and DQI always first
-    columns_order = [u'_id']
-    if u'gbifIssue' in fields:
-        columns_order.append(u'gbifIssue')
+    columns_order = ['_id']
+    if 'gbifIssue' in fields:
+        columns_order.append('gbifIssue')
     # Add the rest of the columns to the columns order
     columns_order += [f for f in fields if f not in columns_order]
-    resource_view[u'state'][u'columnsOrder'] = list(columns_order)
+    resource_view['state']['columnsOrder'] = list(columns_order)
 
     # this is a bit of a hack but not the worst thing that's ever happened. This code is here to
     # solve a specific problem whereby if a user is viewing an old version of the data and in newer
@@ -580,14 +582,14 @@ def resource_view_state(resource_view_json, resource_json):
     # list of hidden columns to pass to slick we can make sure these columns don't appear. If we
     # stop using slick or slick is fixed we can stop doing this.
     latest_fields = get_resource_fields(resource, use_request_version=False)
-    resource_view[u'state'][u'hiddenColumns'] = [f for f in latest_fields if f not in fields]
+    resource_view['state']['hiddenColumns'] = [f for f in latest_fields if f not in fields]
 
     if view.grid_column_widths:
         for column, width in view.grid_column_widths.items():
-            resource_view[u'state'][u'columnsWidth'].append({
-                u'column': column,
-                u'width': width
-                })
+            resource_view['state']['columnsWidth'].append({
+                'column': column,
+                'width': width
+            })
 
     try:
         return json.dumps(resource_view)
@@ -601,7 +603,7 @@ def resource_is_dwc(resource):
     :param resource: return:
 
     '''
-    return bool(resource.get(u'format').lower() == u'dwc')
+    return bool(resource.get('format').lower() == 'dwc')
 
 
 def camel_case_to_string(camel_case_string):
@@ -610,7 +612,7 @@ def camel_case_to_string(camel_case_string):
     :param camel_case_string:
 
     '''
-    s = u' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
+    s = ' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
     return s[0].upper() + s[1:]
 
 
@@ -625,7 +627,7 @@ def get_resource_filter_options(resource, resource_view):
 
     '''
     options = resource_view_get_filter_options(resource)
-    filter_list = toolkit.request.params.get(u'filters', u'').split(u'|')
+    filter_list = toolkit.request.params.get('filters', '').split('|')
     filters = {}
 
     # If this is a gallery view, hide the has image filter
@@ -635,7 +637,7 @@ def get_resource_filter_options(resource, resource_view):
 
     for filter_def in filter_list:
         try:
-            (key, value) = filter_def.split(u':', 1)
+            (key, value) = filter_def.split(':', 1)
         except ValueError:
             continue
 
@@ -648,7 +650,7 @@ def get_resource_filter_options(resource, resource_view):
         if option.hide:
             continue
         result[option.name] = option.as_dict()
-        result[option.name][u'checked'] = option.name in filters and u'true' in filters[
+        result[option.name]['checked'] = option.name in filters and 'true' in filters[
             option.name]
     return result
 
@@ -662,7 +664,7 @@ def get_resource_gbif_errors(resource):
     '''
 
     # If this is a
-    if resource.get(u'id') == get_specimen_resource_id():
+    if resource.get('id') == get_specimen_resource_id():
         return GBIF_ERRORS
     else:
         return {}
@@ -678,7 +680,7 @@ def get_allowed_view_types(resource, package):
     '''
 
     view_types = core_helpers.get_allowed_view_types(resource, package)
-    blacklisted_types = [u'image']
+    blacklisted_types = ['image']
 
     filtered_types = []
 
@@ -688,8 +690,8 @@ def get_allowed_view_types(resource, package):
             continue
 
         # Rename Tiled map => map
-        if view_type[1] == u'Tiled map':
-            view_type = (view_type[0], u'Map', view_type[2])
+        if view_type[1] == 'Tiled map':
+            view_type = (view_type[0], 'Map', view_type[2])
 
         filtered_types.append(view_type)
 
@@ -707,7 +709,7 @@ def get_facet_label_function(facet_name, multi=False):
 
     '''
     facet_function = None
-    if facet_name == u'creator_user_id':
+    if facet_name == 'creator_user_id':
         facet_function = get_creator_id_facet_label
 
     if facet_function and multi:
@@ -719,7 +721,7 @@ def get_facet_label_function(facet_name, multi=False):
 
             '''
             for f in facet:
-                if f[u'name'] == filter_value:
+                if f['name'] == filter_value:
                     return facet_function(f)
             return filter
 
@@ -736,10 +738,10 @@ def get_creator_id_facet_label(facet):
 
     '''
     try:
-        user = model.User.get(facet[u'name'])
+        user = model.User.get(facet['name'])
         display_name = user.display_name
     except (toolkit.ObjectNotFound, AttributeError) as e:
-        display_name = facet[u'display_name']
+        display_name = facet['display_name']
     return display_name
 
 
@@ -750,7 +752,7 @@ def field_name_label(field_name):
     :returns: str label
 
     '''
-    label = field_name.replace(u'_', u' ')
+    label = field_name.replace('_', ' ')
     label = label[0].upper() + label[1:]
     return label
 
@@ -763,7 +765,7 @@ def field_is_link(value):
 
     '''
     try:
-        return value.startswith(u'http') and re_url_validation.match(value)
+        return value.startswith('http') and re_url_validation.match(value)
     except Exception:
         pass
     return False
@@ -781,7 +783,7 @@ def downloadable(resource):
     :returns: bool
 
     '''
-    return bool(resource[u'format'])
+    return bool(resource['format'])
 
 
 def is_sysadmin():
@@ -801,7 +803,7 @@ def record_display_field(field_name, value):
     '''
 
     # If this is a string, strip it before evaluating
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         value = value.strip()
 
     return bool(value)
@@ -829,13 +831,13 @@ def get_image_licence_options():
 
     '''
 
-    licenses = [(u'', u'')] + model.Package.get_license_options()
+    licenses = [('', '')] + model.Package.get_license_options()
 
     # Format licences as form options list of dicts
     return [{
-        u'value': value,
-        u'text': text
-        } for text, value in licenses]
+        'value': value,
+        'text': text
+    } for text, value in licenses]
 
 
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
@@ -846,24 +848,24 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     '''
     text = []
     if rec_dict:
-        title_field = res_dict.get(u'_title_field', None)
+        title_field = res_dict.get('_title_field', None)
         if title_field and rec_dict.get(title_field, None):
             text.append(rec_dict[title_field])
         else:
-            text.append(u'Record {}'.format(rec_dict[u'_id']))
+            text.append('Record {}'.format(rec_dict['_id']))
     elif res_dict:
-        text.append(res_dict[u'name'])
+        text.append(res_dict['name'])
     elif pkg_dict:
-        text.append(pkg_dict[u'title'] or pkg_dict[u'name'])
+        text.append(pkg_dict['title'] or pkg_dict['name'])
 
-    text.append(u'on the @NHM_London Data Portal')
+    text.append('on the @NHM_London Data Portal')
 
     try:
-        text.append(u'DOI: %s' % os.path.join(u'https://doi.org', pkg_dict[u'doi']))
+        text.append('DOI: %s' % os.path.join('https://doi.org', pkg_dict['doi']))
     except KeyError:
         pass
 
-    return urllib.quote(u' '.join(map(unicode, text)).encode(u'utf8'))
+    return urllib.quote(' '.join(map(str, text)).encode('utf8'))
 
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
@@ -879,7 +881,7 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     gravatar_literal = toolkit.h.gravatar(email_hash, size, default)
     if userobj is not None:
         grav_xml = etree.fromstring(gravatar_literal)
-        grav_xml.attrib[u'alt'] = userobj.name
+        grav_xml.attrib['alt'] = userobj.name
         gravatar_literal = literal(etree.tostring(grav_xml))
 
     return gravatar_literal
@@ -904,22 +906,22 @@ def dataset_author_truncate(author_str):
 
         # If we have a separator, split string on it
         if separator:
-            shortened = u';'.join(author_str.split(separator)[0:4])
+            shortened = ';'.join(author_str.split(separator)[0:4])
         else:
             # Otherwise use the jinja truncate function (may split author name)
-            shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end=u'')
+            shortened = do_truncate(author_str, length=AUTHOR_MAX_LENGTH, end='')
 
         return literal(
-            u'{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(
+            '{0} <abbr title="{1}" style="cursor: pointer;">et al.</abbr>'.format(
                 shortened,
                 author_str))
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
 
-        if u';' in author_str:
-            author_str = _truncate(author_str, u';')
-        elif u',' in author_str:
-            author_str = _truncate(author_str, u',')
+        if ';' in author_str:
+            author_str = _truncate(author_str, ';')
+        elif ',' in author_str:
+            author_str = _truncate(author_str, ',')
         else:
             author_str = _truncate(author_str)
 
@@ -939,8 +941,8 @@ def get_resource_facets(resource):
     if not resource_view.field_facets:
         return
     context = {
-        u'user': toolkit.c.user
-        }
+        'user': toolkit.c.user
+    }
     # Build query parameters for the faceted search
     # We'll use the same query parameters used in the current request
     # And then add extras to perform a solr faceted query, returning
@@ -950,28 +952,28 @@ def get_resource_facets(resource):
     # Convert filters to a dictionary as this won't happen automatically
     # as we're retrieving raw get parameters from get_query_params
     filters = defaultdict(list)
-    if query_params.get(u'filters'):
-        for f in query_params.get(u'filters').split(u'|'):
-            filter_field, filter_value = f.split(u':', 1)
+    if query_params.get('filters'):
+        for f in query_params.get('filters').split('|'):
+            filter_field, filter_value = f.split(':', 1)
             filters[filter_field].append(filter_value)
 
     search_params = dict(
-        resource_id=resource.get(u'id'),
+        resource_id=resource.get('id'),
         # use limit 0 as we're not interested in getting any results, just the facets
         limit=0,
         facets=resource_view.field_facets,
-        q=query_params.get(u'q', None),
+        q=query_params.get('q', None),
         filters=filters,
-        )
+    )
 
     # if the show more button is clicked, a parameter is added to the query which
     # informs us we need
     # to show more facets, so use 50 for the facet limit on the given field
     for field_name in resource_view.field_facets:
-        if toolkit.h.get_param_int(u'_{}_limit'.format(field_name)) == 0:
-            search_params.setdefault(u'facet_limits', {})[field_name] = 50
+        if toolkit.h.get_param_int('_{}_limit'.format(field_name)) == 0:
+            search_params.setdefault('facet_limits', {})[field_name] = 50
 
-    search = toolkit.get_action(u'datastore_search')(context, search_params)
+    search = toolkit.get_action('datastore_search')(context, search_params)
     facets = []
 
     # dictionary of facet name => formatter function with camel_case_to_string defined
@@ -979,39 +981,39 @@ def get_resource_facets(resource):
     # default formatting function and then any overrides for specific edge cases
     facet_label_formatters = defaultdict(lambda: camel_case_to_string, **{
         # specific lambda for GBIF to ensure it's capitalised correctly
-        u'gbifIssue': lambda _: u'GBIF Issue'
-        })
+        'gbifIssue': lambda _: 'GBIF Issue'
+    })
 
     # Dictionary of field name => formatter function
     # Pass facet value to a formatter to get a better facet item label, if the facet
     # doesn't have a
     # formatter defined then the value is just used as is
     facet_field_label_formatters = defaultdict(lambda: (lambda v: v.capitalize()), **{
-        u'collectionCode': get_department
-        })
+        'collectionCode': get_department
+    })
 
     # Loop through original facets to ensure order is preserved
     for field_name in resource_view.field_facets:
         # parse the facets into a list of dictionary values
         facets.append({
-            u'name': field_name,
-            u'label': facet_label_formatters[field_name](field_name),
-            u'active': field_name in filters,
-            u'has_more': search[u'facets'][field_name][u'details'][
-                             u'sum_other_doc_count'] > 0,
-            u'facet_values': [
+            'name': field_name,
+            'label': facet_label_formatters[field_name](field_name),
+            'active': field_name in filters,
+            'has_more': search['facets'][field_name]['details'][
+                            'sum_other_doc_count'] > 0,
+            'facet_values': [
                 {
-                    u'name': value,
-                    u'label': facet_field_label_formatters[field_name](value),
-                    u'count': count,
-                    u'active': field_name in filters and value in filters[field_name],
+                    'name': value,
+                    'label': facet_field_label_formatters[field_name](value),
+                    'count': count,
+                    'active': field_name in filters and value in filters[field_name],
                     # loop over the top values, sorted by count desc so that the top
                     # value is first
-                    } for value, count in
-                sorted(search[u'facets'][field_name][u'values'].items(),
+                } for value, count in
+                sorted(search['facets'][field_name]['values'].items(),
                        key=itemgetter(1), reverse=True)
-                ]
-            })
+            ]
+        })
 
     return facets
 
@@ -1029,14 +1031,14 @@ def remove_url_filter(field, value, extras=None):
 
     params = dict(toolkit.request.params)
     try:
-        del params[u'filters']
+        del params['filters']
     except KeyError:
         pass
     else:
         filters = parse_request_filters()
         if field in filters:
             # Convert all filters to unicode for ease of comparison
-            filters[field] = map(unicode.lower, filters[field])
+            filters[field] = [f.lower() for f in filters[field]]
             # Remove the filter value form the current filters
             value_list = value if isinstance(value, list) else [value]
             for value_item in value_list:
@@ -1054,12 +1056,12 @@ def remove_url_filter(field, value, extras=None):
         filter_parts = []
         for filter_field, filter_values in filters.items():
             for filter_value in filter_values:
-                filter_parts.append(u'%s:%s' % (filter_field, filter_value))
+                filter_parts.append(f'{filter_field}:{filter_value}')
         # If we have filter parts, add them back to the params dict
         if filter_parts:
-            filters = u'|'.join(filter_parts)
-            return toolkit.h.remove_url_param(u'filters', replace=filters, extras=extras)
-    return toolkit.h.remove_url_param(u'filters', extras=extras)
+            filters = '|'.join(filter_parts)
+            return toolkit.h.remove_url_param('filters', replace=filters, extras=extras)
+    return toolkit.h.remove_url_param('filters', extras=extras)
 
 
 def add_url_filter(field, value, extras=None):
@@ -1072,11 +1074,11 @@ def add_url_filter(field, value, extras=None):
     :param value:
     '''
 
-    params = {k: v for k, v in toolkit.request.params.items() if k != u'page'}
-    url_filter = u'%s:%s' % (field, value)
-    filters = [f for f in params.get(u'filters', u'').split(u'|') + [url_filter] if f != u'']
-    filters = u'|'.join(filters)
-    params[u'filters'] = filters
+    params = {k: v for k, v in toolkit.request.params.items() if k != 'page'}
+    url_filter = f'{field}:{value}'
+    filters = [f for f in params.get('filters', '').split('|') + [url_filter] if f != '']
+    filters = '|'.join(filters)
+    params['filters'] = filters
     return core_helpers._url_with_params(toolkit.request.base_url, params.items())
 
 
@@ -1085,7 +1087,7 @@ def parse_request_filters():
     filter_dict = {}
 
     try:
-        filter_params = toolkit.request.params.get(u'filters').split(u'|')
+        filter_params = toolkit.request.params.get('filters').split('|')
     except AttributeError:
         return {}
 
@@ -1093,7 +1095,7 @@ def parse_request_filters():
     filter_params = filter(None, filter_params)
 
     for filter_param in filter_params:
-        field, value = filter_param.split(u':', 1)
+        field, value = filter_param.split(':', 1)
         filter_dict.setdefault(field, []).append(value)
 
     return filter_dict
@@ -1115,21 +1117,21 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     filter_dict = parse_request_filters()
     extras = {
-        u'id': package[u'id'],
-        u'resource_id': resource[u'id']
-        }
+        'id': package['id'],
+        'resource_id': resource['id']
+    }
 
     # there are some special filter field names provided by versioned-datastore which
     # should have
     # their values formatted differently to normal filter values
     special = {
         # display a human readable timestamp
-        u'__version__': lambda value: [time.strftime(u'%Y/%m/%d, %H:%M:%S',
-                                                     time.localtime(int(v) / 1000)) for v
-                                       in value],
+        '__version__': lambda value: [time.strftime('%Y/%m/%d, %H:%M:%S',
+                                                    time.localtime(int(v) / 1000)) for v
+                                      in value],
         # display the type of the GeoJSON filter
-        u'__geo__': lambda value: [json.loads(v)[u'type'] for v in filter_value],
-        }
+        '__geo__': lambda value: [json.loads(v)['type'] for v in filter_value],
+    }
 
     pills = []
 
@@ -1137,20 +1139,20 @@ def get_resource_filter_pills(package, resource, resource_view=None):
         # if the field name stars with an underscore, don't include it in the pills (
         # unless it's
         # special!)
-        if filter_field.startswith(u'_') and filter_field not in special:
+        if filter_field.startswith('_') and filter_field not in special:
             continue
 
         # remove filter from url function
         href = remove_url_filter(filter_field, filter_value, extras=extras)
 
         pills.append({
-            u'label': camel_case_to_string(filter_field),
-            u'field': filter_field,
+            'label': camel_case_to_string(filter_field),
+            'field': filter_field,
             # if the filter isn't a special one, just use the value
-            u'value': u' '.join(
+            'value': ' '.join(
                 special.get(filter_field, lambda value: value)(filter_value)),
-            u'href': href,
-            })
+            'href': href,
+        })
 
     return pills
 
@@ -1162,20 +1164,20 @@ def resource_view_get_filterable_fields(resource):
     @return: a list of sorted fields
     '''
     # if this isn't a datastore resource, return an empty list
-    if not resource.get(u'datastore_active'):
+    if not resource.get('datastore_active'):
         return []
 
     # otherwise, query the datastore for the fields
     data = {
-        u'resource_id': resource[u'id'],
-        u'limit': 0,
-        }
-    fields = toolkit.get_action(u'datastore_search')({}, data).get(u'fields', [])
+        'resource_id': resource['id'],
+        'limit': 0,
+    }
+    fields = toolkit.get_action('datastore_search')({}, data).get('fields', [])
 
     # sort and filter the fields ensuring we only return string type fields and don't
     # return the id
     # field
-    return sorted(f[u'id'] for f in fields if f[u'type'] == u'string' and f[u'id'] != u'_id')
+    return sorted(f['id'] for f in fields if f['type'] == 'string' and f['id'] != '_id')
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
@@ -1201,7 +1203,7 @@ def _get_latest_update(package_or_resource_dicts):
              are found then (None, None) is returned
     '''
     # a list of fields on the resource that should contain update dates
-    fields = [u'last_modified', u'revision_timestamp', u'Created']
+    fields = ['last_modified', 'revision_timestamp', 'Created']
 
     latest_dict = None
     latest_date = None
@@ -1228,11 +1230,11 @@ def get_latest_update_for_package(pkg_dict, date_format=None):
     :return: 'unknown' or a string containing the rendered datetime
     '''
     latest_date, _ = _get_latest_update(
-        itertools.chain([pkg_dict], pkg_dict.get(u'resources', [])))
+        itertools.chain([pkg_dict], pkg_dict.get('resources', [])))
     if latest_date is not None:
         return toolkit.h.render_datetime(latest_date, date_format=date_format)
     else:
-        return toolkit._(u'unknown')
+        return toolkit._('unknown')
 
 
 def get_latest_update_for_package_resources(pkg_dict, date_format=None):
@@ -1247,13 +1249,12 @@ def get_latest_update_for_package_resources(pkg_dict, date_format=None):
     :param date_format:     date format for the return datetime
     :return: 'unknown' or a string containing the rendered datetime and the resource name
     '''
-    latest_date, latest_resource = _get_latest_update(pkg_dict.get(u'resources', []))
+    latest_date, latest_resource = _get_latest_update(pkg_dict.get('resources', []))
     if latest_date is not None:
-        name = latest_resource[u'name']
-        return u'{} ({})'.format(
-            toolkit.h.render_datetime(latest_date, date_format=date_format), name)
+        name = latest_resource['name']
+        return f'{toolkit.h.render_datetime(latest_date, date_format=date_format)} ({name})'
     # there is no available update so we return 'unknown'
-    return toolkit._(u'unknown')
+    return toolkit._('unknown')
 
 
 def get_external_links(record):
@@ -1275,8 +1276,7 @@ def get_external_links(record):
     return []
 
 
-def render_epoch(epoch_timestamp, in_milliseconds=True,
-                 date_format=u'%Y-%m-%d %H:%M:%S (UTC)'):
+def render_epoch(epoch_timestamp, in_milliseconds=True, date_format='%Y-%m-%d %H:%M:%S (UTC)'):
     '''
     Renders an epoch timestamp in the given date format. The timestamp is rendered in
     UTC.
@@ -1316,13 +1316,13 @@ def get_object_url(resource_id, guid, version=None, include_version=True):
     :return: the object url
     '''
     if include_version:
-        rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
-            u'resource_id': resource_id,
-            u'version': version,
+        rounded_version = toolkit.get_action('datastore_get_rounded_version')({}, {
+            'resource_id': resource_id,
+            'version': version,
         })
     else:
         rounded_version = None
-    return toolkit.url_for(u'object.view', uuid=guid, qualified=True, version=rounded_version)
+    return toolkit.url_for('object.view', uuid=guid, qualified=True, version=rounded_version)
 
 
 def build_specimen_nav_items(package_name, resource_id, record_id, version=None):
@@ -1338,15 +1338,15 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
     :return: a list of nav items
     '''
     link_definitions = [
-        (u'record.view', toolkit._(u'Normal view')),
-        (u'record.dwc', toolkit._(u'Darwin Core view')),
+        ('record.view', toolkit._('Normal view')),
+        ('record.dwc', toolkit._('Darwin Core view')),
     ]
     links = []
     for route_name, link_text in link_definitions:
         nav_item = toolkit.h.build_nav_icon(route_name, link_text, package_name=package_name,
                                             resource_id=resource_id, record_id=record_id,
                                             version=version)
-        links.append(_add_nav_item_class(nav_item, classes=[], role=u'presentation'))
+        links.append(_add_nav_item_class(nav_item, classes=[], role='presentation'))
 
     return links
 
@@ -1360,15 +1360,15 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     :return: a literal of HTML code where all the <li> nodes have "nav-item" added to their classes
     '''
     if classes is None:
-        classes = [u'nav-item']
+        classes = ['nav-item']
     tree = html.fromstring(html_string)
-    list_items = [i for i in tree.getchildren() if i.tag == u'li']
+    list_items = [i for i in tree.getchildren() if i.tag == 'li']
     for li in list_items:
         for c in classes:
             li.classes.add(c)
         for k, v in kwargs.items():
             li.attrib[k] = v
-    return literal(u'\n'.join([html.tostring(el) for el in tree.getchildren()]))
+    return literal('\n'.join([html.tostring(el) for el in tree.getchildren()]))
 
 
 def build_nav_main(*args):
@@ -1392,11 +1392,11 @@ def get_specimen_jsonld(uuid, version=None):
     :return: string of dumped json-ld data
     '''
     data_dict = {
-        u'uuid': uuid,
-        u'format': u'json-ld',
-        u'version': version,
+        'uuid': uuid,
+        'format': 'json-ld',
+        'version': version,
     }
     try:
-        return toolkit.get_action(u'object_rdf')({}, data_dict).decode(u'utf-8')
-    except toolkit.ValidationError, e:
-        return u''
+        return toolkit.get_action('object_rdf')({}, data_dict).decode('utf-8')
+    except toolkit.ValidationError:
+        return ''

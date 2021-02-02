@@ -29,19 +29,19 @@ class ObjectSerializer(RDFSerializer):
     '''
 
     serializer_kwargs = {
-        u'json-ld': {
+        'json-ld': {
             # this compacts the json output so that the namespaces are declared at the start in a
             # @context field rather than when each value is included
-            u'auto_compact': True
+            'auto_compact': True
         },
-        u'pretty-xml': {
+        'pretty-xml': {
             # this prevents the serializer nesting resource tags inside each other thus forcing the
             # metadata, data and any image tags to appear individually
-            u'max_depth': 1
+            'max_depth': 1
         },
     }
 
-    def serialize_record(self, record, resource, output_format=u'xml', version=None):
+    def serialize_record(self, record, resource, output_format='xml', version=None):
         '''
         Given a record dict, returns an RDF serialization.
 
@@ -87,16 +87,16 @@ class RecordGraphBuilder(object):
         self.version = version
 
         # figure out the rounded version of the record
-        self.rounded_version = toolkit.get_action(u'datastore_get_rounded_version')({}, {
-            u'resource_id': resource.id,
-            u'version': version,
+        self.rounded_version = toolkit.get_action('datastore_get_rounded_version')({}, {
+            'resource_id': resource.id,
+            'version': version,
         })
 
         # figure out the object URI for the record (possibly with version)
         if version is None:
-            self.base_object_uri = object_uri(record[u'occurrenceID'])
+            self.base_object_uri = object_uri(record['occurrenceID'])
         else:
-            self.base_object_uri = object_uri(record[u'occurrenceID'], version=self.rounded_version)
+            self.base_object_uri = object_uri(record['occurrenceID'], version=self.rounded_version)
         # this will be used as the subject for any record data triples
         self.record_ref = URIRef(self.base_object_uri)
 
@@ -110,13 +110,13 @@ class RecordGraphBuilder(object):
         :return: the GBIF record dict or None if we couldn't get it or didn't have a GBIF ID
                  associated with the record
         '''
-        gbif_id = self.record.get(u'gbifID', None)
+        gbif_id = self.record.get('gbifID', None)
 
         if gbif_id is not None:
             try:
-                context = {u'ignore_auth': True}
-                data_dict = {u'gbif_id': gbif_id}
-                return toolkit.get_action(u'gbif_record_show')(context, data_dict)
+                context = {'ignore_auth': True}
+                data_dict = {'gbif_id': gbif_id}
+                return toolkit.get_action('gbif_record_show')(context, data_dict)
             except toolkit.ObjectNotFound:
                 pass
         return None
@@ -168,10 +168,10 @@ class RecordGraphBuilder(object):
 
         :return: yields triples
         '''
-        metadata_uri = u'{}.{}'.format(self.base_object_uri, self.output_format)
+        metadata_uri = '{}.{}'.format(self.base_object_uri, self.output_format)
         meta_ref = URIRef(metadata_uri)
         yield meta_ref, self.namespaces.dc.subject, self.record_ref
-        yield meta_ref, self.namespaces.dc.creator, Literal(u'Natural History Museum, London')
+        yield meta_ref, self.namespaces.dc.creator, Literal('Natural History Museum, London')
         yield meta_ref, self.namespaces.dc.created, Literal(datetime.now())
 
     def _cetaf_cspp(self):
@@ -181,43 +181,43 @@ class RecordGraphBuilder(object):
 
         :return: yields triples
         '''
-        yield self.record_ref, self.namespaces.dc.title, self._get_value(u'scientificName')
-        yield self.record_ref, self.namespaces.dc.type, Literal(u'Specimen')
+        yield self.record_ref, self.namespaces.dc.title, self._get_value('scientificName')
+        yield self.record_ref, self.namespaces.dc.type, Literal('Specimen')
         yield (self.record_ref, self.namespaces.dwc.scientificName,
-               self._get_value(u'scientificName'))
-        yield self.record_ref, self.namespaces.dwc.family, self._get_value(u'family')
+               self._get_value('scientificName'))
+        yield self.record_ref, self.namespaces.dwc.family, self._get_value('family')
 
         # find the previous determinations for this record and yield them as the
         # previousIdentifications term, ignoring the current determination the record is filed as
-        determination_names = self.record.get(u'determinationNames', [])
-        filed_as = self.record.get(u'determinationFiledAs', [])
+        determination_names = self.record.get('determinationNames', [])
+        filed_as = self.record.get('determinationFiledAs', [])
         if determination_names and filed_as:
-            names = (name for name, filed in zip(determination_names, filed_as) if filed == u'No')
+            names = (name for name, filed in zip(determination_names, filed_as) if filed == 'No')
             yield (self.record_ref, self.namespaces.dwc.previousIdentifications,
                    Literal(as_dwc_list(names)))
 
-        yield self.record_ref, self.namespaces.dwc.fieldNumber, self._get_value(u'fieldNumber')
-        yield self.record_ref, self.namespaces.dwc.recordedBy, self._get_value(u'recordedBy')
+        yield self.record_ref, self.namespaces.dwc.fieldNumber, self._get_value('fieldNumber')
+        yield self.record_ref, self.namespaces.dwc.recordedBy, self._get_value('recordedBy')
 
         # if there is associated media, yield it as a list
-        if self.record.get(u'associatedMedia', False):
-            value = as_dwc_list(media[u'identifier'] for media in self.record[u'associatedMedia'])
+        if self.record.get('associatedMedia', False):
+            value = as_dwc_list(media['identifier'] for media in self.record['associatedMedia'])
             yield self.record_ref, self.namespaces.dwc.associatedMedia, Literal(value)
 
         yield (self.record_ref, self.namespaces.dwc.decimalLatitude,
-               self._get_value(u'decimalLatitude'))
+               self._get_value('decimalLatitude'))
         yield (self.record_ref, self.namespaces.dwc.decimalLongitude,
-               self._get_value(u'decimalLongitude'))
+               self._get_value('decimalLongitude'))
 
         # if there's a GBIF record, see if we can yield a country code for the record from it
         if self.gbif_record is not None:
             yield (self.record_ref, self.namespaces.dwc.countryCode,
-                   self._get_value(u'countryCode', source=self.gbif_record))
+                   self._get_value('countryCode', source=self.gbif_record))
 
-        if self.record.get(u'created', None) is not None:
+        if self.record.get('created', None) is not None:
             yield (self.record_ref, self.namespaces.dc.created,
-                   Literal(epoch_to_datetime(self.record[u'created'])))
-        yield self.record_ref, self.namespaces.dc.publisher, URIRef(u'https://nhm.ac.uk')
+                   Literal(epoch_to_datetime(self.record['created'])))
+        yield self.record_ref, self.namespaces.dc.publisher, URIRef('https://nhm.ac.uk')
 
     def _images(self):
         '''
@@ -227,25 +227,25 @@ class RecordGraphBuilder(object):
 
         :return: yields triples
         '''
-        for image in self.record.get(u'associatedMedia', []):
-            image_uri = URIRef(image[u'identifier'])
+        for image in self.record.get('associatedMedia', []):
+            image_uri = URIRef(image['identifier'])
             yield image_uri, self.namespaces.rdf.type, self.namespaces.foaf.Image
 
-            yield image_uri, self.namespaces.dc.title, self._get_value(u'title', source=image)
-            yield image_uri, self.namespaces.cc.license, URIRef(image[u'license'])
-            yield image_uri, self.namespaces.dc.RightsStatement, self._get_value(u'rightsHolder',
+            yield image_uri, self.namespaces.dc.title, self._get_value('title', source=image)
+            yield image_uri, self.namespaces.cc.license, URIRef(image['license'])
+            yield image_uri, self.namespaces.dc.RightsStatement, self._get_value('rightsHolder',
                                                                                  source=image)
             # although the actual image could be something else, the preview will always be a
             # jpeg
-            yield image_uri, self.namespaces.dc.Format, Literal(u'image/jpeg')
+            yield image_uri, self.namespaces.dc.Format, Literal('image/jpeg')
             # add link from image to object
             yield image_uri, self.namespaces.foaf.depicts, self.record_ref
             # add a link from the object to the image
             yield self.record_ref, self.namespaces.foaf.depiction, image_uri
             # add a thumbnail link
-            if mam_url_regex.match(image[u'identifier']):
+            if mam_url_regex.match(image['identifier']):
                 yield (image_uri, self.namespaces.foaf.thumbnail,
-                       URIRef(mam_url_regex.sub(r'\1thumbnail', image[u'identifier'])))
+                       URIRef(mam_url_regex.sub(r'\1thumbnail', image['identifier'])))
 
     def _gbif(self):
         '''
@@ -256,10 +256,10 @@ class RecordGraphBuilder(object):
         if self.gbif_record is not None:
             # assert equivalence with the GBIF record
             yield self.record_ref, self.namespaces.owl.sameAs, \
-                  URIRef(u'https://www.gbif.org/occurrence/{}'.format(self.gbif_record[u'gbifID']))
+                  URIRef('https://www.gbif.org/occurrence/{}'.format(self.gbif_record['gbifID']))
             # if we have a GBIF country code, add it
             yield (self.record_ref, self.namespaces.dwc.countryCode,
-                   self._get_value(u'countryCode', source=self.gbif_record))
+                   self._get_value('countryCode', source=self.gbif_record))
 
     def _dwc(self):
         '''
@@ -267,12 +267,12 @@ class RecordGraphBuilder(object):
 
         :return: yields triples
         '''
-        yield self.record_ref, self.namespaces.dc.identifier, Literal(self.record[u'occurrenceID'])
+        yield self.record_ref, self.namespaces.dc.identifier, Literal(self.record['occurrenceID'])
 
         dwc_terms_dict = dwc_terms(self.record.keys())
 
-        groups_to_skip = {u'dynamicProperties'}
-        terms_to_skip = {u'associatedMedia', u'created', u'modified'}
+        groups_to_skip = {'dynamicProperties'}
+        terms_to_skip = {'associatedMedia', 'created', 'modified'}
         for group, terms in dwc_terms_dict.items():
             if group in groups_to_skip:
                 continue
@@ -285,9 +285,9 @@ class RecordGraphBuilder(object):
 
         # retrieve the dynamic properties and yield them as one JSON dump
         dynamic_properties_dict = {}
-        for properties in dwc_terms_dict.get(u'dynamicProperties', {}).values():
+        for properties in dwc_terms_dict.get('dynamicProperties', {}).values():
             for dynamic_property in properties:
-                if dynamic_property == u'created':
+                if dynamic_property == 'created':
                     continue
                 dynamic_properties_dict[dynamic_property] = self.record.get(dynamic_property)
         if dynamic_properties_dict:
@@ -295,20 +295,20 @@ class RecordGraphBuilder(object):
                   Literal(json.dumps(dynamic_properties_dict))
 
         # yield the associatedMedia term as a pipe-separated list of image URIs
-        media = self.record.get(u'associatedMedia', [])
+        media = self.record.get('associatedMedia', [])
         if media:
             yield self.record_ref, self.namespaces.dwc.associatedMedia, \
-                  Literal(as_dwc_list(map(itemgetter(u'identifier'), media)))
+                  Literal(as_dwc_list(map(itemgetter('identifier'), media)))
 
-        if self.record.get(u'created', None) is not None:
+        if self.record.get('created', None) is not None:
             # yield the created date in the correct format
             yield (self.record_ref, self.namespaces.dc.created,
-                   Literal(epoch_to_datetime(self.record[u'created'])))
+                   Literal(epoch_to_datetime(self.record['created'])))
 
-        if self.record.get(u'modified', None) is not None:
+        if self.record.get('modified', None) is not None:
             # yield the modified date in the correct format
             yield (self.record_ref, self.namespaces.dwc.modified,
-                   Literal(epoch_to_datetime(self.record[u'modified'])))
+                   Literal(epoch_to_datetime(self.record['modified'])))
 
     def _version_info(self):
         '''
@@ -323,7 +323,7 @@ class RecordGraphBuilder(object):
             # data we're using is the same as the latest version's data, yield a same as to show
             # this
             yield self.record_ref, self.namespaces.owl.sameAs, \
-                  URIRef(object_uri(self.record[u'occurrenceID'], version=self.rounded_version))
+                  URIRef(object_uri(self.record['occurrenceID'], version=self.rounded_version))
 
     def _extras(self):
         '''
@@ -333,8 +333,8 @@ class RecordGraphBuilder(object):
         :return: yields triples
         '''
         yield (self.record_ref, self.namespaces.aiiso.Department,
-               Literal(get_department(self.record[u'collectionCode'])))
-        yield self.record_ref, self.namespaces.aiiso.Division, self._get_value(u'subDepartment')
+               Literal(get_department(self.record['collectionCode'])))
+        yield self.record_ref, self.namespaces.aiiso.Division, self._get_value('subDepartment')
 
         yield (self.record_ref, self.namespaces.void.inDataset,
-               URIRef(dataset_uri({u'id': self.resource.get_package_id()}) + u'#dataset'))
+               URIRef(dataset_uri({'id': self.resource.get_package_id()}) + '#dataset'))

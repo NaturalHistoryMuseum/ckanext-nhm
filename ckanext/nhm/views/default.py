@@ -29,25 +29,25 @@ class DefaultView(object):
 
     # Default state
     state = {
-        u'gridOptions': {
-            u'defaultFormatter': u'NHMFormatter',
-            u'enableCellRangeSelection': False,
-            u'enableTextSelectionOnCells': False,
-            u'enableCellNavigation': False,
-            u'enableColumnReorder': False,
-            u'defaultColumnWidth': 70
-            },
-        u'columnsWidth': [{
-            u'column': u'_id',
-            u'width': 45
-            }, ],
-        u'columnsTitle': [{
-            u'column': u'_id',
-            u'title': u''
+        'gridOptions': {
+            'defaultFormatter': 'NHMFormatter',
+            'enableCellRangeSelection': False,
+            'enableTextSelectionOnCells': False,
+            'enableCellNavigation': False,
+            'enableColumnReorder': False,
+            'defaultColumnWidth': 70
+        },
+        'columnsWidth': [{
+            'column': '_id',
+            'width': 45
+        }, ],
+        'columnsTitle': [{
+            'column': '_id',
+            'title': ''
             # This is just converted into a link so lets hide the title
-            }],
-        u'columnsToolTip': []
-        }
+        }],
+        'columnsToolTip': []
+    }
 
     @staticmethod
     def get_ordered_fields(resource_id):
@@ -57,20 +57,20 @@ class DefaultView(object):
 
         '''
         data = {
-            u'resource_id': resource_id,
-            u'limit': 0
-            }
+            'resource_id': resource_id,
+            'limit': 0
+        }
         try:
-            result = toolkit.get_action(u'datastore_search')({}, data)
+            result = toolkit.get_action('datastore_search')({}, data)
         except toolkit.ObjectNotFound:
             return []
         else:
-            return [f[u'id'] for f in result[u'fields']]
+            return [f['id'] for f in result['fields']]
 
     def render_record(self, c):
         '''Render a record
 
-        :param c: 
+        :param c:
 
         '''
 
@@ -78,16 +78,16 @@ class DefaultView(object):
         # So load the fields, and create an OrderedDict with field: value
         toolkit.c.field_data = OrderedDict()
 
-        for field in self.get_ordered_fields(toolkit.c.resource[u'id']):
-            if not field.startswith(u'_'):
+        for field in self.get_ordered_fields(toolkit.c.resource['id']):
+            if not field.startswith('_'):
                 toolkit.c.field_data[field] = toolkit.c.record_dict.get(field, None)
 
-        return toolkit.render(u'record/view.html')
+        return toolkit.render('record/view.html')
 
     def get_field_groups(self, resource):
         '''
 
-        :param resource: 
+        :param resource:
 
         '''
         return self.field_groups

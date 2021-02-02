@@ -6,12 +6,12 @@
 from ckan.plugins import toolkit
 from flask import Blueprint
 
-blueprint = Blueprint(name=u'vfactor_iiif', import_name=__name__, url_prefix=u'/vfactor_iiif')
+blueprint = Blueprint(name='vfactor_iiif', import_name=__name__, url_prefix='/vfactor_iiif')
 
 
-@blueprint.route(u'/')
+@blueprint.route('/')
 def index():
     '''
     Render the vfactor iiif page.
     '''
-    return toolkit.render(u'vfactor_iiif.html')
+    return toolkit.render('vfactor_iiif.html')

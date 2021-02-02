@@ -4,18 +4,17 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from flask import Blueprint
-
 from ckan.plugins import toolkit
+from flask import Blueprint
 
 # bbcm = big butterfly count map :)
 # create a flask blueprint
-blueprint = Blueprint(name=u'big-butterfly-count-map', import_name=__name__)
+blueprint = Blueprint(name='big-butterfly-count-map', import_name=__name__)
 
 
-@blueprint.route(u'/big-butterfly-count-map')
+@blueprint.route('/big-butterfly-count-map')
 def bbcm():
     '''
     Render the big butterfly count map page.
     '''
-    return toolkit.render(u'bbcm.html', {})
+    return toolkit.render('bbcm.html', {})

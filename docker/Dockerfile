@@ -1,4 +1,4 @@
-FROM openknowledge/ckan-dev:2.9-py2
+FROM openknowledge/ckan-dev:2.9
 
 RUN apk add openldap-dev geos-dev geos
 
@@ -9,15 +9,18 @@ WORKDIR /srv/app/src/ckanext-nhm
 COPY . .
 
 # might as well update pip while we're here!
-RUN pip2 install --upgrade pip
+RUN pip3 install --upgrade pip
 
 # fixes this https://github.com/ckan/ckan/issues/5570
-RUN pip2 install pytest-ckan
+RUN pip3 install pytest-ckan
 
 # install the dependencies
-RUN python2 setup.py develop && \
-    pip2 install -r requirements.txt && \
-    pip2 install -r dev_requirements.txt
+RUN python3 setup.py develop && \
+    pip3 install -r requirements.txt && \
+    pip3 install -r dev_requirements.txt
+
+# ultrahack
+RUN curl -s "https://raw.githubusercontent.com/ckan/ckanext-dcat/v1.1.0/requirements.txt" | pip3 install -r /dev/stdin
 
 # this entrypoint ensures our service dependencies (postgresql, solr and redis) are running before
 # running the cmd
