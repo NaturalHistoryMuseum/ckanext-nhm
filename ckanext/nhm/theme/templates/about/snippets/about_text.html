@@ -1,5 +1,5 @@
 {% set collection_stats = h.collection_stats() %}
-{% set collection_codes = collection_stats['collectionCodes'].keys() %}
+{% set collection_codes = collection_stats['collectionCodes'].keys() | list %}
 
 <p>
     The Museum is committed to open access and open science, and has launched the Data Portal to
