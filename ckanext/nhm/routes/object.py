@@ -27,8 +27,7 @@ Old style /specimen urls are also supported to ensure backwards compatibility.
 import logging
 
 from ckan.plugins import toolkit
-from ckanext.dcat.controllers import check_access_header
-from ckanext.dcat.utils import CONTENT_TYPES
+from ckanext.dcat.utils import CONTENT_TYPES, check_access_header
 from flask import Blueprint, Response, redirect, url_for
 
 from ckanext.nhm.lib.record import get_record_by_uuid
