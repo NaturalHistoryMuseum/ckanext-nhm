@@ -56,14 +56,14 @@ def get_site_statistics():
     return stats
 
 
-@cache_region('permanent', 'contributor_count')
+@cache_region('collection_stats', 'contributor_count')
 def get_contributor_count():
     '''Get the total number of authors listed on packages, calculated using Solr facets.'''
     query = toolkit.get_action('package_search')({}, {'facet.field': ['author'], 'facet.limit': -1})
     return len(query.get('facets', {}).get('author', {}).keys())
 
 
-@cache_region('permanent', 'dataset_count')
+@cache_region('collection_stats', 'dataset_count')
 def get_dataset_count():
     return toolkit.get_action('package_search')({}, {
         'rows': 1
@@ -71,7 +71,7 @@ def get_dataset_count():
         'count']
 
 
-@cache_region('permanent', 'record_count')
+@cache_region('collection_stats', 'record_count')
 def get_record_count():
     '''Get the current total number of records in the collections dataset.'''
     record_count = 0
@@ -84,7 +84,7 @@ def get_record_count():
     return record_count
 
 
-@cache_region('permanent', 'record_stats')
+@cache_region('collection_stats', 'record_stats')
 def get_record_stats():
     start_version = 1501545600
     end_version = int(time.time())
@@ -249,7 +249,7 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
                                view_id=view['id'], filters=filters)
 
 
-@cache_region('permanent', 'collection_stats')
+@cache_region('collection_stats', 'collection_stats')
 def indexlot_count():
     '''Get the total number of index lots.'''
     resource_id = get_indexlot_resource_id()
@@ -313,7 +313,7 @@ def get_vfactor_resource_id():
     return str(value) if value is not None else None
 
 
-@cache_region('permanent', 'collection_stats')
+@cache_region('collection_stats', 'collection_stats')
 def collection_stats():
     '''Get collection stats, including collection codes and collection totals.'''
     stats = {}

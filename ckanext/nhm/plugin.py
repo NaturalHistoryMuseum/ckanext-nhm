@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 import ckan.model as model
 import requests
-from beaker.cache import cache_managers
+from beaker.cache import cache_managers, cache_regions
 from ckan.lib.helpers import literal
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.ckanpackager.interfaces import ICkanPackager
@@ -64,6 +64,18 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IGalleryImage)
     implements(IVersionedDatastore, inherit=True)
     implements(interfaces.IClick)
+    implements(interfaces.IConfigurable)
+
+    ## IConfigurable
+    def configure(self, config):
+        options = {}
+        for key, value in config.items():
+            if key.startswith('ckanext.nhm.cache.'):
+                options[key[18:]] = value
+
+        cache_regions.update({
+            'collection_stats': options
+        })
 
     ## IActions
     def get_actions(self):
