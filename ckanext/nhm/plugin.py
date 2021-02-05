@@ -3,6 +3,7 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+import itertools
 
 import logging
 import os
@@ -155,7 +156,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         del facets_dict['groups']
 
         # Add author facet as the first item
-        facets_dict = OrderedDict([('author', 'Authors')] + facets_dict.items())
+        facets_dict = OrderedDict(itertools.chain([('author', 'Authors')], facets_dict.items()))
         facets_dict['creator_user_id'] = 'Users'
 
         return facets_dict
