@@ -3,6 +3,7 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+from collections import OrderedDict, defaultdict
 
 import itertools
 import json
@@ -11,20 +12,12 @@ import operator
 import os
 import re
 import time
-import urllib
-from collections import OrderedDict, defaultdict
-from datetime import datetime
-from operator import itemgetter
-
 from beaker.cache import cache_region
 from ckan import model
 from ckan.lib import helpers as core_helpers
 from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
 from ckanext.gbif.lib.errors import GBIF_ERRORS
-from jinja2.filters import do_truncate
-from lxml import etree, html
-
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
@@ -32,6 +25,11 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
 from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from datetime import datetime
+from jinja2.filters import do_truncate
+from lxml import etree, html
+from operator import itemgetter
+from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -865,7 +863,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     except KeyError:
         pass
 
-    return urllib.quote(' '.join(map(str, text)).encode('utf8'))
+    return quote(' '.join(map(str, text)).encode('utf8'))
 
 
 def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
