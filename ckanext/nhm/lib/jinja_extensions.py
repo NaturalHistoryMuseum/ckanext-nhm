@@ -115,8 +115,7 @@ class TaxonomyFormatExtension(Extension):
         :returns: a combined dict
 
         '''
-        return {k: list(set(ff1.get(k, []) + ff2.get(k, []))) for k in
-                set(ff1.keys() + ff2.keys())}
+        return {k: list(set(ff1.get(k, []) + ff2.get(k, []))) for k in set(ff1).union(ff2)}
 
     @property
     def _zoo(self):
