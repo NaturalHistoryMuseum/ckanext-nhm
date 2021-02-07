@@ -880,7 +880,7 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     if userobj is not None:
         grav_xml = etree.fromstring(gravatar_literal)
         grav_xml.attrib['alt'] = userobj.name
-        gravatar_literal = literal(etree.tostring(grav_xml))
+        gravatar_literal = literal(etree.tostring(grav_xml, encoding='unicode'))
 
     return gravatar_literal
 
