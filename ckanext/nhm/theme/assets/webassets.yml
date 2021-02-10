@@ -210,3 +210,19 @@ vfactor-iiif-js:
   filters: rjsmin
   contents:
     - scripts/apps/vfactor-iiif/dist/vfactor-iiif.js
+
+record-map-css:
+  output: ckanext-nhm/%(version)s_record_map.css
+  filters: cssrewrite
+  contents:
+    - vendor/leaflet/leaflet.css
+
+record-map-js:
+  output: ckanext-nhm/%(version)s_record_map.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - vendor/leaflet/leaflet.js
+    - scripts/modules/record-map.js
