@@ -13,7 +13,7 @@ BHL = Site(name='Biodiversity Heritage Library',
            icon='https://www.biodiversitylibrary.org/favicon.ico',
            link='https://www.biodiversitylibrary.org/name/{}')
 CoL = Site(name='Catalogue of Life',
-           icon='https://www.catalogueoflife.org/sites/default/files/favicon.gif',
+           icon='https://www.catalogueoflife.org/images/col_square_logo.jpg',
            link='http://www.catalogueoflife.org/col/search/all/key/{}')
 PBDB = Site(name='Paleobiology Database',
             icon='https://paleobiodb.org/favicon.ico',
