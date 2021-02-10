@@ -2333,6 +2333,11 @@ select, .select2-choice {
     color: white;
   }
 
+  &[data-format=csv], &[data-format*=csv] {
+    // wcag contrast requirement (the default background-color (#856A00) is too low contrast)
+    background-color: #dfb100;
+  }
+
   &.dataset-private {
     // wcag contrast requirement (the default color (black) is too low contrast)
     color: white;
