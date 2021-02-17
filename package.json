@@ -13,6 +13,8 @@
   },
   "homepage": "http://data.nhm.ac.uk",
   "dependencies": {
-    "less": "^3.12.2"
+    "less": "^3.12.2",
+    "search": "file:ckanext/nhm/theme/assets/scripts/apps/search",
+    "vfactor-iiif": "file:ckanext/nhm/theme/assets/scripts/apps/vfactor-iiif"
   }
 }
