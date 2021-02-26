@@ -123,13 +123,8 @@ def _load_data(package_name, resource_id, record_id, version=None):
                                          f'{image.get("rightsHolder", None) or default_copyright}',
                             'record_id': record_id,
                             'resource_id': resource_id,
-                            'link': toolkit.url_for(
-                                controller='ckanext.nhm.controllers.record:RecordController',
-                                action='view',
-                                package_name=package_name,
-                                resource_id=resource_id,
-                                record_id=record_id
-                            ),
+                            'link': toolkit.url_for('record.view', package_name=package_name,
+                                                    resource_id=resource_id, record_id=record_id),
                         })
             else:
                 # it's a string field value, use the delimiter to split up the field
