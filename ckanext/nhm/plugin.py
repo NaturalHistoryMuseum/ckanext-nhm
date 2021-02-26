@@ -26,15 +26,8 @@ import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.nhm import routes, cli
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
-from ckanext.nhm.lib.helpers import (get_site_statistics,
-                                     resource_view_get_filter_options)  # NOTE: Need
-# to import a function with a cached decorator so clear caches works
+from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-
-# NOTE: Need to import a function with a cached decorator so clear caches works.
-# assigning here as the function is not used anywhere and would be lost in automatic
-# import optimisations
-_this_function_has_a_cached_decorator = get_site_statistics
 
 log = logging.getLogger(__name__)
 
