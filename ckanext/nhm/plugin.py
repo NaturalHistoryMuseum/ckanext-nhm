@@ -3,13 +3,15 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-import itertools
-
-import logging
-import os
 from collections import OrderedDict
 
 import ckan.model as model
+import ckanext.nhm.lib.helpers as helpers
+import ckanext.nhm.logic.action as nhm_action
+import ckanext.nhm.logic.schema as nhm_schema
+import itertools
+import logging
+import os
 import requests
 from beaker.cache import cache_managers, cache_regions
 from ckan.lib.helpers import literal
@@ -18,16 +20,12 @@ from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
-from ckanext.versioned_datastore.interfaces import IVersionedDatastore
-
-import ckanext.nhm.lib.helpers as helpers
-import ckanext.nhm.logic.action as nhm_action
-import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.nhm import routes, cli
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from ckanext.versioned_datastore.interfaces import IVersionedDatastore
 
 log = logging.getLogger(__name__)
 
@@ -631,7 +629,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # if the index lots or specimens collections are in the resource ids list, remove a bunch
         # of groups that we don't care about
         if (helpers.get_specimen_resource_id() in resource_ids or
-                helpers.get_indexlot_resource_id() in resource_ids):
+            helpers.get_indexlot_resource_id() in resource_ids):
             fields.force('collectionCode')
             fields.force('typeStatus')
             fields.force('family')
