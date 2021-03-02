@@ -8,7 +8,7 @@
     {% block resource_item_title %}
     <a class="heading" href="{{ url }}" title="{{ res.name or res.description }}">
         {{ h.resource_display_name(res) | truncate(50) }}
-        {{ h.popular('views', res.tracking_summary.total, min=10) }}
+        {{ h.popular('views', res.tracking_summary.total, min=10) if res.tracking_summary }}
     </a>
   {% endblock %}
   {% block resource_item_description %}
