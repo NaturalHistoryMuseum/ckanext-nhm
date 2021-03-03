@@ -226,3 +226,16 @@ record-map-js:
   contents:
     - vendor/leaflet/leaflet.js
     - scripts/modules/record-map.js
+
+# this bundle just loads the ckanext_stats/stats bundle but adds some extra flot plugins we need
+stats-extra:
+  output: ckanext-nhm/%(version)s_stats_extra.js
+  filters: rjsmin
+  extra:
+    preload:
+      - ckanext_stats/stats
+  contents:
+    - vendor/flot/jquery.flot.categories.js
+    - vendor/flot/jquery.flot.barnumbers.js
+    - vendor/flot/jquery.flot.time.js
+    - vendor/flot/jquery.flot.tickrotor.js
