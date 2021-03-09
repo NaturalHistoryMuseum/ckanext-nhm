@@ -8,7 +8,6 @@ import json
 import logging
 
 import requests
-
 from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
@@ -22,18 +21,18 @@ def mam_media_request(asset_id, email):
 
     '''
     payload = {
-        u'processDefinitionKey': u'original-media-request',
-        u'variables': [{u'name': u'emailAddress', u'value': email},
-                       {u'name': u'assets', u'value': asset_id}]
-        }
-    headers = {u'content-type': u'application/json'}
-    auth = (toolkit.config.get(u'ckanext.nhm.mam.username'),
-            toolkit.config.get(u'ckanext.nhm.mam.password'))
-    r = requests.post(toolkit.config.get(u'ckanext.nhm.mam.endpoint'),
+        'processDefinitionKey': 'original-media-request',
+        'variables': [{'name': 'emailAddress', 'value': email},
+                       {'name': 'assets', 'value': asset_id}]
+    }
+    headers = {'content-type': 'application/json'}
+    auth = (toolkit.config.get('ckanext.nhm.mam.username'),
+            toolkit.config.get('ckanext.nhm.mam.password'))
+    r = requests.post(toolkit.config.get('ckanext.nhm.mam.endpoint'),
                       data=json.dumps(payload), auth=auth, verify=False, headers=headers)
     # Raise an exception and log the error
     try:
         r.raise_for_status()
     except:
-        log.critical(u'Error requesting MAM image: {0}'.format(r.text))
+        log.critical('Error requesting MAM image: {0}'.format(r.text))
         raise

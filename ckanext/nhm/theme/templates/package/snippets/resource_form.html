@@ -30,7 +30,7 @@
             {% endcall %}
         </div>
 
-        {% resource 'ckanext-nhm/toggle-select' %}
+        {% asset 'ckanext-nhm/toggle-select' %}
 
         {% call form.select('_latitude_field', label=_('Decimal latitude field'), options=datastore_fields, selected=data._latitude_field, error=errors._latitude_field) %}
             {{ form.info(_("Please select the field to use for the record's decimal latitude."), inline=True) }}

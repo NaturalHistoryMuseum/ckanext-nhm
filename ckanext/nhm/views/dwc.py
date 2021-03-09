@@ -6,10 +6,10 @@
 
 import logging
 
+from ckan.plugins import toolkit
+
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.views.default import DefaultView
-
-from ckan.plugins import toolkit
 
 log = logging.getLogger(__name__)
 
@@ -17,39 +17,39 @@ log = logging.getLogger(__name__)
 class DarwinCoreView(DefaultView):
     '''View for displaying DwC resources'''
 
-    format = u'dwc'
+    format = 'dwc'
 
-    grid_default_columns = [u'_id', u'gbifIssue', u'scientificName',
-                            u'scientificNameAuthorship', u'specificEpithet',
-                            u'infraspecificEpithet', u'family', u'genus', u'class',
-                            u'locality', u'country', u'viceCounty', u'recordedBy',
-                            u'typeStatus', u'catalogNumber', u'collectionCode']
+    grid_default_columns = ['_id', 'gbifIssue', 'scientificName',
+                            'scientificNameAuthorship', 'specificEpithet',
+                            'infraspecificEpithet', 'family', 'genus', 'class',
+                            'locality', 'country', 'viceCounty', 'recordedBy',
+                            'typeStatus', 'catalogNumber', 'collectionCode']
 
     grid_column_widths = {
-        u'gbifIssue': 70,
-        u'catalogNumber': 120,
-        u'scientificNameAuthorship': 180,
-        u'scientificName': 160
-        }
+        'gbifIssue': 70,
+        'catalogNumber': 120,
+        'scientificNameAuthorship': 180,
+        'scientificName': 160
+    }
 
     def render_record(self, c):
         '''
 
-        :param c: 
+        :param c:
 
         '''
 
-        if c.resource[u'format'].lower() != u'dwc':
-            toolkit.abort(404, toolkit._(u'Record not in Darwin Core format'))
+        if c.resource['format'].lower() != 'dwc':
+            toolkit.abort(404, toolkit._('Record not in Darwin Core format'))
 
-        c.record_title = c.record_dict.get(u'catalogNumber', None) or c.record_dict.get(
-            u'occurrenceID')
+        c.record_title = c.record_dict.get('catalogNumber', None) or c.record_dict.get(
+            'occurrenceID')
         fields = toolkit.h.resource_view_get_fields(c.resource)
         c.dwc_terms = dwc_terms(fields)
 
         try:
-            c.dynamic_properties = c.dwc_terms.pop(u'dynamicProperties')
+            c.dynamic_properties = c.dwc_terms.pop('dynamicProperties')
         except IndexError:
             c.dynamic_properties = []
 
-        return toolkit.render(u'record/dwc.html')
+        return toolkit.render('record/dwc.html')

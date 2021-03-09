@@ -1,5 +1,10 @@
 {% ckan_extends %}
 
+{# ckan's base.html expects pkg_dict to exist so we need to make sure it does! #}
+{% if pkg_dict is not defined and g.pkg_dict is defined %}
+    {% set pkg_dict = g.pkg_dict %}
+{% endif %}
+
 {# Renaming datasets => data #}
 
 {% block subtitle %}{{ _('Data') }}{% endblock %}

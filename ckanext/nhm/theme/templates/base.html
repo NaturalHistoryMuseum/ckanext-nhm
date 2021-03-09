@@ -9,5 +9,6 @@
 
 {% block styles %}
   {{ super() }}
-  {% resource 'ckanext-nhm/main' %}
+    {% asset 'ckanext-nhm/main-css' %}
+    {% asset 'ckanext-nhm/main-js' %}
 {% endblock %}

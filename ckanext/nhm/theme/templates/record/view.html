@@ -33,11 +33,11 @@
                                href="{{ h.url_for('resource.read', id=g.pkg.name, resource_id=res.id) }}">
                                 <i class="fas fa-arrow-circle-left"></i> </a>
 
-                            {% resource 'ckanext-nhm/back-button' %}
+                            {% asset 'ckanext-nhm/back-button' %}
                         </li>
 
                         <li>
-                            {% resource 'ckanext-ckanpackager/main' %}
+                            {% asset 'ckanext-ckanpackager/main' %}
 
                             <a data-module="ckanpackager-download-link"
                                data-module-resource-id="{{ res.id }}"

@@ -6,10 +6,11 @@
 
 import logging
 
-import ckanext.nhm.logic.schema as nhm_schema
 from ckan.lib.navl.dictization_functions import validate
 from ckan.logic import ActionError
 from ckan.plugins import toolkit
+
+import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.mam import mam_media_request
@@ -25,33 +26,33 @@ def record_show(context, data_dict):
     :param data_dict:
 
     '''
-    context[u'user'] = toolkit.c.user or toolkit.c.author
-    schema = context.get(u'schema', nhm_schema.record_show_schema())
+    context['user'] = toolkit.c.user or toolkit.c.author
+    schema = context.get('schema', nhm_schema.record_show_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
 
     if errors:
         raise toolkit.ValidationError(errors)
 
-    resource_id = toolkit.get_or_bust(data_dict, u'resource_id')
-    record_id = toolkit.get_or_bust(data_dict, u'record_id')
+    resource_id = toolkit.get_or_bust(data_dict, 'resource_id')
+    record_id = toolkit.get_or_bust(data_dict, 'record_id')
 
     # Retrieve datastore record
     record_data_dict = {
-        u'resource_id': resource_id,
-        u'filters': {
-            u'_id': record_id
-            }
+        'resource_id': resource_id,
+        'filters': {
+            '_id': record_id
         }
-    if u'version' in data_dict:
-        record_data_dict[u'version'] = data_dict[u'version']
-    search_result = toolkit.get_action(u'datastore_search')(context, record_data_dict)
+    }
+    if 'version' in data_dict:
+        record_data_dict['version'] = data_dict['version']
+    search_result = toolkit.get_action('datastore_search')(context, record_data_dict)
 
     try:
         record = {
-            u'data': search_result[u'records'][0],
-            u'fields': search_result[u'fields'],
-            u'resource_id': resource_id
-            }
+            'data': search_result['records'][0],
+            'fields': search_result['fields'],
+            'resource_id': resource_id
+        }
     except IndexError:
         # If we don't have a result, raise not found
         raise toolkit.ObjectNotFound
@@ -70,42 +71,39 @@ def download_original_image(context, data_dict):
     :param data_dict:
     '''
     # validate the data
-    schema = context.get(u'schema', nhm_schema.download_original_image_schema())
+    schema = context.get('schema', nhm_schema.download_original_image_schema())
     data_dict, errors = validate(data_dict, schema, context)
 
     if errors:
         raise toolkit.ValidationError(errors)
 
     # Get the resource
-    resource = toolkit.get_action(u'resource_show')(context,
-                                                    {
-                                                        u'id': data_dict[u'resource_id']
-                                                        })
+    resource = toolkit.get_action('resource_show')(context, {'id': data_dict['resource_id']})
 
     # Retrieve datastore record
-    search_result = toolkit.get_action(u'datastore_search')(context, {
-        u'resource_id': data_dict[u'resource_id'],
-        u'filters': {
-            u'_id': data_dict[u'record_id']
-            }
-        })
+    search_result = toolkit.get_action('datastore_search')(context, {
+        'resource_id': data_dict['resource_id'],
+        'filters': {
+            '_id': data_dict['record_id']
+        }
+    })
 
     try:
-        record = search_result[u'records'][0]
+        record = search_result['records'][0]
     except IndexError:
         # If we don't have a result, raise not found
         raise toolkit.ObjectNotFound
 
-    if not _image_exists_on_record(resource, record, data_dict[u'asset_id']):
+    if not _image_exists_on_record(resource, record, data_dict['asset_id']):
         raise toolkit.ObjectNotFound
 
     try:
-        mam_media_request(data_dict[u'asset_id'], data_dict[u'email'])
-    except Exception, e:
+        mam_media_request(data_dict['asset_id'], data_dict['email'])
+    except Exception as e:
         log.error(e)
-        raise ActionError(u'Could not request original')
+        raise ActionError('Could not request original')
     else:
-        return u'Original image request successful'
+        return 'Original image request successful'
 
 
 def object_rdf(context, data_dict):
@@ -118,20 +116,20 @@ def object_rdf(context, data_dict):
 
     # Validate the data
     context = {
-        u'user': toolkit.c.user or toolkit.c.author
-        }
-    schema = context.get(u'schema', nhm_schema.object_rdf_schema())
+        'user': toolkit.c.user or toolkit.c.author
+    }
+    schema = context.get('schema', nhm_schema.object_rdf_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
     # Raise any validation errors
     if errors:
         raise toolkit.ValidationError(errors)
 
     # get the record
-    version = data_dict.get(u'version', None)
-    record_dict, resource_dict = get_record_by_uuid(data_dict[u'uuid'], version)
+    version = data_dict.get('version', None)
+    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'], version)
     if record_dict:
         serializer = ObjectSerializer()
-        output = serializer.serialize_record(record_dict, resource_dict, data_dict.get(u'format'),
+        output = serializer.serialize_record(record_dict, resource_dict, data_dict.get('format'),
                                              version)
         return output
     raise toolkit.ObjectNotFound
@@ -146,11 +144,11 @@ def _image_exists_on_record(resource, record, asset_id):
 
     '''
     # FIXME - If no image field use gallery
-    image_field = resource.get(u'_image_field', None)
+    image_field = resource.get('_image_field', None)
 
     # Check the asset ID belongs to the record
     for image in record[image_field]:
-        url = image.get(u'identifier', None)
+        url = image.get('identifier', None)
         if asset_id in url:
             return True
     return False
@@ -178,46 +176,46 @@ def get_permanent_url(context, data_dict):
     :returns: the full URL of the specimen
     :rtype: string
     '''
-    schema = context.get(u'schema', nhm_schema.get_permanent_url_schema())
+    schema = context.get('schema', nhm_schema.get_permanent_url_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
 
     # extract the request parameters
-    field = data_dict[u'field']
-    value = data_dict[u'value']
-    include_version = data_dict.get(u'include_version', False)
+    field = data_dict['field']
+    value = data_dict['value']
+    include_version = data_dict.get('include_version', False)
 
     # create a search dict to use with the datastore_search action
     search_dict = {
-        u'resource_id': helpers.get_specimen_resource_id(),
-        u'filters': {
+        'resource_id': helpers.get_specimen_resource_id(),
+        'filters': {
             field: value
         },
-        u'limit': 1,
+        'limit': 1,
     }
-    result = toolkit.get_action(u'datastore_search')(context, search_dict)
-    records = result[u'records']
-    total = result[u'total']
+    result = toolkit.get_action('datastore_search')(context, search_dict)
+    records = result['records']
+    total = result['total']
     if total == 0:
         raise toolkit.ValidationError({
-            u'message': u'No records found matching the given criteria',
-            u'total': total,
+            'message': 'No records found matching the given criteria',
+            'total': total,
         })
     elif total > 1:
         raise toolkit.ValidationError({
-            u'message': u'More than 1 record found matching the given criteria',
-            u'total': total,
+            'message': 'More than 1 record found matching the given criteria',
+            'total': total,
         })
     else:
-        uuid = records[0][u'occurrenceID']
+        uuid = records[0]['occurrenceID']
         if include_version:
             # figure out the latest rounded version of the specimen resource data
-            version = toolkit.get_action(u'datastore_get_rounded_version')(context, {
-                u'resource_id': helpers.get_specimen_resource_id()
+            version = toolkit.get_action('datastore_get_rounded_version')(context, {
+                'resource_id': helpers.get_specimen_resource_id()
             })
             # create a path with the version included
-            path = toolkit.url_for(u'object_view_versioned', uuid=uuid, version=version)
+            path = toolkit.url_for('object_view_versioned', uuid=uuid, version=version)
         else:
-            path = toolkit.url_for(u'object_view', uuid=uuid)
+            path = toolkit.url_for('object_view', uuid=uuid)
 
         # concatenate the path with the site url and return
-        return u'{}{}'.format(toolkit.config.get(u'ckan.site_url'), path)
+        return f'{toolkit.config.get("ckan.site_url")}{path}'

@@ -3,38 +3,29 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-
-import logging
 from collections import OrderedDict
 
+import ckan.model as model
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
+import itertools
+import logging
 import os
-import re
 import requests
-from beaker.cache import cache_managers
+from beaker.cache import cache_managers, cache_regions
+from ckan.lib.helpers import literal
+from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
-from ckanext.nhm import routes
+from ckanext.nhm import routes, cli
 from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
-from ckanext.nhm.lib.helpers import (get_site_statistics,
-                                     resource_view_get_filter_options)  # NOTE: Need
-# to import a function with a cached decorator so clear caches works
+from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from ckanext.versioned_datastore.interfaces import IVersionedDatastore
-from webhelpers.html import literal
-
-import ckan.model as model
-from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
-
-# NOTE: Need to import a function with a cached decorator so clear caches works.
-# assigning here as the function is not used anywhere and would be lost in automatic
-# import optimisations
-_this_function_has_a_cached_decorator = get_site_statistics
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +39,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     '''
 
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    template_dir = os.path.join(root_dir, u'ckanext', u'nhm', u'theme', u'templates')
+    template_dir = os.path.join(root_dir, 'ckanext', 'nhm', 'theme', 'templates')
 
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.IBlueprint, inherit=True)
@@ -64,6 +55,19 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IDoi, inherit=True)
     implements(IGalleryImage)
     implements(IVersionedDatastore, inherit=True)
+    implements(interfaces.IClick)
+    implements(interfaces.IConfigurable)
+
+    ## IConfigurable
+    def configure(self, config):
+        options = {}
+        for key, value in config.items():
+            if key.startswith('ckanext.nhm.cache.'):
+                options[key[18:]] = value
+
+        cache_regions.update({
+            'collection_stats': options
+        })
 
     ## IActions
     def get_actions(self):
@@ -71,11 +75,15 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IActions.get_actions
         '''
         return {
-            u'record_show': nhm_action.record_show,
-            u'object_rdf': nhm_action.object_rdf,
-            u'download_image': nhm_action.download_original_image,
-            u'get_permanent_url': nhm_action.get_permanent_url,
-            }
+            'record_show': nhm_action.record_show,
+            'object_rdf': nhm_action.object_rdf,
+            'download_image': nhm_action.download_original_image,
+            'get_permanent_url': nhm_action.get_permanent_url,
+        }
+
+    ## IClick
+    def get_commands(self):
+        return cli.get_commands()
 
     ## IBlueprint
     def get_blueprint(self):
@@ -87,18 +95,15 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IConfigurer.update_config
         :param config:
         '''
-        # Add template directory - we manually add to extra_template_paths
-        # rather than using add_template_directory to ensure it is always used
-        # to override templates
-        config[u'extra_template_paths'] = u','.join(
-            [self.template_dir, config.get(u'extra_template_paths', u'')])
+        toolkit.add_template_directory(config, 'theme/templates')
+        toolkit.add_public_directory(config, 'theme/public')
+        toolkit.add_public_directory(config, 'theme/assets/vendor/fontawesome-free-5.14.0-web')
+        toolkit.add_resource('theme/assets', 'ckanext-nhm')
 
-        toolkit.add_public_directory(config, u'theme/public')
-        toolkit.add_resource(u'theme/fanstatic', u'ckanext-nhm')
-
+        # TODO: 2.9 - double check and then remove this
         # Add another public directory for dataset files - this will hopefully
         # be temporary, until DAMS
-        toolkit.add_public_directory(config, u'files')
+        toolkit.add_public_directory(config, 'files')
 
     ## IDatasetForm
     def package_types(self):
@@ -138,12 +143,12 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         '''
 
         # Remove organisations and groups
-        del facets_dict[u'organization']
-        del facets_dict[u'groups']
+        del facets_dict['organization']
+        del facets_dict['groups']
 
         # Add author facet as the first item
-        facets_dict = OrderedDict([(u'author', u'Authors')] + facets_dict.items())
-        facets_dict[u'creator_user_id'] = u'Users'
+        facets_dict = OrderedDict(itertools.chain([('author', 'Authors')], facets_dict.items()))
+        facets_dict['creator_user_id'] = 'Users'
 
         return facets_dict
 
@@ -153,8 +158,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IPackageController.before_search
         '''
         # If there's no sort criteria specified, default to promoted and last modified
-        if not data_dict.get(u'sort', None):
-            data_dict[u'sort'] = u'promoted asc, metadata_modified desc'
+        if not data_dict.get('sort', None):
+            data_dict['sort'] = 'promoted asc, metadata_modified desc'
 
         return data_dict
 
@@ -166,8 +171,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                   field truncated (with HTML!) if necessary
 
         '''
-        pkg_dict[u'all_authors'] = pkg_dict[u'author']
-        pkg_dict[u'author'] = helpers.dataset_author_truncate(pkg_dict[u'author'])
+        pkg_dict['all_authors'] = pkg_dict['author']
+        pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
         return pkg_dict
 
     def after_update(self, context, pkg_dict):
@@ -180,12 +185,12 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         :param pkg_dict:
 
         '''
-        for resource in pkg_dict.get(u'resources', []):
+        for resource in pkg_dict.get('resources', []):
             # If this is the specimen resource ID, clear the collection stats
-            if u'id' in resource:
-                if resource[u'id'] in [helpers.get_specimen_resource_id(),
-                                       helpers.get_indexlot_resource_id()]:
-                    log.info(u'Clearing caches')
+            if 'id' in resource:
+                if resource['id'] in [helpers.get_specimen_resource_id(),
+                                      helpers.get_indexlot_resource_id()]:
+                    log.info('Clearing caches')
                     # Quick and dirty, delete all caches when indexlot or specimens
                     # are updated
                     for _cache in cache_managers.values():
@@ -202,23 +207,23 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         '''
 
         # Dataset metrics
-        _map.connect(u'dataset_metrics', '/dataset/metrics/{id}',
-                     controller=u'ckanext.nhm.controllers.stats:StatsController',
-                     action=u'dataset_metrics', ckan_icon=u'bar-chart')
+        _map.connect('dataset_metrics', '/dataset/metrics/{id}',
+                     controller='ckanext.nhm.controllers.stats:StatsController',
+                     action='dataset_metrics', ckan_icon='bar-chart')
         # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
 
         # The DCAT plugin breaks these links if enable content negotiation is enabled
         # because it maps to /dataset/{_id} without excluding these actions
         # So we re=add them here to make sure it's working
         # TODO: are these still broken?
-        # _map.connect(u'add dataset', u'/dataset/new', controller=u'dataset',
-        #              action=u'new')
-        _map.connect(u'/dataset/{action}',
-                     controller=u'dataset',
-                     requirements=dict(action=u'|'.join([
-                         u'list',
-                         u'autocomplete'
-                         ])))
+        # _map.connect('add dataset', '/dataset/new', controller='dataset',
+        #              action='new')
+        _map.connect('/dataset/{action}',
+                     controller='dataset',
+                     requirements=dict(action='|'.join([
+                         'list',
+                         'autocomplete'
+                     ])))
 
         return _map
 
@@ -233,11 +238,11 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
         for helper in dir(helpers):
             #  Exclude private
-            if not helper.startswith(u'_'):
+            if not helper.startswith('_'):
                 func = getattr(helpers, helper)
 
                 #  Ensure it's a function
-                if hasattr(func, u'__call__'):
+                if hasattr(func, '__call__'):
                     h[helper] = func
         return h
 
@@ -254,17 +259,15 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         :param request_params: a dict of parameters that will be sent with the request
         :return: the url and the params as a tuple
         '''
-        resource = toolkit.get_action(u'resource_show')(None, {
-            u'id': resource_id
-            })
-        package = toolkit.get_action(u'package_show')(None, {
-            u'id': package_id
-            })
-        if resource.get(u'datastore_active', False) and resource.get(u'format',
-                                                                     u'').lower() == \
-            u'dwc':
+        resource = toolkit.get_action('resource_show')(None, {
+            'id': resource_id
+        })
+        package = toolkit.get_action('package_show')(None, {
+            'id': package_id
+        })
+        if resource.get('datastore_active', False) and resource.get('format', '').lower() == 'dwc':
             # if it's a datastore resource and it's in the DwC format, add EML
-            request_params[u'eml'] = generate_eml(package, resource)
+            request_params['eml'] = generate_eml(package, resource)
         return packager_url, request_params
 
     ## IContact
@@ -274,87 +277,87 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         '''
 
         # Get the submitted data values
-        package_id = data_dict.get(u'package_id', None)
-        package_name = data_dict.get(u'package_name', None)
-        resource_id = data_dict.get(u'resource_id', None)
-        record_id = data_dict.get(u'record_id', None)
+        package_id = data_dict.get('package_id', None)
+        package_name = data_dict.get('package_name', None)
+        resource_id = data_dict.get('resource_id', None)
+        record_id = data_dict.get('record_id', None)
 
         context = {
-            u'user': toolkit.c.user or toolkit.c.author
-            }
+            'user': toolkit.c.user or toolkit.c.author
+        }
 
         # URL to provide as link to contact email body
         # Over written by linking to record / resource etc., - see below
         url = None
 
         # Has the user selected a department
-        department = data_dict.get(u'department', None)
+        department = data_dict.get('department', None)
 
         # Build dictionary of URLs
         urls = {}
         if package_id:
-            urls[u'dataset'] = toolkit.url_for(u'dataset.read',
-                                               id=package_id, qualified=True)
+            urls['dataset'] = toolkit.url_for('dataset.read',
+                                              id=package_id, qualified=True)
             if resource_id:
-                urls[u'resource'] = toolkit.url_for(u'resource.read',
-                                                    id=package_id,
-                                                    resource_id=resource_id,
-                                                    qualified=True)
+                urls['resource'] = toolkit.url_for('resource.read',
+                                                   id=package_id,
+                                                   resource_id=resource_id,
+                                                   qualified=True)
                 if record_id:
-                    urls[u'record'] = toolkit.url_for(u'record.view',
-                                                      package_name=package_id,
-                                                      resource_id=resource_id,
-                                                      record_id=record_id,
-                                                      qualified=True)
+                    urls['record'] = toolkit.url_for('record.view',
+                                                     package_name=package_id,
+                                                     resource_id=resource_id,
+                                                     record_id=record_id,
+                                                     qualified=True)
 
         # If this is an index lot enquiry, send to entom
-        if package_name == u'collection-indexlots':
-            mail_dict[u'subject'] = u'Collection Index lot enquiry'
-            mail_dict[u'recipient_email'] = COLLECTION_CONTACTS[u'Insects']
-            mail_dict[u'recipient_name'] = u'Insects'
+        if package_name == 'collection-indexlots':
+            mail_dict['subject'] = 'Collection Index lot enquiry'
+            mail_dict['recipient_email'] = COLLECTION_CONTACTS['Insects']
+            mail_dict['recipient_name'] = 'Insects'
         elif department:
             # User has selected the department
             try:
-                mail_dict[u'recipient_email'] = COLLECTION_CONTACTS[department]
+                mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
             except KeyError:
                 # Other/unknown etc., - so don't set recipient email
-                mail_dict[u'body'] += u'\nDepartment: %s\n' % department
+                mail_dict['body'] += '\nDepartment: %s\n' % department
             else:
-                mail_dict[u'recipient_name'] = department
+                mail_dict['recipient_name'] = department
                 mail_dict[
-                    u'body'] += u'\nThe contactee has chosen to send this to the {0} ' \
-                                u'department. Our apologies if this enquiry isn\'t ' \
-                                u'relevant - please forward this onto data@nhm.ac.uk ' \
-                                u'and we will respond.\nMany thanks, Data Portal ' \
-                                u'team\n\n'.format(department)
+                    'body'] += f'\nThe contactee has chosen to send this to the {department} ' \
+                               f'department. Our apologies if this enquiry isn\'t ' \
+                               f'relevant - please forward this onto data@nhm.ac.uk ' \
+                               f'and we will respond.\nMany thanks, Data Portal ' \
+                               f'team\n\n'
                 # If we have a package ID, load the package
         elif package_id:
-            package_dict = toolkit.get_action(u'package_show')(context, {
-                u'id': package_id
-                })
+            package_dict = toolkit.get_action('package_show')(context, {
+                'id': package_id
+            })
             # Load the user - using model rather user_show API which loads all the
             # users packages etc.,
-            user_obj = model.User.get(package_dict[u'creator_user_id'])
-            mail_dict[u'recipient_name'] = user_obj.fullname or user_obj.name
+            user_obj = model.User.get(package_dict['creator_user_id'])
+            mail_dict['recipient_name'] = user_obj.fullname or user_obj.name
             # Update send to with creator username
-            mail_dict[u'recipient_email'] = user_obj.email
-            mail_dict[u'subject'] = u'Message regarding dataset: %s' % package_dict[
-                u'title']
+            mail_dict['recipient_email'] = user_obj.email
+            mail_dict['subject'] = 'Message regarding dataset: %s' % package_dict[
+                'title']
             mail_dict[
-                u'body'] += u'\n\nYou have been sent this enquiry via the data portal ' \
-                            u'as you are the author of dataset %s.  Our apologies if ' \
-                            u'this isn\'t relevant - please forward this onto ' \
-                            u'data@nhm.ac.uk and we will respond.\nMany thanks, ' \
-                            u'Data Portal team\n\n' % \
-                            package_dict[u'title'] or package_dict[u'name']
+                'body'] += '\n\nYou have been sent this enquiry via the data portal ' \
+                           'as you are the author of dataset %s.  Our apologies if ' \
+                           'this isn\'t relevant - please forward this onto ' \
+                           'data@nhm.ac.uk and we will respond.\nMany thanks, ' \
+                           'Data Portal team\n\n' % \
+                           package_dict["title"] or package_dict["name"]
 
         for i, url in urls.items():
-            mail_dict[u'body'] += u'\n%s: %s' % (i.title(), url)
+            mail_dict['body'] += f'\n{i.title()}: {url}'
 
         # If this is being directed to someone other than @daat@nhm.ac.uk
         # Ensure data@nhm.ac.uk is copied in
-        if mail_dict[u'recipient_email'] != u'data@nhm.ac.uk':
-            mail_dict[u'headers'][u'cc'] = u'data@nhm.ac.uk'
+        if mail_dict['recipient_email'] != 'data@nhm.ac.uk':
+            mail_dict['headers']['cc'] = 'data@nhm.ac.uk'
         return mail_dict
 
     ## IDoi
@@ -363,38 +366,38 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata_dict
         '''
         try:
-            category = pkg_dict.get(u'dataset_category', pkg_dict.get(u'type', u'Dataset'))
+            category = pkg_dict.get('dataset_category', pkg_dict.get('type', 'Dataset'))
             if isinstance(category, list) and len(category) > 0:
                 category = category[0]
             elif isinstance(category, list):
-                category = u'Dataset'
-            metadata_dict[u'resourceType'] = category
-            if u'resourceType' in errors:
-                del errors[u'resourceType']
+                category = 'Dataset'
+            metadata_dict['resourceType'] = category
+            if 'resourceType' in errors:
+                del errors['resourceType']
         except Exception as e:
-            errors[u'resourceType'] = e
+            errors['resourceType'] = e
 
         try:
-            affiliation = pkg_dict.get(u'affiliation', None)
+            affiliation = pkg_dict.get('affiliation', None)
             if affiliation:
-                authors = metadata_dict.get(u'creators', [])
+                authors = metadata_dict.get('creators', [])
                 affiliated_authors = []
                 for a in authors:
-                    a[u'affiliations'] = affiliation.encode(u'unicode-escape')
+                    a['affiliations'] = affiliation.encode('unicode-escape')
                     affiliated_authors.append(a)
-                metadata_dict[u'creators'] = affiliated_authors
+                metadata_dict['creators'] = affiliated_authors
         except Exception:
             pass  # just ignore this one
 
         try:
-            descriptions = metadata_dict.get(u'descriptions', [])
-            abstract = pkg_dict.get(u'notes', None)
+            descriptions = metadata_dict.get('descriptions', [])
+            abstract = pkg_dict.get('notes', None)
             for d in descriptions:
-                if d[u'description'] == abstract:
-                    d[u'descriptionType'] = u'Abstract'
-            metadata_dict[u'descriptions'] = descriptions
-            if u'descriptions' in errors:
-                del errors[u'descriptions']
+                if d['description'] == abstract:
+                    d['descriptionType'] = 'Abstract'
+            metadata_dict['descriptions'] = descriptions
+            if 'descriptions' in errors:
+                del errors['descriptions']
         except Exception as e:
             pass
 
@@ -409,44 +412,44 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         '''
         return {
-            u'title': u'DwC associated media',
-            u'resource_type': [u'dwc', u'csv', u'tsv'],
-            u'field_type': [u'json']
-            }
+            'title': 'DwC associated media',
+            'resource_type': ['dwc', 'csv', 'tsv'],
+            'field_type': ['json']
+        }
 
     def get_images(self, raw_images, record, data_dict):
         '''
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
         '''
         images = []
-        title_field = data_dict[u'resource_view'].get(u'image_title', None)
+        title_field = data_dict['resource_view'].get('image_title', None)
         for image in raw_images:
             title = []
             if title_field and title_field in record:
                 title.append(record[title_field])
-            title.append(image.get(u'title', str(image[u'_id'])))
+            title.append(image.get('title', str(image['_id'])))
 
-            copyright = u'%s<br />&copy; %s' % (
-                toolkit.h.link_to(image[u'license'], image[u'license'],
-                                  target=u'_blank'),
-                image[u'rightsHolder']
-                )
+            copyright = '%s<br />&copy; %s' % (
+                toolkit.h.link_to(image['license'], image['license'],
+                                  target='_blank'),
+                image['rightsHolder']
+            )
             images.append({
-                u'href': image[u'identifier'],
-                u'thumbnail': image[u'identifier'].replace(u'preview', u'thumbnail'),
-                u'link': toolkit.url_for(
-                    u'record.view',
-                    package_name=data_dict[u'package'][u'name'],
-                    resource_id=data_dict[u'resource'][u'id'],
-                    record_id=record[u'_id']
+                'href': image['identifier'],
+                'thumbnail': image['identifier'].replace('preview', 'thumbnail'),
+                'link': toolkit.url_for(
+                    'record.view',
+                    package_name=data_dict['package']['name'],
+                    resource_id=data_dict['resource']['id'],
+                    record_id=record['_id']
                 ),
-                u'copyright': copyright,
+                'copyright': copyright,
                 # Description of image in gallery view
-                u'description': literal(
-                    u''.join([u'<span>%s</span>' % t for t in title])),
-                u'title': u' - '.join(map(unicode, title)),
-                u'record_id': record[u'_id']
-                })
+                'description': literal(
+                    ''.join(['<span>%s</span>' % t for t in title])),
+                'title': ' - '.join(map(str, title)),
+                'record_id': record['_id']
+            })
         return images
 
     ## IVersionedDatastore
@@ -479,31 +482,31 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # remove our custom filters from the filters dict, we'll add them ourselves in
         # the modify
         # search function below
-        if u'filters' in data_dict:
+        if 'filters' in data_dict:
             # figure out which options are available for this resource
-            resource_show = toolkit.get_action(u'resource_show')
+            resource_show = toolkit.get_action('resource_show')
             resource = resource_show(context, {
-                u'id': data_dict[u'resource_id']
-                })
+                'id': data_dict['resource_id']
+            })
             options = resource_view_get_filter_options(resource)
             # we'll store the filters that need applying on the context to avoid
             # repeating our work
             # in the modify search function below
-            context[u'option_filters'] = []
+            context['option_filters'] = []
             for option in options:
-                if option.name in data_dict[u'filters']:
+                if option.name in data_dict['filters']:
                     # if the option is in the filters, delete it and add it's filter
                     # to the context
-                    del data_dict[u'filters'][option.name]
-                    context[u'option_filters'].append(option.filter_dsl)
+                    del data_dict['filters'][option.name]
+                    context['option_filters'].append(option.filter_dsl)
 
-        if u'sort' not in data_dict:
+        if 'sort' not in data_dict:
             # by default sort the EMu resources by modified so that the latest records
             # are first
-            if data_dict[u'resource_id'] in {helpers.get_specimen_resource_id(),
-                                             helpers.get_artefact_resource_id(),
-                                             helpers.get_indexlot_resource_id()}:
-                data_dict[u'sort'] = [u'modified desc']
+            if data_dict['resource_id'] in {helpers.get_specimen_resource_id(),
+                                            helpers.get_artefact_resource_id(),
+                                            helpers.get_indexlot_resource_id()}:
+                data_dict['sort'] = ['modified desc']
 
         return data_dict
 
@@ -527,18 +530,18 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # context. These are
         # added by the datastore_modify_data_dict function above if any of our custom
         # filters exist
-        for filter_dsl in context.pop(u'option_filters', []):
+        for filter_dsl in context.pop('option_filters', []):
             # add the filter to the search
             search = search.filter(filter_dsl)
         return search
 
     def datastore_modify_result(self, context, original_data_dict, data_dict, result):
         # if there's the include_urls parameter then include the permanent url of each specimen
-        if helpers.get_specimen_resource_id() == data_dict[u'resource_id'] and \
-                u'include_urls' in original_data_dict:
+        if helpers.get_specimen_resource_id() == data_dict['resource_id'] and \
+            'include_urls' in original_data_dict:
             for hit in result.hits:
-                if u'occurrenceID' in hit.data:
-                    hit.data.permanentUrl = toolkit.url_for(u'object_view',
+                if 'occurrenceID' in hit.data:
+                    hit.data.permanentUrl = toolkit.url_for('object_view',
                                                             uuid=hit.data.occurrenceID)
 
         return result
@@ -569,9 +572,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                            helpers.get_artefact_resource_id(),
                            helpers.get_indexlot_resource_id()}:
             for field_def in fields:
-                if field_def[u'id'] == u'associatedMedia':
-                    field_def[u'type'] = u'array'
-                    field_def[u'sortable'] = False
+                if field_def['id'] == 'associatedMedia':
+                    field_def['type'] = 'array'
+                    field_def['sortable'] = False
         return fields
 
     def datastore_is_read_only_resource(self, resource_id):
@@ -587,7 +590,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             # whenever anything is indexed, we should clear the cache,
             # catch exceptions on failures
             # and only wait a couple of seconds for the request to complete
-            requests.request(u'purge', toolkit.config.get(u'ckan.site_url'), timeout=2)
+            requests.request('purge', toolkit.config.get('ckan.site_url'), timeout=2)
         except:
             pass
 
@@ -598,22 +601,22 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             helpers.get_indexlot_resource_id(),
         ]
         slugs = {
-            u'collections': dict(resource_ids=collection_resource_ids),
-            u'everything': dict(resource_ids=[]),
-            u'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
-            u'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
-            u'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
+            'collections': dict(resource_ids=collection_resource_ids),
+            'everything': dict(resource_ids=[]),
+            'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
+            'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
+            'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
         }
-        for collection_code in (u'PAL', u'MIN', u'BMNH(E)', u'ZOO', u'BOT'):
+        for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
             slugs[helpers.get_department(collection_code).lower()] = {
-                u'resource_ids': collection_resource_ids,
-                u'query': {
-                    u'filters': {
-                        u'and': [
+                'resource_ids': collection_resource_ids,
+                'query': {
+                    'filters': {
+                        'and': [
                             {
-                                u'string_equals': {
-                                    u'fields': [u'collectionCode'],
-                                    u'value': collection_code
+                                'string_equals': {
+                                    'fields': ['collectionCode'],
+                                    'value': collection_code
                                 }
                             }
                         ]
@@ -626,13 +629,13 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         # if the index lots or specimens collections are in the resource ids list, remove a bunch
         # of groups that we don't care about
         if (helpers.get_specimen_resource_id() in resource_ids or
-                helpers.get_indexlot_resource_id() in resource_ids):
-            fields.force(u'collectionCode')
-            fields.force(u'typeStatus')
-            fields.force(u'family')
-            fields.force(u'genus')
-            for group in (u'created', u'modified', u'basisOfRecord', u'institutionCode',
-                          u'associatedMedia.*'):
+            helpers.get_indexlot_resource_id() in resource_ids):
+            fields.force('collectionCode')
+            fields.force('typeStatus')
+            fields.force('family')
+            fields.force('genus')
+            for group in ('created', 'modified', 'basisOfRecord', 'institutionCode',
+                          'associatedMedia.*'):
                 fields.ignore(group)
 
         return fields

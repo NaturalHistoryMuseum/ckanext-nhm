@@ -7,7 +7,7 @@
 from elasticsearch_dsl import Q
 
 
-class FilterOption(object):
+class FilterOption:
     '''
     Class representing a filter option. These are more prescribed options available on certain
     resources, such as the specimens and index lot resources, and typically are shown as tick boxes.
@@ -35,17 +35,17 @@ class FilterOption(object):
         :return: a dict with the name and the label for the filter
         '''
         return {
-            u'name': self.name,
-            u'label': self.label,
+            'name': self.name,
+            'label': self.label,
         }
 
 
 # define some simple, common filters
-has_image = FilterOption(u'_has_image', u'Has image', Q(u'exists', field=u'data.associatedMedia'))
+has_image = FilterOption('_has_image', 'Has image', Q('exists', field='data.associatedMedia'))
 
-has_lat_long = FilterOption(u'_has_lat_long', u'Has lat/long', Q(u'exists', field=u'meta.geo'))
+has_lat_long = FilterOption('_has_lat_long', 'Has lat/long', Q('exists', field='meta.geo'))
 
-exclude_mineralogy = FilterOption(u'_exclude_mineralogy', u'Exclude Mineralogy',
+exclude_mineralogy = FilterOption('_exclude_mineralogy', 'Exclude Mineralogy',
                                   # note the ~ which inverts the query
-                                  ~Q(u'term', **{u'data.collectionCode': u'min'}),
+                                  ~Q('term', **{'data.collectionCode': 'min'}),
                                   hide=True)

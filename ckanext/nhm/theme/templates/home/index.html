@@ -5,15 +5,17 @@
 {% block maintag %}
     <div role="main" class="homepage">{% endblock %}{% block toolbar %}{% endblock %}
 
-{% block styles %}{{ super() }}
+{% block styles %}
+{{ super() }}
     <link rel="alternate" type="text/n3"
-            href="{{ h.url_for('dcat_catalog', _format='n3', qualified=True) }}"/>
+          href="{{ h.url_for('dcat.read_catalog', _format='n3', qualified=True) }}"/>
     <link rel="alternate" type="text/ttl"
-            href="{{ h.url_for('dcat_catalog', _format='ttl', qualified=True) }}"/>
+          href="{{ h.url_for('dcat.read_catalog', _format='ttl', qualified=True) }}"/>
     <link rel="alternate" type="application/rdf+xml"
-            href="{{ h.url_for('dcat_catalog', _format='xml', qualified=True) }}"/>
+          href="{{ h.url_for('dcat.read_catalog', _format='xml', qualified=True) }}"/>
     <link rel="alternate" type="application/rdf+xml"
-            href="{{ h.url_for('dcat_catalog', _format='rdf', qualified=True) }}"/>{% endblock -%}
+          href="{{ h.url_for('dcat.read_catalog', _format='rdf', qualified=True) }}"/>
+{% endblock -%}
 
 {% set collection_stats = h.collection_stats() %}
 {% set stats = h.get_site_statistics() %}
@@ -67,7 +69,7 @@
 
 {% block main_content %}
     {% block primary_content %}
-        {% resource 'ckanext-nhm/home-search' %}
+        {% asset 'ckanext-nhm/home-search' %}
         <div class="container collection-stats full-width">
             <div class="row">
                 <div class="col-md-12">

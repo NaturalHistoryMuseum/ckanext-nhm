@@ -4,7 +4,8 @@
 
 [![Travis](https://img.shields.io/travis/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://travis-ci.org/NaturalHistoryMuseum/ckanext-nhm)
 [![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
-[![CKAN](https://img.shields.io/badge/ckan-2.9.0a-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
+[![CKAN](https://img.shields.io/badge/ckan-2.9.1-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
+[![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg?style=flat-square)](https://www.python.org/)
 [![Specimen records](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=specimens&query=%24.result.total&suffix=%20records&url=https%3A%2F%2Fdata.nhm.ac.uk%2Fapi%2F3%2Faction%2Fdatastore_search%3Fresource_id%3D05ff2255-c38a-40c9-b657-4ccb55ab2feb&style=flat-square)](https://data.nhm.ac.uk/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb)
 
 _A CKAN extension for the Natural History Museum's Data Portal._
@@ -67,9 +68,9 @@ These are the options that can be specified in to configure this extension.
 Name|Description|Options
 --|--|--
 `ckanext.nhm.specimen_resource_id`|ID for the specimens dataset|
-`ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|  
-`ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|  
-`ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|  
+`ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|
+`ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|
+`ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|
 `ckanext.nhm.mam.username`|Username for the Museum's image server|
 `ckanext.nhm.mam.password`|Password for the Museum's image server|
 
@@ -134,51 +135,55 @@ toolkit.get_action('object_rdf')(
 
 ## Commands
 
-### `dataset-category`
-For managing dataset categories.
+### `create-dataset-vocabulary`
+Ensures the default dataset vocabulary and categories exists.
 
-1. `create-vocabulary`: create vocabulary for dataset categories
-    ```bash
-    paster --plugin=ckanext-nhm dataset-category create-vocabulary -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm create-dataset-vocabulary
+```
 
-2. `add-category`: add `$CATEGORY_NAME` to the vocabulary
-    ```bash
-    paster --plugin=ckanext-nhm dataset-category add-category $CATEGORY_NAME -c $CONFIG_FILE
-    ```
+### `add-dataset-category`
+Adds the given category to the dataset category vocabulary.
 
-3. `delete-category`: remove `$CATEGORY_NAME` from the vocabulary
-    ```bash
-    paster --plugin=ckanext-nhm dataset-category delete-category $CATEGORY_NAME -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm delete-dataset-category $NAME
+```
 
-### `datastore`
-For modifying CKAN datastore resources.
+### `delete-dataset-category`
+Deletes the given dataset category from the vocabulary.
 
-1. `purge-all`: delete all datasets and datastore tables
-    ```bash
-    paster --plugin=ckanext-nhm datastore purge-all -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm create-dataset-vocabulary $NAME
+```
 
-2. `replace`: replace a datastore table with another table by changing the name of `$RESOURCE_ID` to `$TABLE_NAME`
-    ```bash
-    paster --plugin=ckanext-nhm datastore replace -i $RESOURCE_ID -t $TABLE_NAME -c $CONFIG_FILE
-    ```
+### `replace-resource-file`
+Replaces the file associated with `$RESOURCE_ID` with `$PATH`, e.g. to replace a small dummy file
+with a large one that was too big to upload initially.
 
-### `file`
-For modifying files in the datastore.
-
-1. `replace`: replace the file `$RESOURCE_ID` with `$FILE_PATH`, e.g. to replace a small dummy file with a large one that was too big to upload initially.
-    ```bash
-    paster --plugin=ckanext-nhm file replace -r $RESOURCE_ID -p $FILE_PATH -c $CONFIG_FILE
-    ```
+```bash
+ckan -c $CONFIG_FILE nhm replace-resource-file $RESOURCE_ID $PATH
+```
 
 
 # Testing
+_Test coverage is currently super duper extremely limited._
 
-_Test coverage is currently extremely limited._
+To run the tests in this extension, there is a Docker compose configuration available in this
+repository to make it easy.
 
-To run the tests, use nosetests inside your virtualenv. The `--nocapture` flag will allow you to see the debug statements.
+To run the tests against ckan 2.9.x on Python3:
+
+1. Build the required images
 ```bash
-nosetests --ckan --with-pylons=$TEST_CONFIG_FILE --where=$INSTALL_FOLDER/src/ckanext-nhm --nologcapture --nocapture
+docker-compose build
 ```
+
+2. Then run the tests.
+   The root of the repository is mounted into the ckan container as a volume by the Docker compose
+   configuration, so you should only need to rebuild the ckan image if you change the extension's
+   dependencies.
+```bash
+docker-compose run ckan
+```
+
+The ckan image uses the Dockerfile in the `docker/` folder which is based on `openknowledge/ckan-dev:2.9`.

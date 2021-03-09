@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  ckan:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+    depends_on:
+      - db
+      - solr
+      - redis
+      - elasticsearch
+      - mongodb
+    volumes:
+      - .:/srv/app/src/ckanext-nhm
+
+  solr:
+    build:
+      context: https://github.com/okfn/docker-ckan.git#:solr
+
+  db:
+    build:
+      context: https://github.com/okfn/docker-ckan.git#:postgresql
+      args:
+        - DATASTORE_READONLY_PASSWORD=password
+        - POSTGRES_PASSWORD=password
+    environment:
+      - DATASTORE_READONLY_PASSWORD=password
+      - POSTGRES_PASSWORD=password
+
+  redis:
+    image: redis:latest
+
+  elasticsearch:
+    image: elasticsearch:6.8.13
+    environment:
+      discovery.type: single-node
+
+  mongodb:
+    image: mongo:4.2

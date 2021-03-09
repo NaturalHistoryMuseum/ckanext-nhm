@@ -13,7 +13,7 @@
 
 {% block user_image %}
   {% set gravatar_size = 190 %}
-    <div class="image" style="max-width: {{ gravatar_size }}px">{{ h.linked_gravatar(user.email_hash, gravatar_size) }}</div>
+    <div class="image" style="max-width: {{ gravatar_size }}px">{{ h.user_image(user.id, gravatar_size) }}</div>
 {% endblock %}
 
 {% block user_info %}

@@ -36,11 +36,12 @@
 {% snippet 'package/snippets/info.html', pkg=g.pkg %}
 {% endblock %}
 
-{% block package_extent_info %}
-{% set dataset_extent = g.pkg_dict.get('spatial', '') %}
-{% if dataset_extent %}
-    {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=dataset_extent %}
-{% endif %}
-{% endblock %}
+{# TODO: add this back in when ckanext-spatial is python3 compatible, or rewrite into ckanext-nhm #}
+{#{% block package_extent_info %}#}
+{#{% set dataset_extent = g.pkg_dict.get('spatial', '') %}#}
+{#{% if dataset_extent %}#}
+{#    {% snippet "spatial/snippets/dataset_map_sidebar.html", extent=dataset_extent %}#}
+{#{% endif %}#}
+{#{% endblock %}#}
 
 {% endblock %}

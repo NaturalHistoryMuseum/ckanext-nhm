@@ -5,14 +5,16 @@
 # Created by the Natural History Museum in London, UK
 
 import re
-from ckanext.nhm.lib.taxonomy import find_author_split
+
 from jinja2 import nodes
 from jinja2.ext import Extension
+
+from ckanext.nhm.lib.taxonomy import find_author_split
 
 
 class TaxonomyFormatExtension(Extension):
     '''A custom Jinja2 tag for formatting scientific names in HTML.'''
-    tags = {u'taxonomy'}
+    tags = {'taxonomy'}
     # keyed on the format
     format_to_fields = {}
     # keyed on the field name
@@ -21,10 +23,10 @@ class TaxonomyFormatExtension(Extension):
     parsed_fields = []
     # common string formats
     common_strings = {
-        u'italics': u'<em>{0}</em>',
-        u'bold': u'<b>{0}</b>',
-        u'deitalicise': u'<span style="font-style: normal;">{0}</span>'
-        }
+        'italics': '<em>{0}</em>',
+        'bold': '<b>{0}</b>',
+        'deitalicise': '<span style="font-style: normal;">{0}</span>'
+    }
 
     def parse(self, parser):
         '''The main function of the tag - mostly Jinja2 logic.
@@ -37,13 +39,13 @@ class TaxonomyFormatExtension(Extension):
         lineno = next(parser.stream).lineno
 
         args = [parser.parse_expression()]
-        parser.stream.skip_if(u'comma')
+        parser.stream.skip_if('comma')
         args.append(parser.parse_expression())
-        parser.stream.skip_if(u'comma')
+        parser.stream.skip_if('comma')
         args.append(parser.parse_expression())
 
-        body = parser.parse_statements([u'name:endtaxonomy'], drop_needle=True)
-        return nodes.CallBlock(self.call_method(u'_reformat', args), [], [],
+        body = parser.parse_statements(['name:endtaxonomy'], drop_needle=True)
+        return nodes.CallBlock(self.call_method('_reformat', args), [], [],
                                body).set_lineno(lineno)
 
     def _reformat(self, field_name, collection_code, record_dict, caller):
@@ -59,7 +61,7 @@ class TaxonomyFormatExtension(Extension):
         :returns: HTML-formatted tag body
 
         '''
-        body = unicode(caller())
+        body = str(caller())
 
         # add any globals here, e.g. if every collection should have the
         # species italicised
@@ -67,12 +69,12 @@ class TaxonomyFormatExtension(Extension):
         global_parsed_fields = []
 
         collections = {
-            u'(?i)zoo': self._zoo,
-            u'(?i)bmnh\(e\)': self._ent,
-            u'(?i)pal': self._pal,
-            u'(?i)bot': self._bot,
-            u'(?i)min': self._min,
-            }
+            '(?i)zoo': self._zoo,
+            '(?i)bmnh\(e\)': self._ent,
+            '(?i)pal': self._pal,
+            '(?i)bot': self._bot,
+            '(?i)min': self._min,
+        }
 
         # get collection-specific rules
         if collection_code:
@@ -113,8 +115,7 @@ class TaxonomyFormatExtension(Extension):
         :returns: a combined dict
 
         '''
-        return {k: list(set(ff1.get(k, []) + ff2.get(k, []))) for k in
-                set(ff1.keys() + ff2.keys())}
+        return {k: list(set(ff1.get(k, []) + ff2.get(k, []))) for k in set(ff1).union(ff2)}
 
     @property
     def _zoo(self):
@@ -125,12 +126,12 @@ class TaxonomyFormatExtension(Extension):
 
         '''
         formatted_fields = {
-            self.common_strings[u'italics'].format: [u'specificEpithet', u'genus',
-                                                     u'subgenus'],
-            unicode.lower: [u'specificEpithet', u'infraspecificEpithet']
-            }
-        parsed_fields = [u'scientificName', u'infraspecificEpithet',
-                         u'determinations Names']
+            self.common_strings['italics'].format: ['specificEpithet', 'genus',
+                                                    'subgenus'],
+            str.lower: ['specificEpithet', 'infraspecificEpithet']
+        }
+        parsed_fields = ['scientificName', 'infraspecificEpithet',
+                         'determinations Names']
         return formatted_fields, parsed_fields
 
     @property
@@ -164,12 +165,12 @@ class TaxonomyFormatExtension(Extension):
 
         '''
         formatted_fields = {
-            self.common_strings[u'italics'].format: [u'specificEpithet', u'genus',
-                                                     u'subgenus'],
-            unicode.lower: [u'specificEpithet', u'infraspecificEpithet']
-            }
-        parsed_fields = [u'scientificName', u'infraspecificEpithet',
-                         u'determinations Names']
+            self.common_strings['italics'].format: ['specificEpithet', 'genus',
+                                                    'subgenus'],
+            str.lower: ['specificEpithet', 'infraspecificEpithet']
+        }
+        parsed_fields = ['scientificName', 'infraspecificEpithet',
+                         'determinations Names']
         return formatted_fields, parsed_fields
 
     @property
@@ -196,15 +197,15 @@ class TaxonomyFormatExtension(Extension):
 
         '''
         # abbreviations should not be italicised
-        abbr = [u'var', u'subsp', u'subvar', u'f', u'subf', u'ssp', u'cv']
+        abbr = ['var', 'subsp', 'subvar', 'f', 'subf', 'ssp', 'cv']
         for a in abbr:
-            body = re.sub(u'(\s?{0}\.?\s)'.format(a),
-                          u'<span style="font-style: normal;">\\1</span>', body)
+            body = re.sub('(\s?{0}\.?\s)'.format(a),
+                          '<span style="font-style: normal;">\\1</span>', body)
 
         # neither should authors
         body = self._find_authors(body, record_dict)
 
-        return self.common_strings[u'italics'].format(body)
+        return self.common_strings['italics'].format(body)
 
     def _find_authors(self, body, record_dict):
         '''For finding authors in a parsed string.
@@ -218,7 +219,6 @@ class TaxonomyFormatExtension(Extension):
         ix = find_author_split(body, record_dict)
         if ix:
             authors = body[ix:]
-            return u'{0}'.format(body[:ix]) + self.common_strings[u'deitalicise'].format(
-                authors)
+            return f'{body[:ix]}' + self.common_strings["deitalicise"].format(authors)
         else:
             return body

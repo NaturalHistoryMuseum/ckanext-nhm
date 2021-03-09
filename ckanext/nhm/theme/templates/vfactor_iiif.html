@@ -6,7 +6,7 @@
 
 {% block breadcrumb_content %}
     <li class="active">
-        <a class="active" href="{{ h.url_for('vfactor_iiif') }}">V-Factor IIIF</a>
+        <a class="active" href="{{ h.url_for('vfactor-iiif.index') }}">V-Factor IIIF</a>
     </li>
 {% endblock %}
 
@@ -15,7 +15,8 @@
 {% endblock %}
 
 {% block primary %}
-    {% resource 'ckanext-nhm/vfactor-iiif' %}
+    {% asset 'ckanext-nhm/vfactor-iiif-css' %}
+    {% asset 'ckanext-nhm/vfactor-iiif-js' %}
     <div id="vfactor-iiif-app" data-resource-id="{{ h.get_vfactor_resource_id() }}">
     </div>
 {% endblock %}

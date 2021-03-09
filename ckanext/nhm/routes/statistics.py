@@ -9,29 +9,29 @@ from datetime import datetime
 import ckan.model as model
 from ckan.lib.search import make_connection
 from ckan.plugins import toolkit
-from ckanext.nhm.lib.helpers import get_record_stats
 from flask import Blueprint
 from sqlalchemy import func, false
 
+from ckanext.nhm.lib.helpers import get_record_stats
+
 # create a flask blueprint with a prefix
-blueprint = Blueprint(name=u'statistics', import_name=__name__,
-                      url_prefix=u'/about/statistics')
+blueprint = Blueprint(name='statistics', import_name=__name__, url_prefix='/about/statistics')
 
 
 def _context():
     return {
-        u'user': toolkit.c.user or toolkit.c.author,
-        u'auth_user_obj': toolkit.c.userobj
-        }
+        'user': toolkit.c.user or toolkit.c.author,
+        'auth_user_obj': toolkit.c.userobj
+    }
 
 
 @blueprint.before_request
 def before_request():
-    u'''set context and check authorization'''
+    '''set context and check authorization'''
     try:
-        toolkit.check_access(u'site_read', _context())
+        toolkit.check_access('site_read', _context())
     except toolkit.NotAuthorized:
-        toolkit.abort(401, toolkit._(u'Not authorized to see this page'))
+        toolkit.abort(401, toolkit._('Not authorized to see this page'))
 
 
 @blueprint.route('/resources')
@@ -51,36 +51,36 @@ def resources():
     # If we have data for more than 31 days, we'll show by month;
     # otherwise segment by day
     if delta.days > 10:
-        toolkit.c.date_interval = u'month'
-        label_formatter = u'%b %Y'
+        toolkit.c.date_interval = 'month'
+        label_formatter = '%b %Y'
     else:
-        toolkit.c.date_interval = u'day'
-        label_formatter = u'%d/%m/%y'
+        toolkit.c.date_interval = 'day'
+        label_formatter = '%d/%m/%y'
 
     date_func = func.date_trunc(toolkit.c.date_interval, model.Resource.created)
 
-    q = model.Session.query(date_func.label(u'date'), func.count().label(u'count'))
+    q = model.Session.query(date_func.label('date'), func.count().label('count'))
 
     q = q.order_by(date_func)
     q = q.group_by(date_func)
 
     toolkit.c.graph_options = {
-        u'series': {
-            u'lines': {
-                u'show': True
-                },
-            u'points': {
-                u'show': True
-                }
+        'series': {
+            'lines': {
+                'show': True
             },
-        u'xaxis': {
-            u'mode': u'time',
-            u'ticks': []
-            },
-        u'yaxis': {
-            u'tickDecimals': 0
+            'points': {
+                'show': True
             }
+        },
+        'xaxis': {
+            'mode': 'time',
+            'ticks': []
+        },
+        'yaxis': {
+            'tickDecimals': 0
         }
+    }
 
     toolkit.c.graph_data = []
     total = 0
@@ -90,49 +90,47 @@ def resources():
         toolkit.c.graph_data.append([i, total])
 
         formatted_date = stat.date.strftime(label_formatter)
-        toolkit.c.graph_options[u'xaxis'][u'ticks'].append([i, formatted_date])
+        toolkit.c.graph_options['xaxis']['ticks'].append([i, formatted_date])
 
-    return toolkit.render(u'stats/resources.html',
-                          {
-                              u'title': u'Resource statistics'
-                              })
+    return toolkit.render('stats/resources.html', {
+        'title': 'Resource statistics'
+    })
 
 
 @blueprint.route('/records')
 def records():
     '''Render the records stats page.'''
 
-    toolkit.c.datastore_stats = toolkit.get_action(u'dataset_statistics')(
-        _context(), {})
+    toolkit.c.datastore_stats = toolkit.get_action('dataset_statistics')(_context(), {})
 
     toolkit.c.num_records = get_record_stats()
 
-    return toolkit.render(u'stats/records.html', {
-        u'title': u'Record statistics'
-        })
+    return toolkit.render('stats/records.html', {
+        'title': 'Record statistics'
+    })
 
 
-@blueprint.route(u'/contributors')
+@blueprint.route('/contributors')
 def contributors():
     '''
     Render the contributors statistics page.
     '''
     # default the graph options
     toolkit.c.graph_options = {
-        u'series': {
-            u'lines': {
-                u'show': True
+        'series': {
+            'lines': {
+                'show': True
             },
-            u'points': {
-                u'show': True
+            'points': {
+                'show': True
             }
         },
-        u'xaxis': {
-            u'mode': u'time',
-            u'ticks': []
+        'xaxis': {
+            'mode': 'time',
+            'ticks': []
         },
-        u'yaxis': {
-            u'tickDecimals': 0
+        'yaxis': {
+            'tickDecimals': 0
         }
     }
     toolkit.c.graph_data = []
@@ -141,13 +139,13 @@ def contributors():
     # here to get a per-package authors count. We have to use solr directly to do this because the
     # package_search action doesn't allow the pivot options to be passed through
     solr = make_connection()
-    results = solr.search(u'*:*', **{
-        u'fq': u'+capacity:public +state:active',
-        u'facet': u'true',
-        u'facet.pivot': u'id,author',
-        u'facet.pivot.mincount': 1,
-        u'facet.limit': -1,
-    }).facets.get(u'facet_pivot', {}).get(u'id,author', [])
+    results = solr.search('*:*', **{
+        'fq': '+capacity:public +state:active',
+        'facet': 'true',
+        'facet.pivot': 'id,author',
+        'facet.pivot.mincount': 1,
+        'facet.limit': -1,
+    }).facets.get('facet_pivot', {}).get('id,author', [])
 
     # turn the counts into a lookup from package_id -> number of authors. Note that the number of
     # authors only includes authors we haven't seen before to avoid counting authors of multiple
@@ -155,8 +153,8 @@ def contributors():
     counts = {}
     seen_authors = set()
     for hit in results:
-        package_id = hit[u'value']
-        package_authors = set(author[u'value'] for author in hit[u'pivot'])
+        package_id = hit['value']
+        package_authors = set(author['value'] for author in hit['pivot'])
         # figure out which authors have not been counted yet
         unseen_authors = package_authors.difference(seen_authors)
         counts[package_id] = len(unseen_authors)
@@ -174,7 +172,7 @@ def contributors():
         # get the earliest package creation date
         delta = datetime.now() - order[0][1]
         # if we have data for more than 10 days, we'll show by month; otherwise segment by day
-        extraction_format = u'%b %Y' if delta.days > 10 else u'%d/%m/%y'
+        extraction_format = '%b %Y' if delta.days > 10 else '%d/%m/%y'
 
         # sum the counts by package creation time based on the extraction format we chose
         grouped_ordered_data = OrderedDict()
@@ -192,8 +190,8 @@ def contributors():
         for i, (formatted_date, count) in enumerate(grouped_ordered_data.items()):
             total += count
             toolkit.c.graph_data.append([i, total])
-            toolkit.c.graph_options[u'xaxis'][u'ticks'].append([i, formatted_date])
+            toolkit.c.graph_options['xaxis']['ticks'].append([i, formatted_date])
 
-    return toolkit.render(u'stats/contributors.html', {
-        u'title': u'Contributor statistics'
+    return toolkit.render('stats/contributors.html', {
+        'title': 'Contributor statistics'
     })
