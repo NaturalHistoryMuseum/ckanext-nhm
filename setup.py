@@ -18,19 +18,17 @@ def github(name, tag, org='NaturalHistoryMuseum'):
 
 
 ckan_extensions = OrderedDict([
-    # note that this version must be kept up to date with the version in the docker/Dockerfile
-    github('ckanext-dcat', 'v1.1.0', org='ckan'),
-    # the latest josh/ckan-upgrade-2.9 branch for each of these should be compatible with python3
-    github('ckanext-ckanpackager', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-contact', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-doi', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-gallery', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-gbif', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-graph', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-ldap', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-query-dois', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-statistics', 'josh/ckan-upgrade-2.9'),
-    github('ckanext-versioned-datastore', 'josh/ckan-upgrade-2.9'),
+    github('ckanext-dcat', '6b7ec505f303fb18e0eebcebf67130d36b3dca82', org='ckan'),
+    github('ckanext-ckanpackager', 'v2.0.0'),
+    github('ckanext-contact', 'v2.0.0'),
+    github('ckanext-doi', 'v3.0.0'),
+    github('ckanext-gallery', 'v2.0.0'),
+    github('ckanext-gbif', 'v2.0.0'),
+    github('ckanext-graph', 'v2.0.0'),
+    github('ckanext-ldap', 'v3.0.0'),
+    github('ckanext-query-dois', 'v2.0.0'),
+    github('ckanext-statistics', 'v2.0.0'),
+    github('ckanext-versioned-datastore', 'v2.0.0'),
 ])
 
 setup(
