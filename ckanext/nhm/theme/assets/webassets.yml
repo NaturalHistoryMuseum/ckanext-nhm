@@ -213,7 +213,6 @@ vfactor-iiif-js:
 
 record-map-css:
   output: ckanext-nhm/%(version)s_record_map.css
-  filters: cssrewrite
   contents:
     - vendor/leaflet/leaflet.css
 
