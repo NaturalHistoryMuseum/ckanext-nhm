@@ -24,7 +24,7 @@ RUN python3 setup.py develop && \
 # installing the extensions not in editable mode we can't get to the requirements.txt which means
 # we have this ultrahack. It works a treat but it feels real nasty. Note that the version here will
 # need to be kept up to date with the one in our setup.py.
-RUN curl -s "https://raw.githubusercontent.com/ckan/ckanext-dcat/v1.1.0/requirements.txt" | pip3 install -r /dev/stdin
+RUN curl -s "https://raw.githubusercontent.com/ckan/ckanext-dcat/6b7ec505f303fb18e0eebcebf67130d36b3dca82/requirements.txt" | pip3 install -r /dev/stdin
 
 # this entrypoint ensures our service dependencies (postgresql, solr and redis) are running before
 # running the cmd
