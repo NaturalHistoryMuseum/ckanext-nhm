@@ -3,15 +3,16 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+import itertools
+import logging
+import os
 from collections import OrderedDict
+from pathlib import Path
 
 import ckan.model as model
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-import itertools
-import logging
-import os
 import requests
 from beaker.cache import cache_managers, cache_regions
 from ckan.lib.helpers import literal
@@ -25,7 +26,7 @@ from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from ckanext.versioned_datastore.interfaces import IVersionedDatastore
+from ckanext.versioned_datastore.interfaces import IVersionedDatastore, IVersionedDatastoreDownloads
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +58,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(IVersionedDatastore, inherit=True)
     implements(interfaces.IClick)
     implements(interfaces.IConfigurable)
+    implements(IVersionedDatastoreDownloads, inherit=True)
 
     ## IConfigurable
     def configure(self, config):
@@ -639,3 +641,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 fields.ignore(group)
 
         return fields
+
+    # IVersionedDatastoreDownloads
+    def download_modify_email_templates(self, plain_template, html_template):
+        # completely override the default datastore templates with our own ones
+        base = Path(__file__).parent / 'src' / 'download_emails'
+        with (base / 'body.txt').open() as p, (base / 'body.html').open() as h:
+            return p.read().strip(), h.read().strip()
