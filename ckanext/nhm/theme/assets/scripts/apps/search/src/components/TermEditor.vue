@@ -101,7 +101,7 @@
         },
         computed:   {
             ...mapState(['schema']),
-            ...mapState('results/query', ['resourceIds']),
+            ...mapState('results/query/resources', ['resourceIds']),
             ...mapGetters('results/query/filters', ['getFilterById']),
             terms:     function () {
                 let schemaTerms = this.schema.terms[this.fieldType];
