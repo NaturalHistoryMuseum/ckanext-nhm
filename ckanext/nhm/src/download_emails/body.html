@@ -1,0 +1,24 @@
+<html lang="en">
+<body>
+<p>Hello,</p>
+
+<p>
+    The link to the resource data you requested on <a href="{{ site_url }}">{{ site_url }}</a> is
+    available at <a href="{{ download_url }}">{{ download_url }}</a>.
+</p>
+
+{# we should only not have a DOI if an error has occurred #}
+{% if doi is defined %}
+<p>
+    A DOI has been created for this data:
+    <a href="https://doi.org/{{ doi }}">https://doi.org/{{ doi }}</a> (this may take a few hours to
+    become active). Please ensure you reference this DOI when citing this data.
+    <br/>
+    For more information, follow the DOI link.
+</p>
+{% endif %}
+
+<p>Best Wishes,</p>
+<p>The NHM Data Portal Bot</p>
+</body>
+</html>
