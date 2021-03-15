@@ -23,4 +23,4 @@ def cache_clear_nginx_proxy():
         r = s.send(req.prepare(), timeout=0.5)
         r.raise_for_status()
     except:
-        log.critical('Error clearing NGINX Cache')
+        log.warning('Error clearing NGINX cache')
