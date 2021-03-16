@@ -8,13 +8,13 @@
           </tr>
         {% endif %}
 
-        {% if g.pkg_dict.author %}
-          {% asset 'ckanext-nhm/expand-authors' %}
-          <tr>
-            <th scope="row" class="dataset-label">{{ _("Author(s)") }}</th>
-            <td class="dataset-details" property="dc:creator" data-module="expand-authors">{{ g.pkg_dict.author }}</td>
-          </tr>
-        {% endif %}
+<!--        {% if g.pkg_dict.author %}-->
+<!--          {% asset 'ckanext-nhm/expand-authors' %}-->
+<!--          <tr>-->
+<!--            <th scope="row" class="dataset-label">{{ _("Author(s)") }}</th>-->
+<!--            <td class="dataset-details" property="dc:creator" data-module="expand-authors">{{ g.pkg_dict.author }}</td>-->
+<!--          </tr>-->
+<!--        {% endif %}-->
 
         {% if g.pkg_dict.maintainer_email %}
           <tr>
@@ -47,7 +47,6 @@
             {% set temporal_extent = g.pkg_dict.get('temporal_extent', None) %}
             {% set update_frequency = g.pkg_dict.get('update_frequency', None) %}
             {% set affiliation = g.pkg_dict.get('affiliation', None) %}
-            {% set contributors = g.pkg_dict.get('contributors', None) %}
             {% set dataset_category = g.pkg.dataset_category.pop() if g.pkg.dataset_category else None %}
 
             {% if affiliation %}
@@ -57,12 +56,9 @@
                 </tr>
             {%  endif %}
 
-            {% if contributors %}
-                <tr>
-                    <th scope="row" class="dataset-label">{{ _("Contributors") }}</th>
-                    <td class="dataset-details">{{ contributors }}</td>
-                </tr>
-            {%  endif %}
+            {% block attribution_row %}
+                {{ super() }}
+            {% endblock %}
 
             {% if temporal_extent %}
                 <tr>
