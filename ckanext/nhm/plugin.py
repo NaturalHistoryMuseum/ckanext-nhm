@@ -22,7 +22,6 @@ from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
 from ckanext.nhm import routes, cli
-from ckanext.nhm.lib.cache import cache_clear_nginx_proxy
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.settings import COLLECTION_CONTACTS
@@ -197,9 +196,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     # are updated
                     for _cache in cache_managers.values():
                         _cache.clear()
-
-        # Clear the NGINX proxy cache
-        cache_clear_nginx_proxy()
 
     ## IRoutes
     def before_map(self, _map):
@@ -586,15 +582,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return resource_id in {helpers.get_specimen_resource_id(),
                                helpers.get_artefact_resource_id(),
                                helpers.get_indexlot_resource_id()}
-
-    def datastore_after_indexing(self, request, eevee_stats, stats_id):
-        try:
-            # whenever anything is indexed, we should clear the cache,
-            # catch exceptions on failures
-            # and only wait a couple of seconds for the request to complete
-            requests.request('purge', toolkit.config.get('ckan.site_url'), timeout=2)
-        except:
-            pass
 
     def datastore_reserve_slugs(self):
         collection_resource_ids = [
