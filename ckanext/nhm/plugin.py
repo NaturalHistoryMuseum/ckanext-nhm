@@ -381,7 +381,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 authors = metadata_dict.get('creators', [])
                 affiliated_authors = []
                 for a in authors:
-                    a['affiliations'] = affiliation.encode('unicode-escape')
+                    a['affiliations'] = affiliation
                     affiliated_authors.append(a)
                 metadata_dict['creators'] = affiliated_authors
         except Exception:
