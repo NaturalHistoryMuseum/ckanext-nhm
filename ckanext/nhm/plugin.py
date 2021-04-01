@@ -4,6 +4,8 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 import itertools
+from contextlib import suppress
+
 import logging
 import os
 from collections import OrderedDict
@@ -375,29 +377,23 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         except Exception as e:
             errors['resourceType'] = e
 
-        try:
+        with suppress(Exception):
             affiliation = pkg_dict.get('affiliation', None)
             if affiliation:
+                # add the common affiliation to all of the creators in the metadata dict
                 authors = metadata_dict.get('creators', [])
-                affiliated_authors = []
-                for a in authors:
-                    a['affiliations'] = affiliation.encode('unicode-escape')
-                    affiliated_authors.append(a)
-                metadata_dict['creators'] = affiliated_authors
-        except Exception:
-            pass  # just ignore this one
+                for author in authors:
+                    author['affiliations'] = affiliation
 
-        try:
+        with suppress(Exception):
             descriptions = metadata_dict.get('descriptions', [])
             abstract = pkg_dict.get('notes', None)
             for d in descriptions:
                 if d['description'] == abstract:
                     d['descriptionType'] = 'Abstract'
-            metadata_dict['descriptions'] = descriptions
+
             if 'descriptions' in errors:
                 del errors['descriptions']
-        except Exception as e:
-            pass
 
         return metadata_dict, errors
 
