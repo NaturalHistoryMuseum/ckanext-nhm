@@ -380,12 +380,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         with suppress(Exception):
             affiliation = pkg_dict.get('affiliation', None)
             if affiliation:
+                # add the common affiliation to all of the creators in the metadata dict
                 authors = metadata_dict.get('creators', [])
-                affiliated_authors = []
-                for a in authors:
-                    a['affiliations'] = affiliation
-                    affiliated_authors.append(a)
-                metadata_dict['creators'] = affiliated_authors
+                for author in authors:
+                    author['affiliations'] = affiliation
 
         with suppress(Exception):
             descriptions = metadata_dict.get('descriptions', [])
