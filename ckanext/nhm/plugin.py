@@ -391,7 +391,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             for d in descriptions:
                 if d['description'] == abstract:
                     d['descriptionType'] = 'Abstract'
-            metadata_dict['descriptions'] = descriptions
+
             if 'descriptions' in errors:
                 del errors['descriptions']
 
