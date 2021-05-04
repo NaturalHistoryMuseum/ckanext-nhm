@@ -135,6 +135,9 @@
             },
             isMAM() {
                 return this.viewerImage.image.preview.startsWith('https://www.nhm.ac.uk/services/media-store/asset/')
+            },
+            isMSS() {
+                return this.viewerImage.image.preview.startsWith('/media')
             }
         },
         methods:    {
@@ -172,7 +175,14 @@
                 this.downloadStatus.loading = true;
                 this.downloadStatus.failed  = false;
 
-                let download = this.isMAM ? this.downloadMAMImage : this.downloadOtherImage;
+                let download;
+                if (this.isMAM) {
+                    download = this.downloadMAMImage;
+                } else if (this.isMSS) {
+                    download = this.downloadMSSImage;
+                } else {
+                    download = this.downloadOtherImage;
+                }
 
                 download()
                     .catch(error => {
@@ -181,6 +191,9 @@
                     .finally(() => {
                         this.downloadStatus.loading = false;
                     })
+            },
+            downloadMSSImage() {
+                window.location.href = `/media/${this.viewerImage.image.id}/original`;
             },
             downloadMAMImage() {
                 let body = {
