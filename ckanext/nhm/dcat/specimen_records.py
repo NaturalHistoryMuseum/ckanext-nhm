@@ -288,7 +288,7 @@ class RecordGraphBuilder(object):
                         # add the GBIF species URI with label
                         yield gbif_uri, self.namespaces.rdfs.label, Literal(self.record.get(term))
                         # and associated our specimen object's DWC term with the GBIF URI
-                        yield self.record_ref, getattr(self.namespaces.dwc, term), URIRef(gbif_uri)
+                        yield self.record_ref, getattr(self.namespaces.dwc, term), gbif_uri
                 else:
                     yield (self.record_ref, getattr(self.namespaces.dwc, term),
                            Literal(self.record.get(term)))
