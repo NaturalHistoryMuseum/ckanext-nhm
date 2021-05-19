@@ -280,8 +280,18 @@ class RecordGraphBuilder(object):
             for uri, term in terms.items():
                 if term in terms_to_skip:
                     continue
-                yield (self.record_ref, getattr(self.namespaces.dwc, term),
-                       Literal(self.record.get(term)))
+
+                if self.gbif_record is not None:
+                    gbif_key = self.gbif_record.get(f'{term}Key')
+                    if gbif_key:
+                        gbif_uri = URIRef(f'http://www.gbif.org/species/{gbif_key}')
+                        # add the GBIF species URI with label
+                        yield gbif_uri, self.namespaces.rdfs.label, Literal(self.record.get(term))
+                        # and associated our specimen object's DWC term with the GBIF URI
+                        yield self.record_ref, getattr(self.namespaces.dwc, term), URIRef(gbif_uri)
+                else:
+                    yield (self.record_ref, getattr(self.namespaces.dwc, term),
+                           Literal(self.record.get(term)))
 
         # retrieve the dynamic properties and yield them as one JSON dump
         dynamic_properties_dict = {}
