@@ -6,6 +6,9 @@
 {% block package_metadata_fields_version %}
 {% endblock %}
 
+{% block package_metadata_author %}
+{% endblock %}
+
 {% block package_metadata_author_email %}
 {% endblock %}
 
@@ -14,9 +17,9 @@
 
 {% block custom_fields %}
 
-    {{ form.input('affiliation', label=_('Affiliation(s)'), id='field-affiliation', placeholder=_('Natural History Museum'), value=data.affiliation, error=errors.affiliation, classes=['control-medium']) }}
-    {{ form.info("Enter a list of additional contributors, one per line. If you wish to add affiliations, please include in parenthesis.", inline=True) }}
-    {{ form.textarea('contributors', label=_('Contributors'), id='field-contributors', placeholder=_('Ben Scott (Natural History Museum)'), value=data.contributors, error=errors.contributors, classes=['control-medium']) }}
+    {% block package_custom_fields_agent %}
+        {{ super() }}
+    {% endblock %}
 
     {{ form.info("What time period does this dataset cover? If not applicable, leave blank.", inline=True) }}
     {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('1970 - 1985'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
