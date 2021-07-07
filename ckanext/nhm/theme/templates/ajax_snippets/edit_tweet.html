@@ -1,0 +1,19 @@
+{% ckan_extends %}
+
+{% block edit_tweet_title %}
+<div class="flex-container flex-between flex-stretch-first nav-simple-heading">
+    {{ super() }}
+    <button type="button" class="navbar-toggle collapsed no-txt no-icon" data-toggle="collapse" data-target="#nav-tweet" aria-expanded="false">
+        <span class="sr-only">expand</span>
+    </button>
+</div>
+{% endblock %}
+{% block edit_tweet_nav %}
+<ul class="nav nav-simple navbar-collapse collapse" data-module="tweet" id="nav-tweet">
+    <li class="nav-item">
+        {% block edit_tweet_form %}
+        {{ super() }}
+        {% endblock %}
+    </li>
+</ul>
+{% endblock %}

@@ -1,13 +1,13 @@
 {% ckan_extends %}
 
 {% block content_action %}
-    {{ super() }}
-    {% snippet "contact/snippets/modal_link.html", pkg=g.pkg %}
+{{ super() }}
+{% snippet "contact/snippets/modal_link.html", pkg=g.pkg %}
 {% endblock %}
 
 {% block content_primary_nav %}
-  {{ h.build_nav_icon('dataset.read', _('Dataset'), id=g.pkg.name) }}
-  {{ h.build_nav_icon('dataset.activity', _('Activity Stream'), id=g.pkg.name) }}
+{{ h.build_nav_icon('dataset.read', _('Dataset'), id=g.pkg.name) }}
+{{ h.build_nav_icon('dataset.activity', _('Activity Stream'), id=g.pkg.name) }}
 {% endblock %}
 
 {# Reorder blocks so DOI and licence goes to top #}
@@ -16,12 +16,12 @@
 {# Remove organisation #}
 {% block package_organization %}{% endblock %}
 
-  {# Licences should go at top #}
-  {% block package_license %}
-   {{ super() }}
-  {% endblock %}
+{# Licences should go at top #}
+{% block package_license %}
+{{ super() }}
+{% endblock %}
 
-  {% block secondary_help_content %}{% endblock %}
+{% block secondary_help_content %}{% endblock %}
 
 {% block recent_dois %}
 {% snippet "query_dois/snippets/recent_dois_sidebar.html", package_id=pkg['id'], number=3 %}
@@ -29,11 +29,15 @@
 
 {# Pass package into social share links #}
 {% block package_social %}
-    {% snippet "snippets/social.html", pkg_dict=g.pkg_dict %}
+{% snippet "snippets/social.html", pkg_dict=g.pkg_dict %}
 {% endblock %}
 
 {% block package_info %}
 {% snippet 'package/snippets/info.html', pkg=g.pkg %}
+{% endblock %}
+
+{% block tweet %}
+{{ super() }}
 {% endblock %}
 
 {# TODO: add this back in when ckanext-spatial is python3 compatible, or rewrite into ckanext-nhm #}
