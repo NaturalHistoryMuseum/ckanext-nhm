@@ -1,49 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Big Butterfly Count Map</title>
+{% extends "base.html" %}
 
-        <!-- leaflet css and js-->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-              integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-              crossorigin=""/>
-        <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-                integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-                crossorigin=""></script>
+{%- block title -%}Big Butterfly Count Map{% endblock %}
 
-        <!-- GA -->
-        <script>
-            (function (w, d, s, l, i) {
-                w[l] = w[l] || [];
-                w[l].push({
-                    'gtm.start':
-                        new Date().getTime(), event: 'gtm.js'
-                });
-                var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
-                j.async = true;
-                j.src =
-                    '//www.googletagmanager.com/gtm.js?id=' + i + dl;
-                f.parentNode.insertBefore(j, f);
-            })(window, document, 'script', 'dataLayer', 'GTM-5MDTTC');
-        </script>
-    </head>
-    <body>
-        <div id="map"></div>
+{%- block styles %}
+    {{ super() }}
+    <!-- leaflet css and js-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+            integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+            crossorigin=""></script>
+{% endblock %}
 
-        <div id="details">
-            <img id="logo" src="/images/logo_black.png"  alt="NHM logo"/>
-            <hr />
-            <p>This map shows the locations of a selection of butterfly and moth specimens in the Natural History Museum's collection that have been digitised.</p>
-            <p>The featured butterflies and moths are from the following species:</p>
-            <ul id="names"></ul>
-            <p>Click on a dot to see the specimens and images at the location.</p>
-            <p>The data for this map comes from our Data Portal, where you can see more of our digitised collection online - <a target="_blank" href="https://data.nhm.ac.uk">https://data.nhm.ac.uk</a></p>
-        </div>
+{%- block page %}
+    {{ super() }}
+    <!-- GA -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-5MDTTC');
+    </script>
 
-        <!-- our js, must be after the map div definition -->
-        {% asset 'ckanext-nhm/bbcm-css' %}
-        {% asset 'ckanext-nhm/bbcm-js' %}
-    </body>
-</html>
+    <div id="map"></div>
+
+    <div id="details">
+        <img id="logo" src="/images/logo_black.png"  alt="NHM logo"/>
+        <hr />
+        <p>This map shows the locations of a selection of butterfly and moth specimens in the Natural History Museum's collection that have been digitised.</p>
+        <p>The featured butterflies and moths are from the following species:</p>
+        <ul id="names"></ul>
+        <p>Click on a dot to see the specimens and images at the location.</p>
+        <p>The data for this map comes from our Data Portal, where you can see more of our digitised collection online - <a target="_blank" href="https://data.nhm.ac.uk">https://data.nhm.ac.uk</a></p>
+    </div>
+
+    <!-- our js, must be after the map div definition -->
+    {% asset 'ckanext-nhm/bbcm-css' %}
+    {% asset 'ckanext-nhm/bbcm-js' %}
+{% endblock -%}
+
