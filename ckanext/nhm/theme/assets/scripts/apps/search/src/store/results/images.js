@@ -17,15 +17,13 @@ let images = {
                         let imgLicence = img.license === resourceDetails.imageLicence.url ?
                             resourceDetails.imageLicence :
                             {title: img.license, url: img.license};
-                        let imgThumb   = img.identifier.replace('preview', 'thumbnail');
-                        let isBroken   = false;
                         return {
-                            preview:  img.identifier,
-                            thumb:    imgThumb,
+                            preview:  `/media/${img._id}/preview`,
+                            thumb:    `/media/${img._id}/thumbnail`,
                             title:    img.title,
-                            id:       img.assetID,
+                            id:       img._id,
                             licence:  imgLicence,
-                            isBroken: isBroken
+                            isBroken: false
                         };
                     });
                 } catch (e) {
