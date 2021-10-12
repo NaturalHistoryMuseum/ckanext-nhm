@@ -429,8 +429,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 image['rightsHolder']
             )
             images.append({
-                'href': image['identifier'],
-                'thumbnail': image['identifier'].replace('preview', 'thumbnail'),
+                'href': f'/media/{image["_id"]}/preview',
+                'thumbnail': f'/media/{image["_id"]}/thumbnail',
+                'download': f'/media/{image["_id"]}/original',
                 'link': toolkit.url_for(
                     'record.view',
                     package_name=data_dict['package']['name'],
