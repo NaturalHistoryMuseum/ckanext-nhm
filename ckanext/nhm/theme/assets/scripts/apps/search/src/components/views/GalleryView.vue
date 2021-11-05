@@ -1,10 +1,5 @@
 <template>
     <div class="view-component">
-        <Loading v-if="loading && loadedImageRecords.length > 0">
-            <h3>
-                Loading {{ nLoaded }} of {{loadedImageRecords.length }} images...
-            </h3>
-        </Loading>
         <LoadError v-if="loadError"></LoadError>
         <div class="flex-container flex-right">
             <small v-if="!loading">{{ imageRecords.length }} images associated with {{ recordTag }}s {{ (page * 100) + 1 }} - {{ (page * 100) + records.length }}</small>
