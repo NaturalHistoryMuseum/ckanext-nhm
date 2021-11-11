@@ -12,10 +12,10 @@ from ckanext.nhm.lib.taxonomy import extract_ranks
 
 
 class Site(object):
-    def __init__(self, name, icon, link_template: str = None,
+    def __init__(self, name, site_icon_url, link_template: str = None,
                  link_callback: Callable[..., tuple] = None):
         self.name = name
-        self.icon_url = icon
+        self.site_icon_url = site_icon_url
         if link_template:
             self.get_link = lambda x: link_template.format(x)
         elif link_callback:
@@ -33,16 +33,16 @@ class Site(object):
 
 # Taxonomy searches
 BHL = Site(name='Biodiversity Heritage Library',
-           icon='https://www.biodiversitylibrary.org/favicon.ico',
+           site_icon_url='https://www.biodiversitylibrary.org/favicon.ico',
            link_template='https://www.biodiversitylibrary.org/name/{}')
 CoL = Site(name='Catalogue of Life',
-           icon='https://www.catalogueoflife.org/images/col_square_logo.jpg',
+           site_icon_url='https://www.catalogueoflife.org/images/col_square_logo.jpg',
            link_template='https://www.catalogueoflife.org/col/search/all/key/{}')
 PBDB = Site(name='Paleobiology Database',
-            icon='https://paleobiodb.org/favicon.ico',
+            site_icon_url='https://paleobiodb.org/favicon.ico',
             link_template='https://paleobiodb.org/classic/checkTaxonInfo?taxon_name={}')
 Mindat = Site(name='Mindat',
-              icon='https://www.mindat.org/favicon.ico',
+              site_icon_url='https://www.mindat.org/favicon.ico',
               link_template='https://www.mindat.org/search.php?search={}')
 
 SEARCHES = {
@@ -64,7 +64,7 @@ def get_taxonomy_searches(record):
     '''
     # if no collection code is available, default to None
     relevant_searches = SEARCHES.get(record.get('collectionCode', None), [])
-    return [(s.name, s.icon_url, s.rank_links(record)) for s in relevant_searches]
+    return [(s.name, s.site_icon_url, s.rank_links(record)) for s in relevant_searches]
 
 
 def _p10k_api(gbif_record):
@@ -81,7 +81,7 @@ def _p10k_api(gbif_record):
 
 
 P10k = Site(name='Phenome10k',
-            icon='https://www.phenome10k.org/static/icons/favicon.ico',
+            site_icon_url='https://www.phenome10k.org/static/icons/favicon.ico',
             link_callback=_p10k_api)
 
 
@@ -112,5 +112,5 @@ def get_gbif_links(record):
     all_links.append(('GBIF', 'https://gbif.org/favicon.ico', gbif_links))
     p10k_link = P10k.get_link(gbif_record)
     if p10k_link:
-        all_links.append((P10k.name, P10k.icon_url, [p10k_link]))
+        all_links.append((P10k.name, P10k.site_icon_url, [p10k_link]))
     return all_links
