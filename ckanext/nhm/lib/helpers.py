@@ -22,7 +22,6 @@ from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
                                            resource_view_get_view)
-from ckanext.nhm.lib.taxonomy import extract_ranks
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
 from datetime import datetime
@@ -1265,13 +1264,9 @@ def get_external_links(record):
     :param record:
     :return:
     '''
-    sites = external_links.get_relevant_sites(record)
-    ranks = extract_ranks(record)
-    if ranks:
-        return [(name, icon, OrderedDict.fromkeys(
-            [(rank, link.format(rank)) for rank in ranks.values()]))
-                for name, icon, link in sites]
-    return []
+    taxonomy_search_links = external_links.get_taxonomy_searches(record)
+    gbif_links = external_links.get_gbif_links(record)
+    return taxonomy_search_links + gbif_links
 
 
 def render_epoch(epoch_timestamp, in_milliseconds=True, date_format='%Y-%m-%d %H:%M:%S (UTC)'):
