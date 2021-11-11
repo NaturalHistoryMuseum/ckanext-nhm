@@ -101,7 +101,7 @@ def _get_gbif_record(record):
 def get_gbif_links(record):
     gbif_record = _get_gbif_record(record)
     if not gbif_record:
-        return False
+        return []
     all_links = []
     gbif_links = [
         (gbif_record.get('catalogNumber'), f'https://gbif.org/occurrence/{gbif_record.get("key")}')
