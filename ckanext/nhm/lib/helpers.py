@@ -3,8 +3,6 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-from collections import OrderedDict, defaultdict
-
 import itertools
 import json
 import logging
@@ -12,6 +10,11 @@ import operator
 import os
 import re
 import time
+from collections import OrderedDict, defaultdict
+from datetime import datetime
+from operator import itemgetter
+from urllib.parse import quote
+
 from beaker.cache import cache_region
 from ckan import model
 from ckan.lib import helpers as core_helpers
@@ -24,11 +27,8 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
                                            resource_view_get_view)
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree, html
-from operator import itemgetter
-from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -1393,3 +1393,18 @@ def get_specimen_jsonld(uuid, version=None):
         return toolkit.get_action('object_rdf')({}, data_dict).decode('utf-8')
     except toolkit.ValidationError:
         return ''
+
+
+def get_resource_group(resource):
+    group_name = resource.get('resource_group')
+    if (group_name or '').strip() == '':
+        group_name = None
+    return group_name
+
+
+def group_resources(resource_list):
+    group_and_resource = sorted([(get_resource_group(r), r) for r in resource_list],
+                                key=lambda x: x[0] or '')
+    return [(group_name, re.sub('[^A-Za-z0-9]', '', group_name or 'ungrouped'),
+             [x[1] for x in resources]) for group_name, resources in
+            itertools.groupby(group_and_resource, key=itemgetter(0))]

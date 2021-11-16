@@ -16,8 +16,22 @@ Example:
       <ul class="{% block resource_list_class %}resource-list{% endblock %}">
         {% block resource_list_inner %}
           {% set can_edit = h.check_access('package_update', {'id':pkg.id }) %}
-          {% for resource in resources %}
-            {% snippet 'package/snippets/resource_item.html', pkg=pkg, res=resource, can_edit=can_edit %}
+          {% set grouped_resources = h.group_resources(resources) %}
+          {% for group_name, group_slug, group_items in grouped_resources %}
+              {% if group_name %}
+              <div class="flex-container flex-between flex-stretch-first subgroup-header">
+                <h3 class="no-margin">{{ group_name }} </h3>
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                        data-target="#grp-{{ group_slug }}" aria-expanded="true">
+                    <span class="sr-only">Expand {{ group_name }}</span>
+                </button>
+              </div>
+              {% endif %}
+              <div id="grp-{{ group_slug }}" class="collapse in {% if group_name %}subgroup{% endif %}" aria-expanded="true">
+                  {% for resource in group_items %}
+                    {% snippet 'package/snippets/resource_item.html', pkg=pkg, res=resource, can_edit=can_edit %}
+                  {% endfor %}
+              </div>
           {% endfor %}
         {% endblock %}
       </ul>
