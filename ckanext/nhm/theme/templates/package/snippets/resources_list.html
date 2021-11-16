@@ -19,15 +19,17 @@ Example:
           {% set grouped_resources = h.group_resources(resources) %}
           {% for group_name, group_slug, group_items in grouped_resources %}
               {% if group_name %}
-              <div class="flex-container flex-between flex-stretch-first subgroup-header">
-                <h3 class="no-margin">{{ group_name }} </h3>
-                <button type="button" class="navbar-toggle" data-toggle="collapse"
-                        data-target="#grp-{{ group_slug }}" aria-expanded="true">
+              <div class="flex-container flex-between subgroup-header">
+                  <i class="fas fa-layer-group inline-icon-left"></i>
+                <h3 class="no-margin flex-child-grow">{{ group_name }}</h3>
+                  <span>({{ group_items|length }} resource{% if (group_items|length) != 1 %}s{% endif %})</span>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#grp-{{ group_slug }}" aria-expanded="false">
                     <span class="sr-only">Expand {{ group_name }}</span>
                 </button>
               </div>
               {% endif %}
-              <div id="grp-{{ group_slug }}" class="collapse in {% if group_name %}subgroup{% endif %}" aria-expanded="true">
+              <div id="grp-{{ group_slug }}" class="collapse {% if group_name %}subgroup{% else %}in{% endif %}" aria-expanded="false">
                   {% for resource in group_items %}
                     {% snippet 'package/snippets/resource_item.html', pkg=pkg, res=resource, can_edit=can_edit %}
                   {% endfor %}
