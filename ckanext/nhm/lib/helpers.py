@@ -1397,6 +1397,16 @@ def get_specimen_jsonld(uuid, version=None):
 
 def get_resource_group(resource):
     group_name = resource.get('resource_group')
+    linked_specimen = resource.get('linked_specimen')
+    if linked_specimen and group_name and '$' in group_name:
+        resource_id = get_specimen_resource_id()
+        linked_specimen_record = toolkit.get_action('record_show')({}, {'resource_id': resource_id,
+                                                                        'record_id': linked_specimen})
+        linked_specimen_record = (linked_specimen_record or {}).get('data')
+        if linked_specimen_record and group_name:
+            tokens = [t for t in re.findall('\$[a-zA-Z]+', group_name) if t.strip('$') in linked_specimen_record]
+            for token in tokens:
+                group_name = group_name.replace(token, linked_specimen_record.get(token.strip('$')))
     if (group_name or '').strip() == '':
         group_name = None
     return group_name

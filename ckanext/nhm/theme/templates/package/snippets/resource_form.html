@@ -1,53 +1,93 @@
 {% ckan_extends %}
 
 {% block basic_fields %}
-    {{ super() }}
-    {{ form.input('resource_group', id='field-resource_group', label=_('Resource group'), placeholder=_('e.g. Spreadsheets'), value=data.resource_group, error=errors.resource_group, classes=['control-full'], is_required=False) }}
+{{ super() }}
+
+<div class="form-group">
+    <div class="flex-container flex-between flex-stretch-first">
+        <b class="no-pad-h">{{ _('Resource grouping') }}:</b>
+        <button type="button" class="collapse-toggle collapsed" data-toggle="collapse"
+                data-target="#grouping" aria-expanded="false">
+            <span class="sr-only">Expand</span>
+        </button>
+    </div>
+    <span class="info-block info-block-small">
+      <i class="fa fa-info-circle"></i>
+      {{ _('This section is optional and will not be relevant in most cases.') }}
+    </span>
+    <div id="grouping" class="collapse pad-h" aria-expanded="false">
+        <br>
+        {% call form.input('linked_specimen', id='field-linked-specimen', label=_('Associated
+        specimen record'), placeholder=_('(optional) e.g. 1234567'), value=data.linked_specimen,
+        error=errors.linked_specimen, classes=['control-medium'], is_required=False) %}
+        <span class="info-block info-block-small">
+              <i class="fa fa-info-circle"></i>
+              {{ _('The ID of a record from the collection specimens dataset that this resource is associated with, e.g. this resource is a 3D model of the specimen. Leave blank if not relevant.') }}
+            </span>
+        {% endcall %}
+
+        {% call form.input('resource_group', id='field-resource_group', label=_('Group name'),
+        placeholder=_('(optional) e.g. "Supplementary Data" or "$genus"'),
+        value=data.resource_group, error=errors.resource_group, classes=['control-medium'],
+        is_required=False) %}
+        <span class="info-block info-block-small">
+              <i class="fa fa-info-circle"></i>
+              {{ _('The literal name of the group (e.g. "Appendix 1" or "Spreadsheets") or tokens (e.g. "$scientificName" or "Collection: $collectionCode") to extract metadata from the associated specimen record.') }}
+            </span>
+        {% endcall %}
+    </div>
+</div>
+
 {% endblock %}
 
 {% block basic_fields_name %}
-  {{ form.input('name', id='field-name', label=_('Name'), placeholder=_('e.g. Specimens'), value=data.name, error=errors.name, classes=['control-full'], is_required=True) }}
+{{ form.input('name', id='field-name', label=_('Name'), placeholder=_('e.g. Specimens'), value=data.name, error=errors.name, classes=['control-full'], is_required=True) }}
 {% endblock %}
 
 {% block metadata_fields %}
 
-    {% set datastore_fields = h.form_select_datastore_field_options(data, allow_empty=True) %}
+{% set datastore_fields = h.form_select_datastore_field_options(data, allow_empty=True) %}
 
-    {# We allow empty to has to be greater than 1 for there to be fields #}
-    {% if datastore_fields.__len__() > 1 %}
+{# We allow empty to has to be greater than 1 for there to be fields #}
+{% if datastore_fields.__len__() > 1 %}
 
-        {% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field) %}
-            {{ form.info(_('Please select the field to use for the record title.'), inline=True) }}
-        {% endcall %}
+{% call form.select('_title_field', label=_('Title field'), options=datastore_fields, selected=data._title_field, error=errors._title_field) %}
+{{ form.info(_('Please select the field to use for the record title.'), inline=True) }}
+{% endcall %}
 
-        {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs={'data-module': 'toggle-select', 'data-module-target': '#image-options'}) %}
-            {{ form.info(_('Does your dataset contain images?  If so, please select the field here.'), inline=True) }}
-        {% endcall %}
+{% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs={'data-module': 'toggle-select', 'data-module-target': '#image-options'}) %}
+{{ form.info(_('Does your dataset contain images?  If so, please select the field here.'), inline=True) }}
+{% endcall %}
 
-        {# If there's an image field in this dataset #}
-        <div id="image-options">
-            {% call form.select('_image_licence', label=_('Image licence'), options=h.get_image_licence_options(), selected=data._image_licence, error=errors._image_licence) %}
-                {{ form.info(_('Please select a licence for images in this dataset.  This licence will be displayed next to the image.'), inline=True) }}
-            {% endcall %}
+{# If there's an image field in this dataset #}
+<div id="image-options">
+    {% call form.select('_image_licence', label=_('Image licence'),
+    options=h.get_image_licence_options(), selected=data._image_licence,
+    error=errors._image_licence) %}
+    {{ form.info(_('Please select a licence for images in this dataset. This licence will be
+    displayed next to the image.'), inline=True) }}
+    {% endcall %}
 
-            {% call form.input('_image_delimiter', label=_('Image list delimiter'), value=data._image_delimiter, error=errors._image_delimiter) %}
-                {{ form.info(_('If your image field contains a series of delimited image URLs instead of just a single one enter it here'), inline=True) }}
-            {% endcall %}
-        </div>
+    {% call form.input('_image_delimiter', label=_('Image list delimiter'),
+    value=data._image_delimiter, error=errors._image_delimiter) %}
+    {{ form.info(_('If your image field contains a series of delimited image URLs instead of just a
+    single one enter it here'), inline=True) }}
+    {% endcall %}
+</div>
 
-        {% asset 'ckanext-nhm/toggle-select' %}
+{% asset 'ckanext-nhm/toggle-select' %}
 
-        {% call form.select('_latitude_field', label=_('Decimal latitude field'), options=datastore_fields, selected=data._latitude_field, error=errors._latitude_field) %}
-            {{ form.info(_("Please select the field to use for the record's decimal latitude."), inline=True) }}
-        {% endcall %}
-        {% call form.select('_longitude_field', label=_('Decimal longitude field'), options=datastore_fields, selected=data._longitude_field, error=errors._longitude_field) %}
-            {{ form.info(_("Please select the field to use for the record's decimal longitude."), inline=True) }}
-        {% endcall %}
+{% call form.select('_latitude_field', label=_('Decimal latitude field'), options=datastore_fields, selected=data._latitude_field, error=errors._latitude_field) %}
+{{ form.info(_("Please select the field to use for the record's decimal latitude."), inline=True) }}
+{% endcall %}
+{% call form.select('_longitude_field', label=_('Decimal longitude field'), options=datastore_fields, selected=data._longitude_field, error=errors._longitude_field) %}
+{{ form.info(_("Please select the field to use for the record's decimal longitude."), inline=True) }}
+{% endcall %}
 
-    {% endif %}
+{% endif %}
 
 {% endblock %}
 
 {% block again_button %}
-    <button class="btn" name="save" value="again" type="submit">{{ _('Add another file') }}</button>
+<button class="btn" name="save" value="again" type="submit">{{ _('Add another file') }}</button>
 {% endblock %}
