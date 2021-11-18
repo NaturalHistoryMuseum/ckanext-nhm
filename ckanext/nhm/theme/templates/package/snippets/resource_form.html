@@ -18,11 +18,11 @@
     <div id="grouping" class="collapse pad-h" aria-expanded="false">
         <br>
         {% call form.input('linked_specimen', id='field-linked-specimen', label=_('Associated
-        specimen record'), placeholder=_('(optional) e.g. 1234567'), value=data.linked_specimen,
+        specimen'), placeholder=_('(optional) e.g. 7e4fe982-9ff7-4bf4-9aea-2759ab387a6a'), value=data.linked_specimen,
         error=errors.linked_specimen, classes=['control-medium'], is_required=False) %}
         <span class="info-block info-block-small">
               <i class="fa fa-info-circle"></i>
-              {{ _('The ID of a record from the collection specimens dataset that this resource is associated with, e.g. this resource is a 3D model of the specimen. Leave blank if not relevant.') }}
+              {{ _('The occurrence ID of a record from the collection specimens dataset that this resource is associated with, e.g. this resource is a 3D model of the specimen. Leave blank if not relevant.') }}
             </span>
         {% endcall %}
 
