@@ -1173,15 +1173,11 @@ iframe {
   }
 }
 
-.navbar-toggle {
+.collapse-toggle, .navbar-toggle {
   z-index: 1;
   padding: 0 10px;
   height: 100%;
   text-align: left;
-
-  @media (max-width: @collapse-width) {
-    display: block;
-  }
 
   &:after {
     .mixin-font-symbol(normal);
@@ -1208,6 +1204,18 @@ iframe {
       padding-left: 0;
     }
   }
+}
+
+.nav-toggle {
+  @media (max-width: @collapse-width) {
+    display: block;
+  }
+}
+
+.collapse-toggle {
+  display: block;
+  background: transparent;
+  border: none;
 }
 
 .pill {
@@ -2440,6 +2448,14 @@ select, .select2-choice {
 
 .resource-list {
   margin: 0 0 30px 0;
+
+  & .subgroup-header {
+    margin-top: 3em;
+  }
+
+  & .subgroup {
+    margin: 0.2em 1em;
+  }
 }
 
 .tags {
