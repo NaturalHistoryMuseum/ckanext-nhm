@@ -57,6 +57,7 @@ setup(
     install_requires=[
         'lxml>=3.4.4',
         'elasticsearch-dsl>=6.0.0,<7.0.0',
+        'cachetools>=4.2.4',
         # extensions we need to be installed too
     ] + [f'{name} @ {repo}' for (name, repo) in ckan_extensions.items()],
     dependency_links=list(ckan_extensions.values()),
