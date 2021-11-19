@@ -1400,8 +1400,8 @@ def get_resource_group(resource):
     linked_specimen = resource.get('linked_specimen')
     if linked_specimen and group_name and '$' in group_name:
         # has to be imported here due to circular imports
-        from ckanext.nhm.lib.record import get_record_by_uuid
-        linked_specimen_record = get_record_by_uuid(linked_specimen)[0]
+        from ckanext.nhm.lib.record import get_specimen_by_uuid
+        linked_specimen_record = get_specimen_by_uuid(linked_specimen)
         if linked_specimen_record and group_name:
             tokens = [t for t in re.findall('\$[a-zA-Z]+', group_name) if t.strip('$') in linked_specimen_record]
             for token in tokens:
