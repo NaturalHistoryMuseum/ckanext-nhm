@@ -110,16 +110,16 @@ def _load_data(package_name, resource_id, record_id, version=None):
 
             if isinstance(image_field_value, list):
                 for image in image_field_value:
-                    href = f'/media/{image["_id"]}/preview'
-                    if href:
+                    image_url = image.get('identifier', None)
+                    if image_url:
                         license_link = toolkit.h.link_to(image.get('license'),
                                                          image.get(
                                                              'license')) if image.get(
                             'license', None) else None
                         toolkit.c.images.append({
                             'title': image.get('title', None) or toolkit.c.record_title,
-                            'href': href,
-                            'download': f'/media/{image["_id"]}/original',
+                            'href': image_url,
+                            'download': f'{image_url}/original',
                             'copyright': f'{license_link or default_licence}<br />'
                                          f'{image.get("rightsHolder", None) or default_copyright}',
                             'record_id': record_id,

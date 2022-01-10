@@ -8,62 +8,8 @@
                 </a>
             </h4>
             <div class="info-popup-button">
-                <transition name="slidedown">
-                    <div class="floating info-popup download-popup"
-                         v-if="showDownload"
-                         v-dismiss="{switch: 'showDownload', ignore: ['#show-download']}">
-                        <p class="alert-error" v-if="downloadStatus.failed">
-                            The download request failed. Please try again later.</p>
-                        <template v-if="isMAM">
-                            <p v-if="download !== null">
-                                Success! You should receive an email at
-                                <b>{{ email }}</b>
-                                soon.
-                            </p>
-                            <div v-if="download === null">
-                                <p>Please enter your email address, and we will send you the
-                                   original image.</p>
-                                <div class="form-row">
-                                    <label for="download-email" class="control-label">
-                                        <span class="control-required">*</span>
-                                        Your email
-                                    </label>
-                                    <input id="download-email"
-                                           type="text"
-                                           class="full-width"
-                                           v-model="email"
-                                           placeholder="data@nhm.ac.uk">
-                                </div>
-                            </div>
-                            <div class="privacy-warning">
-                                <p>
-                                    <i>Data Protection</i>
-                                </p>
-                                <p>The Natural History Museum will use your personal data in
-                                   accordance with data protection legislation to process your
-                                   requests. For more information please read our
-                                    <a href="/privacy">privacy notice</a>
-                                   .
-                                </p>
-                            </div>
-                        </template>
-                        <template v-if="!isMAM">
-                            <p>Click below to download the original image.</p>
-                        </template>
-                        <div class="text-right" v-if="download === null">
-                            <a href="#"
-                               class="btn btn-primary text-right"
-                               @click="downloadImage">
-                                <i class="fas"
-                                   :class="downloadStatus.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
-                                {{ isMAM ? 'Request ': ''}}Download
-                            </a>
-                        </div>
-                    </div>
-                </transition>
                 <a class="image-viewer-icon" title="Download original image"
-                   @click="showDownload = !showDownload"
-                   id="show-download">
+                   :href="viewerImage.image.download">
                     <i class="fas fa-cloud-download-alt fa-2x"></i>
                 </a>
             </div>
@@ -99,8 +45,6 @@
     import imagesLoaded from 'vue-images-loaded';
     import Loading from '../Loading.vue';
     import LoadError from '../LoadError.vue';
-    import {camelCase, post} from '../../store/utils';
-    import axios from 'axios';
 
     export default {
         name:       'ImageViewer',
@@ -111,10 +55,6 @@
                 email:          null,
                 showDownload:   false,
                 download:       null,
-                downloadStatus: {
-                    failed:  false,
-                    loading: false
-                }
             }
         },
         directives: {
@@ -132,12 +72,6 @@
             },
             lastImage() {
                 return this.viewerImagePage.length <= (this.viewerImageIndex + 1);
-            },
-            isMAM() {
-                return this.viewerImage.image.preview.startsWith('https://www.nhm.ac.uk/services/media-store/asset/')
-            },
-            isMSS() {
-                return this.viewerImage.image.preview.startsWith('/media')
             }
         },
         methods:    {
@@ -171,78 +105,6 @@
                 this.loading   = false;
                 this.loadError = instance.hasAnyBroken;
             },
-            downloadImage() {
-                this.downloadStatus.loading = true;
-                this.downloadStatus.failed  = false;
-
-                let download;
-                if (this.isMAM) {
-                    download = this.downloadMAMImage;
-                } else if (this.isMSS) {
-                    download = this.downloadMSSImage;
-                } else {
-                    download = this.downloadOtherImage;
-                }
-
-                download()
-                    .catch(error => {
-                        this.downloadStatus.failed = true;
-                    })
-                    .finally(() => {
-                        this.downloadStatus.loading = false;
-                    })
-            },
-            downloadMSSImage() {
-                window.location.href = `/media/${this.viewerImage.image.id}/original`;
-            },
-            downloadMAMImage() {
-                let body = {
-                    'resource_id': this.viewerImage.record.resource,
-                    'record_id':   this.viewerImage.record.data._id,
-                    'asset_id':    this.viewerImage.image.id,
-                    'email':       this.email
-                };
-
-                return post('download_image', body)
-                    .then(data => {
-                        if (data.success) {
-                            this.download = data;
-                        }
-                        else {
-                            throw Error;
-                        }
-                    });
-
-            },
-            downloadOtherImage() {
-                let link      = document.createElement('a');
-                let imageName = this.viewerImage.image.preview.split('/').slice(-1)
-                                    .pop().split('.').slice(0, -1)
-                                    .join('') || camelCase(this.viewerImage.image.title);
-
-                let downloader = axios.get(this.viewerImage.image.preview, {responseType: 'blob'})
-                                      .then(response => {
-                                          if (response.status === 200 &&
-                                              response.data instanceof Blob &&
-                                              response.data.type.startsWith('image/')) {
-                                              let imageType = response.data.type.split('/')[1];
-
-                                              link.download = imageName + '.' + imageType;
-                                              link.href     = URL.createObjectURL(response.data);
-                                          }
-                                          else {
-                                              throw Error;
-                                          }
-                                      });
-
-
-                downloader.then(() => {
-                    link.click();
-                    URL.revokeObjectURL(link.href);
-                });
-
-                return downloader;
-            }
         },
         mounted() {
             $(document).on('keyup', this.keyListener);

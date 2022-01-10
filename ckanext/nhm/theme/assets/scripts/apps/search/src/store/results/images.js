@@ -18,8 +18,9 @@ let images = {
                             resourceDetails.imageLicence :
                             {title: img.license, url: img.license};
                         return {
-                            preview:  `/media/${img._id}/preview`,
-                            thumb:    `/media/${img._id}/thumbnail`,
+                            download: `${img.identifier}/original`,
+                            preview:  `${img.identifier}/preview`,
+                            thumb:    `${img.identifier}/thumbnail`,
                             title:    img.title,
                             id:       img._id,
                             licence:  imgLicence,
@@ -44,6 +45,7 @@ let images = {
                     }
                     images = images.map((img, ix) => {
                         return {
+                            download: img,
                             preview:  img,
                             thumb:    img,
                             title:    item.data[resourceDetails.titleField],
