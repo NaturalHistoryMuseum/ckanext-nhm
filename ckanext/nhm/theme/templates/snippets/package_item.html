@@ -43,7 +43,7 @@
 {% block resources_inner %}
     {% for format in h.dict_list_reduce(package.resources, 'format') %}
         <li>
-          <span class="label label-default" data-format="{{ format.lower() }}">{{ format }}</span>
+            <a href="{{ h.url_for('dataset.search', res_format=format) }}" class="label label-default" data-format="{{ format.lower() }}">{{ format }}</a>
         </li>
     {% endfor %}
 {% endblock %}
