@@ -1927,7 +1927,15 @@ select, .select2-choice {
 
   & i.large {
     font-size: @font-size-head-xl;
-    padding: @min-pad 0 @min-pad @min-pad;
+    padding: @min-pad;
+  }
+
+  & .box-text p {
+    margin-bottom: 0;
+  }
+
+  & .module-content {
+    padding: @min-pad/2;
   }
 }
 
@@ -2319,7 +2327,7 @@ select, .select2-choice {
   color: black;
   text-transform: uppercase;
   font-size: @font-size-body-s;
-  padding: .2em .6em;
+  padding: .4em .6em .2em;
 
   &[data-format=dwc], &[data-format*=dwc] {
     background-color: @primary5;
