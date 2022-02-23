@@ -49,6 +49,18 @@
                         </li>
 
                         <li>
+                            {%
+                                set json_url = h.url_for('record.json_view',
+                                                         package_name=g.pkg.name,
+                                                         resource_id=res.id, record_id=rec['_id'],
+                                                         version=g.version)
+                            %}
+                            <a class="btn btn-primary" href="{{ json_url }}">
+                                <i class="fas fa-file-code-o"></i> {{ _('View as JSON') }}
+                            </a>
+                        </li>
+
+                        <li>
                             {% snippet "contact/snippets/modal_link.html", pkg=g.pkg,
                             res=res, rec=rec, link_text="Contact record curator" %}
                         </li>
