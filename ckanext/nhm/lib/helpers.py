@@ -1419,9 +1419,9 @@ def get_resource_group(resource):
         from ckanext.nhm.lib.record import get_specimen_by_uuid
         linked_specimen_record = get_specimen_by_uuid(linked_specimen)
         if linked_specimen_record and group_name:
-            tokens = [t for t in re.findall('\$[a-zA-Z]+', group_name) if t.strip('$') in linked_specimen_record]
+            tokens = [t for t in re.findall('\$[a-zA-Z]+', group_name) if t.strip('$') in linked_specimen_record.data]
             for token in tokens:
-                group_name = group_name.replace(token, linked_specimen_record.get(token.strip('$')))
+                group_name = group_name.replace(token, linked_specimen_record.data.get(token.strip('$')))
     if (group_name or '').strip() == '':
         group_name = None
     return group_name

@@ -17,20 +17,15 @@ from contextlib import suppress
 from functools import partial
 
 
-def get_record_by_uuid(uuid, version=None):
+def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
     '''
     Loop through all resources, and try and find the record. Currently this only works for
     specimens (as rdf_resources() only returns the specimens resource).
-
     '''
-
     context = {'user': toolkit.c.user or toolkit.c.author}
     for resource_id in rdf_resources():
-        try:
-            # load the resource via model so we have access to get_package_id
-            resource = model.Resource.get(resource_id)
-
-            # then search for the record
+        with suppress(Exception):
+            # search for the record
             search_data_dict = {
                 'resource_id': resource_id,
                 'filters': {
@@ -40,18 +35,16 @@ def get_record_by_uuid(uuid, version=None):
             }
             # retrieve datastore record
             search_result = toolkit.get_action('datastore_search')(context, search_data_dict)
-            record = search_result['records'][0]
-        except:
-            pass
-        else:
-            return record, resource
-
-    return None, None
+            records = search_result['records']
+            if records:
+                data = records[0]
+                return Record(data['_id'], version, data, resource_id, context=context)
+    return None
 
 
 # cache for 5 mins
 @cached(cache=TTLCache(maxsize=4096, ttl=300))
-def get_specimen_by_uuid(uuid: str, version: Optional[int] = None) -> Optional[dict]:
+def get_specimen_by_uuid(uuid: str, version: Optional[int] = None) -> Optional['Record']:
     with suppress(Exception):
         search_data_dict = {
             'resource_id': get_specimen_resource_id(),
@@ -61,8 +54,10 @@ def get_specimen_by_uuid(uuid: str, version: Optional[int] = None) -> Optional[d
             'version': version,
         }
         search_result = toolkit.get_action('datastore_search')({}, search_data_dict)
-        return search_result['records'][0]
-
+        records = search_result['records']
+        if records:
+            data = records[0]
+            return Record(data['_id'], version, data, get_specimen_resource_id())
     return None
 
 
@@ -96,6 +91,14 @@ class RecordImage:
     @property
     def download_url(self) -> str:
         return f'{self.url}/original' if self.is_mss_image else self.url
+
+    @property
+    def preview_url(self) -> str:
+        return f'{self.url}/preview' if self.is_mss_image else self.url
+
+    @property
+    def thumbnail_url(self) -> str:
+        return f'{self.url}/thumbnail' if self.is_mss_image else self.url
 
 
 class Record:
@@ -226,7 +229,7 @@ class Record:
         name_or_id = self.package_id if use_package_id else self.package_name
         create_url = partial(url_for, 'record.view', package_name=name_or_id,
                              resource_id=self.resource_id, record_id=self.id)
-        if self.version is None:
+        if self.version is not None:
             return create_url(version=self.version)
         else:
             return create_url()
