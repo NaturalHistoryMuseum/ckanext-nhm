@@ -11,149 +11,57 @@ Loads all the data and then defers render function to view objects
 
 import json
 import logging
-
-from ckan import model
+from ckan.lib.helpers import link_to
 from ckan.plugins import toolkit
-from flask import Blueprint, current_app
-
 from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
+from ckanext.nhm.lib.record import Record, RecordImage
 from ckanext.nhm.views import DarwinCoreView
+from flask import Blueprint, current_app
 
 log = logging.getLogger(__name__)
 
 blueprint = Blueprint(name='record', import_name=__name__, url_prefix='/dataset')
 
 
-def _load_data(package_name, resource_id, record_id, version=None):
-    '''Load the data for dataset, resource and record (into toolkit.c variable).
-
-    :param package_name:
-    :param record_id:
-    :param resource_id:
-
+def prepare_image(image: RecordImage) -> dict:
     '''
-    context = {
-        'user': toolkit.c.user or toolkit.c.author
+    Given an image object, return a dict of information about it for the view.
+
+    :param image: the RecordImage object
+    :return: a dict of info
+    '''
+    license_link = link_to(image.title, image.url, target='_blank')
+    return {
+        'title': image.title,
+        'href': image.url,
+        'download': f'{image.url}/original',
+        'copyright': f'{license_link}<br /><small>{image.rights}</small>',
+        'record_id': image.record.id,
+        'resource_id': image.record.resource_id,
+        'link': image.record.url(),
     }
 
-    # try & get the resource
-    try:
-        toolkit.c.resource = toolkit.get_action('resource_show')(context, {
-            'id': resource_id
-        })
-        toolkit.c.package = toolkit.get_action('package_show')(context, {
-            'id': package_name
-        })
-        # required for nav menu
-        toolkit.c.pkg = context['package']
-        toolkit.c.pkg_dict = toolkit.c.package
 
-        record_data_dict = {
-            'resource_id': resource_id,
-            'record_id': record_id
-        }
-        if version is not None:
-            version = int(version)
-            record_data_dict['version'] = version
-        toolkit.c.version = version
-        record = toolkit.get_action('record_show')(context, record_data_dict)
-        toolkit.c.record_dict = record['data']
-
-    except toolkit.ObjectNotFound:
-        toolkit.abort(404, toolkit._('Resource not found'))
-    except toolkit.NotAuthorized:
-        toolkit.abort(401, toolkit._(f'Unauthorized to read resource {package_name}'))
-
-    field_names = {
-        'image': toolkit.c.resource.get('_image_field', None),
-        'title': toolkit.c.resource.get('_title_field', None),
-        'latitude': toolkit.c.resource.get('_latitude_field', None),
-        'longitude': toolkit.c.resource.get('_longitude_field', None),
+def update_render_context(record: Record):
+    '''
+    Sets the various expected context variables for the templates. The values set here are used
+    in some of our templates and some core CKAN ones too, it's a bit of a mess (especially for
+    packages).
+    '''
+    toolkit.c.pkg_dict = toolkit.c.package = toolkit.c.pkg = record.package
+    toolkit.c.resource = record.resource
+    image_field = record.image_field
+    # the templates expect for the record dict to not include the images
+    toolkit.c.record_dict = {
+        field: value for field, value in record.data.items() if field != image_field
     }
-
-    # if this is a DwC dataset, add some default for image and lat/lon fields
-    if toolkit.c.resource['format'].lower() == 'dwc':
-        for field_name, dwc_field in [('latitude', 'decimalLatitude'),
-                                      ('longitude', 'decimalLongitude')]:
-            if dwc_field in toolkit.c.record_dict:
-                field_names[field_name] = dwc_field
-
-    # assign title based on the title field
-    toolkit.c.record_title = toolkit.c.record_dict.get(field_names['title'],
-                                                       f'Record {toolkit.c.record_dict.get("_id")}')
-
-    # sanity check: image field hasn't been set to _id
-    if field_names['image'] and field_names['image'] != '_id':
-        default_copyright = '<small>&copy; The Trustees of the Natural History ' \
-                            'Museum, London</small>'
-        licence_id = toolkit.c.resource.get('_image_licence') or 'cc-by'
-        short_licence_id = licence_id[:5].lower()
-        # try and overwrite default licence with more specific one
-        for l_id in [licence_id, short_licence_id]:
-            try:
-                licence = model.Package.get_license_register()[l_id]
-                break
-            except KeyError:
-                continue
-
-        licence_url = toolkit.h.link_to(licence.title, licence.url, target="_blank")
-        default_licence = f'Licence: {licence_url}'
-
-        # pop the image field so it isn't output as part of the
-        # record_dict/field_data dict (see self.view())
-        image_field_value = toolkit.c.record_dict.pop(field_names['image'], None)
-
-        if image_field_value:
-            # init the images list on the context var
-            toolkit.c.images = []
-
-            if isinstance(image_field_value, list):
-                for image in image_field_value:
-                    image_url = image.get('identifier', None)
-                    if image_url:
-                        license_link = toolkit.h.link_to(image.get('license'),
-                                                         image.get(
-                                                             'license')) if image.get(
-                            'license', None) else None
-                        toolkit.c.images.append({
-                            'title': image.get('title', None) or toolkit.c.record_title,
-                            'href': image_url,
-                            'download': f'{image_url}/original',
-                            'copyright': f'{license_link or default_licence}<br />'
-                                         f'{image.get("rightsHolder", None) or default_copyright}',
-                            'record_id': record_id,
-                            'resource_id': resource_id,
-                            'link': toolkit.url_for('record.view', package_name=package_name,
-                                                    resource_id=resource_id, record_id=record_id),
-                        })
-            else:
-                # it's a string field value, use the delimiter to split up the field
-                # value (if there is one!)
-                delimiter = toolkit.c.resource.get('_image_delimiter', None)
-                if delimiter:
-                    images = image_field_value.split(delimiter)
-                else:
-                    images = [image_field_value]
-                # loop through the images, adding dicts with their details to the context
-                for image in images:
-                    if image.strip():
-                        toolkit.c.images.append({
-                            'title': toolkit.c.record_title,
-                            'href': image.strip(),
-                            'copyright': f'{default_licence}<br />{default_copyright}'
-                        })
-
-    if field_names['latitude'] and field_names['longitude']:
-        latitude = toolkit.c.record_dict.get(field_names['latitude'])
-        longitude = toolkit.c.record_dict.get(field_names['longitude'])
-
-        if latitude and longitude:
-            # create a piece of GeoJSON to point at the specific record location on a map
-            toolkit.c.record_map = json.dumps({
-                'type': 'Point',
-                'coordinates': [float(longitude), float(latitude)]
-            })
+    toolkit.c.version = record.version
+    toolkit.c.record_title = record.title
+    toolkit.c.images = list(map(prepare_image, record.images))
+    geojson = record.geojson
+    # something expects this as json apparently, sigh
+    toolkit.c.record_map = json.dumps(geojson) if geojson else None
 
 
 @blueprint.before_app_first_request
@@ -170,16 +78,19 @@ def init_jinja_extensions():
                  defaults={'version': None})
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/<int:version>')
 def view(package_name, resource_id, record_id, version):
-    '''View an individual record.
-
-    :param package_name:
-    :param record_id:
-    :param resource_id:
-    :param version:
-
     '''
-    _load_data(package_name, resource_id, record_id, version)
-    view_cls = resource_view_get_view(toolkit.c.resource)
+    View an individual record.
+
+    :param package_name: the package name or ID, doesn't matter which
+    :param record_id: the record ID
+    :param resource_id: the resource ID
+    :param version: optional record version, defaults to None which will be interpreted as now
+    :return: the rendered view template from the correct record view class
+    '''
+    record = Record(record_id, package_id_or_name=package_name, resource_id=resource_id,
+                    version=version)
+    update_render_context(record)
+    view_cls = resource_view_get_view(record.resource)
     return view_cls.render_record(toolkit.c)
 
 
@@ -187,18 +98,17 @@ def view(package_name, resource_id, record_id, version):
                  defaults={'version': None})
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/dwc/<int:version>')
 def dwc(package_name, resource_id, record_id, version):
-    '''Explicit DwC view
-
-    :param package_name:
-    :param record_id:
-    :param resource_id:
-    :param version:
-
     '''
-    _load_data(package_name, resource_id, record_id, version)
+    View an individual record using the DwC view.
 
-    # Is this a DwC view of an additional dataset?
-    # In which case, provide links back to the original record view
+    :param package_name: the package name or ID, doesn't matter which
+    :param record_id: the record ID
+    :param resource_id: the resource ID
+    :param version: optional record version, defaults to None which will be interpreted as now
+    :return: the rendered view template from the correct record view class
+    '''
+    record = Record(record_id, package_id_or_name=package_name, resource_id=resource_id,
+                    version=version)
+    update_render_context(record)
     toolkit.c.additional_view = True
-
     return DarwinCoreView().render_record(toolkit.c)
