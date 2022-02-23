@@ -74,6 +74,22 @@ def init_jinja_extensions():
     current_app.jinja_env.add_extension(TaxonomyFormatExtension)
 
 
+@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>.json',
+                 defaults={'version': None})
+@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>.json/<int:version>')
+def json_view(package_name, resource_id, record_id, version):
+    '''
+    View the record as JSON.
+
+    :param package_name: the package name or ID, we don't actually need this
+    :param resource_id: the resource ID, we do need this!
+    :param record_id: the record ID, stunningly enough we need this too
+    :param version: optional record version, defaults to None which will be interpreted as now
+    :return: the record data as a dict which will be turned into JSON automatically by Flask, huzzah
+    '''
+    return Record(record_id, resource_id=resource_id, version=version).data
+
+
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>',
                  defaults={'version': None})
 @blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/<int:version>')
