@@ -71,8 +71,6 @@ Name|Description|Options
 `ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|
 `ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|
 `ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|
-`ckanext.nhm.mam.username`|Username for the Museum's image server|
-`ckanext.nhm.mam.password`|Password for the Museum's image server|
 
 
 # Usage
@@ -92,25 +90,6 @@ data_dict = {
             }
 
 toolkit.get_action('record_show')(
-    context,
-    data_dict
-)
-```
-
-### `download_original_image`
-Request original image from the Museum's image server.
-
-```python
-from ckan.plugins import toolkit
-
-data_dict = {
-                'resource_id': RESOURCE_ID,
-                'record_id': RECORD_ID,
-                'asset_id': IMAGE_ID,
-                'email': REQUESTER_EMAIL
-            }
-
-toolkit.get_action('download_original_image')(
     context,
     data_dict
 )
