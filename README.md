@@ -97,25 +97,6 @@ toolkit.get_action('record_show')(
 )
 ```
 
-### `download_original_image`
-Request original image from the Museum's image server.
-
-```python
-from ckan.plugins import toolkit
-
-data_dict = {
-                'resource_id': RESOURCE_ID,
-                'record_id': RECORD_ID,
-                'asset_id': IMAGE_ID,
-                'email': REQUESTER_EMAIL
-            }
-
-toolkit.get_action('download_original_image')(
-    context,
-    data_dict
-)
-```
-
 ### `object_rdf`
 Get record RDF from its occurrence ID.
 

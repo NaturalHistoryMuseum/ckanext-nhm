@@ -60,52 +60,6 @@ def record_show(context, data_dict):
     return record
 
 
-def download_original_image(context, data_dict):
-    '''
-    Request an original image from the MAM. Before sending request, performs a number of checks
-        - The resource exists
-        - The record exists on that resource
-        - And the image exists on that record
-
-    :param context:
-    :param data_dict:
-    '''
-    # validate the data
-    schema = context.get('schema', nhm_schema.download_original_image_schema())
-    data_dict, errors = validate(data_dict, schema, context)
-
-    if errors:
-        raise toolkit.ValidationError(errors)
-
-    # Get the resource
-    resource = toolkit.get_action('resource_show')(context, {'id': data_dict['resource_id']})
-
-    # Retrieve datastore record
-    search_result = toolkit.get_action('datastore_search')(context, {
-        'resource_id': data_dict['resource_id'],
-        'filters': {
-            '_id': data_dict['record_id']
-        }
-    })
-
-    try:
-        record = search_result['records'][0]
-    except IndexError:
-        # If we don't have a result, raise not found
-        raise toolkit.ObjectNotFound
-
-    if not _image_exists_on_record(resource, record, data_dict['asset_id']):
-        raise toolkit.ObjectNotFound
-
-    try:
-        mam_media_request(data_dict['asset_id'], data_dict['email'])
-    except Exception as e:
-        log.error(e)
-        raise ActionError('Could not request original')
-    else:
-        return 'Original image request successful'
-
-
 def object_rdf(context, data_dict):
     '''Get record RDF
 

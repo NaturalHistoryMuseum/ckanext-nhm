@@ -46,17 +46,6 @@ def object_rdf_schema():
     return schema
 
 
-def download_original_image_schema():
-    ''' '''
-    schema = {
-        'resource_id': [not_missing, str, resource_id_exists],
-        'record_id': [not_missing, int_validator],
-        'asset_id': [not_missing, uuid_validator],
-        'email': [not_missing, not_empty]
-    }
-    return schema
-
-
 def create_package_schema():
     ''' '''
     schema = default_create_package_schema()
