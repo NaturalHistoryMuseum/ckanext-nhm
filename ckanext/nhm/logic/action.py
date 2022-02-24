@@ -13,7 +13,6 @@ from ckan.plugins import toolkit
 import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
-from ckanext.nhm.lib.mam import mam_media_request
 from ckanext.nhm.lib.record import get_record_by_uuid
 
 log = logging.getLogger(__name__)
