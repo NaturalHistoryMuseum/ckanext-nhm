@@ -79,11 +79,10 @@ def object_rdf(context, data_dict):
 
     # get the record
     version = data_dict.get('version', None)
-    record_dict, resource_dict = get_record_by_uuid(data_dict['uuid'], version)
-    if record_dict:
+    record = get_record_by_uuid(data_dict['uuid'], version)
+    if record:
         serializer = ObjectSerializer()
-        output = serializer.serialize_record(record_dict, resource_dict, data_dict.get('format'),
-                                             version)
+        output = serializer.serialize_record(record, data_dict.get('format'), version)
         return output
     raise toolkit.ObjectNotFound
 

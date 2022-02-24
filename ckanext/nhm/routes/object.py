@@ -30,11 +30,11 @@ from ckan.plugins import toolkit
 from ckanext.dcat.utils import CONTENT_TYPES, check_access_header
 from flask import Blueprint, Response, redirect, url_for
 
-from ckanext.nhm.lib.record import get_record_by_uuid
+from ckanext.nhm.lib.record import get_record_by_uuid, Record
 
 log = logging.getLogger(__name__)
 
-ABYSSLINE_UUIDS = [
+ABYSSLINE_UUIDS = {
     'bc03fc1a-3613-41a2-b1f1-bf905e0fa6d0',
     'de4bd6ce-07fe-496e-bffc-67a4c6b9782c',
     '16599946-2aba-4710-98e6-43c522061878',
@@ -69,7 +69,7 @@ ABYSSLINE_UUIDS = [
     '93b0a70d-c74e-4735-b70e-0c6e4c6a36ff',
     'e9f38ce3-5ed5-49f3-8713-c26de2eefd2b',
     'f263bc90-6307-462c-9e02-7b87d20e2840'
-]
+}
 
 # this is the main record citation blueprint, use this in url_fors etc
 blueprint = Blueprint(name='object', import_name=__name__, url_prefix='/object')
@@ -134,17 +134,12 @@ def view(uuid, version):
     else:
         try:
             # get the record at the given version
-            record, resource = get_record_by_uuid(uuid, version)
-        except TypeError:
-            pass
-        else:
+            record = get_record_by_uuid(uuid, version)
             if record:
-                package_id = resource.get_package_id()
-                package = toolkit.get_action('package_show')(_context(), {'id': package_id})
                 # cetaf standards require us to return a 303 redirect to the html record page
-                url = url_for('record.view', package_name=package['name'],
-                              resource_id=resource.id, record_id=record['_id'], version=version)
-                return redirect(url, code=303)
+                return redirect(record.url(), code=303)
+        except Exception:
+            pass
 
     toolkit.abort(404, toolkit._('Record not found'))
 
@@ -175,12 +170,10 @@ def abyssline_object_redirect(uuid, version):
 
     search_result = toolkit.get_action('datastore_search')(_context(), search_data_dict)
     try:
-        record = search_result['records'][0]
-    except KeyError:
+        data = search_result['records'][0]
+        record = Record(data['_id'], version, data, resource_id)
+        redirect(record.url(), code=303)
+    except IndexError:
         pass
-    else:
-        toolkit.redirect_to('record.view', package_name='abyssline',
-                            resource_id=resource_id,
-                            record_id=record['_id'], version=version)
 
     toolkit.abort(404, toolkit._('Record not found'))

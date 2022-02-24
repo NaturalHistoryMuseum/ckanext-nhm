@@ -3,6 +3,10 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+
+from collections import OrderedDict, defaultdict
+from urllib.parse import quote
+
 import itertools
 import json
 import logging
@@ -10,11 +14,6 @@ import operator
 import os
 import re
 import time
-from collections import OrderedDict, defaultdict
-from datetime import datetime
-from operator import itemgetter
-from urllib.parse import quote
-
 from beaker.cache import cache_region
 from ckan import model
 from ckan.lib import helpers as core_helpers
@@ -27,8 +26,10 @@ from ckanext.nhm.lib.resource_view import (resource_view_get_filter_options,
                                            resource_view_get_view)
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
+from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree, html
+from operator import itemgetter
 
 log = logging.getLogger(__name__)
 
@@ -271,6 +272,21 @@ def get_nhm_organisation_id():
     '''
     value = toolkit.config.get('ldap.organization.id')
     return str(value) if value is not None else None
+
+
+def is_collection_resource_id(resource_id: str) -> bool:
+    '''
+    Given a resource ID, returns True if the resource ID is one of the designated collection IDs.
+
+    :param resource_id: the resource ID
+    :return: True if the resource ID is one of the collection resource IDs, False if not
+    '''
+    resource_ids = {
+        get_artefact_resource_id(),
+        get_indexlot_resource_id(),
+        get_specimen_resource_id(),
+    }
+    return resource_id in resource_ids
 
 
 def get_specimen_resource_id():
@@ -1403,9 +1419,9 @@ def get_resource_group(resource):
         from ckanext.nhm.lib.record import get_specimen_by_uuid
         linked_specimen_record = get_specimen_by_uuid(linked_specimen)
         if linked_specimen_record and group_name:
-            tokens = [t for t in re.findall('\$[a-zA-Z]+', group_name) if t.strip('$') in linked_specimen_record]
+            tokens = [t for t in re.findall('\$[a-zA-Z]+', group_name) if t.strip('$') in linked_specimen_record.data]
             for token in tokens:
-                group_name = group_name.replace(token, linked_specimen_record.get(token.strip('$')))
+                group_name = group_name.replace(token, linked_specimen_record.data.get(token.strip('$')))
     if (group_name or '').strip() == '':
         group_name = None
     return group_name
