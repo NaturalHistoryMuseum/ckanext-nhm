@@ -71,8 +71,6 @@ Name|Description|Options
 `ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|
 `ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|
 `ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|
-`ckanext.nhm.mam.username`|Username for the Museum's image server|
-`ckanext.nhm.mam.password`|Password for the Museum's image server|
 
 
 # Usage
