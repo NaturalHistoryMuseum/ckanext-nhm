@@ -47,4 +47,8 @@
             <dd class="value"><code>{{ user.apikey }}</code></dd>
           </dl>
         {% endif %}
-  {% endblock %}
+    {% block user_info_extras %}
+        {{ super() }}
+    {% endblock %}
+      </div>
+{% endblock %}
