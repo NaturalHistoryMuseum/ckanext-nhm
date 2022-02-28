@@ -144,6 +144,7 @@
                                         v-model="downloadForm.format"
                                         class="full-width">
                                     <option>csv</option>
+                                    <option>dwc</option>
                                 </select>
                             </div>
                             <div class="form-row flex-container flex-wrap flex-between">
