@@ -732,6 +732,13 @@ iframe {
 }
 
 .page-header {
+
+  &::before, &::after {
+    // stops it interfering with the flexbox styles - I'm not entirely sure what these do so this
+    // might have to be changed later
+    position: absolute;
+  }
+
   border-bottom: none;
   background-color: transparent;
   .no-border-radius;
