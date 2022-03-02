@@ -1080,6 +1080,12 @@ iframe {
   }
 }
 
+@media (max-width: @collapse-width) {
+  .navbar-toggle {
+    display: block;
+  }
+}
+
 .nav-item.active > a:before, .nav-aside li.active a:before {
   @media (min-width: @lg) {
     @arrow-size: 8px;
