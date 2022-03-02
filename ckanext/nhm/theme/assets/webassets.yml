@@ -238,3 +238,12 @@ stats-extra:
     - vendor/flot/jquery.flot.barnumbers.js
     - vendor/flot/jquery.flot.time.js
     - vendor/flot/jquery.flot.tickrotor.js
+
+resource-view-reorder:
+  output: ckanext-nhm/%(version)s_resource-view-reorder.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/modules/resource-view-reorder.js
