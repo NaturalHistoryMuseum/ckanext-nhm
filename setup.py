@@ -21,14 +21,14 @@ ckan_extensions = OrderedDict([
     github('ckanext-dcat', '6b7ec505f303fb18e0eebcebf67130d36b3dca82', org='ckan'),
     github('ckanext-ckanpackager', 'v2.0.0'),
     github('ckanext-contact', 'v2.0.0'),
-    github('ckanext-doi', 'v3.0.1'),
+    github('ckanext-doi', 'v3.0.3'),
     github('ckanext-gallery', 'v2.0.0'),
     github('ckanext-gbif', 'v2.0.0'),
     github('ckanext-graph', 'v2.0.0'),
     github('ckanext-ldap', 'v3.0.0'),
-    github('ckanext-query-dois', 'v2.0.2'),
+    github('ckanext-query-dois', 'v2.0.3'),
     github('ckanext-statistics', 'v2.0.1'),
-    github('ckanext-versioned-datastore', 'v3.0.0'),
+    github('ckanext-versioned-datastore', 'v3.1.0'),
 ])
 
 setup(
