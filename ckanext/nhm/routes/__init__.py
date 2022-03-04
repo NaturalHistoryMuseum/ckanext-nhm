@@ -4,8 +4,8 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from . import about, legal, statistics, record, object, help, bbcm, vfactor_iiif
+from . import about, legal, statistics, record, object, help, bbcm, vfactor_iiif, misc
 
 blueprints = [about.blueprint, statistics.blueprint, legal.blueprint, record.blueprint,
               object.blueprint, object.specimen_blueprint, help.blueprint, bbcm.blueprint,
-              vfactor_iiif.blueprint]
+              vfactor_iiif.blueprint, misc.blueprint]
