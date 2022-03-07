@@ -7,7 +7,7 @@
 from collections import OrderedDict
 from setuptools import find_packages, setup
 
-__version__ = '3.0.22'
+__version__ = '3.0.23'
 
 with open('README.md', 'r') as f:
     __long_description__ = f.read()
