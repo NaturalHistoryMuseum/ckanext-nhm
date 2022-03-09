@@ -1,0 +1,15 @@
+{% ckan_extends %}
+
+{% block contribution_list %}
+    {% if contributions %}
+        <table class="table table-chunky contribution-list">
+            {% block contribution_list_header %}
+            {{ super() }}
+            {% endblock %}
+
+            {% block contribution_list_inner %}
+            {{ super() }}
+            {% endblock %}
+        </table>
+    {% endif %}
+{% endblock %}
