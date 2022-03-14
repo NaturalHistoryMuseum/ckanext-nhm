@@ -148,7 +148,6 @@
                 }
                 else {
                     this.$set(this.values, 'custom_area', existing.content);
-                    this.values.custom_area.push([]);
                 }
 
                 if (this.comparisonType === 'named_area') {
