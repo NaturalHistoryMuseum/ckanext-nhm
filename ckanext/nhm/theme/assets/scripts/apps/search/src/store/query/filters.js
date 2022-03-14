@@ -106,7 +106,7 @@ let filters = {
                         let itemList = {};
                         items.forEach((i) => {
                             let item = d3.entries(i)[0];
-                            if (Array.isArray(item.value)) {
+                            if (Array.isArray(item.value) && Object.prototype.toString.call(item.value[0]) === '[object Object]') {
                                 let groupId       = parent === null ? 'group_root' : `group_${shortid.generate()}`;
                                 itemList[groupId] = {
                                     parent:  parent,
