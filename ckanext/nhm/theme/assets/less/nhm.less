@@ -2384,7 +2384,7 @@ select, .select2-choice {
   }
 }
 
-.package-list {
+.package-list, .contribution-list {
   & th, & td {
     width: 20%;
     text-align: center;
@@ -2407,6 +2407,13 @@ select, .select2-choice {
 
 .empty {
   color: @grey4;
+}
+
+.contribution-list .td-roles {
+  & ul {
+    list-style: none;
+    padding: 0;
+  }
 }
 
 // RESOURCE LIST -----------------------------------------------------------------------------------
