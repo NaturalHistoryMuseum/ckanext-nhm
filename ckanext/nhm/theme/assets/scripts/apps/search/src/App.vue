@@ -117,10 +117,11 @@
             }
         },
         created:    function () {
-            if (this.$route.params !== undefined){
-                this.$store.dispatch('resolveUrl', this.$route);
-            }
-            this.getSchema();
+            this.getSchema().then(() => {
+                if (this.$route.params !== undefined){
+                    this.$store.dispatch('resolveUrl', this.$route);
+                }
+            });
             this.getPackageList();
             this.getLicences();
         },
