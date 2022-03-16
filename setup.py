@@ -55,7 +55,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'lxml>=3.4.4',
+        'lxml>=4.4.2',
         'elasticsearch-dsl>=6.0.0,<7.0.0',
         'cachetools>=4.2.4',
         # extensions we need to be installed too
