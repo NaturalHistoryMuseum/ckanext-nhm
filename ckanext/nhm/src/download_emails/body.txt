@@ -3,7 +3,7 @@ Hello,
 The link to the resource data you requested on {{ site_url }} is available at {{ download_url }}.
 
 {% if doi is defined %}
-A DOI has been created for this data: https://doi.org/{{ doi }} (this may take a few hours to become active). Please ensure you reference this DOI when citing this data.
+A DOI has been created for this download request: https://doi.org/{{ doi }} (this may take a few hours to become active). Please ensure you reference this DOI when citing these data.
 
 For more information, follow the DOI link.
 {% endif %}
