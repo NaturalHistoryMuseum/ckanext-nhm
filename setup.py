@@ -18,7 +18,7 @@ def github(name, tag, org='NaturalHistoryMuseum'):
 
 
 ckan_extensions = OrderedDict([
-    github('ckanext-dcat', '6b7ec505f303fb18e0eebcebf67130d36b3dca82', org='ckan'),
+    github('ckanext-dcat', 'v1.1.1', org='ckan'),
     github('ckanext-ckanpackager', 'v2.0.0'),
     github('ckanext-contact', 'v2.0.0'),
     github('ckanext-doi', 'v3.0.4'),
