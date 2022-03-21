@@ -1217,12 +1217,16 @@ def _get_latest_update(package_or_resource_dicts):
     '''
     # a list of fields on the resource that should contain update dates
     fields = ['last_modified', 'revision_timestamp', 'Created']
+    get_rounded_version = toolkit.get_action('datastore_get_rounded_version')
 
     latest_dict = None
     latest_date = None
     for package_or_resource_dict in package_or_resource_dicts:
-        for field in fields:
-            date = core_helpers._datestamp_to_datetime(package_or_resource_dict.get(field, None))
+        dates = [package_or_resource_dict.get(field, None) for field in fields]
+        if package_or_resource_dict.get('datastore_active', False):  # i.e. a datastore resource
+            dates.append(get_rounded_version({}, {'resource_id': package_or_resource_dict['id']}))
+        for datestamp in dates:
+            date = core_helpers._datestamp_to_datetime(datestamp)
             if date is not None and (latest_date is None or date > latest_date):
                 latest_date = date
                 latest_dict = package_or_resource_dict
