@@ -1224,7 +1224,9 @@ def _get_latest_update(package_or_resource_dicts):
     for package_or_resource_dict in package_or_resource_dicts:
         dates = [package_or_resource_dict.get(field, None) for field in fields]
         if package_or_resource_dict.get('datastore_active', False):  # i.e. a datastore resource
-            dates.append(get_rounded_version({}, {'resource_id': package_or_resource_dict['id']}))
+            pkg_version = get_rounded_version({}, {'resource_id': package_or_resource_dict['id']})
+            version_date = datetime.fromtimestamp(pkg_version / 1000)
+            dates.append(version_date)
         for datestamp in dates:
             date = core_helpers._datestamp_to_datetime(datestamp)
             if date is not None and (latest_date is None or date > latest_date):
