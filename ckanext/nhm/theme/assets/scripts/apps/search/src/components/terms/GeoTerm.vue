@@ -4,7 +4,7 @@
         <div class="flex-container" v-if="!showName">
             <i class="fas" :class="icon"></i> <span v-if="comparison === 'point'">({{ Math.round(data.content.latitude,1) }} , {{ Math.round(data.content.longitude,1) }})</span>
             <span v-if="comparison === 'named_area'">{{ areaName }}</span>
-            <span v-if="comparison === 'custom_area'">{{ data.content.length }} polygons</span>
+            <span v-if="comparison === 'custom_area'">{{ data.content.length }} polygon{{ data.content.length !== 1 ? 's' : '' }}</span>
         </div>
     </div>
 </template>

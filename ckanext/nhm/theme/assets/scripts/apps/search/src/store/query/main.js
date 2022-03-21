@@ -59,7 +59,7 @@ let query = {
             else {
                 return;
             }
-            context.commit('filters/setFromQuery', newBody.query || {});
+            context.dispatch('filters/setFromQuery', newBody.query || {});
             Vue.set(context.rootState.appState.query.parsingError, 'queryBody', context.state.filters.parsingError);
             if (context.rootState.appState.query.parsingError.queryBody !== null) {
                 return;

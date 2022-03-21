@@ -49,7 +49,7 @@ const store = new Vuex.Store(
                 context.state.appState.app.loading = true;
                 context.state.appState.app.error   = false;
                 let schemaPath                     = '/querySchemas/v1.0.0/v1.0.0.json';
-                $RefParser.dereference(schemaPath, {resolve: {http: {timeout: 2000}}})
+                return $RefParser.dereference(schemaPath, {resolve: {http: {timeout: 2000}}})
                           .then(data => {
                               let groups = d3.keys(data.definitions.group.properties);
                               let terms  = d3.nest()

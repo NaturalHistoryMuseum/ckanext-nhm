@@ -95,51 +95,6 @@ let filters = {
         }
     },
     mutations:  {
-        setFromQuery(state, query) {
-            let currentState = {...state.items};
-            try {
-                if (query.filters === undefined) {
-                    state.items = {...initialFilters};
-                }
-                else {
-                    let dequeryfy = (items, parent) => {
-                        let itemList = {};
-                        items.forEach((i) => {
-                            let item = d3.entries(i)[0];
-                            if (Array.isArray(item.value)) {
-                                let groupId       = parent === null ? 'group_root' : `group_${shortid.generate()}`;
-                                itemList[groupId] = {
-                                    parent:  parent,
-                                    key:     item.key,
-                                    content: [],
-                                    display: {}
-                                };
-                                d3.entries(dequeryfy(item.value, groupId)).forEach((f) => {
-                                    itemList[f.key] = f.value;
-                                });
-                            }
-                            else {
-                                itemList[`term_${shortid.generate()}`] = {
-                                    parent:  parent,
-                                    key:     item.key,
-                                    content: item.value,
-                                    display: {}
-                                }
-                            }
-                        });
-                        return itemList;
-                    };
-
-                    let dequeried = dequeryfy([query.filters], null);
-                    state.items   = {...dequeried};
-                }
-                state.parsingError = null;
-            } catch (e) {
-                state.parsingError = e;
-                // revert back to previous state
-                state.items        = {...currentState};
-            }
-        },
         changeKey(state, payload) {
             Vue.set(state.items[payload.id], 'key', payload.key);
         },
@@ -263,6 +218,51 @@ let filters = {
                 deleteCount++;
             });
             return deleteCount;
+        },
+        setFromQuery(context, query) {
+            let currentState = {...context.state.items};
+            try {
+                if (query.filters === undefined) {
+                    context.state.items = {...initialFilters};
+                }
+                else {
+                    let dequeryfy = (items, parent) => {
+                        let itemList = {};
+                        items.forEach((i) => {
+                            let item = d3.entries(i)[0];
+                            if (Array.isArray(item.value) && context.rootState.schema.groups.includes(item.key)) {
+                                let groupId       = parent === null ? 'group_root' : `group_${shortid.generate()}`;
+                                itemList[groupId] = {
+                                    parent:  parent,
+                                    key:     item.key,
+                                    content: [],
+                                    display: {}
+                                };
+                                d3.entries(dequeryfy(item.value, groupId)).forEach((f) => {
+                                    itemList[f.key] = f.value;
+                                });
+                            }
+                            else {
+                                itemList[`term_${shortid.generate()}`] = {
+                                    parent:  parent,
+                                    key:     item.key,
+                                    content: item.value,
+                                    display: {}
+                                }
+                            }
+                        });
+                        return itemList;
+                    };
+
+                    let dequeried = dequeryfy([query.filters], null);
+                    context.state.items   = {...dequeried};
+                }
+                context.state.parsingError = null;
+            } catch (e) {
+                context.state.parsingError = e;
+                // revert back to previous state
+                context.state.items        = {...currentState};
+            }
         },
     }
 };
