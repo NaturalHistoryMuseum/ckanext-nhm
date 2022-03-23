@@ -70,6 +70,7 @@ class SpecimenView(DefaultView):
             ('decimalLongitude', 'Decimal longitude'),
             ('verbatimLatitude', 'Verbatim latitude'),
             ('verbatimLongitude', 'Verbatim longitude'),
+            ('coordinateUncertaintyInMeters', 'Coordinate uncertainty'),
             ('centroid', 'Centroid'),
             ('maxError', 'Max error'),
             ('geodeticDatum', 'Geodetic datum'),
@@ -225,6 +226,13 @@ class SpecimenView(DefaultView):
                 c.record_dict['registeredWeightUnit'])
             # Merge unit into the field
             c.record_dict['registeredWeight'] += ' %s' % c.record_dict['registeredWeightUnit']
+
+        # add a meters unit to the coordinateUncertaintyInMeters value
+        coordinate_uncertainty_in_meters = c.record_dict.get('coordinateUncertaintyInMeters')
+        if coordinate_uncertainty_in_meters is not None:
+            c.record_dict['coordinateUncertaintyInMeters'] = f'{coordinate_uncertainty_in_meters}m'
+            c.custom_filters['coordinateUncertaintyInMeters'] = \
+                f'coordinateUncertaintyInMeters:{coordinate_uncertainty_in_meters}'
 
         collection_date = []
         collection_date_filter = []
