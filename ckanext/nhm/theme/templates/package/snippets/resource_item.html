@@ -17,6 +17,9 @@
         {{ h.markdown_extract(res.description, extract_length=80) }}
       {% endif %}
     </p>
+    <p class="resource-size">
+        {{ h.get_resource_size(res) }}
+    </p>
   {% endblock %}
   </div>
   {% block resource_item_explore %}
