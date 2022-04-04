@@ -1444,11 +1444,14 @@ def group_resources(resource_list):
 def get_resource_size(resource_dict):
     prefixes = 'KMGTPEZ'  # kilo, mega, giga, etc. I could make this a list but what's the point
     if toolkit.get_action('datastore_is_datastore_resource')({}, {'resource_id': resource_dict['id']}):
-        records = toolkit.get_action('datastore_count')({}, {'resource_ids': [resource_dict['id']]})
-        return f'{records} records'
+        try:
+            records = toolkit.get_action('datastore_count')({}, {'resource_ids': [resource_dict['id']]})
+            return f'{records} records'
+        except:
+            return 'Unknown size'
     sz = resource_dict.get('Size')
     if sz is None:
-        return ''
+        return 'Unknown size'
     p = ''
     while sz >= 1024:
         p = prefixes[0]
