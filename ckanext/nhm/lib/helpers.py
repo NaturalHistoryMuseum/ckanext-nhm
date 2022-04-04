@@ -1439,3 +1439,19 @@ def group_resources(resource_list):
     return [(group_name, re.sub('[^A-Za-z0-9]', '', group_name or 'ungrouped'),
              [x[1] for x in resources]) for group_name, resources in
             itertools.groupby(group_and_resource, key=itemgetter(0))]
+
+
+def get_resource_size(resource_dict):
+    prefixes = 'KMGTPEZ'  # kilo, mega, giga, etc. I could make this a list but what's the point
+    if toolkit.get_action('datastore_is_datastore_resource')({}, {'resource_id': resource_dict['id']}):
+        records = toolkit.get_action('datastore_count')({}, {'resource_ids': [resource_dict['id']]})
+        return f'{records} records'
+    sz = resource_dict.get('Size')
+    if sz is None:
+        return ''
+    p = ''
+    while sz >= 1024:
+        p = prefixes[0]
+        prefixes = prefixes[1:]
+        sz /= 1024
+    return f'{round(sz)}{p}B'
