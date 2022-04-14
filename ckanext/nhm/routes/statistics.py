@@ -50,12 +50,7 @@ def resources():
 
     # If we have data for more than 31 days, we'll show by month;
     # otherwise segment by day
-    if delta.days > 10:
-        toolkit.c.date_interval = 'month'
-        label_formatter = '%b %Y'
-    else:
-        toolkit.c.date_interval = 'day'
-        label_formatter = '%d/%m/%y'
+    toolkit.c.date_interval = 'day'
 
     date_func = func.date_trunc(toolkit.c.date_interval, model.Resource.created)
 
@@ -85,12 +80,10 @@ def resources():
     toolkit.c.graph_data = []
     total = 0
 
-    for i, stat in enumerate(q.all()):
+    for stat in q.all():
         total += stat.count
-        toolkit.c.graph_data.append([i, total])
-
-        formatted_date = stat.date.strftime(label_formatter)
-        toolkit.c.graph_options['xaxis']['ticks'].append([i, formatted_date])
+        formatted_date = stat.date.strftime('%Y-%m-%d')
+        toolkit.c.graph_data.append([formatted_date, total])
 
     return toolkit.render('stats/resources.html', {
         'title': 'Resource statistics'
@@ -172,7 +165,7 @@ def contributors():
         # get the earliest package creation date
         delta = datetime.now() - order[0][1]
         # if we have data for more than 10 days, we'll show by month; otherwise segment by day
-        extraction_format = '%b %Y' if delta.days > 10 else '%d/%m/%y'
+        extraction_format = '%d/%m/%y'
 
         # sum the counts by package creation time based on the extraction format we chose
         grouped_ordered_data = OrderedDict()
@@ -189,8 +182,7 @@ def contributors():
         # run through the data, adding up a total as we go and adding the data to the graph
         for i, (formatted_date, count) in enumerate(grouped_ordered_data.items()):
             total += count
-            toolkit.c.graph_data.append([i, total])
-            toolkit.c.graph_options['xaxis']['ticks'].append([i, formatted_date])
+            toolkit.c.graph_data.append([formatted_date, total])
 
     return toolkit.render('stats/contributors.html', {
         'title': 'Contributor statistics'
