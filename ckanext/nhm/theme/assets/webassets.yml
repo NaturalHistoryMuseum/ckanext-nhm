@@ -247,6 +247,7 @@ stats-graphs:
       - base/ckan
   contents:
     - vendor/d3/dist/d3.min.js
+    - vendor/pako/pako_inflate.min.js
     - scripts/modules/graphs.js
 
 resource-view-reorder:
