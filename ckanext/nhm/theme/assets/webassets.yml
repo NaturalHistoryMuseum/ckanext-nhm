@@ -167,11 +167,7 @@ search-js:
   output: ckanext-nhm/%(version)s_search.js
   filters: rjsmin
   contents:
-    - scripts/apps/search/dist/search.js
-    - scripts/apps/search/dist/0.search.js
-    - scripts/apps/search/dist/1.search.js
-    - scripts/apps/search/dist/2.search.js
-    - scripts/apps/search/dist/3.search.js
+    - scripts/apps/search/dist/*.js
 
 home-search:
   output: ckanext-nhm/%(version)s_home-search.js
