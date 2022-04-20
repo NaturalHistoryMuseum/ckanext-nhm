@@ -102,7 +102,6 @@ const store = new Vuex.Store(
                         if (viewParam !== undefined) {
                             context.commit('results/display/setView', viewParam);
                         }
-                        router.replace({query: {}, params: {}, path: '/search'})
                         context.dispatch('results/runSearch', page);
                     }
                     else {
@@ -110,6 +109,8 @@ const store = new Vuex.Store(
                     }
                 }).catch(error => {
                     context.commit('results/query/filters/resetFilters');
+                }).finally(() => {
+                    router.replace({query: {}, params: {}, path: '/search'})
                 });
             },
         }
