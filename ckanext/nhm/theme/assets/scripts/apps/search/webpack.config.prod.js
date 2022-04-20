@@ -39,7 +39,7 @@ module.exports = {
         library:       'search',
         libraryTarget: 'umd',
         filename:      'search.js',
-        publicPath: '/fanstatic/scripts/apps/search/'
+        publicPath: '/webassets/ckanext-nhm/'
     },
     resolve: {
         alias: {
