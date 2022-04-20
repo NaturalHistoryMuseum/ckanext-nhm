@@ -1,66 +1,50 @@
 {% extends "stats/base.html" %}
 
 {% block breadcrumb_content %}
-    {{ super() }}
-    <li class="active">{% link_for _(title), named_route='statistics.records' %}</li>
+{{ super() }}
+<li class="active">{% link_for _(title), named_route='statistics.records' %}</li>
 {% endblock %}
 
 {% block stats_content %}
+<section id="stats-total-datasets">
+    <h2>{{ _('Total number of records') }}</h2>
+    <div data-module="stats_graphs" data-module-data="{{ h.dump_json(g.graph_data) }}"
+         id="graph-box" style="width: 100%;">
+    </div>
+</section>
 
-      <section id="stats-total-datasets">
-      <h2>{{ _('Total number of records') }}</h2>
+<section id="stats-record-count">
+    <h2>{{ _('Records per dataset') }}</h2>
 
-      {% set xaxis = {'mode': 'time', 'timeformat': '%d-%m-%y'} %}
-      {% set yaxis = {'min': 0, 'tickDecimals': 0} %}
-      <table class="table table-chunky table-bordered table-striped" data-module="plot" data-module-xaxis="{{ h.dump_json(xaxis) }}" data-module-yaxis="{{ h.dump_json(yaxis) }}">
+    <table class="table table-chunky table-bordered table-striped">
         <thead>
-          <tr>
-            <th>{{ _("Date") }}</th>
-            <th>{{ _("Records") }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in g.num_records %}
-            <tr>
-              <th data-type="date" data-value="{{ row.date.strftime("%s") }}"><time datetime="{{ row.date.isoformat() }}">{{ h.render_datetime(row.date) }}</time></th>
-              <td>{{ row.count }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-
-    <section id="stats-record-count">
-      <h2>{{ _('Records per dataset') }}</h2>
-
-      <table class="table table-chunky table-bordered table-striped">
-        <thead>
-          <tr>
+        <tr>
             <th>{{ _("Dataset") }}</th>
             <th>{{ _("Resource") }}</th>
             <th>{{ _("Number of records") }}</th>
-          </tr>
+        </tr>
         </thead>
         <tbody>
 
-          {% for row in g.datastore_stats['resources'] %}
-            <tr>
-              <th><a href="{{ h.url_for('dataset.read', id=row.pkg_name ) }}">{{ row.pkg_title }}</a></th>
-              <th><a href="{{ h.url_for('resource.read', id=row.pkg_name, resource_id=row.id ) }}">{{ row.name }}</a></th>
-              <td>{{ h.delimit_number(row.total) }}</td>
-            </tr>
-          {% endfor %}
+        {% for row in g.datastore_stats['resources'] %}
+        <tr>
+            <th><a href="{{ h.url_for('dataset.read', id=row.pkg_name ) }}">{{ row.pkg_title }}</a>
+            </th>
+            <th><a href="{{ h.url_for('resource.read', id=row.pkg_name, resource_id=row.id ) }}">{{
+                                                                                                 row.name
+                                                                                                 }}</a>
+            </th>
+            <td>{{ h.delimit_number(row.total) }}</td>
+        </tr>
+        {% endfor %}
 
-          <tr>
-              <td colspan="2"><strong>Total</strong></td>
-              <td><strong>{{ h.delimit_number(g.datastore_stats['total']) }}</strong></td>
-          </tr>
+        <tr>
+            <td colspan="2"><strong>Total</strong></td>
+            <td><strong>{{ h.delimit_number(g.datastore_stats['total']) }}</strong></td>
+        </tr>
 
         </tbody>
-      </table>
+    </table>
 
-      </section>
-
-      {% asset "ckanext-nhm/stats-extra" %}
-
+</section>
 {% endblock %}

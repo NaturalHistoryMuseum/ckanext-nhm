@@ -1,20 +1,18 @@
 {% extends "stats/base.html" %}
 
 {% block breadcrumb_content %}
-    {{ super() }}
-    <li class="active">{% link_for _(title), named_route='statistics.resources' %}</li>
+{{ super() }}
+<li class="active">{% link_for _(title), named_route='statistics.resources' %}</li>
 {% endblock %}
 
 
 {% block stats_content %}
 
-    <section id="stats-total-resources">
-
-      <h2>{{ _('Total number of resources') }}</h2>
-      <div data-module="graph" data-module-data="{{ h.dump_json(g.graph_data) }}" data-module-config="{{ h.dump_json(g.graph_options) }}" style="width:100%; height:300px;"></div>
-      {% asset 'ckanext-graph/main-css' %}
-      {% asset 'ckanext-graph/main-js' %}
-
-    </section>
+<section id="stats-total-resources">
+    <h2>{{ _('Total number of resources') }}</h2>
+    <div data-module="stats_graphs" data-module-data="{{ h.dump_json(g.graph_data) }}"
+         id="graph-box" style="width: 100%;">
+    </div>
+</section>
 
 {% endblock %}
