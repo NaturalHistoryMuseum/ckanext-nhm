@@ -145,6 +145,7 @@
                                         class="full-width">
                                     <option>csv</option>
                                     <option>dwc</option>
+                                    <option>xlsx</option>
                                 </select>
                             </div>
                             <div class="form-row flex-container flex-wrap flex-between">
