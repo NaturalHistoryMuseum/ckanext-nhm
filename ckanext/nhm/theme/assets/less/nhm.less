@@ -261,16 +261,23 @@ body {
   }
 }
 
-.copyable {
+.copyable, .editable {
   font-family: monospace;
   background-color: @grey9;
   border: 1px dashed @grey8;
   font-size: 1.3em;
   padding: 0;
-  .mixin-flex-container();
-  .mixin-flex-row();
-  .mixin-flex-top();
-  .mixin-flex-stretch-first();
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  & > :first-child {
+    grid-row: span 2;
+  }
+
+  & .fa-pencil {
+    // otherwise it gets cut off
+    letter-spacing: 2px;
+  }
 
   &.copied {
     border-color: @primary5;
@@ -293,6 +300,18 @@ body {
     & .fa-times {
       color: @warning2;
     }
+  }
+}
+
+.editable {
+  & input {
+    border: none;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  & .edited {
+    color: @warning2;
   }
 }
 
