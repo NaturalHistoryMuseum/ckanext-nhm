@@ -18,6 +18,7 @@ let results = {
         resultData:      {},
         unfilteredTotal: 0,
         slug:            null,
+        slugReserved:    false,
         doi:             null,
         download:        null,
         queryParams:     null,
@@ -190,7 +191,26 @@ let results = {
             context.dispatch('getMetadata', {
                 meta:    'slug',
                 action:  'datastore_create_slug',
-                extract: (data) => data.result.slug
+                extract: (data) => {
+                    Vue.set(context.state, 'slugReserved', data.result.is_reserved);
+                    return data.result.slug;
+                }
+            });
+        },
+        editSlug(context, payload) {
+            Vue.set(context.rootState.appState.status.slugEdit, 'loading', true)
+            return post('datastore_edit_slug', {
+                current_slug: context.state.slug,
+                new_reserved_slug: payload
+            }).then(d => {
+                Vue.set(context.rootState.appState.status.slugEdit, 'failed', !d.success)
+                if (d.success) {
+                    context.dispatch('getSlug');
+                }
+            }).catch(e => {
+                Vue.set(context.rootState.appState.status.slugEdit, 'failed', true);
+            }).finally(() => {
+                Vue.set(context.rootState.appState.status.slugEdit, 'loading', false)
             });
         },
         getDOI(context, payload) {

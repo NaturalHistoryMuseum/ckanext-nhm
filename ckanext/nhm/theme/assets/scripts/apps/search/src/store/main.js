@@ -5,7 +5,7 @@ import results from './results/main';
 import appState from './appState';
 import $RefParser from 'json-schema-ref-parser';
 import * as d3 from 'd3-collection';
-import {post} from './utils';
+import {post, get} from './utils';
 import pako from 'pako';
 import router from '../router';
 
@@ -113,6 +113,19 @@ const store = new Vuex.Store(
                     router.replace({query: {}, params: {}, path: '/search'})
                 });
             },
+            getUser(context) {
+                return get('user_show').then(d => {
+                    return {
+                        loggedIn: true,
+                        sysAdmin: d.result.sysadmin
+                    }
+                }).catch(e => {
+                    return {
+                        loggedIn: false,
+                        sysAdmin: false
+                    };
+                });
+            }
         }
     }
 );
