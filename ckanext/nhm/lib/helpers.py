@@ -796,7 +796,7 @@ def downloadable(resource):
     :returns: bool
 
     '''
-    return bool(resource['format'])
+    return bool(resource['format']) or resource.get('datastore_active', False)
 
 
 def is_sysadmin():
