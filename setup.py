@@ -27,8 +27,8 @@ ckan_extensions = OrderedDict([
     github('ckanext-graph', 'v2.0.1'),
     github('ckanext-ldap', 'v3.1.1'),
     github('ckanext-query-dois', 'v2.1.0'),
-    github('ckanext-statistics', 'v2.0.6'),
-    github('ckanext-versioned-datastore', 'v3.3.0'),
+    github('ckanext-statistics', 'v2.0.7'),
+    github('ckanext-versioned-datastore', 'v3.4.0'),
 ])
 
 setup(
