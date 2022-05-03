@@ -171,3 +171,12 @@ def get_permanent_url(context, data_dict):
 
         # concatenate the path with the site url and return
         return f'{toolkit.config.get("ckan.site_url")}{path}'
+
+
+@toolkit.chained_action
+def user_show(next_action, context, data_dict):
+    # FIXME: temporary override until we update to ckan 2.10
+    current_user = context.get('auth_user_obj')
+    if 'id' not in data_dict and 'user_obj' not in data_dict and current_user is not None:
+        data_dict['id'] = context['auth_user_obj'].id
+    return next_action(context, data_dict)

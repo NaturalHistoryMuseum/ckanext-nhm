@@ -21,6 +21,10 @@ let appState = {
                 loading: false,
                 failed:  false
             },
+            slugEdit: {
+                loading: false,
+                failed:  false
+            },
             doi:        {
                 loading: false,
                 failed:  false

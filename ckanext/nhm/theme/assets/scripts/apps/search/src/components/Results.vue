@@ -75,9 +75,10 @@
                          v-dismiss="{switch: 'showShare', ignore: ['#show-share']}">
                         <div v-if="slug !== null">
                             <p>Share this search:</p>
-                            <Copyable :copy-text="'https://' + shareUrl" :display-text="shareUrl">
-                                <span :style="{minWidth: ((22 + slug.length) * 9.6) + 'px', width: '100%', wordBreak: 'break-all'}">{{ shareUrl }}</span>
+                            <Copyable :copy-text="'https://' + shareUrl" :display-text="shareUrl" :edit-button="canEditSlug" @edit="showEditSlug = !showEditSlug">
+                                <span :style="{minWidth: ((22 + slug.length) * 9.6) + 'px', width: '100%', wordBreak: 'break-all', opacity: showEditSlug ? 0.5 : 1}">{{ shareUrl }}</span>
                             </Copyable>
+                            <Editable :edit-text="slug" :edit-status="status.slugEdit" v-if="showEditSlug" @save="saveSlugEdit"/>
                             <div class="form-row flex-container flex-wrap flex-around">
                                 <div v-if="page > 0">
                                     <label for="chkSharePage">Include page</label>
@@ -257,14 +258,16 @@
     import ListView from './views/ListView.vue';
     import GalleryView from './views/GalleryView.vue';
     import FieldPicker from './misc/FieldPicker.vue';
-    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+    import {mapActions, mapGetters, mapMutations, mapState} from 'vuex';
     import Copyable from './misc/Copyable.vue';
     import Loading from './Loading.vue';
     import LoadError from './LoadError.vue'
+    import Editable from './misc/Editable.vue';
 
     export default {
         name:       'Results',
         components: {
+            Editable,
             Copyable,
             TableView,
             ListView,
@@ -279,6 +282,7 @@
                 showCite:         false,
                 showShare:        false,
                 showFields:       false,
+                showEditSlug:     false,
                 includeSharePage: false,
                 includeShareView: false,
                 views:            ['Table', 'List', 'Gallery'],
@@ -290,11 +294,15 @@
                     format:              'csv',
                     separate_files:      true,
                     ignore_empty_fields: true
+                },
+                user: {
+                    loggedIn: false,
+                    sysAdmin: false
                 }
             }
         },
         computed:   {
-            ...mapState('results', ['resultData', 'page', '_after', 'slug', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
+            ...mapState('results', ['resultData', 'page', '_after', 'slug', 'slugReserved', 'doi', 'download', 'invalidated', 'unfilteredTotal']),
             ...mapState('results/display', ['view', 'headers']),
             ...mapState('appState', ['status']),
             ...mapGetters('results', ['total', 'hasResult', 'hasRecords', 'resultResourceIds', 'records', 'pageParam']),
@@ -316,12 +324,22 @@
                     Url += `?${params.join('&')}`
                 }
                 return Url;
+            },
+            canEditSlug() {
+                if (this.slug === null) {
+                    return false;
+                }
+                if (this.slugReserved && !this.user.sysAdmin) {
+                    return false;
+                }
+                return this.user.loggedIn;
             }
         },
         methods:    {
             ...mapMutations('results/display', ['addCustomHeader', 'setView', 'resetFilteredRecordTag']),
             ...mapActions('results/query/filters', ['deleteTemporaryFilters']),
-            ...mapActions('results', ['runSearch', 'getSlug', 'getDOI', 'getDownload']),
+            ...mapActions('results', ['runSearch', 'getSlug', 'editSlug', 'getDOI', 'getDownload']),
+            ...mapActions(['getUser']),
             shareSearch() {
                 if (!this.showShare && this.slug === null) {
                     this.getSlug();
@@ -329,11 +347,19 @@
                 else {
                     this.showShare = !this.showShare;
                 }
+                if (!this.showShare) {
+                    this.showEditSlug = false;
+                }
             },
             citeNotShare() {
                 this.showShare = false;
                 this.showCite  = true;
             },
+            saveSlugEdit(newSlug) {
+                this.editSlug(newSlug).then(() => {
+                    this.showEditSlug = false;
+                })
+            }
         },
         watch:      {
             slug() {
@@ -353,5 +379,10 @@
                 this.resetFilteredRecordTag();
             }
         },
+        created() {
+            this.getUser().then(u => {
+                this.$set(this, 'user', u);
+            })
+        }
     }
 </script>

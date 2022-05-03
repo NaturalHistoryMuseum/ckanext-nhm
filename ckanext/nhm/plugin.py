@@ -81,6 +81,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'record_show': nhm_action.record_show,
             'object_rdf': nhm_action.object_rdf,
             'get_permanent_url': nhm_action.get_permanent_url,
+            'user_show': nhm_action.user_show
         }
 
     ## IClick
