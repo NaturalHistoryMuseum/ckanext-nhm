@@ -45,25 +45,21 @@
     </div>
 
     <h3>3. Records</h3>
-    <p>Records from the <i>Specimens</i> resource are versioned, so you can either cite the most up-to-date version of the record or the version as it was when you initially retrieved it. Both URLs can be found in the 'Cite this as' section at the bottom of a record page.</p>
+    <p>Records from the <i>Specimens</i> resource have shorter <code>/object/</code> URLs leading directly to the record. You can cite the version as it was when you initially retrieved it or omit the version ID to always display the most up-to-date record. Both URLs can be found in the 'Cite this as' section at the bottom of the record page.</p>
     <div class="citation-string">
         Natural History Museum. (<u>Year updated</u>). <u><i>Record name</i></u> (from <i>Collection specimens</i>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/object/<u>record-id</u>/<u>version</u>
     </div>
 
-    <p>Other records can be cited without a version, using their full URL.</p>
+    <p>Other records can be cited using their full standard URL (including dataset and resource).</p>
     <div class="citation-string">
         <u>Author, A., Author, B.</u>. (<u>Year</u>). <u><i>Record name</i></u> (from <u><i>Dataset name</i></u>, <u><i>Resource name</i></u>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/dataset/<u>dataset-id</u>/resource/<u>resource-id</u>/record/<u>record-id</u>
     </div>
 
     <h3>4. Searches</h3>
     <p>You can cite results generated from the <a href="{{ h.url_for('search.view') }}">integrated search</a>. Clicking the "Cite" button and entering an email address will generate a DOI for the search. All records within the search are versioned. This allows you to cite subsets of resources, multiple datasets, and exact versions of multiple records.</p>
+    <p>Downloads generated from a search (from either interface) will include a DOI to uniquely identify that search.</p>
     <div class="citation-string">
         Natural History Museum. (<u>Year</u>). <i>Query on the Natural History Museum Data Portal (data.nhm.ac.uk) (<u>n</u> records)</i> [Data set]. Natural History Museum. https://doi.org/<u>doi</u>
-    </div>
-
-    <p>We recommend you use the integrated search where possible, as the older single-resource search does not have the same versioning features. However, if this is not possible, you can use the full URL to cite the search.</p>
-    <div class="citation-string">
-        <u>Author, A., Author, B.</u>. (<u>Year</u>). <i>Query on <u>Resource name</u></i> (from <u><i>Dataset name</i></u>) [Data set]. Natural History Museum. https://data.nhm.ac.uk/dataset/<u>dataset-id</u>/resource/<u>resource-id</u>?<u>url-parameters</u>
     </div>
 
     <h3>5. The Data Portal</h3>
