@@ -45,19 +45,30 @@
     </div>
 
     <h3>3. Records</h3>
-    <p>Records are versioned, so you can either cite the most up-to-date version of the record or the version as it was when you initially retrieved it. Both URLs can be found in the 'Cite this as' section at the bottom of a record page.</p>
+    <p>Records from the <i>Specimens</i> resource are versioned, so you can either cite the most up-to-date version of the record or the version as it was when you initially retrieved it. Both URLs can be found in the 'Cite this as' section at the bottom of a record page.</p>
     <div class="citation-string">
-        <u>Author, A., Author, B.</u>. (<u>Year</u>). <u><i>Record name</i></u> (from <u><i>Dataset name</i></u>, <u><i>Resource name</i></u>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/object/<u>record-id</u>/<u>version</u>
+        Natural History Museum. (<u>Year updated</u>). <u><i>Record name</i></u> (from <i>Collection specimens</i>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/object/<u>record-id</u>/<u>version</u>
+    </div>
+
+    <p>Other records can be cited without a version, using their full URL.</p>
+    <div class="citation-string">
+        <u>Author, A., Author, B.</u>. (<u>Year</u>). <u><i>Record name</i></u> (from <u><i>Dataset name</i></u>, <u><i>Resource name</i></u>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/dataset/<u>dataset-id</u>/resource/<u>resource-id</u>/record/<u>record-id</u>
     </div>
 
     <h3>4. Searches</h3>
     <p>You can cite results generated from the <a href="{{ h.url_for('search.view') }}">integrated search</a>. Clicking the "Cite" button and entering an email address will generate a DOI for the search. All records within the search are versioned. This allows you to cite subsets of resources, multiple datasets, and exact versions of multiple records.</p>
     <div class="citation-string">
-        Natural History Museum. (<u>Year</u>). Query on the Natural History Museum Data Portal (data.nhm.ac.uk) (<u>n</u> records) [Data set]. Natural History Museum. https://doi.org/<u>doi</u>
+        Natural History Museum. (<u>Year</u>). <i>Query on the Natural History Museum Data Portal (data.nhm.ac.uk) (<u>n</u> records)</i> [Data set]. Natural History Museum. https://doi.org/<u>doi</u>
+    </div>
+
+    <p>We recommend you use the integrated search where possible, as the older single-resource search does not have the same versioning features. However, if this is not possible, you can use the full URL to cite the search.</p>
+    <div class="citation-string">
+        <u>Author, A., Author, B.</u>. (<u>Year</u>). <i>Query on <u>Resource name</u></i> (from <u><i>Dataset name</i></u>) [Data set]. Natural History Museum. https://data.nhm.ac.uk/dataset/<u>dataset-id</u>/resource/<u>resource-id</u>?<u>url-parameters</u>
     </div>
 
     <h3>5. The Data Portal</h3>
     <p>Only cite the Portal directly if you are referencing a non-data aspect of the website, e.g. discussing the concept in general.</p>
+    <p>The principles, impetus, and technical details of the initial development of the Data Portal are described in <i>The Natural History Museum Data Portal</i> (Scott et al., 2019). Read it here: <a href="https://doi.org/10.1093/database/baz038" class="external">https://doi.org/10.1093/database/baz038</a></p>
     <p>Implementations of specific features can be found on our <a href="https://github.com/NaturalHistoryMuseum">GitHub</a> repositories, so if you wish to reference code then it may be better to target these specifically.</p>
 
 {% endblock %}
