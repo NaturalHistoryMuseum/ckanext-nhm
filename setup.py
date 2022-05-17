@@ -21,7 +21,7 @@ ckan_extensions = OrderedDict([
     github('ckanext-dcat', 'v1.1.1', org='ckan'),
     github('ckanext-ckanpackager', 'v2.1.1'),
     github('ckanext-contact', 'v2.0.0'),
-    github('ckanext-doi', 'v3.0.4'),
+    github('ckanext-doi', 'v3.0.5'),
     github('ckanext-gallery', 'v2.0.1'),
     github('ckanext-gbif', 'v2.0.0'),
     github('ckanext-graph', 'v2.0.1'),
