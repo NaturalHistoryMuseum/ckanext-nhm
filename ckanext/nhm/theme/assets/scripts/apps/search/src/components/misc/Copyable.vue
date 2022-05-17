@@ -6,7 +6,7 @@
             v-clipboard:error="onCopyError" aria-label="copy button" title="copy this">
         <i class="fas" :class="{'fa-check': copySuccess && copyAttempt, 'fa-times': copyFailure, 'fa-clipboard': !copyAttempt}"></i></button>
         <button aria-label="edit button" v-if="editButton" @click="$emit('edit')" title="edit this">
-            <i class="fas fa-pencil"></i>
+            <i class="fas fa-pencil-alt"></i>
         </button>
     </p>
 </template>
