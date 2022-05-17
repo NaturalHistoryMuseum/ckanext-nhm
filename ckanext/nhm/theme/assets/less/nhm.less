@@ -2529,9 +2529,11 @@ select, .select2-choice {
   color: @primary2;
 }
 
-// RESOURCE VIEW -----------------------------------------------------------------------------------
+// CITATIONS ---------------------------------------------------------------------------------------
 
 .additional-info {
+  padding-bottom: @min-pad;
+
   h3 {
     background: @grey9;
     margin: 0 0 10px 0;
@@ -2594,7 +2596,26 @@ select, .select2-choice {
       padding-bottom: 0;
     }
   }
+
 }
+
+.citation-string {
+  border: 2px dashed @grey8;
+  padding: @min-pad;
+  border-radius: @rounding;
+  margin-bottom: @min-pad;
+
+  & u {
+    color: @grey3;
+
+    &:hover {
+      transition: color 0.1s;
+      color: @grey1;
+    }
+  }
+}
+
+// RESOURCE VIEW -----------------------------------------------------------------------------------
 
 .ckanext-datapreview {
   padding-top: 0;
