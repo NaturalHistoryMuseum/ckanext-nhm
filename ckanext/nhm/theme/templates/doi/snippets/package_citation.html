@@ -1,0 +1,36 @@
+{% ckan_extends %}
+
+{% block citation_status %}
+<div id="citation-status">
+    {% if not pkg_dict['doi_status'] %}
+    <div class="pad-v">
+            <span class="dataset-private label label-inverse"
+                  title="This DOI has not yet been published">
+                <i class="fas fa-lock inline-icon-left"></i> Private DOI</span>
+        <small>
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>This DOI is not yet resolvable.</strong>
+        </small>
+    </div>
+    <div>
+        <small>
+            It is available for use in manuscripts, and will be published when the Dataset
+            is made public.
+        </small>
+    </div>
+    {% else %}
+    <div class="flex-container flex-between">
+        <small>
+            <i class="fas fa-calendar pad-h"></i>
+            Retrieved: {{ h.render_datetime(h.now(), date_format='%H:%M %d %b %Y (%Z)') }}
+        </small>
+        {% if include_bibtex_link %}
+        {% set datacite_url = 'api.test.datacite.org' if config.get('ckanext.doi.test_mode', config.get('DEBUG', True)) else 'api.datacite.org' %}
+        <a class="btn btn-mini" title="Download BibTeX" href="https://{{ datacite_url }}/dois/application/x-bibtex/{{ pkg_dict['doi'] }}">
+            <small><i class="fas fa-file-code"></i>BibTeX</small>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

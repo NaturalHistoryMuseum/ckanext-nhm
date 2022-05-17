@@ -21,23 +21,50 @@
         data into the portal.
     </p>
 
-    <img class="pull-right" id="datacite" src="/images/datacite.jpg" alt="Datacite" />
+    <h2>What to cite</h2>
+    <p>
+        There are a few different ways of citing our data, depending on the material being referenced.
+    </p>
+    <p>Datasets and versioned queries have unique <i>Digital Object Identifiers</i> (DOIs) provided by the <a class="external" target="_blank" href="https://bl.uk/datacite">British Library's DataCite Service</a>. Please use these if you cite these materials in your work.</p>
 
-    <div class="row">
-        <div class="col-md-6">
-            <h2>Digital Object Identifier (DOI)</h2>
-            <p>
-                All of our datasets are assigned a DOI, a persistent digital identifier used to
-                uniquely identify the dataset.  Our DOIs are provided by the
-                <a class="external" target="_blank" href="http://www.bl.uk/aboutus/stratpolprog/digi/datasets/datacitefaq/faqhome.html">
-                    British Library's DataCite service.
-                </a>
-            </p>
-            <p>Please use the DOI in all citations.</p>
-            <h2>Preferred citation format</h2>
-            <p class="about-doi">
-                Scott, B., &amp; Smith , V. (2014): Dataset title data.nhm.ac.uk. https://doi.org/10.5072/1
-            </p>
-        </div>
+    <h3>1. Datasets</h3>
+    <p>
+        A single, complete dataset: e.g. the DOI <a href="https://doi.org/10.5519/hay2d5yo">10.5519/hay2d5yo</a> references the <a href="/dataset/join-the-dots-collection-level-descriptions">Join the Dots</a> dataset (including all resources therein).
+    </p>
+    <p>
+        Each dataset overview page will have a 'Cite this as' section with an APA-style reference you can copy, or you can download the BibTeX reference from DataCite using the "BibTeX" button.
+    </p>
+    <div class="citation-string">
+        <u>Author, A., Author, B.</u>. (<u>Year</u>). <u><i>Dataset name</i></u> [Data set]. Natural History Museum. https://doi.org/<u>doi</u>
     </div>
+
+    <h3>2. Resources</h3>
+    <p>We don't currently provide separate DOIs for resources, so if you cite a single resource use the standard URL. As with datasets, each resource overview page has an APA-style example reference that can be copied.</p>
+    <div class="citation-string">
+        <u>Author, A., Author, B.</u>. (<u>Year</u>). <u><i>Resource name</i></u> (from <u><i>Dataset name</i></u>) [Data set]. Natural History Museum. https://data.nhm.ac.uk/dataset/<u>dataset-id</u>/resource/<u>resource-id</u>
+    </div>
+
+    <h3>3. Records</h3>
+    <p>Records from the <i>Specimens</i> resource have shorter <code>/object/</code> URLs leading directly to the record. You can cite the version as it was when you initially retrieved it or omit the version ID to always display the most up-to-date record. Both URLs can be found in the 'Cite this as' section at the bottom of the record page.</p>
+    <div class="citation-string">
+        Natural History Museum. (<u>Year updated</u>). <u><i>Record name</i></u> (from <i>Collection specimens</i>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/object/<u>record-id</u>/<u>version</u>
+    </div>
+
+    <p>Other records can be cited using their full standard URL (including dataset and resource).</p>
+    <div class="citation-string">
+        <u>Author, A., Author, B.</u>. (<u>Year</u>). <u><i>Record name</i></u> (from <u><i>Dataset name</i></u>, <u><i>Resource name</i></u>) [Data set record]. Natural History Museum. https://data.nhm.ac.uk/dataset/<u>dataset-id</u>/resource/<u>resource-id</u>/record/<u>record-id</u>
+    </div>
+
+    <h3>4. Searches</h3>
+    <p>You can cite results generated from the <a href="{{ h.url_for('search.view') }}">integrated search</a>. Clicking the "Cite" button and entering an email address will generate a DOI for the search. All records within the search are versioned. This allows you to cite subsets of resources, multiple datasets, and exact versions of multiple records.</p>
+    <p>Downloads generated from a search (from either interface) will include a DOI to uniquely identify that search.</p>
+    <div class="citation-string">
+        Natural History Museum. (<u>Year</u>). <i>Query on the Natural History Museum Data Portal (data.nhm.ac.uk) (<u>n</u> records)</i> [Data set]. Natural History Museum. https://doi.org/<u>doi</u>
+    </div>
+
+    <h3>5. The Data Portal</h3>
+    <p>Only cite the Portal directly if you are referencing a non-data aspect of the website, e.g. discussing the concept in general.</p>
+    <p>The principles, impetus, and technical details of the initial development of the Data Portal are described in <i>The Natural History Museum Data Portal</i> (Scott et al., 2019). Read it here: <a href="https://doi.org/10.1093/database/baz038" class="external">https://doi.org/10.1093/database/baz038</a></p>
+    <p>Implementations of specific features can be found on our <a href="https://github.com/NaturalHistoryMuseum">GitHub</a> repositories, so if you wish to reference code then it may be better to target these specifically.</p>
+
 {% endblock %}
