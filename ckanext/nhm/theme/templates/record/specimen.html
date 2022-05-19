@@ -29,10 +29,3 @@
         </li>
     {% endfor %}
 {% endblock %}
-
-{% block record_additional_information %}
-    {% if g.record_dict['occurrenceID']%}
-        {% snippet "doi/snippets/record_citation.html", pkg_dict=g.pkg, res=res %}
-    {% endif %}
-    {{ super() }}
-{% endblock %}
