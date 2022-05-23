@@ -17,11 +17,11 @@ from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
 from ckanext.nhm.lib.record import Record, RecordImage
 from ckanext.nhm.views import DarwinCoreView
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, redirect
 
 log = logging.getLogger(__name__)
 
-blueprint = Blueprint(name='record', import_name=__name__, url_prefix='/dataset')
+blueprint = Blueprint(name='record', import_name=__name__)
 
 
 def prepare_image(image: RecordImage) -> dict:
@@ -74,9 +74,9 @@ def init_jinja_extensions():
     current_app.jinja_env.add_extension(TaxonomyFormatExtension)
 
 
-@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>.json',
+@blueprint.route('/dataset/<package_name>/resource/<resource_id>/record/<record_id>.json',
                  defaults={'version': None})
-@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>.json/<int:version>')
+@blueprint.route('/dataset/<package_name>/resource/<resource_id>/record/<record_id>.json/<int:version>')
 def json_view(package_name, resource_id, record_id, version):
     '''
     View the record as JSON.
@@ -90,9 +90,9 @@ def json_view(package_name, resource_id, record_id, version):
     return Record(record_id, resource_id=resource_id, version=version).data
 
 
-@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>',
+@blueprint.route('/dataset/<package_name>/resource/<resource_id>/record/<record_id>',
                  defaults={'version': None})
-@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/<int:version>')
+@blueprint.route('/dataset/<package_name>/resource/<resource_id>/record/<record_id>/<int:version>')
 def view(package_name, resource_id, record_id, version):
     '''
     View an individual record.
@@ -110,9 +110,9 @@ def view(package_name, resource_id, record_id, version):
     return view_cls.render_record(toolkit.c)
 
 
-@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/dwc',
+@blueprint.route('/dataset/<package_name>/resource/<resource_id>/record/<record_id>/dwc',
                  defaults={'version': None})
-@blueprint.route('/<package_name>/resource/<resource_id>/record/<record_id>/dwc/<int:version>')
+@blueprint.route('/dataset/<package_name>/resource/<resource_id>/record/<record_id>/dwc/<int:version>')
 def dwc(package_name, resource_id, record_id, version):
     '''
     View an individual record using the DwC view.
@@ -128,3 +128,14 @@ def dwc(package_name, resource_id, record_id, version):
     update_render_context(record)
     toolkit.c.additional_view = True
     return DarwinCoreView().render_record(toolkit.c)
+
+
+@blueprint.route('/record/<resource_id>/<record_id>', defaults={'version': None})
+@blueprint.route('/record/<resource_id>/<record_id>/<int:version>')
+def permalink(resource_id, record_id, version):
+    resource = toolkit.get_action('resource_show')({}, {'id': resource_id})
+    if not resource:
+        raise toolkit.Invalid
+    url = toolkit.url_for('record.view', package_name=resource['package_id'],
+                          resource_id=resource_id, record_id=record_id, version=version)
+    return redirect(url)
