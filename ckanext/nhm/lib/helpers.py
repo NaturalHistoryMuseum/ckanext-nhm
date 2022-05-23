@@ -1458,3 +1458,21 @@ def get_resource_size(resource_dict):
         prefixes = prefixes[1:]
         sz /= 1024
     return f'{round(sz)}{p}B'
+
+
+def get_record_permalink(resource_dict, record_dict, version=None, include_version=False):
+    try:
+        url = get_object_url(resource_dict['id'], record_dict['occurrenceID'], version, include_version)
+    except KeyError:
+        url_for_params = {
+            'resource_id': resource_dict['id'],
+            'record_id': record_dict['_id']
+        }
+        if include_version:
+            rounded_version = toolkit.get_action('datastore_get_rounded_version')({}, {
+                'resource_id': resource_dict['id'],
+                'version': version,
+            })
+            url_for_params['version'] = rounded_version
+        url = toolkit.url_for('record.permalink', qualified=True, **url_for_params)
+    return url
