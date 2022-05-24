@@ -11,7 +11,7 @@ COLLECTION_CONTACTS = OrderedDict([
     ('Data Portal / Other', 'data@nhm.ac.uk'),
     ('Algae, Fungi & Plants', 'm.carine@nhm.ac.uk'),
     ('Economic & Environmental Earth Sciences', 'g.miller@nhm.ac.uk'),
-    ('Fossil Invertebrates & Plants', 'z.hughes@nhm.ac.uk@nhm.ac.uk'),
+    ('Fossil Invertebrates & Plants', 'z.hughes@nhm.ac.uk'),
     ('Fossil Vertebrates & Anthropology', 'm.richter@nhm.ac.uk'),
     ('Insects', 'g.broad@nhm.ac.uk'),
     ('Invertebrates', 'm.lowe@nhm.ac.uk'),
