@@ -15,6 +15,6 @@
   "dependencies": {
     "less": "^3.12.2",
     "search": "file:ckanext/nhm/theme/assets/scripts/apps/search",
-    "vfactor-iiif": "file:ckanext/nhm/theme/assets/scripts/apps/vfactor-iiif"
+    "beetle-iiif": "file:ckanext/nhm/theme/assets/scripts/apps/beetle-iiif"
   }
 }

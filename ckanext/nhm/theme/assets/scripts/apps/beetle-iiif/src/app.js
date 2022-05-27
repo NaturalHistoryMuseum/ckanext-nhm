@@ -3,7 +3,7 @@ import App from './App.vue';
 import Vuex from 'vuex';
 import {API} from "./api";
 
-const rootElement = document.getElementById('vfactor-iiif-app');
+const rootElement = document.getElementById('beetle-iiif-app');
 const resourceId = rootElement.getAttribute('data-resource-id')
 
 Vue.use(Vuex);
@@ -31,7 +31,7 @@ const store = new Vuex.Store({
 export const api = new API(store.state);
 
 const app = new Vue({
-    el: '#vfactor-iiif-app',
+    el: '#beetle-iiif-app',
     store,
     template: '<App/>',
     components: {App}

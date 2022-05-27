@@ -1,7 +1,7 @@
 {
-  "name": "vfactor-iiif",
-  "version": "1.0.0",
-  "description": "V-Factor IIIF App",
+  "name": "beetle-iiif",
+  "version": "2.0.0",
+  "description": "Beetle IIIF App",
   "dependencies": {
     "axios": "^0.19.2",
     "babel-runtime": "^6.26.0",

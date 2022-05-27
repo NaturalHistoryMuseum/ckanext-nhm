@@ -193,19 +193,19 @@ bbcm-js:
     - scripts/vendor/leaflet.utfgrid.js
     - scripts/bbcm.js
 
-vfactor-iiif-css:
-  output: ckanext-nhm/%(version)s_vfactor-iiif.css
+beetle-iiif-css:
+  output: ckanext-nhm/%(version)s_beetle-iiif.css
   filters: less
   config:
     LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
-    - less/vfactor-iiif.less
+    - less/beetle-iiif.less
 
-vfactor-iiif-js:
-  output: ckanext-nhm/%(version)s_vfactor-iiif.js
+beetle-iiif-js:
+  output: ckanext-nhm/%(version)s_beetle-iiif.js
   filters: rjsmin
   contents:
-    - scripts/apps/vfactor-iiif/dist/vfactor-iiif.js
+    - scripts/apps/beetle-iiif/dist/beetle-iiif.js
 
 record-map-css:
   output: ckanext-nhm/%(version)s_record_map.css
