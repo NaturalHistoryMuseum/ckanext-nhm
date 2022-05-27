@@ -33,8 +33,7 @@
 
 <script>
 import {mapState} from "vuex";
-import {SET_RECORD} from "../mutation-types";
-import {api} from "../app";
+import {api, SET_RECORD} from "../app";
 
 export default {
     name: "ThumbnailCarousel",

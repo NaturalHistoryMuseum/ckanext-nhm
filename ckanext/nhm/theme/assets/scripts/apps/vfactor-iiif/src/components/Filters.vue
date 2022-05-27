@@ -57,8 +57,7 @@
 </template>
 
 <script>
-import {api} from "../app";
-import {SET_QUERY} from "../mutation-types";
+import {api, SET_QUERY} from "../app";
 
 export default {
     name: "Filters",
