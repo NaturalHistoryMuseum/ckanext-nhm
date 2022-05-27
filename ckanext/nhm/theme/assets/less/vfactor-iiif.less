@@ -101,13 +101,19 @@ button.btn[disabled].viiif-button {
 }
 
 .viiif-thumbnail-header {
-  padding: 10px 0;
   margin: 10px 0;
   border-top: 1px solid black;
   border-bottom: 1px solid @grey5;
 
   .mixin-flex-container();
   .mixin-flex-between();
+
+  .viiif-status {
+    padding: 10px 0;
+  }
+  .viiif-manifest-link img {
+    height: 2.5em;
+  }
 }
 
 .viiif-thumbnail-track {

@@ -5,5 +5,8 @@
     }],
     "minify"
   ],
-  "plugins": ["syntax-dynamic-import"]
+  "plugins": [
+    "syntax-dynamic-import",
+    ["@babel/plugin-transform-runtime", {"regenerator": true}]
+  ]
 }

@@ -48,7 +48,7 @@
                     </div>
                     <button class="btn btn-primary viiif-button"
                             :disabled="collections.length === 0" @click="changeCollections">
-                        {{'View collection' | pluralize(collections)}}
+                        {{ 'View collection' | pluralize(collections) }}
                     </button>
                 </div>
             </div>
@@ -57,84 +57,123 @@
 </template>
 
 <script>
-    import axios from "axios";
+import {api} from "../app";
+import {SET_QUERY} from "../mutation-types";
 
-    export default {
-        name: "Filters",
-        props: {
-            resourceId: {
-                type: String,
-                required: true
-            },
-            query: {
-                type: Object,
-                default: {}
+export default {
+    name: "Filters",
+    data() {
+        return {
+            // a list of all the available barcodes
+            barcodes: [],
+            // a list of all the available collection names
+            collectionNames: [],
+            // the currently selected barcode (or null if no barcode is selected)
+            barcode: null,
+            // the list of currently selected collections (empty list if none are selected)
+            collections: [],
+            // the name of the currently active filter (either 'collections' or 'barcode')
+            activeFilter: null
+        }
+    },
+    async created() {
+        // first, run through all the records and grab all the barcodes and all the available
+        // collection names. We could use the autocomplete API to get these values but because we
+        // want to get all the barcodes, and they are unique, we'll end up going through all records
+        // anyway and this way is more efficient than calling the autocomplete endpoint.
+        let barcodes = [];
+        let names = [];
+        for await (const record of api.getRecords(100, false)) {
+            const barcode = record.data['Barcode'];
+            // this is technically not needed but hey why not
+            if (!barcodes.includes(barcode)) {
+                barcodes.push(barcode);
             }
-        },
-        data() {
-            return {
-                barcodes: [],
-                collectionNames: [],
-                barcode: null,
-                collections: [],
-                activeFilter: null
-            }
-        },
-        created() {
-            axios.post('/api/3/action/datastore_multisearch', {
-                resource_ids: [this.resourceId],
-                query: this.query,
-                // we know that the number of records in this resource is 400 so we can just get
-                // them all straight up
-                size: 400
-            }).then(response => {
-                for (const record of response.data.result.records) {
-                    this.barcodes.push(record.data.Barcode);
-                    const name = record.data['Collection Name'];
-                    if (!this.collectionNames.includes(name)) {
-                        this.collectionNames.push(name);
-                    }
-                }
-                this.barcodes.sort();
-                this.collectionNames.sort();
-
-                // start off with everything selected
-                this.selectAll();
-                this.changeCollections();
-            }).catch(error => {
-                console.log(error);
-            });
-        },
-        methods: {
-            selectAll() {
-                for (const collection of this.collectionNames) {
-                    if (!this.collections.includes(collection)) {
-                        this.collections.push(collection);
-                    }
-                }
-            },
-            deselectAll() {
-                this.collections = [];
-            },
-            changeCollections() {
-                this.activeFilter = 'collections';
-                this.$emit('collections-change', this.collections);
-            },
-            changeBarcode() {
-                this.activeFilter = 'barcode';
-                this.$emit('barcode-change', this.barcode);
-            }
-        },
-        filters: {
-            trim(value) {
-                return value.trim();
-            },
-            pluralize: function (value, collections) {
-                if (collections.length > 1) {
-                    return `${value}s`;
-                }
-                return value;
+            const name = record.data['Collection Name'];
+            if (!names.includes(name)) {
+                names.push(name);
             }
         }
+
+        // add all the barcodes and collection names in alphabetical order
+        this.barcodes.push(...barcodes.sort());
+        this.collectionNames.push(...names.sort());
+
+        // start off with everything selected
+        this.selectAll();
+        this.changeCollections();
+    },
+    methods: {
+        /**
+         * Select all the available collections.
+         */
+        selectAll() {
+            for (const collection of this.collectionNames) {
+                if (!this.collections.includes(collection)) {
+                    this.collections.push(collection);
+                }
+            }
+        },
+        /**
+         * Clear the collection names selection.
+         */
+        deselectAll() {
+            this.collections = [];
+        },
+        /**
+         * Changes the current store state's query to a new query using the currently selected
+         * collections to filter the results.
+         */
+        changeCollections() {
+            this.activeFilter = 'collections';
+            let query;
+            switch (this.collections.length) {
+                case 0:
+                    query = null;
+                    break;
+                case 1:
+                    query = {
+                        string_equals: {
+                            fields: ['Collection Name'],
+                            value: this.collections[0]
+                        }
+                    };
+                    break;
+                default:
+                    query = {
+                        or: this.collections.map(collection => ({
+                            string_equals: {
+                                fields: ['Collection Name'],
+                                value: collection
+                            }
+                        }))
+                    };
+                    break;
+            }
+            // update the query in the store state
+            this.$store.commit(SET_QUERY, query);
+        },
+        /**
+         * Changes the current store state's query to a new query using the currently selected
+         * barcode to filter the results.
+         */
+        changeBarcode() {
+            this.activeFilter = 'barcode';
+            this.$store.commit(SET_QUERY, {
+                string_equals: {
+                    fields: ['Barcode'],
+                    value: this.barcode
+                }
+            });
+        }
+    },
+    filters: {
+        pluralize: function (value, collections) {
+            if (collections.length > 1) {
+                return `${value}s`;
+            }
+            return value;
+        }
     }
+}
 </script>
