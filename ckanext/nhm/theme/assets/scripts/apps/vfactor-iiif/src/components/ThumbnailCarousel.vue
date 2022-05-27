@@ -2,7 +2,7 @@
     <div>
         <div class="viiif-thumbnail-header">
             <span class="viiif-status">
-                Showing {{ records.length }} of {{ total }} total thumbnails
+                Found {{ total }} records
             </span>
             <a v-if="manifestLink" target="_blank" :href="manifestLink" class="viiif-manifest-link">
                 <img src="/images/iiif.png" alt="IIIF Manifest">
