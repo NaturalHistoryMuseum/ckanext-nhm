@@ -8,45 +8,45 @@
                 If you know what drawer you're looking for, please select its barcode from the
                 dropdown below. If not, use the checkboxes to filter your search by collection.
             </div>
-            <div class="viiif-intro-text-lower">
+            <div class="biiif-intro-text-lower">
                 Please be aware that you cannot use both of these options at the same time.
             </div>
             <hr/>
-            <div :class="{'viiif-filter': true, 'active': activeFilter === 'barcode'}">
-                <label class="viiif-filter-barcode-label" for="viiif-filter-barcode-select">
+            <div :class="{'biiif-filter': true, 'active': activeFilter === 'barcode'}">
+                <label class="biiif-filter-barcode-label" for="biiif-filter-barcode-select">
                     Select a barcode:
                 </label>
-                <div class="viiif-filter-barcode-body">
-                    <select id="viiif-filter-barcode-select" v-model="barcode">
+                <div class="biiif-filter-barcode-body">
+                    <select id="biiif-filter-barcode-select" v-model="barcode">
                         <option disabled value="">Please select one</option>
                         <option v-for="option in barcodes" :value="option" :key="option">
                             {{ option }}
                         </option>
                     </select>
-                    <button class="btn btn-primary viiif-button" :disabled="barcode == null"
+                    <button class="btn btn-primary biiif-button" :disabled="barcode == null"
                             @click="changeBarcode">View drawer
                     </button>
                 </div>
             </div>
             <hr/>
-            <div :class="{'viiif-filter': true, 'active': activeFilter === 'collections'}">
-                <div class="viiif-filter-collection-label-header">
+            <div :class="{'biiif-filter': true, 'active': activeFilter === 'collections'}">
+                <div class="biiif-filter-collection-label-header">
                     Or choose one or more collections to view:
                 </div>
                 <div v-for="option in collectionNames">
-                    <label class="viiif-filter-collection-label">
+                    <label class="biiif-filter-collection-label">
                         <input type="checkbox" :value="option" v-model="collections">
                         {{ option }}
                     </label>
                 </div>
-                <div class="viiif-filter-collection-actions">
-                    <div class="viiif-filter-collection-selectors">
-                        <span class="viiif-filter-collection-selector"
+                <div class="biiif-filter-collection-actions">
+                    <div class="biiif-filter-collection-selectors">
+                        <span class="biiif-filter-collection-selector"
                               @click="selectAll">Select all</span>
-                        <span class="viiif-filter-collection-selector"
+                        <span class="biiif-filter-collection-selector"
                               @click="deselectAll">Clear</span>
                     </div>
-                    <button class="btn btn-primary viiif-button"
+                    <button class="btn btn-primary biiif-button"
                             :disabled="collections.length === 0" @click="changeCollections">
                         {{ 'View collection' | pluralize(collections) }}
                     </button>

@@ -1,28 +1,28 @@
 <template>
     <div>
-        <div class="viiif-thumbnail-header">
-            <span class="viiif-status">
+        <div class="biiif-thumbnail-header">
+            <span class="biiif-status">
                 Found {{ total }} records
             </span>
-            <a v-if="manifestLink" target="_blank" :href="manifestLink" class="viiif-manifest-link">
+            <a v-if="manifestLink" target="_blank" :href="manifestLink" class="biiif-manifest-link">
                 <img src="/images/iiif.png" alt="IIIF Manifest">
             </a>
         </div>
-        <div class="viiif-thumbnail-track" @mousedown="onMouseDown" @mouseleave="onMouseLeave"
+        <div class="biiif-thumbnail-track" @mousedown="onMouseDown" @mouseleave="onMouseLeave"
              @mouseup="onMouseUp" @mousemove="onMouseMove" @scroll="onScroll"
              @contextmenu="onRightClick" ref="track">
-            <div :class="{'viiif-thumbnail-container': true, 'active': currentIndex === index}"
+            <div :class="{'biiif-thumbnail-container': true, 'active': currentIndex === index}"
                  v-for="(record, index) in records" role="button"
                  :aria-pressed="currentIndex === index ? 'true' : 'false'"
                  :key="record.data._id" :data-thumbnail-index="index" ref="container">
-                <img class="viiif-thumbnail-image" :src="getRecordThumbnail(record)"
+                <img class="biiif-thumbnail-image" :src="getRecordThumbnail(record)"
                      :width="`${thumbnailSize}px`" draggable="false"
                      :alt="`Thumbnail of ${record.data['Barcode']} from ${record.data['Collection Name']}`"/>
-                <div class="viiif-thumbnail-label">
-                    <div class="viiif-thumbnail-label-barcode">
+                <div class="biiif-thumbnail-label">
+                    <div class="biiif-thumbnail-label-barcode">
                         {{ record.data['Barcode'] }}
                     </div>
-                    <div class="viiif-thumbnail-label-collection">
+                    <div class="biiif-thumbnail-label-collection">
                         {{ record.data['Collection Name'] }}
                     </div>
                 </div>
@@ -168,10 +168,10 @@ export default {
             if (this.startX >= event.pageX - this.mouseClickMoveThreshold &&
                 this.startX <= event.pageX + this.mouseClickMoveThreshold) {
                 let index = null;
-                if (event.target.classList.contains('viiif-thumbnail-image') ||
-                    event.target.classList.contains('viiif-thumbnail-label')) {
+                if (event.target.classList.contains('biiif-thumbnail-image') ||
+                    event.target.classList.contains('biiif-thumbnail-label')) {
                     index = parseInt(event.target.parentElement.dataset.thumbnailIndex);
-                } else if (event.target.classList.contains('viiif-thumbnail-container')) {
+                } else if (event.target.classList.contains('biiif-thumbnail-container')) {
                     index = parseInt(event.target.dataset.thumbnailIndex);
                 }
                 if (index != null) {
