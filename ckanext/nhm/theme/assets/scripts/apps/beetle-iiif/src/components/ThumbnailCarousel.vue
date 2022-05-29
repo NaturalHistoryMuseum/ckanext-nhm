@@ -49,6 +49,10 @@ export default {
         mouseClickMoveThreshold: {
             type: Number,
             default: 5
+        },
+        fetchImmediately: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -88,7 +92,9 @@ export default {
         }
     },
     async created() {
-        await this.getRecords();
+        if (this.fetchImmediately) {
+            await this.getRecords();
+        }
     },
     methods: {
         /**
