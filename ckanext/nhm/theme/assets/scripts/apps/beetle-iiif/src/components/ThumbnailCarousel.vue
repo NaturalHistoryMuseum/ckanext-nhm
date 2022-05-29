@@ -136,10 +136,9 @@ export default {
          */
         getRecordThumbnail(record) {
             if (!!record.iiif) {
-                const infoUrl = record.iiif.items[0].items[0].items[0].body.id;
-                // 10 is the length of "info.json"
-                const baseUrl = infoUrl.slice(0, infoUrl.length - 10);
-                return `${baseUrl}/full/${this.thumbnailSize},/0/default.jpg`
+                // TODO: what about non-iiif images?
+                const baseUrl = record.iiif.items[0].items[0].items[0].body.id;
+                return `${baseUrl}/full/${this.thumbnailSize},/0/default.jpg`;
             }
             return '';
         },
