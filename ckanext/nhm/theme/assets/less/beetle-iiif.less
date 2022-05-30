@@ -4,11 +4,11 @@
 
 .load-fonts();
 
-.viiif-intro-text-lower {
+.biiif-intro-text-lower {
   margin-top: 15px;
 }
 
-.viiif-filter {
+.biiif-filter {
   padding: 5px;
   border-radius: 5px;
 
@@ -17,7 +17,7 @@
   }
 }
 
-.viiif-filter-collection-label {
+.biiif-filter-collection-label {
   font-weight: normal;
   margin-left: 10px;
 
@@ -26,7 +26,7 @@
   }
 }
 
-.viiif-filter-collection-actions {
+.biiif-filter-collection-actions {
   margin-top: 5px;
   .mixin-flex-container();
 
@@ -43,7 +43,7 @@
   }
 }
 
-.viiif-filter-collection-selectors {
+.biiif-filter-collection-selectors {
   .mixin-flex-container();
   .mixin-flex-row();
   .mixin-flex-center();
@@ -53,17 +53,17 @@
   }
 }
 
-.viiif-filter-collection-selector {
+.biiif-filter-collection-selector {
   cursor: pointer;
   font-weight: bold;
   text-decoration: underline;
 }
 
-.viiif-filter-collection-label-header {
+.biiif-filter-collection-label-header {
   margin-bottom: 15px;
 }
 
-.viiif-filter-barcode-label {
+.biiif-filter-barcode-label {
   font-weight: normal;
   margin-bottom: 15px;
 
@@ -72,7 +72,7 @@
   }
 }
 
-.viiif-filter-barcode-body {
+.biiif-filter-barcode-body {
   .mixin-flex-container();
 
   // if the page width is beyond xl or less than md - 1, show everything on the same line. When the
@@ -96,28 +96,34 @@
   }
 }
 
-button.btn[disabled].viiif-button {
+button.btn[disabled].biiif-button {
   opacity: 0.95;
 }
 
-.viiif-thumbnail-header {
-  padding: 10px 0;
+.biiif-thumbnail-header {
   margin: 10px 0;
   border-top: 1px solid black;
   border-bottom: 1px solid @grey5;
 
   .mixin-flex-container();
   .mixin-flex-between();
+
+  .biiif-status {
+    padding: 10px 0;
+  }
+  .biiif-manifest-link img {
+    height: 2.5em;
+  }
 }
 
-.viiif-thumbnail-track {
+.biiif-thumbnail-track {
   cursor: pointer;
   display: flex;
   overflow-x: auto;
   flex-wrap: nowrap;
 }
 
-.viiif-thumbnail-container {
+.biiif-thumbnail-container {
   text-align: center;
   padding: 10px;
 
@@ -126,16 +132,16 @@ button.btn[disabled].viiif-button {
   }
 }
 
-.viiif-thumbnail-image {
+.biiif-thumbnail-image {
   padding: 0 10px;
 }
 
-.viiif-thumbnail-label {
-  .viiif-thumbnail-label-barcode {
+.biiif-thumbnail-label {
+  .biiif-thumbnail-label-barcode {
     font-weight: bold;
   }
 
-  .viiif-thumbnail-label-collection {
+  .biiif-thumbnail-label-collection {
     font-style: italic;
   }
 }

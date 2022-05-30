@@ -3,7 +3,7 @@
 const {VueLoaderPlugin} = require('vue-loader');
 
 module.exports = {
-    mode: 'development',
+    mode: 'production',
     entry: [
         './src/app.js'
     ],
@@ -19,10 +19,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ],
+                use: ['style-loader', 'css-loader'],
             }
         ]
     },
@@ -30,14 +27,14 @@ module.exports = {
         new VueLoaderPlugin()
     ],
     output: {
-        library: 'vfactor_iiif',
+        library: 'beetle_iiif',
         libraryTarget: 'umd',
-        filename: 'vfactor-iiif.js',
-        publicPath: '/fanstatic/scripts/apps/vfactor-iiif/'
+        filename: 'beetle-iiif.js',
+        publicPath: '/webassets/ckanext-nhm/'
     },
     resolve: {
         alias: {
-            vue: 'vue/dist/vue.js'
+            vue: 'vue/dist/vue.min.js'
         }
     }
 };

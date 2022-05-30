@@ -316,13 +316,13 @@ def get_artefact_resource_id():
     return toolkit.config.get('ckanext.nhm.artefact_resource_id')
 
 
-def get_vfactor_resource_id():
+def get_beetle_iiif_resource_id():
     '''
-    Get the ID for the vfactor resource.
+    Get the ID for the beetle IIIF resource.
 
     :return: the resource id
     '''
-    value = toolkit.config.get('ckanext.nhm.vfactor_resource_id')
+    value = toolkit.config.get('ckanext.nhm.beetle_iiif_resource_id')
     return str(value) if value is not None else None
 
 

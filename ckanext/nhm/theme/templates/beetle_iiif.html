@@ -1,0 +1,22 @@
+{% extends "page.html" %}
+
+{% block title %}
+    {{ _('Beetle IIIF') }}
+{% endblock %}
+
+{% block breadcrumb_content %}
+    <li class="active">
+        <a class="active" href="{{ h.url_for('beetle-iiif.index') }}">Beetle IIIF</a>
+    </li>
+{% endblock %}
+
+{# no secondary block here, we render it in the vue app instead #}
+{% block secondary %}
+{% endblock %}
+
+{% block primary %}
+    {% asset 'ckanext-nhm/beetle-iiif-css' %}
+    {% asset 'ckanext-nhm/beetle-iiif-js' %}
+    <div id="beetle-iiif-app" data-resource-id="{{ h.get_beetle_iiif_resource_id() }}">
+    </div>
+{% endblock %}

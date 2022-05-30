@@ -1,0 +1,12 @@
+{
+  "presets": [
+    ["@babel/env", {
+      "modules": false
+    }],
+    "minify"
+  ],
+  "plugins": [
+    "syntax-dynamic-import",
+    ["@babel/plugin-transform-runtime", {"regenerator": true}]
+  ]
+}
