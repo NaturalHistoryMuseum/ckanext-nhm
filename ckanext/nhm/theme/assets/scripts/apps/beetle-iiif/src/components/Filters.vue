@@ -82,7 +82,7 @@ export default {
         // anyway and this way is more efficient than calling the autocomplete endpoint.
         let barcodes = [];
         let names = [];
-        for await (const record of api.getRecords(100, false)) {
+        for await (const record of api.getRecords(500, false)) {
             const barcode = record.data['Barcode'];
             // this is technically not needed but hey why not
             if (!barcodes.includes(barcode)) {
