@@ -4,18 +4,16 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 import itertools
-from contextlib import suppress
-
 import logging
 import os
 from collections import OrderedDict
+from contextlib import suppress
 from pathlib import Path
 
 import ckan.model as model
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-import requests
 from beaker.cache import cache_managers, cache_regions
 from ckan.lib.helpers import literal
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
@@ -81,7 +79,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'record_show': nhm_action.record_show,
             'object_rdf': nhm_action.object_rdf,
             'get_permanent_url': nhm_action.get_permanent_url,
-            'user_show': nhm_action.user_show
+            'user_show': nhm_action.user_show,
+            'package_update': nhm_action.package_update,
+            'resource_update': nhm_action.resource_update
         }
 
     ## IClick

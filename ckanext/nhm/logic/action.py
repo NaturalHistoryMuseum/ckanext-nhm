@@ -14,6 +14,7 @@ import ckanext.nhm.logic.schema as nhm_schema
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.record import get_record_by_uuid
+from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
 
 log = logging.getLogger(__name__)
 
@@ -180,3 +181,33 @@ def user_show(next_action, context, data_dict):
     if 'id' not in data_dict and 'user_obj' not in data_dict and current_user is not None:
         data_dict['id'] = context['auth_user_obj'].id
     return next_action(context, data_dict)
+
+
+@toolkit.chained_action
+def package_update(next_action, context, pkg_dict):
+    # force lowercase for tags with no vocabulary
+    category_tags = [t['name'] for t in
+                     toolkit.get_action('vocabulary_show')({}, {'id': DATASET_TYPE_VOCABULARY})[
+                         'tags']]
+    tags = []
+    for tag in pkg_dict.get('tags', []):
+        if tag.get('vocabulary_id'):
+            tags.append(tag)
+            continue
+        if tag['name'] in category_tags:
+            # this is a reserved tag, don't use it
+            continue
+        tag['name'] = tag['name'].lower()
+        if tag['name'] not in [t['name'] for t in tags]:
+            tags.append(tag)
+    pkg_dict['tag_string'] = ','.join([t['name'] for t in tags if not t.get('vocabulary_id')])
+    pkg_dict['tags'] = tags
+
+    return next_action(context, pkg_dict)
+
+
+@toolkit.chained_action
+def resource_update(next_action, context, res_dict):
+    # force uppercase and trim '.' for file formats
+    res_dict['format'] = res_dict.get('format', '').upper().strip('.')
+    return next_action(context, res_dict)
