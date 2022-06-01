@@ -207,6 +207,13 @@ def package_update(next_action, context, pkg_dict):
 
 
 @toolkit.chained_action
+def resource_create(next_action, context, res_dict):
+    # force uppercase and trim '.' for file formats
+    res_dict['format'] = res_dict.get('format', '').upper().strip('.')
+    return next_action(context, res_dict)
+
+
+@toolkit.chained_action
 def resource_update(next_action, context, res_dict):
     # force uppercase and trim '.' for file formats
     res_dict['format'] = res_dict.get('format', '').upper().strip('.')

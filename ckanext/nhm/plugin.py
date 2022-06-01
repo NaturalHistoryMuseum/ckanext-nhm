@@ -81,6 +81,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'get_permanent_url': nhm_action.get_permanent_url,
             'user_show': nhm_action.user_show,
             'package_update': nhm_action.package_update,
+            'resource_create': nhm_action.resource_create,
             'resource_update': nhm_action.resource_update
         }
 
