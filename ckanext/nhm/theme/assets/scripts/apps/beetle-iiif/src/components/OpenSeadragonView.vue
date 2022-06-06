@@ -65,6 +65,7 @@
                 // TODO: need to change this to use the images in the node module
                 prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@2.4/build/openseadragon/images/",
                 sequenceMode: false,
+                showRotationControl: true,
                 tileSources: []
             });
         }
