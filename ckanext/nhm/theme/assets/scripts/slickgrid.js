@@ -88,7 +88,7 @@ var NHMFormatter = function(row, cell, value, columnDef, dataContext) {
         columnDef.sortable = false;
         if (value.length > 0) {
             // return an image icon and a count of how many images there are for this record
-            return '<i class="icon-picture"></i> x' + value.length;
+            return '<i class="fas fa-image"></i> x' + value.length;
         } else {
             // if there are no images, just return nothing
             return '';
