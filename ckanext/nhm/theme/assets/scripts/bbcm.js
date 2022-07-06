@@ -250,16 +250,6 @@ function mapToCommonName(name) {
 }
 
 /**
- * Returns a thumbnail url for the given asset ID.
- *
- * @param assetId the asset id
- * @returns {string}
- */
-function getThumbnailUrl(assetId) {
-    return 'https://www.nhm.ac.uk/services/media-store/asset/' + assetId + '/contents/thumbnail';
-}
-
-/**
  * Extract the first specimen image we come across and return a URL to a thumbnail of it.
  *
  * @param specimen the specimen object
@@ -270,7 +260,7 @@ function extractSpecimenImageUrl(specimen) {
         for (let i = 0; i < specimen.associatedMedia.length; i++) {
             const media = specimen.associatedMedia[i];
             if (media.category === 'Specimen' || media.category === 'specimen') {
-                return getThumbnailUrl(media.assetID);
+                return `${media.identifier}/thumbnail`;
             }
         }
     }
