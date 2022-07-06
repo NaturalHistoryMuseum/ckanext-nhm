@@ -20,7 +20,8 @@ const names = [
     'Polyommatus icarus',
     'Celastrina argiolus',
     'Autographa gamma',
-    'Zygaena filipendulae'
+    'Zygaena filipendulae',
+    'Euplagia quadripunctaria',
 ];
 
 // these are the common names of the above species, note that the order is important
@@ -43,7 +44,8 @@ const commonNames = [
     'Common Blue',
     'Holly Blue',
     'Silver Y Moth',
-    'Six spot Burnet Moth'
+    'Six spot Burnet Moth',
+    'Jersey Tiger',
 ];
 
 // add the names to the list in the details div
