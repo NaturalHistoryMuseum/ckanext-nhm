@@ -8,8 +8,9 @@ this.ckan.module('iframe-resize', function(jQuery, _) {
         var set_height = function(){
           // body is not always available on some browsers. True even if we did a jQuery(i_window.document).ready(...)
           if (i_window.document && i_window.document.body){
-            var current = $iframe.height();
-            var target = jQuery(i_window.document).height();
+            // without Math.ceil it will constantly switch between pixel fractions and make the page twitch
+            var current = Math.ceil($iframe.height());
+            var target = Math.ceil(jQuery(i_window.document).height());
             if (current != target){
               $iframe.height(target);
             }
