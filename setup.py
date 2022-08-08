@@ -7,7 +7,7 @@
 from collections import OrderedDict
 from setuptools import find_packages, setup
 
-__version__ = '3.3.4'
+__version__ = '3.3.5'
 
 with open('README.md', 'r') as f:
     __long_description__ = f.read()
@@ -25,10 +25,10 @@ ckan_extensions = OrderedDict([
     github('ckanext-gallery', 'v2.0.1'),
     github('ckanext-gbif', 'v2.0.0'),
     github('ckanext-graph', 'v2.0.1'),
-    github('ckanext-ldap', 'v3.1.1'),
+    github('ckanext-ldap', 'v3.1.2'),
     github('ckanext-query-dois', 'v2.1.1'),
-    github('ckanext-statistics', 'v2.0.10'),
-    github('ckanext-versioned-datastore', 'v3.5.0'),
+    github('ckanext-statistics', 'v2.0.11'),
+    github('ckanext-versioned-datastore', 'v3.5.1'),
 ])
 
 setup(
