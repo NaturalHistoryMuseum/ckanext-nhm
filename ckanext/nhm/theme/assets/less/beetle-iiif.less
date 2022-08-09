@@ -121,11 +121,13 @@ button.btn[disabled].biiif-button {
   display: flex;
   overflow-x: auto;
   flex-wrap: nowrap;
+  scroll-snap-type: x proximity;
 }
 
 .biiif-thumbnail-container {
   text-align: center;
   padding: 10px;
+  scroll-snap-align: start;
 
   &.active {
     background-color: @primary6;
