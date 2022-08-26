@@ -23,9 +23,9 @@ ckan.module('stats_graphs', function ($) {
             function drawGraph() {
                 graphBox.empty();
                 const width = graphBox.width();
-                const height = 500;
-                const marginH = 50;
-                const marginV = 20;
+                const height = graphBox.height() > 0 ? graphBox.height() : 500;
+                const marginH = Math.round(height * 0.1);
+                const marginV = Math.round(height * 0.04);
 
                 let svg = d3.select('#graph-box').append('svg').attr('width', width)
                             .attr('height', height)
