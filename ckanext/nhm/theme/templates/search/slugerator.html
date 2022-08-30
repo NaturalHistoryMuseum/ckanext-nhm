@@ -1,0 +1,13 @@
+{% ckan_extends %}
+
+{% block slug_stats %}
+{% asset "ckanext-nhm/stats-graphs" %}
+<div id="stats-total-slugs">
+    <b>Query slugs in use</b>
+    <br><br>
+    <div data-module="stats_graphs" data-module-data="{{ h.dump_json(g.graph_data) }}"
+         id="graph-box" style="width: 100%; height: 300px;">
+    </div>
+</div>
+{{ super() }}
+{% endblock %}

@@ -26,7 +26,7 @@
                         {% set href = h.remove_url_filter(facet.name, item.name, extras=extras) if item.active else h.add_url_filter(facet.name, item.name, extras=extras) %}
                         <li class="nav-item{% if item.active %} active{% endif %}">
                             <a href="{{ href }}" title="{{ item.label }}">
-                                <span>{{ label_truncated|title }} ({{ item.count }})</span> </a>
+                                <span>{{ label_truncated|title }} ({{ h.delimit_number(item.count) }})</span> </a>
                         </li>
                     {% endfor %}
                     {% if not facet.active %}
@@ -51,4 +51,3 @@
     {% endfor %}
 </div>
 
- 
