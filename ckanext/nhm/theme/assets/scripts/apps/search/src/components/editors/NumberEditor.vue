@@ -1,7 +1,7 @@
 <template>
     <div class="flex-container flex-center">
         <span v-if="comparisonType === 'range'">
-            <input type="number" v-model="values.range.greater_than">
+            <input type="number" v-model="values.range.greater_than" @keyup.enter="pressedEnter">
             <input type="checkbox" v-model="values.range.greater_than_inclusive" id="greaterThanEq">
             <label for="greaterThanEq" v-if="comparisonType === 'range'">
                 <i :class="['fas', 'fa-less-than' + (values.range.greater_than_inclusive ? '-equal' : '')]"></i>
@@ -15,13 +15,13 @@
             <label for="lessThanEq">
                 <i :class="['fas', 'fa-less-than' + (values.range.less_than_inclusive ? '-equal' : '')]"></i>
             </label>
-            <input type="number" v-model="values.range.less_than">
+            <input type="number" v-model="values.range.less_than" @keyup.enter="pressedEnter">
         </span>
         <span v-if="comparisonType === 'equals'">
             <label for="queryValueInt1"><i
                 class="fas fa-equals"></i></label>
             <input type="number" v-if="comparisonType === 'equals'"
-                v-model="values.equals.value" id="queryValueInt1">
+                v-model="values.equals.value" id="queryValueInt1" @keyup.enter="pressedEnter">
         </span>
     </div>
 </template>

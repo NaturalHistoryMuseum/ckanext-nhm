@@ -6,7 +6,7 @@
         <label for="queryValueText">
             <i :class="['fas', comparisonType === 'equals' ? 'fa-equals' : 'fa-search' ]"></i>
         </label>
-        <input type="text" v-model="values[comparisonType].value" id="queryValueText" size="10">
+        <input type="text" v-model="values[comparisonType].value" id="queryValueText" size="10" @keyup.enter="pressedEnter">
     </div>
 </template>
 
