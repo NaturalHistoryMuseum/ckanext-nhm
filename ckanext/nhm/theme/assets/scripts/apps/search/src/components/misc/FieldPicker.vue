@@ -33,7 +33,7 @@
                 const vue = this;
                 post('datastore_field_autocomplete', {
                     resource_ids: vue.resourceIds,
-                    text:         vue.fieldSearch,
+                    text:         (vue.fieldSearch || '').toLowerCase(),
                     lowercase:    true
                 }).then(data => {
                     if (data.success){
