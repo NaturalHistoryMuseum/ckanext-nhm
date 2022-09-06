@@ -39,13 +39,14 @@
                     <component :is="fieldType"
                                :comparison-type="comparisonType"
                                :existing-term-id="existingTermId"
-                               v-on:set-query-values="setQueryValues"></component>
+                               v-on:set-query-values="setQueryValues"
+                               v-on:pressed-enter="submitTerm"></component>
                 </keep-alive>
             </div>
             <div class="flex-container flex-column flex-stretch-height">
                 <span>
                     <label for="termNameInput">Name (optional)</label>
-                    <input id="termNameInput" type="text" v-model="termName">
+                    <input id="termNameInput" type="text" v-model="termName" @keyup.enter="submitTerm">
                 </span>
             </div>
             <div class="query-submit">

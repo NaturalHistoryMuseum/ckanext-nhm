@@ -35,6 +35,9 @@
                 d3.keys(this.values[this.comparisonType]).forEach((k) => {
                     this.$set(this.values[this.comparisonType], k, existing.content[k] || null);
                 });
+            },
+            pressedEnter() {
+                this.$emit('pressed-enter');
             }
         },
         watch: {

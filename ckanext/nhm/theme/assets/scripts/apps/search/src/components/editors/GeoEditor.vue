@@ -1,11 +1,11 @@
 <template>
     <div class="flex-container flex-column flex-center">
         <div class="flex-container flex-center" v-if="comparisonType === 'point'">
-            <input type="text" title="Latitude" v-model="values.point.latitude" size="3">
+            <input type="text" title="Latitude" v-model="values.point.latitude" size="3" @keyup.enter="pressedEnter">
             <span>,</span>
-            <input type="text" title="Longitude" v-model="values.point.longitude" size="3">
+            <input type="text" title="Longitude" v-model="values.point.longitude" size="3" @keyup.enter="pressedEnter">
             <label for="radius">±</label>
-            <input type="number" title="Radius" v-model="values.point.radius" min="0" id="radius">
+            <input type="number" title="Radius" v-model="values.point.radius" min="0" id="radius" @keyup.enter="pressedEnter">
             <select v-model="values.point.radius_unit" title="Radius units">
                 <option v-for="unit in radiusUnits" :key="unit.id">{{ unit }}
                 </option>
