@@ -8,7 +8,6 @@ from collections import OrderedDict
 # the order here matters as the default option should always be first in the dict so that it is
 # automatically selected in combo boxes that use this list as a source for options
 COLLECTION_CONTACTS = OrderedDict([
-    ('Data Portal / Other', 'data@nhm.ac.uk'),
     ('Algae, Fungi & Plants', 'm.carine@nhm.ac.uk'),
     ('Economic & Environmental Earth Sciences', 'g.miller@nhm.ac.uk'),
     ('Fossil Invertebrates & Plants', 'z.hughes@nhm.ac.uk'),
@@ -18,4 +17,5 @@ COLLECTION_CONTACTS = OrderedDict([
     ('Library & Archives', 'library@nhm.ac.uk'),
     ('Mineral & Planetary Sciences', 'm.rumsey@nhm.ac.uk'),
     ('Vertebrates', 'simon.loader@nhm.ac.uk'),
+    ('Data Portal / Other', 'data@nhm.ac.uk'),
 ])

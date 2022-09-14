@@ -17,7 +17,7 @@ def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
     options = []
 
     if allow_empty:
-        options.append({'value': None, 'text': allow_empty_text or None})
+        options.append({'value': '', 'text': allow_empty_text or None})
 
     for value in values:
 
