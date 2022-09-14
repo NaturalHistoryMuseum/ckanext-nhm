@@ -27,7 +27,7 @@
 
         {# If this is the collections dataset, still add the department select #}
         {% if package['name'] == 'collection-specimens' %}
-            {{ form.select('department', label=_('Department'), options=h.get_contact_form_department_options(), selected=data.department, error=errors.department) }}
+            {{ form.select('department', label=_('Department'), options=h.get_contact_form_department_options(), selected=data.department, error=errors.department, is_required=true) }}
         {% endif %}
 
         <div class="control-group control-medium">
@@ -43,7 +43,7 @@
     {% else %}
 
        {# Add department selection (for non dataset forms)  #}
-       {{ form.select('department', label=_('Department'), options=h.get_contact_form_department_options(), selected=data.department, error=errors.department) }}
+       {{ form.select('department', label=_('Department'), options=h.get_contact_form_department_options(), selected=data.department, error=errors.department, is_required=true) }}
 
     {% endif %}
 
