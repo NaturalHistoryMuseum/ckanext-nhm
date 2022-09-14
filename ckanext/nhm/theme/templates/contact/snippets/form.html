@@ -5,21 +5,10 @@
 {% block contact_form_legend_content %}
     {% set package_id = h.get_request_param('package_id', None) %}
     {% if not package_id %}
-        {# use the default legend text #}
-        {{ _('Questions? Comments? We are always glad to hear from you! If you want to contact a
-              specific department, use the Department selection box below, otherwise leave it on the
-              default option to contact the general Data Portal inbox.') }}
+        {{ _('Choose a department to enquire about a specific area of the collection. To contact
+              the Data Portal team, select Data Portal / Other.') }}
     {% else %}
-        {% set package = h.get_package(package_id) %}
-        {% if package['name'] == 'collection-specimens' %}
-            {# show some special text if this is the specimens collection #}
-            {{ _('Use this form to contact the curator of this dataset. If you want to contact a
-                  specific department about this dataset, use the Department selection box below,
-                  otherwise leave it on the default option to contact the general Data Portal
-                  inbox.') }}
-        {% else %}
-            {{ _('Use this form to contact the owner of this dataset.') }}
-        {% endif %}
+        {{ _('Use this form to contact the owner of this dataset.') }}
     {% endif %}
 {% endblock %}
 
