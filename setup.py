@@ -7,7 +7,7 @@
 from collections import OrderedDict
 from setuptools import find_packages, setup
 
-__version__ = '3.4.1'
+__version__ = '3.5.0'
 
 with open('README.md', 'r') as f:
     __long_description__ = f.read()
@@ -20,7 +20,7 @@ def github(name, tag, org='NaturalHistoryMuseum'):
 ckan_extensions = OrderedDict([
     github('ckanext-dcat', 'v1.1.1', org='ckan'),
     github('ckanext-ckanpackager', 'v2.1.3'),
-    github('ckanext-contact', 'v2.0.0'),
+    github('ckanext-contact', 'v2.0.1'),
     github('ckanext-doi', 'v3.0.7'),
     github('ckanext-gallery', 'v2.1.0'),
     github('ckanext-gbif', 'v2.0.0'),
