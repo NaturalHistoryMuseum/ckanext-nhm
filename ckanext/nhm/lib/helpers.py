@@ -786,7 +786,8 @@ def field_is_link(value):
 
 def get_contact_form_department_options():
     '''Contact form category'''
-    return list_to_form_options(COLLECTION_CONTACTS.keys())
+    return list_to_form_options(COLLECTION_CONTACTS.keys(), allow_empty=True,
+                                allow_empty_text='Select an option')
 
 
 def downloadable(resource):
