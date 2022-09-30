@@ -41,7 +41,7 @@ let resources = {
         },
         invalidResourceIds:     (state, getters) => (resourceIds) => {
             let invalidIds = resourceIds.filter(r => {
-                !getters.allResourceIds.includes(r);
+                return !getters.allResourceIds.includes(r);
             });
             return invalidIds.length > 0 ? invalidIds : null;
         },
