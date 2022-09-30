@@ -52,26 +52,36 @@ let query = {
     },
     actions:    {
         setRequestBody(context, newBody) {
-            Vue.set(context.rootState.appState.query.parsingError, 'resourceIds', context.getters['resources/invalidResourceIds'](newBody.resource_ids));
-            if (context.rootState.appState.query.parsingError.resourceIds === null) {
-                context.commit('resources/setResourceIds', newBody.resource_ids);
-            }
-            else {
-                return;
-            }
-            context.dispatch('filters/setFromQuery', newBody.query || {});
-            Vue.set(context.rootState.appState.query.parsingError, 'queryBody', context.state.filters.parsingError);
-            if (context.rootState.appState.query.parsingError.queryBody !== null) {
-                return;
-            }
+            let resourceIdsPromise = new Promise((resolve, reject) => {
+                Vue.set(context.rootState.appState.query.parsingError, 'resourceIds',
+                    context.getters['resources/invalidResourceIds'](newBody.resource_ids));
 
-            if (newBody.query !== undefined && newBody.query.search !== undefined) {
-                context.state.search = newBody.query.search.toString();
-            }
+                if (context.rootState.appState.query.parsingError.resourceIds === null) {
+                    context.commit('resources/setResourceIds', newBody.resource_ids);
+                    resolve()
+                }
+                else {
+                    reject()
+                }
+            })
+
+            let filtersPromise = context.dispatch('filters/setFromQuery', newBody.query || {}).then(() => {
+                Vue.set(context.rootState.appState.query.parsingError, 'queryBody', context.state.filters.parsingError);
+                if (context.rootState.appState.query.parsingError.queryBody !== null) {
+                    throw Error;
+                }
+
+                if (newBody.query !== undefined && newBody.query.search !== undefined) {
+                    context.state.search = newBody.query.search.toString();
+                }
+            })
+
 
             if (newBody.after !== undefined) {
                 context.state.after = newBody.after;
             }
+
+            return Promise.all([resourceIdsPromise, filtersPromise]);
         }
     }
 };

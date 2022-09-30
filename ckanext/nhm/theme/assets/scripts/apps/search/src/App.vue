@@ -32,9 +32,9 @@
                         </a>
                     </div>
                     <div class="text-right nowrap" style="margin-left: 10px;">
-                        <a href="#" @click="showQuery = !showQuery" class="collapse-to-icon"> Query
+                        <a href="#" @click="toggleQuery" class="collapse-to-icon"> Query
                             <i class="inline-icon-right fas"
-                               :class="[showQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
+                               :class="[showQuery || showEditQuery ? 'fa-eye-slash' : 'fa-eye']"></i> </a>
                     </div>
                     <div class="text-right nowrap" style="margin-left: 10px;">
                         <a href="#" @click="reset" class="collapse-to-icon"> Reset
@@ -61,9 +61,10 @@
                                  key="root"></FilterGroup>
                 </div>
             </transition>
-            <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery">
+            <Copyable :copy-text="JSON.stringify(requestBody)" v-if="showQuery" :edit-button="true" @edit="toggleEditQuery">
                 <pre>{{ requestBody(false) }}</pre>
             </Copyable>
+            <Editable :edit-text="JSON.stringify(requestBody(false), null, 2)" v-if="showEditQuery" :edit-status="status.queryEdit" @save="saveQueryEdit" :long="true"/>
 
             <Results @show-query="showQuery = true" @reset="reset"></Results>
         </div>
@@ -76,6 +77,7 @@
     import FilterGroup from './components/FilterGroup.vue';
     import Results from './components/Results.vue';
     import Copyable from './components/misc/Copyable.vue';
+    import Editable from './components/misc/Editable.vue';
     import ImageViewer from './components/misc/ImageViewer.vue';
     import {mapActions, mapMutations, mapState, mapGetters} from 'vuex';
 
@@ -84,6 +86,7 @@
     export default {
         name:       'App',
         components: {
+            Editable,
             ResourceList: () => ({component: ResourceList, loading: Loading, error: LoadError}),
             Loading,
             LoadError,
@@ -96,11 +99,13 @@
             return {
                 showResources: false,
                 showAdvanced:  true,
-                showQuery:     false
+                showQuery:     false,
+                showEditQuery: false
             }
         },
         computed:   {
             ...mapGetters('appState', ['app']),
+            ...mapState('appState', ['status']),
             ...mapGetters('results/query', ['requestBody']),
             ...mapState('results/query/resources', ['packageList', 'resourceIds']),
             ...mapState('results/display', ['showImage']),
@@ -133,7 +138,25 @@
             ...mapActions('results', ['runSearch', 'invalidate', 'reset']),
             ...mapActions('results/display', ['getLicences']),
             ...mapActions('results/query', ['setRequestBody']),
-            ...mapActions('results/query/resources', ['getPackageList'])
+            ...mapActions('results/query/resources', ['getPackageList']),
+            toggleQuery() {
+                this.showQuery = !(this.showQuery || this.showEditQuery);
+                this.showEditQuery = false;
+            },
+            toggleEditQuery() {
+                this.showEditQuery = !this.showEditQuery;
+                this.showQuery = !this.showEditQuery;
+            },
+            saveQueryEdit(editedQuery) {
+                this.setRequestBody(JSON.parse(editedQuery)).then(() => {
+                        this.status.queryEdit.loading = false;
+                        this.status.queryEdit.failed = false;
+                        this.toggleEditQuery();
+                    }
+                ).catch(e => {
+                    this.status.queryEdit.failed = true;
+                });
+            }
         },
         watch:      {
             packageList: function (newList, oldList) {
