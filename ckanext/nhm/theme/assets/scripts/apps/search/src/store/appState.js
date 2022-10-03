@@ -36,6 +36,10 @@ let appState = {
             resources: {
                 loading: false,
                 failed: false
+            },
+            queryEdit: {
+                loading: false,
+                failed: false
             }
         }
     },

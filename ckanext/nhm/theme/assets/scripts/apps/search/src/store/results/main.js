@@ -100,13 +100,13 @@ let results = {
             Vue.set(context.rootState.appState.status.resultData, 'failed', false);
             if (page === 0) {
                 context.state._after = [];
+                // only get the headers on first page, subsequent pages just use the same headers
+                context.dispatch('display/getHeaders', {
+                    filters: context.state.query.filters.items,
+                    request: context.getters['query/requestBody'](false)
+                });
             }
             context.commit('setPage', page);
-            context.dispatch('display/getHeaders', {
-                filters: context.state.query.filters.items,
-                request: context.getters['query/requestBody'](false)
-            });
-
             context.commit('query/setAfter', context.getters.after[context.state.page - 1]);
 
             let tempFilters = context.getters['query/filters/temporaryFilters'];
