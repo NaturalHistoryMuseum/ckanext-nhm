@@ -2299,38 +2299,13 @@ select, .select2-choice {
 
 // DATASET LIST ------------------------------------------------------------------------------------
 
-.label { // format label for datasets
+.label {
   // default to black text because most of the labels have an acceptable contrast with black text
-  // rather than white. Ones that need white are overidden below.
+  // rather than white.
   color: black;
   text-transform: uppercase;
   font-size: @font-size-body-s;
   padding: .4em .6em .2em;
-
-  &[data-format=dwc], &[data-format*=dwc] {
-    background-color: @primary5;
-  }
-
-  &[data-format=rdf], &[data-format*=rdf], &[data-format*=nquad], &[data-format*=ntriples],
-  &[data-format*=turtle] {
-    // wcag contrast requirement (the default color (black) is too low contrast)
-    color: white;
-  }
-
-  &[data-format=zip], &[data-format*=zip] {
-    // wcag contrast requirement (the default color (black) is too low contrast)
-    color: white;
-  }
-
-  &[data-format=pdf], &[data-format*=pdf] {
-    // wcag contrast requirement (the default color (black) is too low contrast)
-    color: white;
-  }
-
-  &[data-format=csv], &[data-format*=csv] {
-    // wcag contrast requirement (the default background-color (#856A00) is too low contrast)
-    background-color: #dfb100;
-  }
 
   &.dataset-private {
     // wcag contrast requirement (the default color (black) is too low contrast)
@@ -2346,6 +2321,68 @@ select, .select2-choice {
     background-color: @warning2;
     padding-top: 0.45em;
     color: @grey10;
+  }
+}
+
+.dataset-resources .label {
+  background-color: @grey7;
+
+  &[data-format=csv], &[data-format*=csv] {
+    background-color: #dfb100;
+  }
+
+  &[data-format=pdf], &[data-format*=pdf] {
+    background-color: #b30b00;
+    color: white;
+  }
+
+  &[data-format=zip], &[data-format*=zip] {
+    background-color: @grey3;
+    color: white;
+  }
+
+  &[data-format=xlsx], &[data-format*=xlsx], &[data-format=xls], &[data-format*=xls] {
+    background-color: #107c41;
+    color: white;
+  }
+
+  &[data-format=txt], &[data-format*=txt] {
+    background-color: #44dbff;
+  }
+
+  &[data-format=r] {
+    background-color: #3864BA;
+    color: white;
+  }
+
+  &[data-format=docx], &[data-format*=docx], &[data-format=doc], &[data-format*=doc] {
+    background-color: #185abd;
+    color: white;
+  }
+
+  &[data-format=jpeg], &[data-format*=jpeg], &[data-format=jpg], &[data-format*=jpg] {
+    background-color: #ff7a2e;
+  }
+
+  &[data-format=dwc], &[data-format*=dwc] {
+    background-color: @primary5;
+  }
+
+  &[data-format=nex], &[data-format*=nex] {
+    background-color: #b78ffd;
+  }
+
+  &[data-format=tre], &[data-format*=tre] {
+    background-color: #ff89b6;
+  }
+
+  &[data-format=fasta], &[data-format*=fasta] {
+    background-color: #ffab7b;
+  }
+
+  &[data-format=tiff], &[data-format*=tiff] {
+    background-color: #3d4e67;
+    color: white;
   }
 }
 
