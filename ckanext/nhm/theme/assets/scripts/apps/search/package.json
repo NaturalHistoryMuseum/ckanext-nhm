@@ -21,8 +21,7 @@
     "vue-clipboard2": "^0.3.3",
     "vue-images-loaded": "^1.1.2",
     "vue-router": "^3.6.5",
-    "vuex": "^3.6.2",
-    "vuex-persist": "^2.3.0"
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
