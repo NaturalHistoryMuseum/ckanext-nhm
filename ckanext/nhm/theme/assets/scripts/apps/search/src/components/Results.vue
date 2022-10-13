@@ -16,10 +16,10 @@
              v-if="hasResult"
              :class="{disabled: invalidated}">
             <div class="records-total">
-                <h3>{{ recordHeader(unfilteredTotal) }}</h3>
-                <small class="filtered-total" v-if="total > 0">
-                    showing {{ (page * 100) + 1 }}-{{ (page * 100) + records.length }} of {{
-                    filteredRecordHeader(total) }}
+                <h3>{{ filteredRecordHeader(total) }}</h3>
+                <small class="filtered-total">
+                    <template v-if="total > 0">showing {{ (page * 100) + 1 }}-{{ (page * 100) + records.length }}</template>
+                    <template v-else>0</template> of {{ recordHeader(unfilteredTotal) }} total
                 </small>
             </div>
             <div class="info-popup-button">
@@ -192,7 +192,7 @@
                 </a>
             </div>
         </div>
-        <div v-if="hasResult && total > 0" :class="{disabled: invalidated}">
+        <div v-if="hasResult" :class="{disabled: invalidated}">
             <div class="flex-container flex-stretch-first flex-center">
                 <ul class="nav nav-tabs">
                     <li v-for="viewTab in views"
@@ -221,7 +221,7 @@
                 <component :is="viewComponent" v-if="hasRecords"></component>
             </div>
         </div>
-        <div v-if="hasResult && total === 0 && !invalidated" class="pad-h">
+        <div v-if="hasResult && total === 0 && !invalidated" class="pad-h pad-v">
             <small>Try removing some filters, or use different search terms. Have a look at our
                 <a href="/help/search">search help</a> page to learn more about how searches are
                    constructed.</small>
