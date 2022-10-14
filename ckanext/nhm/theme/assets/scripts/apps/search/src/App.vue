@@ -122,12 +122,14 @@
             }
         },
         created:    function () {
-            this.getSchema().then(() => {
-                if (this.$route.params !== undefined){
-                    this.$store.dispatch('resolveUrl', this.$route);
-                }
+            this.getPackageList().then(() => {
+                this.getSchema().then(() => {
+                    if (this.$route.params !== undefined) {
+                        this.$store.dispatch('resolveUrl', this.$route);
+                    }
+                });
             });
-            this.getPackageList();
+
             this.getLicences();
         },
         methods:    {
