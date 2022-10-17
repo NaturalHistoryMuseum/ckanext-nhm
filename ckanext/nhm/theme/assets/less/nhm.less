@@ -2098,8 +2098,22 @@ select, .select2-choice {
   position: relative;
 }
 
+.featured-container {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1fr;
+
+  @media (min-width: @md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: @xxl) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .featured {
   height: 100%;
+  padding: 10px 0;
 
   .box-text {
     .flex-child-grow;
