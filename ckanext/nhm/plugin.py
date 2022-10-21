@@ -167,6 +167,28 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         return data_dict
 
+    def after_search(self, search_results, search_params):
+        '''
+        ...seealso:: ckan.plugins.interfaces.IPackageController.after_search
+        '''
+        # set the collections datasets as top (above other promoted datasets)
+        if search_params['sort'].startswith('promoted asc'):
+            top_datasets_names = ['collection-specimens', 'collection-indexlots']
+            custom_order = []
+            other_datasets = []
+            for ix, d in enumerate(search_results['results']):
+                if d['name'] in top_datasets_names:
+                    custom_order.insert(top_datasets_names.index(d['name']), d)
+                else:
+                    other_datasets.append(d)
+                if len(custom_order) == len(top_datasets_names):
+                    # to avoid iterating over everything if we've already got them
+                    other_datasets += search_results['results'][ix+1:]
+                    break
+            search_results['results'] = custom_order + other_datasets
+
+        return search_results
+
     def before_view(self, pkg_dict):
         '''
         ..seealso:: ckan.plugins.interfaces.IPackageController.before_view
