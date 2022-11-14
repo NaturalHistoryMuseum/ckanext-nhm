@@ -3,9 +3,10 @@
 # ckanext-nhm
 
 [![Tests](https://img.shields.io/github/workflow/status/NaturalHistoryMuseum/ckanext-nhm/Tests?style=flat-square)](https://github.com/NaturalHistoryMuseum/ckanext-nhm/actions/workflows/main.yml)
-[![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
+[![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/main?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
 [![CKAN](https://img.shields.io/badge/ckan-2.9.1-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
 [![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg?style=flat-square)](https://www.python.org/)
+[![Docs](https://img.shields.io/readthedocs/ckanext-nhm?style=flat-square)](https://ckanext-nhm.readthedocs.io)
 [![Specimen records](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=specimens&query=%24.result.total&suffix=%20records&url=https%3A%2F%2Fdata.nhm.ac.uk%2Fapi%2F3%2Faction%2Fdatastore_search%3Fresource_id%3D05ff2255-c38a-40c9-b657-4ccb55ab2feb&style=flat-square)](https://data.nhm.ac.uk/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb)
 
 _A CKAN extension for the Natural History Museum's Data Portal._
@@ -19,8 +20,6 @@ The codebase shows how to implement various plugins created by the Museum's deve
 
 
 # Installation
-
-Installation is not going to be useful for anyone not working on the Data Portal, but the steps are left here for reference.
 
 Path variables used below:
 - `$INSTALL_FOLDER` (i.e. where CKAN is installed), e.g. `/usr/lib/ckan/default`
@@ -61,8 +60,7 @@ Path variables used below:
 
 # Configuration
 
-These are the options that can be specified in to configure this extension.
-
+These are the options that can be specified in your .ini config file.
 ## **[REQUIRED]**
 
 Name|Description|Options
@@ -145,10 +143,8 @@ ckan -c $CONFIG_FILE nhm replace-resource-file $RESOURCE_ID $PATH
 
 
 # Testing
-_Test coverage is currently super duper extremely limited._
 
-To run the tests in this extension, there is a Docker compose configuration available in this
-repository to make it easy.
+There is a Docker compose configuration available in this repository to make it easier to run tests.
 
 To run the tests against ckan 2.9.x on Python3:
 
@@ -165,4 +161,4 @@ docker-compose build
 docker-compose run ckan
 ```
 
-The ckan image uses the Dockerfile in the `docker/` folder which is based on `openknowledge/ckan-dev:2.9`.
+The ckan image uses the Dockerfile in the `docker/` folder.
