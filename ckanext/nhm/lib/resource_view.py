@@ -8,14 +8,15 @@ import ckanext.nhm.views as nhm_views
 
 
 def resource_view_get_view(resource):
-    '''Retrieve the controller for a resource. Try and match on resource ID, or on
+    """
+    Retrieve the controller for a resource. Try and match on resource ID, or on.
+
     format so we can provide a custom controller for all format types - e.g. DwC.
 
     :param resource:
 
     :returns: controller class
-
-    '''
+    """
 
     subclasses = nhm_views.DefaultView.__subclasses__()
 
@@ -34,12 +35,12 @@ def resource_view_get_view(resource):
 
 
 def resource_view_get_filter_options(resource):
-    '''Return additional filter options for a resource view
+    """
+    Return additional filter options for a resource view.
 
     :param resource: resource dict
 
     :returns: OrderedDict of filter options
-
-    '''
+    """
     view_cls = resource_view_get_view(resource)
     return view_cls.filter_options

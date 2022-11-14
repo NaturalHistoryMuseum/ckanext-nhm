@@ -15,21 +15,36 @@ log = logging.getLogger(__name__)
 
 
 class DarwinCoreView(DefaultView):
-    '''View for displaying DwC resources'''
+    """
+    View for displaying DwC resources.
+    """
 
     format = 'dwc'
 
-    grid_default_columns = ['_id', 'gbifIssue', 'scientificName',
-                            'scientificNameAuthorship', 'specificEpithet',
-                            'infraspecificEpithet', 'family', 'genus', 'class',
-                            'locality', 'country', 'viceCounty', 'recordedBy',
-                            'typeStatus', 'catalogNumber', 'collectionCode']
+    grid_default_columns = [
+        '_id',
+        'gbifIssue',
+        'scientificName',
+        'scientificNameAuthorship',
+        'specificEpithet',
+        'infraspecificEpithet',
+        'family',
+        'genus',
+        'class',
+        'locality',
+        'country',
+        'viceCounty',
+        'recordedBy',
+        'typeStatus',
+        'catalogNumber',
+        'collectionCode',
+    ]
 
     grid_column_widths = {
         'gbifIssue': 70,
         'catalogNumber': 120,
         'scientificNameAuthorship': 180,
-        'scientificName': 160
+        'scientificName': 160,
     }
 
     def render_record(self, c):
@@ -43,7 +58,8 @@ class DarwinCoreView(DefaultView):
             toolkit.abort(404, toolkit._('Record not in Darwin Core format'))
 
         c.record_title = c.record_dict.get('catalogNumber', None) or c.record_dict.get(
-            'occurrenceID')
+            'occurrenceID'
+        )
         fields = toolkit.h.resource_view_get_fields(c.resource)
         c.dwc_terms = dwc_terms(fields)
 

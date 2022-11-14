@@ -6,15 +6,15 @@
 
 
 def generate_eml(package, resource):
-    '''
-    Given a package and a resource, return some EML that can be used in a download of the resource.
-    This XML string still has two placeholders in it: pub_date and date_stamp which are filled in by
-    the ckanpackager.
+    """
+    Given a package and a resource, return some EML that can be used in a download of
+    the resource. This XML string still has two placeholders in it: pub_date and
+    date_stamp which are filled in by the ckanpackager.
 
     :param package: the package dict
     :param resource: the resource dict
     :return: the EML as a string
-    '''
+    """
     # use empty strings as defaults just in case some of these fields don't exist. They should, but
     # we don't want to raise an exception and therefore stop the request from being sent if
     # something is missing
@@ -24,12 +24,14 @@ def generate_eml(package, resource):
         'abstract': resource.get('description', ''),
         'license': package.get('license_title', 'License not specified'),
         'package_name': package.get('name', ''),
-        'additional_metadata': ''
+        'additional_metadata': '',
     }
 
     # only include DOI data if we have some to provide
     if 'doi' in package:
-        formatting_data['additional_metadata'] = '''
+        formatting_data[
+            'additional_metadata'
+        ] = '''
     <additionalMetadata>
       <metadata>
         <gbif>
@@ -39,11 +41,14 @@ def generate_eml(package, resource):
         </gbif>
       </metadata>
     </additionalMetadata>
-        '''.format(**{
-            'doi': package['doi'],
-            'citation': 'Natural History Museum http://data.nhm.ac.uk ({0}): {1}'.format(
-                package.get('doi_date_published', '')[:4], package.get('title', '')),
-        }).strip()
+        '''.format(
+            **{
+                'doi': package['doi'],
+                'citation': 'Natural History Museum http://data.nhm.ac.uk ({0}): {1}'.format(
+                    package.get('doi_date_published', '')[:4], package.get('title', '')
+                ),
+            }
+        ).strip()
 
     # build the xml string and return it
     return '''
@@ -88,4 +93,6 @@ def generate_eml(package, resource):
   </dataset>
   {additional_metadata}
 </eml:eml>
-'''.format(**formatting_data).strip()
+'''.format(
+        **formatting_data
+    ).strip()

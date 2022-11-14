@@ -14,15 +14,15 @@ blueprint = Blueprint(name='help', import_name=__name__, url_prefix='/help')
 @blueprint.route('/')
 @blueprint.route('')
 def index():
-    '''Render the help index.'''
-    return toolkit.render('help/index.html', {
-        'title': 'Help'
-    })
+    """
+    Render the help index.
+    """
+    return toolkit.render('help/index.html', {'title': 'Help'})
 
 
 @blueprint.route('/search')
 def search():
-    '''Render the help page for integrated search.'''
-    return toolkit.render('help/search.html', {
-        'title': 'Integrated Search Help'
-    })
+    """
+    Render the help page for integrated search.
+    """
+    return toolkit.render('help/search.html', {'title': 'Integrated Search Help'})

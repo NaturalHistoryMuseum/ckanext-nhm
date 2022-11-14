@@ -34,12 +34,12 @@ METADATA_LICENCE = 'http://creativecommons.org/publicdomain/zero/1.0/'
 
 
 class NHMDCATProfile(RDFProfile):
-    '''
-    An RDF profile for the NHM
+    """
+    An RDF profile for the NHM.
 
     http://www.w3.org/2011/gld/wiki/Data_Catalog_Vocabulary/Recipes
     http://rdf-vocabulary.ddialliance.org/discovery.html
-    '''
+    """
 
     def _get_update_frequency_code(self, frequency):
         freq_codes = {
@@ -63,12 +63,8 @@ class NHMDCATProfile(RDFProfile):
         Set up context
         :return: context dict
         '''
-        user = toolkit.get_action('get_site_user')({
-            'ignore_auth': True
-        }, {})
-        context = {
-            'user': user['name']
-        }
+        user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
+        context = {'user': user['name']}
         return context
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
@@ -89,7 +85,7 @@ class NHMDCATProfile(RDFProfile):
             'mads': MADS,
             'void': VOID,
             'cc': CC,
-            'org': ORG
+            'org': ORG,
         }
 
         g = self.g
@@ -113,7 +109,9 @@ class NHMDCATProfile(RDFProfile):
         # If it is possible to access the RDF via dataset name, not uuid
         # In which case add a sameAs for the dataset name uri
         if dataset_dict['name'] in toolkit.request.environ.get('CKAN_CURRENT_URL'):
-            alt_dataset_uri = f'{catalog_uri().rstrip("/")}/dataset/{dataset_dict["name"]}'
+            alt_dataset_uri = (
+                f'{catalog_uri().rstrip("/")}/dataset/{dataset_dict["name"]}'
+            )
             # Add a sameAs link
             g.add((dataset_metadata_uri, OWL.sameAs, URIRef(alt_dataset_uri)))
         # And now we can describe the dataset itself
@@ -147,9 +145,12 @@ class NHMDCATProfile(RDFProfile):
 
         # We don't have maintainers - whoever added it to the portal is the maintainer
         creator_user_id = dataset_dict['creator_user_id']
-        user = toolkit.get_action('user_show')(context, {
-            'id': creator_user_id,
-        })
+        user = toolkit.get_action('user_show')(
+            context,
+            {
+                'id': creator_user_id,
+            },
+        )
 
         # Add publisher
         nhm_uri = self.graph_add_museum()
@@ -207,7 +208,13 @@ class NHMDCATProfile(RDFProfile):
                 author_details = BNode()
                 g.add((author_details, VCARD.fn, Literal(author)))
                 if dataset_dict.get('author_email', None):
-                    g.add((author_details, VCARD.hasEmail, Literal(dataset_dict['author_email'])))
+                    g.add(
+                        (
+                            author_details,
+                            VCARD.hasEmail,
+                            Literal(dataset_dict['author_email']),
+                        )
+                    )
                 g.add((author_details, RDF.type, VCARD.Person))
                 g.add((dataset_uri, DC.creator, author_details))
                 affiliation = dataset_dict.get('affiliation', None)
@@ -215,7 +222,9 @@ class NHMDCATProfile(RDFProfile):
                     if affiliation == 'Natural History Museum':
                         g.add((author_details, MADS.hasAffiliation, nhm_uri))
                     else:
-                        g.add((author_details, MADS.hasAffiliation, Literal(affiliation)))
+                        g.add(
+                            (author_details, MADS.hasAffiliation, Literal(affiliation))
+                        )
 
         contributors = dataset_dict.get('contributors', None)
         if contributors:
@@ -232,12 +241,23 @@ class NHMDCATProfile(RDFProfile):
         g.set((nhm_uri, FOAF.name, Literal('Natural History Museum')))
         # # Add TDWG institution details - http://rs.tdwg.org/ontology/voc/Institution
         g.set((nhm_uri, TDWGI.acronymOrCoden, Literal('NHMUK')))
-        g.set((nhm_uri, TDWGI.institutionType,
-               URIRef('http://rs.tdwg.org/ontology/voc/InstitutionType#museum')))
+        g.set(
+            (
+                nhm_uri,
+                TDWGI.institutionType,
+                URIRef('http://rs.tdwg.org/ontology/voc/InstitutionType#museum'),
+            )
+        )
         # Add AIISO institution
         g.add((nhm_uri, RDF.type, AIISO.Institution))
         # Add same as link
-        g.add((nhm_uri, OWL.sameAs, URIRef('http://dbpedia.org/resource/Natural_history_museum')))
+        g.add(
+            (
+                nhm_uri,
+                OWL.sameAs,
+                URIRef('http://dbpedia.org/resource/Natural_history_museum'),
+            )
+        )
         g.add((nhm_uri, OWL.sameAs, URIRef('https://www.wikidata.org/wiki/Q309388')))
         return nhm_uri
 
@@ -269,16 +289,21 @@ class NHMDCATProfile(RDFProfile):
 
             # Format
             if '/' in resource_dict.get('format', ''):
-                g.add((distribution, DCAT.mediaType,
-                       Literal(resource_dict['format'])))
+                g.add((distribution, DCAT.mediaType, Literal(resource_dict['format'])))
             else:
                 if resource_dict.get('format'):
-                    g.add((distribution, DC['format'],
-                           Literal(resource_dict['format'])))
+                    g.add(
+                        (distribution, DC['format'], Literal(resource_dict['format']))
+                    )
 
                 if resource_dict.get('mimetype'):
-                    g.add((distribution, DCAT.mediaType,
-                           Literal(resource_dict['mimetype'])))
+                    g.add(
+                        (
+                            distribution,
+                            DCAT.mediaType,
+                            Literal(resource_dict['mimetype']),
+                        )
+                    )
 
             g.set((distribution, DCAT.accessURL, distribution))
 
@@ -293,9 +318,12 @@ class NHMDCATProfile(RDFProfile):
             # Numbers
             if resource_dict.get('size'):
                 try:
-                    g.add((distribution, DCAT.byteSize,
-                           Literal(float(resource_dict['size']),
-                                   datatype=XSD.decimal)))
+                    g.add(
+                        (
+                            distribution,
+                            DCAT.byteSize,
+                            Literal(float(resource_dict['size']), datatype=XSD.decimal),
+                        )
+                    )
                 except (ValueError, TypeError):
-                    g.add((distribution, DCAT.byteSize,
-                           Literal(resource_dict['size'])))
+                    g.add((distribution, DCAT.byteSize, Literal(resource_dict['size'])))

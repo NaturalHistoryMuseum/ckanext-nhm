@@ -13,7 +13,10 @@ from ckanext.nhm.lib.taxonomy import find_author_split
 
 
 class TaxonomyFormatExtension(Extension):
-    '''A custom Jinja2 tag for formatting scientific names in HTML.'''
+    """
+    A custom Jinja2 tag for formatting scientific names in HTML.
+    """
+
     tags = {'taxonomy'}
     # keyed on the format
     format_to_fields = {}
@@ -25,7 +28,7 @@ class TaxonomyFormatExtension(Extension):
     common_strings = {
         'italics': '<em>{0}</em>',
         'bold': '<b>{0}</b>',
-        'deitalicise': '<span style="font-style: normal;">{0}</span>'
+        'deitalicise': '<span style="font-style: normal;">{0}</span>',
     }
 
     def parse(self, parser):
@@ -45,11 +48,13 @@ class TaxonomyFormatExtension(Extension):
         args.append(parser.parse_expression())
 
         body = parser.parse_statements(['name:endtaxonomy'], drop_needle=True)
-        return nodes.CallBlock(self.call_method('_reformat', args), [], [],
-                               body).set_lineno(lineno)
+        return nodes.CallBlock(
+            self.call_method('_reformat', args), [], [], body
+        ).set_lineno(lineno)
 
     def _reformat(self, field_name, collection_code, record_dict, caller):
-        '''Controls the reformatting of the tag body.
+        """
+        Controls the reformatting of the tag body.
 
         :param field_name: the name of the field whose value is being parsed currently,
                             e.g. 'specificEpithet' or 'genus'
@@ -59,8 +64,7 @@ class TaxonomyFormatExtension(Extension):
         :param caller: the tag body
 
         :returns: HTML-formatted tag body
-
-        '''
+        """
         body = str(caller())
 
         # add any globals here, e.g. if every collection should have the
@@ -81,15 +85,22 @@ class TaxonomyFormatExtension(Extension):
             for rgx, p in collections.items():
                 if re.match(rgx, collection_code):
                     collection_formatted_fields, collection_parsed_fields = p
-                    self.format_to_fields = self._merge(global_formatted_fields,
-                                                        collection_formatted_fields)
+                    self.format_to_fields = self._merge(
+                        global_formatted_fields, collection_formatted_fields
+                    )
                     self.parsed_fields = global_parsed_fields + collection_parsed_fields
                     break
 
         self.field_to_formats = {
-            f: [k for k, v in self.format_to_fields.items() if f in v] for f in set(
-                [item for field_names in self.format_to_fields.values() for item in
-                 field_names])}
+            f: [k for k, v in self.format_to_fields.items() if f in v]
+            for f in set(
+                [
+                    item
+                    for field_names in self.format_to_fields.values()
+                    for item in field_names
+                ]
+            )
+        }
 
         for f, keys in self.format_to_fields.items():
             if field_name in keys:
@@ -102,7 +113,8 @@ class TaxonomyFormatExtension(Extension):
 
     @staticmethod
     def _merge(ff1, ff2):
-        '''Helper method to merge two lists of field formats.
+        """
+        Helper method to merge two lists of field formats.
 
         :param ff1: a dict where the keys are functions taking and outputting a single
                     string, and the values are the names of fields to which that
@@ -113,80 +125,94 @@ class TaxonomyFormatExtension(Extension):
                     function should be applied
         :type ff2: <function, string[]> dict
         :returns: a combined dict
-
-        '''
-        return {k: list(set(ff1.get(k, []) + ff2.get(k, []))) for k in set(ff1).union(ff2)}
+        """
+        return {
+            k: list(set(ff1.get(k, []) + ff2.get(k, []))) for k in set(ff1).union(ff2)
+        }
 
     @property
     def _zoo(self):
-        '''Zoology-specific rules.
+        """
+        Zoology-specific rules.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
                   and corresponding field names, and a list of fields to be parsed
-
-        '''
+        """
         formatted_fields = {
-            self.common_strings['italics'].format: ['specificEpithet', 'genus',
-                                                    'subgenus'],
-            str.lower: ['specificEpithet', 'infraspecificEpithet']
+            self.common_strings['italics'].format: [
+                'specificEpithet',
+                'genus',
+                'subgenus',
+            ],
+            str.lower: ['specificEpithet', 'infraspecificEpithet'],
         }
-        parsed_fields = ['scientificName', 'infraspecificEpithet',
-                         'determinations Names']
+        parsed_fields = [
+            'scientificName',
+            'infraspecificEpithet',
+            'determinations Names',
+        ]
         return formatted_fields, parsed_fields
 
     @property
     def _ent(self):
-        '''Entomology-specific rules. Will almost always follow zoology rules but
-        can override them if necessary.
+        """
+        Entomology-specific rules. Will almost always follow zoology rules but can
+        override them if necessary.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
                   and corresponding field names, and a list of fields to be parsed
-
-        '''
+        """
         return self._zoo
 
     @property
     def _pal(self):
-        '''Palaeontology-specific rules. Will almost always follow zoology rules
-        but can override them if necessary.
+        """
+        Palaeontology-specific rules. Will almost always follow zoology rules but can
+        override them if necessary.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
                   and corresponding field names, and a list of fields to be parsed
-
-        '''
+        """
         return self._zoo
 
     @property
     def _bot(self):
-        '''Botany-specific rules.
+        """
+        Botany-specific rules.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
                   and corresponding field names, and a list of fields to be parsed
-
-        '''
+        """
         formatted_fields = {
-            self.common_strings['italics'].format: ['specificEpithet', 'genus',
-                                                    'subgenus'],
-            str.lower: ['specificEpithet', 'infraspecificEpithet']
+            self.common_strings['italics'].format: [
+                'specificEpithet',
+                'genus',
+                'subgenus',
+            ],
+            str.lower: ['specificEpithet', 'infraspecificEpithet'],
         }
-        parsed_fields = ['scientificName', 'infraspecificEpithet',
-                         'determinations Names']
+        parsed_fields = [
+            'scientificName',
+            'infraspecificEpithet',
+            'determinations Names',
+        ]
         return formatted_fields, parsed_fields
 
     @property
     def _min(self):
-        '''Mineralogy-specific rules.
+        """
+        Mineralogy-specific rules.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
                   and corresponding field names, and a list of fields to be parsed
-
-        '''
+        """
         formatted_fields = {}
         parsed_fields = []
         return formatted_fields, parsed_fields
 
     def _parse_field(self, body, record_dict):
-        '''For longer/more complex fields with multiple parts that need to be variably
+        """
+        For longer/more complex fields with multiple parts that need to be variably
         italicised/not italicised. Mostly achieved via regex.
 
         :param body: the tag body
@@ -194,13 +220,15 @@ class TaxonomyFormatExtension(Extension):
 
         :returns: the tag body wrapped in italics tags, with certain parts deitalicised
                   by wrapping in span tags
-
-        '''
+        """
         # abbreviations should not be italicised
         abbr = ['var', 'subsp', 'subvar', 'f', 'subf', 'ssp', 'cv']
         for a in abbr:
-            body = re.sub('(\s?{0}\.?\s)'.format(a),
-                          '<span style="font-style: normal;">\\1</span>', body)
+            body = re.sub(
+                '(\s?{0}\.?\s)'.format(a),
+                '<span style="font-style: normal;">\\1</span>',
+                body,
+            )
 
         # neither should authors
         body = self._find_authors(body, record_dict)
@@ -208,14 +236,14 @@ class TaxonomyFormatExtension(Extension):
         return self.common_strings['italics'].format(body)
 
     def _find_authors(self, body, record_dict):
-        '''For finding authors in a parsed string.
+        """
+        For finding authors in a parsed string.
 
         :param body: the tag body
         :param record_dict: the full record
 
         :returns: the tag body with the authors wrapped in deitalicising tags
-
-        '''
+        """
         ix = find_author_split(body, record_dict)
         if ix:
             authors = body[ix:]

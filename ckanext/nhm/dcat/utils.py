@@ -29,30 +29,30 @@ def rdf_resources():
 
 
 def as_dwc_list(objects):
-    '''
+    """
     Returns the given objects as a list using the DwC standard | style separator.
 
     :param objects: the objects
     :return: a | separated string
-    '''
+    """
     return ' | '.join(objects)
 
 
 def epoch_to_datetime(epoch_timestamp):
-    '''
-    Converts the given epoch timestamp into a datetime object. The timestamp passed in is assumed to
-    be the integer number of milliseconds since the UNIX epoch.
+    """
+    Converts the given epoch timestamp into a datetime object. The timestamp passed in
+    is assumed to be the integer number of milliseconds since the UNIX epoch.
 
     :param epoch_timestamp: the integer number of milliseconds since the UNIX epoch
     :return: a datetime object
-    '''
+    """
     return datetime.fromtimestamp(epoch_timestamp / 1000.0)
 
 
 class Namespaces:
-    '''
+    """
     Class representing the namespaces available to an RDF graph.
-    '''
+    """
 
     def __init__(self, graph):
         '''
@@ -78,23 +78,27 @@ class Namespaces:
             'rdf': namespace.RDF,
             'rdfs': namespace.RDFS,
             'schema': namespace.Namespace('http://schema.org/'),
-            'sdmx_code': namespace.Namespace('http://purl.org/linked-data/sdmx/2009/code#'),
+            'sdmx_code': namespace.Namespace(
+                'http://purl.org/linked-data/sdmx/2009/code#'
+            ),
             'sdwc': namespace.Namespace('http://rs.tdwg.org/dwc/xsd/simpledarwincore#'),
             'skos': namespace.SKOS,
-            'tdwgi': namespace.Namespace('http://rs.tdwg.org/ontology/voc/Institution#'),
+            'tdwgi': namespace.Namespace(
+                'http://rs.tdwg.org/ontology/voc/Institution#'
+            ),
             'time': namespace.Namespace('http://www.w3.org/2006/time'),
             'vcard': namespace.Namespace('http://www.w3.org/2006/vcard/ns#'),
             'void': namespace.VOID,
         }
 
     def __getattr__(self, prefix):
-        '''
-        Returns the namespace associated with the given prefix and ensures it is bound to the graph
-        if it hasn't been already.
+        """
+        Returns the namespace associated with the given prefix and ensures it is bound
+        to the graph if it hasn't been already.
 
         :param prefix: the namespace prefix as defined in the known_namespaces dict attribute
         :return: the namespace object
-        '''
+        """
         if prefix in self.known_namespaces:
             ns = self.known_namespaces[prefix]
             if (prefix, ns) not in self.bound:
