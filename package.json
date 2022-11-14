@@ -7,7 +7,7 @@
     "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-nhm.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/NaturalHistoryMuseum/ckanext-nhm/issues"
   },
