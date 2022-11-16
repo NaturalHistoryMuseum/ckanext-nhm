@@ -33,7 +33,7 @@ dependencies = [
     "ckanext-query-dois==2.1.1",
     "ckanext-statistics==2.0.15",
     "ckanext-versioned-datastore==3.6.2",
-    "ckanext-dcat @ git+https://github.com/ckan/ckanext-dcat@v1.1.1#egg=ckanext-dcat"
+    "ckanext-dcat @ git+https://github.com/ckan/ckanext-dcat@v1.3.0#egg=ckanext-dcat"
 ]
 
 [project.optional-dependencies]
