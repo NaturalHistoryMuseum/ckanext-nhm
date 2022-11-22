@@ -20,12 +20,12 @@ log = logging.getLogger(__name__)
 
 
 def record_show(context, data_dict):
-    '''Retrieve an individual record
+    """
+    Retrieve an individual record.
 
     :param context:
     :param data_dict:
-
-    '''
+    """
     context['user'] = toolkit.c.user or toolkit.c.author
     schema = context.get('schema', nhm_schema.record_show_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
@@ -37,12 +37,7 @@ def record_show(context, data_dict):
     record_id = toolkit.get_or_bust(data_dict, 'record_id')
 
     # Retrieve datastore record
-    record_data_dict = {
-        'resource_id': resource_id,
-        'filters': {
-            '_id': record_id
-        }
-    }
+    record_data_dict = {'resource_id': resource_id, 'filters': {'_id': record_id}}
     if 'version' in data_dict:
         record_data_dict['version'] = data_dict['version']
     search_result = toolkit.get_action('datastore_search')(context, record_data_dict)
@@ -51,7 +46,7 @@ def record_show(context, data_dict):
         record = {
             'data': search_result['records'][0],
             'fields': search_result['fields'],
-            'resource_id': resource_id
+            'resource_id': resource_id,
         }
     except IndexError:
         # If we don't have a result, raise not found
@@ -61,17 +56,15 @@ def record_show(context, data_dict):
 
 
 def object_rdf(context, data_dict):
-    '''Get record RDF
+    """
+    Get record RDF.
 
     :param context:
     :param data_dict:
-
-    '''
+    """
 
     # Validate the data
-    context = {
-        'user': toolkit.c.user or toolkit.c.author
-    }
+    context = {'user': toolkit.c.user or toolkit.c.author}
     schema = context.get('schema', nhm_schema.object_rdf_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
     # Raise any validation errors
@@ -89,13 +82,13 @@ def object_rdf(context, data_dict):
 
 
 def _image_exists_on_record(resource, record, asset_id):
-    '''Check the image belongs to the record
+    """
+    Check the image belongs to the record.
 
     :param resource:
     :param asset_id:
     :param record:
-
-    '''
+    """
     # FIXME - If no image field use gallery
     image_field = resource.get('_image_field', None)
 
@@ -109,11 +102,12 @@ def _image_exists_on_record(resource, record, asset_id):
 
 @toolkit.side_effect_free
 def get_permanent_url(context, data_dict):
-    '''
-    Retrieve the permanent URL of a specimen from the specimen collection using the field and value
-    to filter the results (i.e. field must equal value for the record to match). A URL is returned
-    only if exactly one record is matched by the field and value combination. If more than 1 record
-    is matched or if 0 records are matched then an error is returned.
+    """
+    Retrieve the permanent URL of a specimen from the specimen collection using the
+    field and value to filter the results (i.e. field must equal value for the record to
+    match). A URL is returned only if exactly one record is matched by the field and
+    value combination. If more than 1 record is matched or if 0 records are matched then
+    an error is returned.
 
     **Params:**
 
@@ -128,7 +122,7 @@ def get_permanent_url(context, data_dict):
 
     :returns: the full URL of the specimen
     :rtype: string
-    '''
+    """
     schema = context.get('schema', nhm_schema.get_permanent_url_schema())
     data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
 
@@ -140,31 +134,33 @@ def get_permanent_url(context, data_dict):
     # create a search dict to use with the datastore_search action
     search_dict = {
         'resource_id': helpers.get_specimen_resource_id(),
-        'filters': {
-            field: value
-        },
+        'filters': {field: value},
         'limit': 1,
     }
     result = toolkit.get_action('datastore_search')(context, search_dict)
     records = result['records']
     total = result['total']
     if total == 0:
-        raise toolkit.ValidationError({
-            'message': 'No records found matching the given criteria',
-            'total': total,
-        })
+        raise toolkit.ValidationError(
+            {
+                'message': 'No records found matching the given criteria',
+                'total': total,
+            }
+        )
     elif total > 1:
-        raise toolkit.ValidationError({
-            'message': 'More than 1 record found matching the given criteria',
-            'total': total,
-        })
+        raise toolkit.ValidationError(
+            {
+                'message': 'More than 1 record found matching the given criteria',
+                'total': total,
+            }
+        )
     else:
         uuid = records[0]['occurrenceID']
         if include_version:
             # figure out the latest rounded version of the specimen resource data
-            version = toolkit.get_action('datastore_get_rounded_version')(context, {
-                'resource_id': helpers.get_specimen_resource_id()
-            })
+            version = toolkit.get_action('datastore_get_rounded_version')(
+                context, {'resource_id': helpers.get_specimen_resource_id()}
+            )
             # create a path with the version included
             path = toolkit.url_for('object_view_versioned', uuid=uuid, version=version)
         else:
@@ -178,7 +174,11 @@ def get_permanent_url(context, data_dict):
 def user_show(next_action, context, data_dict):
     # FIXME: temporary override until we update to ckan 2.10
     current_user = context.get('auth_user_obj')
-    if 'id' not in data_dict and 'user_obj' not in data_dict and current_user is not None:
+    if (
+        'id' not in data_dict
+        and 'user_obj' not in data_dict
+        and current_user is not None
+    ):
         data_dict['id'] = context['auth_user_obj'].id
     return next_action(context, data_dict)
 
@@ -186,9 +186,12 @@ def user_show(next_action, context, data_dict):
 @toolkit.chained_action
 def package_update(next_action, context, pkg_dict):
     # force lowercase for tags with no vocabulary
-    category_tags = [t['name'] for t in
-                     toolkit.get_action('vocabulary_show')({}, {'id': DATASET_TYPE_VOCABULARY})[
-                         'tags']]
+    category_tags = [
+        t['name']
+        for t in toolkit.get_action('vocabulary_show')(
+            {}, {'id': DATASET_TYPE_VOCABULARY}
+        )['tags']
+    ]
     tags = []
     for tag in pkg_dict.get('tags', []):
         if tag.get('vocabulary_id'):
@@ -200,7 +203,9 @@ def package_update(next_action, context, pkg_dict):
         tag['name'] = tag['name'].lower()
         if tag['name'] not in [t['name'] for t in tags]:
             tags.append(tag)
-    pkg_dict['tag_string'] = ','.join([t['name'] for t in tags if not t.get('vocabulary_id')])
+    pkg_dict['tag_string'] = ','.join(
+        [t['name'] for t in tags if not t.get('vocabulary_id')]
+    )
     pkg_dict['tags'] = tags
 
     return next_action(context, pkg_dict)

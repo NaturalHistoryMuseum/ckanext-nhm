@@ -27,4 +27,3 @@ this.ckan.module('social', function ($, _) {
     }
 
 });
-

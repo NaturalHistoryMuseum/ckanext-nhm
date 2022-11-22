@@ -8,10 +8,12 @@ from elasticsearch_dsl import Q
 
 
 class FilterOption:
-    '''
-    Class representing a filter option. These are more prescribed options available on certain
-    resources, such as the specimens and index lot resources, and typically are shown as tick boxes.
-    '''
+    """
+    Class representing a filter option.
+
+    These are more prescribed options available on certain resources, such as the
+    specimens and index lot resources, and typically are shown as tick boxes.
+    """
 
     def __init__(self, name, label, filter_dsl, hide=False):
         '''
@@ -28,12 +30,12 @@ class FilterOption:
         self.hide = hide
 
     def as_dict(self):
-        '''
-        Produces a dict with the details required by the frontend to show the filter options to the
-        user.
+        """
+        Produces a dict with the details required by the frontend to show the filter
+        options to the user.
 
         :return: a dict with the name and the label for the filter
-        '''
+        """
         return {
             'name': self.name,
             'label': self.label,
@@ -41,11 +43,18 @@ class FilterOption:
 
 
 # define some simple, common filters
-has_image = FilterOption('_has_image', 'Has image', Q('exists', field='data.associatedMedia'))
+has_image = FilterOption(
+    '_has_image', 'Has image', Q('exists', field='data.associatedMedia')
+)
 
-has_lat_long = FilterOption('_has_lat_long', 'Has lat/long', Q('exists', field='meta.geo'))
+has_lat_long = FilterOption(
+    '_has_lat_long', 'Has lat/long', Q('exists', field='meta.geo')
+)
 
-exclude_mineralogy = FilterOption('_exclude_mineralogy', 'Exclude Mineralogy',
-                                  # note the ~ which inverts the query
-                                  ~Q('term', **{'data.collectionCode': 'min'}),
-                                  hide=True)
+exclude_mineralogy = FilterOption(
+    '_exclude_mineralogy',
+    'Exclude Mineralogy',
+    # note the ~ which inverts the query
+    ~Q('term', **{'data.collectionCode': 'min'}),
+    hide=True,
+)

@@ -14,7 +14,7 @@ blueprint = Blueprint(name='big-butterfly-count-map', import_name=__name__)
 
 @blueprint.route('/big-butterfly-count-map')
 def bbcm():
-    '''
+    """
     Render the big butterfly count map page.
-    '''
+    """
     return toolkit.render('bbcm.html', {})

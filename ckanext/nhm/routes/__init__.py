@@ -6,6 +6,15 @@
 
 from . import about, legal, statistics, record, object, help, bbcm, beetle_iiif, misc
 
-blueprints = [about.blueprint, statistics.blueprint, legal.blueprint, record.blueprint,
-              object.blueprint, object.specimen_blueprint, help.blueprint, bbcm.blueprint,
-              beetle_iiif.blueprint, misc.blueprint]
+blueprints = [
+    about.blueprint,
+    statistics.blueprint,
+    legal.blueprint,
+    record.blueprint,
+    object.blueprint,
+    object.specimen_blueprint,
+    help.blueprint,
+    bbcm.blueprint,
+    beetle_iiif.blueprint,
+    misc.blueprint,
+]

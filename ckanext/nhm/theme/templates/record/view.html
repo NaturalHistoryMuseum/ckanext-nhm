@@ -87,7 +87,7 @@
         <div class="record-content">
 
             {% block heading %}
-            <h1 class="page-heading">{{ g.record_title }}</h1>
+                <h1 class="page-heading">{{ g.record_title }}</h1>
             {% endblock %}
 
             {% block record_data %}
@@ -137,6 +137,24 @@
         {% block record_images %} {% if g.images %}
         <h3>Images</h3>
         {% snippet 'gallery/snippets/gallery.html', images=g.images, resource_id=res.id %}
+
+        {% set iiif_manifest_url = h.get_record_iiif_manifest_url(res.id, rec['_id']) %}
+        <a target=”_blank” href="{{ iiif_manifest_url }}">
+            <img class="iiif-manifest-image" src="/images/iiif.png" alt="IIIF Manifest">
+        </a>
+        <p>
+            IIIF (International Image Interoperability Framework) provides rich metadata
+            and media viewing options for images allowing (amongst other things!)
+            comparison of objects across natural history collections.
+            Visit the <a href="https://iiif.io">IIIF</a> page to learn more.
+        </p>
+        <a target=”_blank” href="{{ iiif_manifest_url }}">
+            View Manifest
+        </a> |
+        <a target="_blank"
+           href="https://uv-v4.netlify.app/#?manifest={{ iiif_manifest_url }}">
+            View in Universal Viewer
+        </a>
         {% endif %} {% endblock %}
 
     </div>

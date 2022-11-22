@@ -6,14 +6,14 @@
 
 
 def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
-    '''Format a list of values into a list of dict suitable
-    for use in forms: [{value: x, name: y}]
+    """
+    Format a list of values into a list of dict suitable for use in forms: [{value: x,
+    name: y}]
 
     :param values: list or list of tuples [(value, name)]
     :param allow_empty: if true, will add none option (optional, default: False)
     :param allow_empty_text: label for none value (optional, default: 'None')
-
-    '''
+    """
     options = []
 
     if allow_empty:

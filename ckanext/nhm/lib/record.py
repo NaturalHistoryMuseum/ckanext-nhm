@@ -18,10 +18,12 @@ from functools import partial
 
 
 def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
-    '''
-    Loop through all resources, and try and find the record. Currently this only works for
-    specimens (as rdf_resources() only returns the specimens resource).
-    '''
+    """
+    Loop through all resources, and try and find the record.
+
+    Currently this only works for specimens (as rdf_resources() only returns the
+    specimens resource).
+    """
     context = {'user': toolkit.c.user or toolkit.c.author}
     for resource_id in rdf_resources():
         with suppress(Exception):
@@ -34,7 +36,9 @@ def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
                 'version': version,
             }
             # retrieve datastore record
-            search_result = toolkit.get_action('datastore_search')(context, search_data_dict)
+            search_result = toolkit.get_action('datastore_search')(
+                context, search_data_dict
+            )
             records = search_result['records']
             if records:
                 data = records[0]
@@ -44,7 +48,9 @@ def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
 
 # cache for 5 mins
 @cached(cache=TTLCache(maxsize=4096, ttl=300))
-def get_specimen_by_uuid(uuid: str, version: Optional[int] = None) -> Optional['Record']:
+def get_specimen_by_uuid(
+    uuid: str, version: Optional[int] = None
+) -> Optional['Record']:
     with suppress(Exception):
         search_data_dict = {
             'resource_id': get_specimen_resource_id(),
@@ -79,7 +85,10 @@ DEFAULT_IMAGE_LICENSE_ID = 'cc-by'
 
 @dataclass
 class RecordImage:
-    '''Simple class representing an image associated with a record'''
+    """
+    Simple class representing an image associated with a record.
+    """
+
     url: str
     title: str
     license_title: str
@@ -102,20 +111,31 @@ class RecordImage:
 
 
 class Record:
-    '''
-    A model class for a record. This class allows access to various information related to the
-    record using the resource and package and will lazily load those entities as required.
-    '''
+    """
+    A model class for a record.
 
-    def __init__(self, record_id: int, version: Optional[int] = None, data: Optional[dict] = None,
-                 resource_id: Optional[str] = None, package_id: Optional[str] = None,
-                 package_name: Optional[str] = None, package_id_or_name: Optional[str] = None,
-                 resource: Optional[dict] = None, package: Optional[dict] = None,
-                 context: Optional[dict] = None):
-        '''
-        The only required init parameter is the record_id, however, most of the related information
-        requires other parameters to be passed to make it possible to look them up. For example,
-        just a record_id will not allow access to the record's data, a resource_id is required too.
+    This class allows access to various information related to the record using the
+    resource and package and will lazily load those entities as required.
+    """
+
+    def __init__(
+        self,
+        record_id: int,
+        version: Optional[int] = None,
+        data: Optional[dict] = None,
+        resource_id: Optional[str] = None,
+        package_id: Optional[str] = None,
+        package_name: Optional[str] = None,
+        package_id_or_name: Optional[str] = None,
+        resource: Optional[dict] = None,
+        package: Optional[dict] = None,
+        context: Optional[dict] = None,
+    ):
+        """
+        The only required init parameter is the record_id, however, most of the related
+        information requires other parameters to be passed to make it possible to look
+        them up. For example, just a record_id will not allow access to the record's
+        data, a resource_id is required too.
 
         :param record_id: the record ID as an int
         :param version: the record's version
@@ -129,7 +149,7 @@ class Record:
         :param resource: the resource this record is from as a dict
         :param package: the package this record is from as a dict
         :param context: a context to use for any action API calls
-        '''
+        """
         self.id = record_id
         self.version = version
         self._data = data
@@ -142,10 +162,14 @@ class Record:
         self._image_license = None
         self._images = None
         self._geojson = None
-        self._context = context if context else {
-            'user': toolkit.c.user or toolkit.c.author,
-            'auth_user_obj': toolkit.c.userobj
-        }
+        self._context = (
+            context
+            if context
+            else {
+                'user': toolkit.c.user or toolkit.c.author,
+                'auth_user_obj': toolkit.c.userobj,
+            }
+        )
 
     @property
     def data(self) -> dict:
@@ -153,7 +177,9 @@ class Record:
             data_dict = dict(record_id=self.id, resource_id=self.resource_id)
             if self.version is not None:
                 data_dict['version'] = self.version
-            self._data = toolkit.get_action('record_show')(self._context, data_dict)['data']
+            self._data = toolkit.get_action('record_show')(self._context, data_dict)[
+                'data'
+            ]
         return self._data
 
     @property
@@ -169,19 +195,24 @@ class Record:
         return self._resource
 
     def _set_resource(self):
-        '''
+        """
         Sets up the resource data.
-        '''
+        """
         data_dict = dict(id=self.resource_id)
         self._resource = toolkit.get_action('resource_show')(self._context, data_dict)
 
     def _set_package(self):
-        '''
-        Sets up the package dict using the package ID or name depending on which one is available.
-        If neither are available, this function will attempt to get the package ID from the resource
-        model object. If none of these strategies work, an Exception is thrown.
-        '''
-        id_or_name = self._package_id or self._package_name or self._package_id_or_name or None
+        """
+        Sets up the package dict using the package ID or name depending on which one is
+        available.
+
+        If neither are available, this function will attempt to get the package ID from
+        the resource model object. If none of these strategies work, an Exception is
+        thrown.
+        """
+        id_or_name = (
+            self._package_id or self._package_name or self._package_id_or_name or None
+        )
         # if we don't have an id or a name for the package, see if we can use the resource
         if not id_or_name and self._resource_id:
             resource = model.Resource.get(self.resource_id)
@@ -189,7 +220,9 @@ class Record:
                 id_or_name = resource.get_package_id()
         if not id_or_name:
             raise Exception('Package id or name not available')
-        self._package = toolkit.get_action('package_show')(self._context, dict(id=id_or_name))
+        self._package = toolkit.get_action('package_show')(
+            self._context, dict(id=id_or_name)
+        )
         self._package_id = self._package['id']
         self._package_name = self._package['name']
         # set this to None to avoid confusion
@@ -219,16 +252,22 @@ class Record:
         return self.data.get(self.resource.get(TITLE_FIELD), f'Record {self.id}')
 
     def url(self, use_package_id=False) -> str:
-        '''
-        Returns the URL for this record. If the version is present it is included in the URL.
+        """
+        Returns the URL for this record. If the version is present it is included in the
+        URL.
 
         :param use_package_id: whether to use the package ID in the URL or the package name, the
                                default is the package name (i.e. use_package_id=False)
         :return: the record URL
-        '''
+        """
         name_or_id = self.package_id if use_package_id else self.package_name
-        create_url = partial(url_for, 'record.view', package_name=name_or_id,
-                             resource_id=self.resource_id, record_id=self.id)
+        create_url = partial(
+            url_for,
+            'record.view',
+            package_name=name_or_id,
+            resource_id=self.resource_id,
+            record_id=self.id,
+        )
         if self.version is not None:
             return create_url(version=self.version)
         else:
@@ -236,12 +275,12 @@ class Record:
 
     @property
     def image_license(self) -> DefaultLicense:
-        '''
-        Retrieves the default image license for the record based on the image licence field set on
-        the resource.
+        """
+        Retrieves the default image license for the record based on the image licence
+        field set on the resource.
 
         :return: the licence model object
-        '''
+        """
         if not self._image_license:
             license_registry = model.Package.get_license_register()
             id_options = []
@@ -259,23 +298,26 @@ class Record:
 
     @property
     def image_field(self) -> Optional[str]:
-        '''
-        Returns the name of the field in the record that contains the image data. If no field is
-        specified at the resource level then we check for a DwC associated_media field and use it
-        if we find it. If no field name can be resolved, return None.
+        """
+        Returns the name of the field in the record that contains the image data. If no
+        field is specified at the resource level then we check for a DwC
+        associated_media field and use it if we find it. If no field name can be
+        resolved, return None.
 
         :return: the name of the field in the record containing the image data or None if there
                  isn't one
-        '''
-        return self.resource.get(IMAGE_FIELD, DWC_ASSOCIATED_MEDIA if self.is_dwc else None)
+        """
+        return self.resource.get(
+            IMAGE_FIELD, DWC_ASSOCIATED_MEDIA if self.is_dwc else None
+        )
 
     @property
     def images(self) -> List[RecordImage]:
-        '''
+        """
         Retrieves a list of RecordImages associated with this record.
 
         :return: a list of RecordImage objects
-        '''
+        """
         if self._images is None:
             self._images = []
             # TODO: there used to be a check that this wasn't _id here, do we really need that?
@@ -286,23 +328,43 @@ class Record:
                     if isinstance(raw_images, str):
                         # if we have a delimiter, use it to split the images
                         delimiter = self.resource.get(IMAGE_DELIMETER_FIELD)
-                        images = raw_images.split(delimiter) if delimiter else [raw_images]
+                        images = (
+                            raw_images.split(delimiter) if delimiter else [raw_images]
+                        )
                         for image in filter(None, (image.strip() for image in images)):
-                            self._images.append(RecordImage(image, self.title,
-                                                            self.image_license.title,
-                                                            self.image_license.url, DEFAULT_RIGHTS,
-                                                            self, is_mss_image))
+                            self._images.append(
+                                RecordImage(
+                                    image,
+                                    self.title,
+                                    self.image_license.title,
+                                    self.image_license.url,
+                                    DEFAULT_RIGHTS,
+                                    self,
+                                    is_mss_image,
+                                )
+                            )
                     elif isinstance(raw_images, list):
                         for image in raw_images:
                             image_url = image.get('identifier')
                             if image_url:
-                                license_title = image.get('license', self.image_license.title)
-                                licence_url = image.get('license', self.image_license.url)
+                                license_title = image.get(
+                                    'license', self.image_license.title
+                                )
+                                licence_url = image.get(
+                                    'license', self.image_license.url
+                                )
                                 rights = image.get('rightsHolder', DEFAULT_RIGHTS)
-                                self._images.append(RecordImage(image_url,
-                                                                image.get('title', self.title),
-                                                                license_title, licence_url, rights,
-                                                                self, is_mss_image))
+                                self._images.append(
+                                    RecordImage(
+                                        image_url,
+                                        image.get('title', self.title),
+                                        license_title,
+                                        licence_url,
+                                        rights,
+                                        self,
+                                        is_mss_image,
+                                    )
+                                )
         return self._images
 
     @property
@@ -311,15 +373,19 @@ class Record:
 
     @property
     def geojson(self) -> Optional[dict]:
-        '''
-        If latitude and longitude fields are set on the resource, or can be inferred, extract the
-        values from the record data and return a GeoJSON compatible Point where the record is
-        located.
+        """
+        If latitude and longitude fields are set on the resource, or can be inferred,
+        extract the values from the record data and return a GeoJSON compatible Point
+        where the record is located.
 
         :return: None if the latitude and longitude couldn't be identified or a GeoJSON Point
-        '''
-        lat_field = self.resource.get(LATITUDE_FIELD, DWC_LATITUDE if self.is_dwc else None)
-        lon_field = self.resource.get(LONGITUDE_FIELD, DWC_LONGITUDE if self.is_dwc else None)
+        """
+        lat_field = self.resource.get(
+            LATITUDE_FIELD, DWC_LATITUDE if self.is_dwc else None
+        )
+        lon_field = self.resource.get(
+            LONGITUDE_FIELD, DWC_LONGITUDE if self.is_dwc else None
+        )
 
         if not lat_field or not lon_field:
             return None

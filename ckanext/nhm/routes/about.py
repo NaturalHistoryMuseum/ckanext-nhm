@@ -13,39 +13,39 @@ blueprint = Blueprint(name='about', import_name=__name__, url_prefix='/about')
 
 @blueprint.route('/citation')
 def citation():
-    '''Render the "about" page for citations and attributions.'''
-    return toolkit.render('about/citation.html', {
-        'title': 'Citation and attribution'
-    })
+    """
+    Render the "about" page for citations and attributions.
+    """
+    return toolkit.render('about/citation.html', {'title': 'Citation and attribution'})
 
 
 @blueprint.route('/download')
 def download():
-    '''Render the "about" page for downloads and the API.'''
-    return toolkit.render('about/download.html', {
-        'title': 'Download and API'
-    })
+    """
+    Render the "about" page for downloads and the API.
+    """
+    return toolkit.render('about/download.html', {'title': 'Download and API'})
 
 
 @blueprint.route('/credits')
 def credits():
-    '''Render the "about" page for credits.'''
-    return toolkit.render('about/credits.html', {
-        'title': 'Credits'
-    })
+    """
+    Render the "about" page for credits.
+    """
+    return toolkit.render('about/credits.html', {'title': 'Credits'})
 
 
 @blueprint.route('/privacy')
 def privacy():
-    '''Render the "about" page for privacy.'''
-    return toolkit.render('about/privacy.html', {
-        'title': 'Privacy'
-    })
+    """
+    Render the "about" page for privacy.
+    """
+    return toolkit.render('about/privacy.html', {'title': 'Privacy'})
 
 
 @blueprint.route('/terms')
 def terms():
-    '''Render the "about" page for terms and conditions.'''
-    return toolkit.render('about/terms.html', {
-        'title': 'Terms and conditions'
-    })
+    """
+    Render the "about" page for terms and conditions.
+    """
+    return toolkit.render('about/terms.html', {'title': 'Terms and conditions'})

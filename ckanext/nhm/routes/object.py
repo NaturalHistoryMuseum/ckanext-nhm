@@ -68,19 +68,21 @@ ABYSSLINE_UUIDS = {
     '241d094a-568f-4194-997c-fd08f67dcdac',
     '93b0a70d-c74e-4735-b70e-0c6e4c6a36ff',
     'e9f38ce3-5ed5-49f3-8713-c26de2eefd2b',
-    'f263bc90-6307-462c-9e02-7b87d20e2840'
+    'f263bc90-6307-462c-9e02-7b87d20e2840',
 }
 
 # this is the main record citation blueprint, use this in url_fors etc
 blueprint = Blueprint(name='object', import_name=__name__, url_prefix='/object')
 # this blueprint is here for the old citation urls, don't use it in url_fors etc
-specimen_blueprint = Blueprint(name='specimen', import_name=__name__, url_prefix='/specimen')
+specimen_blueprint = Blueprint(
+    name='specimen', import_name=__name__, url_prefix='/specimen'
+)
 
 
 def _context():
     return {
         'user': toolkit.c.user or toolkit.c.author,
-        'auth_user_obj': toolkit.c.userobj
+        'auth_user_obj': toolkit.c.userobj,
     }
 
 
@@ -89,14 +91,14 @@ def _context():
 @blueprint.route('/<uuid>.<_format>', defaults={'version': None})
 @blueprint.route('/<uuid>/<int:version>.<_format>')
 def rdf(uuid, _format, version):
-    '''
+    """
     Return RDF view of object.
 
     :param uuid: the object's uuid
     :param _format: the format requested
     :param version: the version of the record to retrieve, or None if the current version is desired
     :return: the data to display
-    '''
+    """
     data_dict = {
         'uuid': uuid,
         'format': _format,
@@ -114,13 +116,13 @@ def rdf(uuid, _format, version):
 @blueprint.route('/<uuid>', defaults={'version': None})
 @blueprint.route('/<uuid>/<int:version>')
 def view(uuid, version):
-    '''
-    View object. If this is normal HTTP request, this will redirect to the record, otherwise if
-    the request is for RDF (content negotiation) return the rdf.
+    """
+    View object. If this is normal HTTP request, this will redirect to the record,
+    otherwise if the request is for RDF (content negotiation) return the rdf.
 
     :param uuid: the uuid of the object
     :param version: the version of the object, or None for current version
-    '''
+    """
     if uuid in ABYSSLINE_UUIDS:
         abyssline_object_redirect(uuid, version)
 
@@ -145,12 +147,12 @@ def view(uuid, version):
 
 
 def abyssline_object_redirect(uuid, version):
-    '''
+    """
     Temporary fix to allow abyssline object references to resolve to the temp dataset.
 
     :param uuid: the object's uuid
     :param version: the version to get
-    '''
+    """
     resource_id = toolkit.config.get('ckanext.nhm.abyssline_resource_id')
 
     # figure out the rounded version
@@ -161,12 +163,7 @@ def abyssline_object_redirect(uuid, version):
     version = toolkit.get_action('datastore_get_rounded_version')(_context(), data_dict)
 
     # search for the record
-    search_data_dict = {
-        'resource_id': resource_id,
-        'filters': {
-            'catalogNumber': uuid
-        }
-    }
+    search_data_dict = {'resource_id': resource_id, 'filters': {'catalogNumber': uuid}}
 
     search_result = toolkit.get_action('datastore_search')(_context(), search_data_dict)
     try:

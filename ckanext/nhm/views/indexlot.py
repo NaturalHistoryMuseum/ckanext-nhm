@@ -16,7 +16,9 @@ log = logging.getLogger(__name__)
 
 
 class IndexLotView(DefaultView):
-    '''Controller for displaying a specimen record'''
+    """
+    Controller for displaying a specimen record.
+    """
 
     resource_id = toolkit.config.get('ckanext.nhm.indexlot_resource_id')
 
@@ -25,42 +27,71 @@ class IndexLotView(DefaultView):
         'type',
         'taxonRank',
         'associatedMedia.category',
-        'kindOfMaterial'
+        'kindOfMaterial',
     ]
 
     # Additional search filter options
     filter_options = [has_image]
 
     field_groups = OrderedDict(
-        [('Classification', OrderedDict(
-            [('currentScientificName', 'Scientific name'),
-             ('scientificNameAuthorship', 'Author'),
-             ('kingdom', 'Kingdom'),
-             ('phylum', 'Phylum'), ('class', 'Class'),
-             ('order', 'Order'),
-             ('family', 'Family'), ('genus', 'Genus'),
-             ('subgenus', 'Subgenus'),
-             ('specificEpithet', 'Species'),
-             ('infraspecificEpithet', 'Subspecies'),
-             ('higherClassification', 'Higher classification'),
-             ('taxonRank', 'Taxon rank'), ])),
-         ('Specimen', OrderedDict(
-             [('type', 'Type'),
-              ('media', 'Media'),
-              ('british', 'British'), ])),
-         ('Material details', OrderedDict(
-             [('material', 'Material'),
-              ('kindOfMaterial', 'Kind of material'),
-              ('kindOfMedia', 'Kind of media'),
-              ('materialCount', 'Count'),
-              ('materialSex', 'Sex'),
-              ('materialStage', 'Stage'),
-              ('materialTypes', 'Types'),
-              ('materialPrimaryTypeNumber', 'Primary type number'), ])),
-         ('Record', OrderedDict([
-             ('GUID', 'GUID'),
-             ('modified', 'Modified'),
-             ('created', 'Created'), ])), ])
+        [
+            (
+                'Classification',
+                OrderedDict(
+                    [
+                        ('currentScientificName', 'Scientific name'),
+                        ('scientificNameAuthorship', 'Author'),
+                        ('kingdom', 'Kingdom'),
+                        ('phylum', 'Phylum'),
+                        ('class', 'Class'),
+                        ('order', 'Order'),
+                        ('family', 'Family'),
+                        ('genus', 'Genus'),
+                        ('subgenus', 'Subgenus'),
+                        ('specificEpithet', 'Species'),
+                        ('infraspecificEpithet', 'Subspecies'),
+                        ('higherClassification', 'Higher classification'),
+                        ('taxonRank', 'Taxon rank'),
+                    ]
+                ),
+            ),
+            (
+                'Specimen',
+                OrderedDict(
+                    [
+                        ('type', 'Type'),
+                        ('media', 'Media'),
+                        ('british', 'British'),
+                    ]
+                ),
+            ),
+            (
+                'Material details',
+                OrderedDict(
+                    [
+                        ('material', 'Material'),
+                        ('kindOfMaterial', 'Kind of material'),
+                        ('kindOfMedia', 'Kind of media'),
+                        ('materialCount', 'Count'),
+                        ('materialSex', 'Sex'),
+                        ('materialStage', 'Stage'),
+                        ('materialTypes', 'Types'),
+                        ('materialPrimaryTypeNumber', 'Primary type number'),
+                    ]
+                ),
+            ),
+            (
+                'Record',
+                OrderedDict(
+                    [
+                        ('GUID', 'GUID'),
+                        ('modified', 'Modified'),
+                        ('created', 'Created'),
+                    ]
+                ),
+            ),
+        ]
+    )
 
     def render_record(self, c):
         '''

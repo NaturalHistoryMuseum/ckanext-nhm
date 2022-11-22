@@ -7,7 +7,7 @@
 
 {{ form.input('title', id='field-title', label=_('Title'), placeholder=_('eg. My View'), value=data.title, error=errors.title, classes=['control-full', 'control-large'], is_required=true) }}
 
-{# form template is defined in ResouceView extention point #} 
+{# form template is defined in ResouceView extention point #}
 {% if form_template %}
   {% include form_template %}
 {% endif %}
