@@ -5,7 +5,6 @@
 # Created by the Natural History Museum in London, UK
 
 from collections import OrderedDict, defaultdict
-from urllib.parse import quote
 
 import itertools
 import json
@@ -32,6 +31,8 @@ from datetime import datetime
 from jinja2.filters import do_truncate
 from lxml import etree, html
 from operator import itemgetter
+from typing import Optional
+from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -1561,3 +1562,18 @@ def get_record_permalink(
             url_for_params['version'] = rounded_version
         url = toolkit.url_for('record.permalink', qualified=True, **url_for_params)
     return url
+
+
+def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
+    """
+    Given a resource ID and a record ID, a fully qualified URL to the IIIF manifest for
+    the record's images.
+
+    :param resource_id: the resource ID
+    :param record_id: the record ID
+    :return: the fully qualified URL
+    """
+    manifest_id = toolkit.get_action("build_iiif_identifier")(
+        {"builder_id": "record", "resource_id": resource_id, "record_id": record_id},
+    )
+    return toolkit.url_for("iiif.resource", identifier=manifest_id, _external=True)
