@@ -5,7 +5,7 @@
             <span>,</span>
             <input type="text" title="Longitude" v-model="values.point.longitude" size="3" @keyup.enter="pressedEnter">
             <label for="radius">±</label>
-            <input type="number" title="Radius" v-model="values.point.radius" min="0" id="radius" @keyup.enter="pressedEnter">
+            <input type="number" title="Radius" v-model.number="values.point.radius" min="0" id="radius" @keyup.enter="pressedEnter">
             <select v-model="values.point.radius_unit" title="Radius units">
                 <option v-for="unit in radiusUnits" :key="unit.id">{{ unit }}
                 </option>
