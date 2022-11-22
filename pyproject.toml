@@ -67,6 +67,17 @@ zip-safe = false
 [tool.setuptools.packages.find]
 exclude = ["tests", "docs"]
 
+[tool.commitizen]
+name = "cz_nhm"
+version = "3.7.1"
+tag_format = "v$version"
+update_changelog_on_bump = true
+changelog_incremental = false
+version_files = [
+    "package.json",
+    "pyproject.toml:version"
+]
+
 [tool.black]
 line-length = 88
 skip_string_normalization = true
