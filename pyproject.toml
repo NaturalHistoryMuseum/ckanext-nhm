@@ -72,7 +72,7 @@ name = "cz_nhm"
 version = "3.7.1"
 tag_format = "v$version"
 update_changelog_on_bump = true
-changelog_incremental = false
+changelog_incremental = true
 version_files = [
     "package.json",
     "pyproject.toml:version"
