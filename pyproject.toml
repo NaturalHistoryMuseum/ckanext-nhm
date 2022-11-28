@@ -69,7 +69,7 @@ exclude = ["tests", "docs"]
 
 [tool.commitizen]
 name = "cz_nhm"
-version = "3.7.1"
+version = "4.0.0"
 tag_format = "v$version"
 update_changelog_on_bump = true
 changelog_incremental = true
