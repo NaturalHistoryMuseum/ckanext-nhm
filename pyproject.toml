@@ -51,7 +51,7 @@ changelog = "https://github.com/NaturalHistoryMuseum/ckanext-nhm/blob/main/CHANG
 [project.entry-points."ckan.plugins"]
 nhm = "ckanext.nhm.plugin:NHMPlugin"
 
-[project.entry-points."ckan.rdf.plugins"]
+[project.entry-points."ckan.rdf.profiles"]
 nhm_dcat = "ckanext.nhm.dcat.profiles:NHMDCATProfile"
 
 
