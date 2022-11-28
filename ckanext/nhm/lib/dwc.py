@@ -18,18 +18,21 @@ with open(path, 'r') as xml_f:
 
 
 def dwc_terms(fields):
-    '''
-    Get DwC terms and groups, parsed from tdwg_dwcterms. Even though we use simple DwC terms, we use
-    this XSD as it allows us to group terms into events etc., on record display.
+    """
+    Get DwC terms and groups, parsed from tdwg_dwcterms. Even though we use simple DwC
+    terms, we use this XSD as it allows us to group terms into events etc., on record
+    display.
 
     :param fields: list of fields for this record
     :return: dict, keyed by groups
-    '''
+    """
     fields = list(fields)
     dynamic_properties_uri = None
     terms = OrderedDict()
     for group in DWC_XSD.iterfind('xs:group', namespaces=DWC_XSD.nsmap):
-        for element in group.iterfind('xs:sequence/xs:element', namespaces=DWC_XSD.nsmap):
+        for element in group.iterfind(
+            'xs:sequence/xs:element', namespaces=DWC_XSD.nsmap
+        ):
             ns, name = element.get('ref').split(':')
             uri = f'{DWC_XSD.nsmap[ns]}{name}'
             if name == 'dynamicProperties':

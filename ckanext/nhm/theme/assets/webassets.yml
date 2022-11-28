@@ -35,9 +35,11 @@ view-controls:
 
 slickgrid-css:
   output: ckanext-nhm/%(version)s_slickgrid.css
+  filters: less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
-    # TODO: 2.9 - switch to less
-    - css/slickgrid.css
+    - less/slickgrid.less
 
 slickgrid-js:
   output: ckanext-nhm/%(version)s_slickgrid.js
@@ -49,11 +51,13 @@ slickgrid-js:
   contents:
     - scripts/slickgrid.js
 
-# TODO: 2.9 - switch to less
 map:
   output: ckanext-nhm/%(version)s_map.css
+  filters: less
+  config:
+    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
-    - css/map.css
+    - less/map.less
 
 resource-view-field-filters:
   output: ckanext-nhm/%(version)s_resource-view-field-filters.js

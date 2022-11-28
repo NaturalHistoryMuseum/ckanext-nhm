@@ -18,19 +18,23 @@ from sqlalchemy import func, false
 from ckanext.nhm.lib.helpers import get_record_stats
 
 # create a flask blueprint with a prefix
-blueprint = Blueprint(name='statistics', import_name=__name__, url_prefix='/about/statistics')
+blueprint = Blueprint(
+    name='statistics', import_name=__name__, url_prefix='/about/statistics'
+)
 
 
 def _context():
     return {
         'user': toolkit.c.user or toolkit.c.author,
-        'auth_user_obj': toolkit.c.userobj
+        'auth_user_obj': toolkit.c.userobj,
     }
 
 
 @blueprint.before_request
 def before_request():
-    '''set context and check authorization'''
+    """
+    set context and check authorization.
+    """
     try:
         toolkit.check_access('site_read', _context())
     except toolkit.NotAuthorized:
@@ -39,7 +43,9 @@ def before_request():
 
 @blueprint.route('/resources')
 def resources():
-    '''Render the resources statistics page.'''
+    """
+    Render the resources statistics page.
+    """
 
     # segment by day (further grouping can be done by d3)
     toolkit.c.date_interval = 'day'
@@ -59,16 +65,18 @@ def resources():
         graph_data.append([formatted_date, total])
 
     # compress the data
-    toolkit.c.graph_data = base64.b64encode(zlib.compress(json.dumps(graph_data).encode(), level=9))
+    toolkit.c.graph_data = base64.b64encode(
+        zlib.compress(json.dumps(graph_data).encode(), level=9)
+    )
 
-    return toolkit.render('stats/resources.html', {
-        'title': 'Resource statistics'
-    })
+    return toolkit.render('stats/resources.html', {'title': 'Resource statistics'})
 
 
 @blueprint.route('/records')
 def records():
-    '''Render the records stats page.'''
+    """
+    Render the records stats page.
+    """
 
     toolkit.c.datastore_stats = toolkit.get_action('dataset_statistics')(_context(), {})
 
@@ -76,18 +84,18 @@ def records():
     graph_data = [[x['date'].strftime('%Y-%m-%d'), x['count']] for x in record_stats]
 
     # compress the data
-    toolkit.c.graph_data = base64.b64encode(zlib.compress(json.dumps(graph_data).encode(), level=9))
+    toolkit.c.graph_data = base64.b64encode(
+        zlib.compress(json.dumps(graph_data).encode(), level=9)
+    )
 
-    return toolkit.render('stats/records.html', {
-        'title': 'Record statistics'
-    })
+    return toolkit.render('stats/records.html', {'title': 'Record statistics'})
 
 
 @blueprint.route('/contributors')
 def contributors():
-    '''
+    """
     Render the contributors statistics page.
-    '''
+    """
 
     graph_data = []
 
@@ -95,13 +103,20 @@ def contributors():
     # here to get a per-package authors count. We have to use solr directly to do this because the
     # package_search action doesn't allow the pivot options to be passed through
     solr = make_connection()
-    results = solr.search('*:*', **{
-        'fq': '+capacity:public +state:active',
-        'facet': 'true',
-        'facet.pivot': 'id,author',
-        'facet.pivot.mincount': 1,
-        'facet.limit': -1,
-    }).facets.get('facet_pivot', {}).get('id,author', [])
+    results = (
+        solr.search(
+            '*:*',
+            **{
+                'fq': '+capacity:public +state:active',
+                'facet': 'true',
+                'facet.pivot': 'id,author',
+                'facet.pivot.mincount': 1,
+                'facet.limit': -1,
+            }
+        )
+        .facets.get('facet_pivot', {})
+        .get('id,author', [])
+    )
 
     # turn the counts into a lookup from package_id -> number of authors. Note that the number of
     # authors only includes authors we haven't seen before to avoid counting authors of multiple
@@ -118,10 +133,12 @@ def contributors():
 
     # retrieve the packages in the database ordered by creation time. We need this because we can't
     # order the solr facets by created date
-    order = list(model.Session.query(model.Package.id, model.Package.metadata_created)
-                 .filter(model.Package.private == false())
-                 .filter(model.Package.state == model.State.ACTIVE)
-                 .order_by(model.Package.metadata_created))
+    order = list(
+        model.Session.query(model.Package.id, model.Package.metadata_created)
+        .filter(model.Package.private == false())
+        .filter(model.Package.state == model.State.ACTIVE)
+        .order_by(model.Package.metadata_created)
+    )
 
     # only do stuff if we have some packages
     if order:
@@ -146,8 +163,10 @@ def contributors():
             graph_data.append([formatted_date, total])
 
     # compress the data
-    toolkit.c.graph_data = base64.b64encode(zlib.compress(json.dumps(graph_data).encode(), level=9))
+    toolkit.c.graph_data = base64.b64encode(
+        zlib.compress(json.dumps(graph_data).encode(), level=9)
+    )
 
-    return toolkit.render('stats/contributors.html', {
-        'title': 'Contributor statistics'
-    })
+    return toolkit.render(
+        'stats/contributors.html', {'title': 'Contributor statistics'}
+    )

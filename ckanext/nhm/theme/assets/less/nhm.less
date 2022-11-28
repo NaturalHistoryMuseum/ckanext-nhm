@@ -612,6 +612,7 @@ iframe {
           width: 210px;
         }
       }
+
       height: 60px;
       width: 129px;
     }
@@ -1544,7 +1545,7 @@ select {
 }
 
 .actions {
-  top: floor(@min-pad / 3);
+  top: floor((@min-pad / 3));
 }
 
 .btn {
@@ -1584,7 +1585,7 @@ select {
 
 .btn-group {
   &, & + .btn {
-    margin-top: floor(@min-pad / 3); // to center it - looks better than halving
+    margin-top: floor((@min-pad / 3)); // to center it - looks better than halving
   }
 
   &.open .btn-primary.dropdown-toggle {
@@ -2672,7 +2673,7 @@ select, .select2-choice {
 
       & a {
         margin: 0;
-        padding: ceil(@min-pad / 2) @min-pad;
+        padding: ceil((@min-pad / 2)) @min-pad;
       }
     }
 
@@ -2992,6 +2993,10 @@ select, .select2-choice {
 
 #record-map-container {
   height: 250px;
+}
+
+.iiif-manifest-image {
+  width: 40px;
 }
 
 // FEED --------------------------------------------------------------------------------------------
