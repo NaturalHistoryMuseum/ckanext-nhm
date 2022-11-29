@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.0.1 (2022-11-29)
+
+### Fix
+
+- remove .decode() from object_rdf result
+- change ckan.rdf.plugins to ckan.rdf.profiles
+
 ## v4.0.0 (2022-11-28)
 
 ### Fix
