@@ -136,12 +136,12 @@ def delete_dataset_category(name):
     vocab = get_vocabulary(context, create_if_missing=False)
 
     if vocab is None:
-        click.secho(u"Vocabulary doesn't exist so no deletion necessary", fg='yellow')
+        click.secho("Vocabulary doesn't exist so no deletion necessary", fg='yellow')
         return
     else:
         tag = next(iter(filter(lambda t: t['name'] == name, vocab['tags'])), None)
         if tag is None:
-            click.secho(u"Tag doesn't exist in vocabulary", fg='yellow')
+            click.secho("Tag doesn't exist in vocabulary", fg='yellow')
         else:
             data = {'id': tag['id'], 'vocabulary_id': vocab['id']}
             toolkit.get_action('tag_delete')(context, data)
