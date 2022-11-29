@@ -282,7 +282,7 @@ class RecordGraphBuilder(object):
             yield image_uri, self.namespaces.cc.license, URIRef(image.license_url)
             yield image_uri, self.namespaces.dc.RightsStatement, Literal(image.rights)
             # although the actual image could be something else, the preview will always be a jpeg
-            yield image_uri, self.namespaces.dc.Format, Literal('image/jpeg')
+            yield image_uri, self.namespaces.dc.format, Literal('image/jpeg')
             # add link from image to object
             yield image_uri, self.namespaces.foaf.depicts, self.record_ref
             # add a link from the object to the image
