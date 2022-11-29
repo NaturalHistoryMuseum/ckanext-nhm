@@ -1472,7 +1472,7 @@ def get_specimen_jsonld(uuid, version=None):
         'version': version,
     }
     try:
-        return toolkit.get_action('object_rdf')({}, data_dict).decode('utf-8')
+        return toolkit.get_action('object_rdf')({}, data_dict)
     except toolkit.ValidationError:
         return ''
 
