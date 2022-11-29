@@ -240,7 +240,7 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
                 if view['view_type'] == view_type:
                     break
 
-        filters = '|'.join(['%s:%s' % (k, v) for k, v in filters.items()])
+        filters = '|'.join([f'{k}:{v}' for k, v in filters.items()])
 
         return toolkit.url_for(
             'resource.read',
@@ -446,7 +446,7 @@ def persistent_follow_button(obj_type, obj_id):
 
     if toolkit.c.user:
         context = {'user': toolkit.c.user}
-        action = 'am_following_%s' % obj_type
+        action = f'am_following_{obj_type}'
         following = toolkit.get_action(action)(context, {'id': obj_id})
         return toolkit.h.snippet(
             'snippets/follow_button.html',
@@ -901,7 +901,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     text.append('on the @NHM_London Data Portal')
 
     try:
-        text.append('DOI: %s' % os.path.join('https://doi.org', pkg_dict['doi']))
+        text.append(f'DOI: {"/".join(["https://doi.org", pkg_dict["doi"]])}')
     except KeyError:
         pass
 

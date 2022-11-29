@@ -271,7 +271,7 @@ class SpecimenView(DefaultView):
 
         occurrence_id = c.record_dict.get('occurrenceID')
 
-        log.info('Viewing record %s', occurrence_id)
+        log.info(f'Viewing record {occurrence_id}')
 
         c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
 
@@ -289,14 +289,11 @@ class SpecimenView(DefaultView):
             # Create custom filter which acts on both weight and units
             c.custom_filters[
                 'registeredWeight'
-            ] = 'registeredWeight:%s|registeredWeightUnit:%s' % (
-                c.record_dict['registeredWeight'],
-                c.record_dict['registeredWeightUnit'],
-            )
+            ] = f'registeredWeight:{c.record_dict["registeredWeight"]}|registeredWeightUnit:{c.record_dict["registeredWeightUnit"]}'
             # Merge unit into the field
-            c.record_dict['registeredWeight'] += (
-                ' %s' % c.record_dict['registeredWeightUnit']
-            )
+            c.record_dict[
+                'registeredWeight'
+            ] += f' {c.record_dict["registeredWeightUnit"]}'
 
         # add a meters unit to the coordinateUncertaintyInMeters value
         coordinate_uncertainty_in_meters = c.record_dict.get(
