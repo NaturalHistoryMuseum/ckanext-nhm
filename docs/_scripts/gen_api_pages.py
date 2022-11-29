@@ -35,7 +35,7 @@ for path in py_files:
 
     nav[parts] = doc_path.as_posix()
 
-    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
+    with mkdocs_gen_files.open(full_doc_path, 'w') as fd:
         ident = '.'.join(parts)
         fd.write(f'::: ckanext.{ident}')
 

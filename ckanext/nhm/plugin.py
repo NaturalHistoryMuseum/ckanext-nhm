@@ -467,7 +467,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 toolkit.h.link_to(image['license'], image['license'], target='_blank'),
                 image['rightsHolder'],
             )
-            image_base_url = image["identifier"]
+            image_base_url = image['identifier']
             images.append(
                 {
                     'href': f'{image_base_url}/preview',

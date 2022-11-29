@@ -668,7 +668,7 @@ def get_resource_filter_options(resource, resource_view):
     # If this is a gallery view, hide the has image filter
     # Only records with images will be displayed anyway
     # if resource_view['view_type'] == 'gallery':
-    #     options.pop("_has_image", None)
+    #     options.pop('_has_image', None)
 
     for filter_def in filter_list:
         try:
@@ -1573,11 +1573,11 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
     :param record_id: the record ID
     :return: the fully qualified URL
     """
-    manifest_id = toolkit.get_action("build_iiif_identifier")(
+    manifest_id = toolkit.get_action('build_iiif_identifier')(
         {},
         {
-            "builder_id": "record",
-            "builder_args": {"resource_id": resource_id, "record_id": record_id},
+            'builder_id': 'record',
+            'builder_args': {'resource_id': resource_id, 'record_id': record_id},
         },
     )
-    return toolkit.url_for("iiif.resource", identifier=manifest_id, _external=True)
+    return toolkit.url_for('iiif.resource', identifier=manifest_id, _external=True)
