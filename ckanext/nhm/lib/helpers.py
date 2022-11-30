@@ -1575,9 +1575,6 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
     """
     manifest_id = toolkit.get_action('build_iiif_identifier')(
         {},
-        {
-            'builder_id': 'record',
-            'builder_args': {'resource_id': resource_id, 'record_id': record_id},
-        },
+        {'builder_id': 'record', 'resource_id': resource_id, 'record_id': record_id},
     )
     return toolkit.url_for('iiif.resource', identifier=manifest_id, _external=True)
