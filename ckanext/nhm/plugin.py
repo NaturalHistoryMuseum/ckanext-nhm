@@ -358,7 +358,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
             except KeyError:
                 # Other/unknown etc., - so don't set recipient email
-                mail_dict['body'] += '\nDepartment: %s\n' % department
+                mail_dict['body'] += f'\nDepartment: {department}\n'
             else:
                 mail_dict['recipient_name'] = department
                 mail_dict['body'] += (
@@ -379,16 +379,14 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             mail_dict['recipient_name'] = user_obj.fullname or user_obj.name
             # Update send to with creator username
             mail_dict['recipient_email'] = user_obj.email
-            mail_dict['subject'] = (
-                'Message regarding dataset: %s' % package_dict['title']
-            )
+            pkg_title = package_dict['title'] or package_dict['name']
+            mail_dict['subject'] = f'Message regarding dataset: {pkg_title}'
             mail_dict['body'] += (
                 '\n\nYou have been sent this enquiry via the data portal '
-                'as you are the author of dataset %s.  Our apologies if '
-                'this isn\'t relevant - please forward this onto '
+                f'as you are the author of dataset {pkg_title}.  Our apologies '
+                'if this isn\'t relevant - please forward this onto '
                 'data@nhm.ac.uk and we will respond.\nMany thanks, '
-                'Data Portal team\n\n' % package_dict["title"]
-                or package_dict["name"]
+                'Data Portal team\n\n'
             )
 
         for i, url in urls.items():
@@ -463,11 +461,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 title.append(record[title_field])
             title.append(image.get('title', str(image['_id'])))
 
-            copyright = '%s<br />&copy; %s' % (
-                toolkit.h.link_to(image['license'], image['license'], target='_blank'),
-                image['rightsHolder'],
-            )
-            image_base_url = image["identifier"]
+            copyright = f'{toolkit.h.link_to(image["license"], image["license"], target="_blank")}<br />&copy; {image["rightsHolder"]}'
+            image_base_url = image['identifier']
             images.append(
                 {
                     'href': f'{image_base_url}/preview',
@@ -482,7 +477,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     'copyright': copyright,
                     # Description of image in gallery view
                     'description': literal(
-                        ''.join(['<span>%s</span>' % t for t in title])
+                        ''.join([f'<span>{t}</span>' for t in title])
                     ),
                     'title': ' - '.join(map(str, title)),
                     'record_id': record['_id'],

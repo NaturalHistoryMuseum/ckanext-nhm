@@ -5,7 +5,7 @@
 
 [![Tests](https://img.shields.io/github/workflow/status/NaturalHistoryMuseum/ckanext-nhm/Tests?style=flat-square)](https://github.com/NaturalHistoryMuseum/ckanext-nhm/actions/workflows/main.yml)
 [![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-nhm/main?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-nhm)
-[![CKAN](https://img.shields.io/badge/ckan-2.9.1-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
+[![CKAN](https://img.shields.io/badge/ckan-2.9.7-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
 [![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg?style=flat-square)](https://www.python.org/)
 [![Docs](https://img.shields.io/readthedocs/ckanext-nhm?style=flat-square)](https://ckanext-nhm.readthedocs.io)
 [![Specimen records](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=specimens&query=%24.result.total&suffix=%20records&url=https%3A%2F%2Fdata.nhm.ac.uk%2Fapi%2F3%2Faction%2Fdatastore_search%3Fresource_id%3D05ff2255-c38a-40c9-b657-4ccb55ab2feb&style=flat-square)](https://data.nhm.ac.uk/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb)
@@ -30,53 +30,47 @@ Path variables used below:
 - `$INSTALL_FOLDER` (i.e. where CKAN is installed), e.g. `/usr/lib/ckan/default`
 - `$CONFIG_FILE`, e.g. `/etc/ckan/default/development.ini`
 
-1. Clone the repository into the `src` folder:
+## Installing from PyPI
 
-  ```bash
-  cd $INSTALL_FOLDER/src
-  git clone https://github.com/NaturalHistoryMuseum/ckanext-nhm.git
-  ```
+```shell
+pip install ckanext-nhm
+```
+
+## Installing from source
+
+1. Clone the repository into the `src` folder:
+   ```shell
+   cd $INSTALL_FOLDER/src
+   git clone https://github.com/NaturalHistoryMuseum/ckanext-nhm.git
+   ```
 
 2. Activate the virtual env:
+   ```shell
+   . $INSTALL_FOLDER/bin/activate
+   ```
 
-  ```bash
-  . $INSTALL_FOLDER/bin/activate
-  ```
+3. Install via pip:
+   ```shell
+   pip install $INSTALL_FOLDER/src/ckanext-nhm
+   ```
 
-3. Install the requirements from requirements.txt:
+### Installing in editable mode
 
-  ```bash
-  cd $INSTALL_FOLDER/src/ckanext-nhm
-  pip install -r requirements.txt
-  ```
+Installing from a `pyproject.toml` in editable mode (i.e. `pip install -e`) requires `setuptools>=64`; however, CKAN 2.9 requires `setuptools==44.1.0`. See [our CKAN fork](https://github.com/NaturalHistoryMuseum/ckan) for a version of v2.9 that uses an updated setuptools if this functionality is something you need.
 
-4. Run setup.py:
+## Post-install setup
 
-  ```bash
-  cd $INSTALL_FOLDER/src/ckanext-nhm
-  python setup.py develop
-  ```
+1. Add 'nhm' to the list of plugins in your `$CONFIG_FILE`:
+   ```ini
+   ckan.plugins = ... nhm
+   ```
 
-5. Add 'nhm' to the list of plugins in your `$CONFIG_FILE`:
-
-  ```ini
-  ckan.plugins = ... nhm
-  ```
-
-<!--overview-end-->
+<!--installation-end-->
 
 # Configuration
 
-<!--installation-start-->
-These are the options that can be specified in your .ini config file.
-## **[REQUIRED]**
+<!--configuration-start-->
 
-Name|Description|Options
---|--|--
-`ckanext.nhm.specimen_resource_id`|ID for the specimens dataset|
-`ckanext.nhm.indexlot_resource_id`|ID for the index lots dataset|
-`ckanext.nhm.artefact_resource_id`|ID for the artefacts dataset|
-`ckanext.nhm.abyssline_resource_id`|ID for the abyssline dataset|
 
 <!--configuration-end-->
 
@@ -156,23 +150,21 @@ ckan -c $CONFIG_FILE nhm replace-resource-file $RESOURCE_ID $PATH
 # Testing
 
 <!--testing-start-->
-There is a Docker compose configuration available in this repository to make it easier to run tests.
+There is a Docker compose configuration available in this repository to make it easier to run tests. The ckan image uses the Dockerfile in the `docker/` folder.
 
 To run the tests against ckan 2.9.x on Python3:
 
-1. Build the required images
-```bash
-docker-compose build
-```
+1. Build the required images:
+   ```shell
+   docker-compose build
+   ```
 
 2. Then run the tests.
    The root of the repository is mounted into the ckan container as a volume by the Docker compose
    configuration, so you should only need to rebuild the ckan image if you change the extension's
    dependencies.
-```bash
-docker-compose run ckan
-```
-
-The ckan image uses the Dockerfile in the `docker/` folder.
+   ```shell
+   docker-compose run ckan
+   ```
 
 <!--testing-end-->

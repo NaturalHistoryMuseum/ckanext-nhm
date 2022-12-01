@@ -29,6 +29,7 @@ dependencies = [
     "ckanext-gallery>=2.2.0",
     "ckanext-gbif>=2.1.0",
     "ckanext-graph>=2.1.0",
+    "ckanext-iiif>=3.0.1",
     "ckanext-ldap>=3.2.0",
     "ckanext-query-dois>=2.2.0",
     "ckanext-statistics>=3.0.0",
