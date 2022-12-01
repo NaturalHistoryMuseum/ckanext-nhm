@@ -10,7 +10,7 @@
 [![Docs](https://img.shields.io/readthedocs/ckanext-nhm?style=flat-square)](https://ckanext-nhm.readthedocs.io)
 [![Specimen records](https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=specimens&query=%24.result.total&suffix=%20records&url=https%3A%2F%2Fdata.nhm.ac.uk%2Fapi%2F3%2Faction%2Fdatastore_search%3Fresource_id%3D05ff2255-c38a-40c9-b657-4ccb55ab2feb&style=flat-square)](https://data.nhm.ac.uk/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb)
 
-_A CKAN extension for the Natural History Museum's Data Portal._
+_A CKAN extension for the Natural History Museum's [Data Portal](https://data.nhm.ac.uk)._
 
 <!--header-end-->
 
