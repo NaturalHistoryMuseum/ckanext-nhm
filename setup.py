@@ -7,8 +7,4 @@
 import setuptools
 
 if __name__ == '__main__':
-    setuptools.setup(
-        dependency_links=[
-            'https://github.com/ckan/ckanext-dcat@v1.3.0#egg=ckanext-dcat'
-        ]
-    )
+    setuptools.setup()

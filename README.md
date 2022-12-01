@@ -30,6 +30,15 @@ Path variables used below:
 - `$INSTALL_FOLDER` (i.e. where CKAN is installed), e.g. `/usr/lib/ckan/default`
 - `$CONFIG_FILE`, e.g. `/etc/ckan/default/development.ini`
 
+## Pre-install setup
+
+This package depends on `ckanext-dcat==1.3.0`, but since that isn't available on PyPI it's not listed in the package dependencies.
+
+Install it with:
+```shell
+pip install git+https://github.com/ckan/ckanext-dcat@v1.3.0#egg=ckanext-dcat
+```
+
 ## Installing from PyPI
 
 ```shell
