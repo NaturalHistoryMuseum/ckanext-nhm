@@ -1,5 +1,34 @@
 # Changelog
 
+## v4.0.2 (2022-12-01)
+
+### Fix
+
+- re-fix IIIF builder args issue
+- add context and builder_args to build_iiif_identifier call
+- **dcat**: change Format to format
+- add view filters js to resource view snippet
+
+### Refactor
+
+- **featured**: change featured dataset 4 to predicts
+
+### Docs
+
+- **readme**: format test section
+- **readme**: update installation steps
+- **readme**: update ckan patch version in header badge
+
+### Style
+
+- replace %s style strings with f-strings
+- remove u-strings
+- **quotes**: use single quotes
+
+### Build System(s)
+
+- **requirements**: add ckanext-iiif as a dependency
+
 ## v4.0.1 (2022-11-29)
 
 ### Fix
