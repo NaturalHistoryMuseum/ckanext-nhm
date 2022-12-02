@@ -23,7 +23,8 @@ let results = {
         download:        null,
         queryParams:     null,
         _after:          [],
-        page:            0
+        page:            0,
+        downloadId:      null
     },
     getters:    {
         hasResult:         (state) => {
@@ -226,15 +227,22 @@ let results = {
             });
         },
         getDownload(context, payload) {
-            if (payload.email_address === null) {
-                return;
-            }
-
+            console.log(payload);
+            payload['query'] = context.getters['query/requestBody']();
+            console.log(payload);
             context.dispatch('getMetadata', {
                 meta:     'download',
                 action:   'datastore_queue_download',
                 formData: payload,
-                extract:  (data) => data.result
+                extract:  (data) => {
+                    if (data.success) {
+                        Vue.set(context.state, 'downloadId', data.result.download_id);
+                    }
+                    else {
+                        Vue.set(context.state, 'downloadId', null);
+                    }
+                    return data.result;
+                }
             });
         },
         reset(context) {
