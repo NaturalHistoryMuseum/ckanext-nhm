@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.4 (2022-12-07)
+
+### Fix
+
+- use package data instead of relative paths
+
 ## v4.0.3 (2022-12-01)
 
 ## v4.0.2 (2022-12-01)
