@@ -19,6 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8"
 ]
 dependencies = [
+    "importlib-resources",
     "ckantools>=0.3.0",
     "cachetools>=4.2.4",
     "lxml>=4.4.2",
@@ -67,6 +68,10 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "docs"]
+
+[tool.setuptools.package-data]
+"ckanext.nhm.theme" = ["*"]
+"ckanext.nhm.src" = ["*"]
 
 [tool.commitizen]
 name = "cz_nhm"

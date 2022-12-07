@@ -5,16 +5,17 @@
 # Created by the Natural History Museum in London, UK
 import itertools
 import logging
-import os
 from collections import OrderedDict
 from contextlib import suppress
 from pathlib import Path
+
+from beaker.cache import cache_managers, cache_regions
+from importlib_resources import files
 
 import ckan.model as model
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-from beaker.cache import cache_managers, cache_regions
 from ckan.lib.helpers import literal
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.ckanpackager.interfaces import ICkanPackager
@@ -42,8 +43,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     View individual records in a dataset, Set up NHM (CKAN) model
     """
 
-    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    template_dir = os.path.join(root_dir, 'ckanext', 'nhm', 'theme', 'templates')
+    root_dir = files('ckanext.nhm.theme')
+    template_dir = root_dir.joinpath('templates')
 
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.IBlueprint, inherit=True)
