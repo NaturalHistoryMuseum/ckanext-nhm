@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.5 (2022-12-08)
+
+### Fix
+
+- fix patterns for package data
+
 ## v4.0.4 (2022-12-07)
 
 ### Fix
