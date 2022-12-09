@@ -70,9 +70,8 @@ zip-safe = false
 exclude = ["tests", "docs"]
 
 [tool.setuptools.package-data]
-"ckanext.nhm" = ["package.json"]
-"ckanext.nhm.theme" = ["**/*"]
-"ckanext.nhm.src" = ["**/*"]
+"ckanext.nhm.theme" = ["*", "**/*"]
+"ckanext.nhm.src" = ["*", "**/*"]
 
 [tool.commitizen]
 name = "cz_nhm"

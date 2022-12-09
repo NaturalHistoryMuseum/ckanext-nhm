@@ -10,8 +10,6 @@ main-js:
 main-css:
   output: ckanext-nhm/%(version)s_main.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/nhm.less
     - less/leaflet.less
@@ -28,16 +26,12 @@ font-awesome-css:
 view-controls:
   output: ckanext-nhm/%(version)s_view-controls.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/view-controls.less
 
 slickgrid-css:
   output: ckanext-nhm/%(version)s_slickgrid.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/slickgrid.less
 
@@ -54,8 +48,6 @@ slickgrid-js:
 map:
   output: ckanext-nhm/%(version)s_map.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/map.less
 
@@ -162,8 +154,6 @@ record-citation:
 search-css:
   output: ckanext-nhm/%(version)s_multisearch.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/multisearch.less
 
@@ -185,8 +175,6 @@ home-search:
 bbcm-css:
   output: ckanext-nhm/%(version)s_bbcm.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/bbcm.less
 
@@ -200,8 +188,6 @@ bbcm-js:
 beetle-iiif-css:
   output: ckanext-nhm/%(version)s_beetle-iiif.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/beetle-iiif.less
 
