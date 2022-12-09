@@ -10,6 +10,10 @@ WORKDIR /base/src/ckanext-nhm
 # copy over the source
 COPY . .
 
+# see readme for explanation of why this is here and not installed automatically in the
+# next step
+RUN pip install git+https://github.com/ckan/ckanext-dcat@v1.3.0#egg=ckanext-dcat
+
 # install the base + test dependencies
 RUN pip install -e .[test]
 
@@ -18,7 +22,7 @@ RUN pip install -e .[test]
 # installing the extensions not in editable mode we can't get to the requirements.txt which means
 # we have this ultrahack. It works a treat but it feels real nasty. Note that the version here will
 # need to be kept up to date with the one in our setup.py.
-RUN curl -s "https://raw.githubusercontent.com/ckan/ckanext-dcat/6b7ec505f303fb18e0eebcebf67130d36b3dca82/requirements.txt" | pip install -r /dev/stdin
+RUN curl -s "https://raw.githubusercontent.com/ckan/ckanext-dcat/v1.3.0/requirements.txt" | pip install -r /dev/stdin
 
 # this entrypoint ensures our service dependencies (postgresql, solr, redis, elasticsearch, and mongodb) are running before
 # running the cmd
