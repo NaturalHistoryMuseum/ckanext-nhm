@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.1.0 (2022-12-12)
+
+### Feature
+
+- **records.html**: adds a reverse total record sort to the records stats page
+
+### Refactor
+
+- move package.json into theme, remove less
+
+### Docs
+
+- **readme**: add instruction to install lessc globally
+
+### Tests
+
+- **Dockerfile**: fixes the Dockerfile for testing by installing ckanext-dcat
+
+### Build System(s)
+
+- **requirements**: use compatible release specifier for extensions
+
 ## v4.0.5 (2022-12-08)
 
 ### Fix
