@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.1 (2022-12-14)
+
+### Build System(s)
+
+- update minor versions of query-dois and vds
+
 ## v4.1.0 (2022-12-12)
 
 ### Feature
