@@ -1,6 +1,6 @@
 {
   "name": "ckanext-nhm",
-  "version": "4.0.3",
+  "version": "4.1.1",
   "description": "A CKAN extension for the Natural History Museum's Data Portal.",
   "repository": {
     "type": "git",
@@ -13,8 +13,7 @@
   },
   "homepage": "https://github.com/NaturalHistoryMuseum/ckanext-nhm",
   "dependencies": {
-    "less": "^4.1.3",
-    "search": "file:ckanext/nhm/theme/assets/scripts/apps/search",
-    "beetle-iiif": "file:ckanext/nhm/theme/assets/scripts/apps/beetle-iiif"
+    "search": "file:assets/scripts/apps/search",
+    "beetle-iiif": "file:assets/scripts/apps/beetle-iiif"
   }
 }

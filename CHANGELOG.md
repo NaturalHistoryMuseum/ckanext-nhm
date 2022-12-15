@@ -1,5 +1,45 @@
 # Changelog
 
+## v4.1.1 (2022-12-14)
+
+### Build System(s)
+
+- update minor versions of query-dois and vds
+
+## v4.1.0 (2022-12-12)
+
+### Feature
+
+- **records.html**: adds a reverse total record sort to the records stats page
+
+### Refactor
+
+- move package.json into theme, remove less
+
+### Docs
+
+- **readme**: add instruction to install lessc globally
+
+### Tests
+
+- **Dockerfile**: fixes the Dockerfile for testing by installing ckanext-dcat
+
+### Build System(s)
+
+- **requirements**: use compatible release specifier for extensions
+
+## v4.0.5 (2022-12-08)
+
+### Fix
+
+- fix patterns for package data
+
+## v4.0.4 (2022-12-07)
+
+### Fix
+
+- use package data instead of relative paths
+
 ## v4.0.3 (2022-12-01)
 
 ## v4.0.2 (2022-12-01)

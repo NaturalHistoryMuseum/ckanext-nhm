@@ -4,14 +4,14 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-import os
 from collections import OrderedDict
 
+from importlib_resources import files
 from lxml import etree
 
 # even though we use simple DwC terms, we use this XSD as it allows us to group terms into events
 # etc., on record display
-path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src/tdwg_dwcterms.xsd')
+path = files('ckanext.nhm.src').joinpath('tdwg_dwcterms.xsd')
 with open(path, 'r') as xml_f:
     data = etree.parse(xml_f, etree.XMLParser())
     DWC_XSD = data.getroot()
