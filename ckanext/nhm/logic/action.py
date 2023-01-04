@@ -234,7 +234,7 @@ def show_extension_versions(context, data_dict) -> Dict[str, str]:
 
     :return: a dict of extension package name -> version
     """
-    extensions = {}
+    dists = []
 
     for distribution in distributions():
         # ckan will show up in this list and will pass the lower tests, ignore it
@@ -244,9 +244,10 @@ def show_extension_versions(context, data_dict) -> Dict[str, str]:
         # entry, and it's loaded, add it to the extensions dict
         for entry_point in distribution.entry_points:
             if entry_point.group == 'ckan.plugins' and plugin_loaded(entry_point.name):
-                extensions[distribution.name] = distribution.version
+                dists.append(distribution)
                 # break on the first matching entry point as that's enough to confirm
                 # that the package as a whole should be in the list
                 break
 
-    return extensions
+    # sort the result alphabetically
+    return {dist.name: dist.version for dist in sorted(dists, key=lambda d: d.name)}
