@@ -86,6 +86,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'package_update': nhm_action.package_update,
             'resource_create': nhm_action.resource_create,
             'resource_update': nhm_action.resource_update,
+            'show_extension_versions': nhm_action.show_extension_versions,
         }
 
     ## IClick

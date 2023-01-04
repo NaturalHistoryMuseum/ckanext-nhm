@@ -5,16 +5,18 @@
 # Created by the Natural History Museum in London, UK
 
 import logging
-
-from ckan.lib.navl.dictization_functions import validate
-from ckan.logic import ActionError
-from ckan.plugins import toolkit
+from functools import lru_cache
+from importlib.metadata import distributions
+from typing import Dict
 
 import ckanext.nhm.logic.schema as nhm_schema
+from ckan.plugins import toolkit
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.record import get_record_by_uuid
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
+
+from ckan.plugins import plugin_loaded
 
 log = logging.getLogger(__name__)
 
@@ -223,3 +225,28 @@ def resource_update(next_action, context, res_dict):
     # force uppercase and trim '.' for file formats
     res_dict['format'] = res_dict.get('format', '').upper().strip('.')
     return next_action(context, res_dict)
+
+
+@toolkit.side_effect_free
+def show_extension_versions(context, data_dict) -> Dict[str, str]:
+    """
+    Find all the installed extension packages and return their names and versions.
+
+    :return: a dict of extension package name -> version
+    """
+    extensions = {}
+
+    for distribution in distributions():
+        # ckan will show up in this list and will pass the lower tests, ignore it
+        if distribution.name == 'ckan':
+            continue
+        # loop through the entry points in the package and if they have a ckan plugin
+        # entry, and it's loaded, add it to the extensions dict
+        for entry_point in distribution.entry_points:
+            if entry_point.group == 'ckan.plugins' and plugin_loaded(entry_point.name):
+                extensions[distribution.name] = distribution.version
+                # break on the first matching entry point as that's enough to confirm
+                # that the package as a whole should be in the list
+                break
+
+    return extensions
