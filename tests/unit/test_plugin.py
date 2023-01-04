@@ -9,7 +9,13 @@ def test_download_modify_email_templates():
     original_plain = 'original plain'
     original_html = 'original html'
 
-    base = Path(__file__).parent.parent / 'ckanext' / 'nhm' / 'src' / 'download_emails'
+    base = (
+        Path(__file__).parent.parent.parent
+        / 'ckanext'
+        / 'nhm'
+        / 'src'
+        / 'download_emails'
+    )
     with (base / 'body.txt').open() as f:
         plain_contents = f.read().strip()
     with (base / 'body.html').open() as f:
