@@ -5,18 +5,15 @@
 # Created by the Natural History Museum in London, UK
 
 import logging
-from functools import lru_cache
 from importlib.metadata import distributions
 from typing import Dict
 
 import ckanext.nhm.logic.schema as nhm_schema
-from ckan.plugins import toolkit
+from ckan.plugins import toolkit, plugin_loaded
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.record import get_record_by_uuid
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
-
-from ckan.plugins import plugin_loaded
 
 log = logging.getLogger(__name__)
 
