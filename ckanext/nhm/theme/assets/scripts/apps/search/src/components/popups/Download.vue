@@ -303,8 +303,7 @@ export default {
                 });
             }
 
-            console.log(this.downloadForm);
-            //this.getDownload(this.downloadForm);
+            this.getDownload(this.downloadForm);
         }
     },
     created() {
