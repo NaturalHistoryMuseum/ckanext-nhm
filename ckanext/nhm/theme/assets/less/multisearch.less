@@ -212,6 +212,38 @@
   color: @primary2;
 }
 
+.input-list {
+  padding: 0.5em;
+  border: 1px solid @grey7;
+  border-radius: @rounding;
+  max-height: 9em;
+  overflow-y: scroll;
+  margin-top: 5px;
+
+  & input[type="checkbox"] {
+    top: unset;
+  }
+
+  & label {
+    font-size: 0.9em;
+    font-weight: normal;
+  }
+
+  & input {
+    font-size: 0.9em;
+  }
+}
+
+.advanced-options-divider {
+  text-align: center;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+.full-width-input {
+  width: 100%;
+}
+
 // TRANSITIONS -------------------------------------------------------------------------------------
 
 .slidedown-leave-active, .slidedown-enter-active,

@@ -2,7 +2,8 @@
     <Popup classes="download-popup" icon="fa-cloud-download-alt" label="Download"
            popup-id="show-download" :parent-toggle="showPopup" v-on:toggle="toggle">
         <p v-if="download !== null">
-            Success! Check the <a :href="statusPage">status page</a> to follow your download's progress.
+            Success! Check the <a :href="statusPage">status page</a> to follow your
+            download's progress.
         </p>
         <p class="alert-error" v-if="status.download.failed">
             The download request failed. Please try again later. </p>
@@ -12,7 +13,7 @@
                     <label for="download-format">File format</label>
                     <select id="download-format" @change="setFileDefaults"
                             v-model="downloadForm.file.format"
-                            class="full-width">
+                            class="full-width-input">
                         <option value="csv">CSV/TSV</option>
                         <option value="dwc">Darwin Core</option>
                         <option value="xlsx">Excel (XLSX)</option>
@@ -34,33 +35,65 @@
                                v-model="downloadForm.file.ignore_empty_fields">
                     </div>
                 </div>
-                <template v-if="downloadForm.file.format === 'csv'">
-                    <div class="form-row">
-                        <label for="download-csv-delimiter">Delimiter</label>
-                        <select id="download-csv-delimiter" class="full-width"
-                                v-model="downloadForm.file.format_args['delimiter']">
-                            <option value="comma">Comma</option>
-                            <option value="tab">Tab</option>
-                        </select>
-                    </div>
-                </template>
-                <template v-else-if="downloadForm.file.format === 'dwc'">
-                    <div class="form-row">
-                        <label for="download-dwc-core-ext">Core extension</label>
-                        <select id="download-dwc-core-ext" class="full-width"
-                                v-model="downloadForm.file.format_args['core_extension_name']">
-                            <option value="gbif_occurrence">GBIF Occurrence (default)</option>
-                            <option value="gbif_taxon">GBIF Taxon</option>
-                            <option value="gbif_event">GBIF Event</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label for="download-dwc-exts">Extensions</label>
-                        <select id="download-dwc-exts" class="full-width" multiple
-                                v-model="downloadForm.file.format_args['extension_names']">
-                            <option value="gbif_multimedia">GBIF Multimedia</option>
-                        </select>
-                    </div>
+                <div @click="showAdvanced = !showAdvanced"
+                     v-if="['csv', 'dwc'].includes(downloadForm.file.format)"
+                     class="advanced-options-divider"><b>Advanced Options</b>
+                    <i class="inline-icon-left fas"
+                       :class="showAdvanced ? 'fa-caret-up' : 'fa-caret-down'"></i>
+                </div>
+                <template v-if="showAdvanced">
+                    <template v-if="downloadForm.file.format === 'csv'">
+                        <div class="form-row">
+                            <label for="download-csv-delimiter">Delimiter</label>
+                            <select id="download-csv-delimiter" class="full-width-input"
+                                    v-model="downloadForm.file.format_args['delimiter']">
+                                <option value="comma">Comma</option>
+                                <option value="tab">Tab</option>
+                            </select>
+                        </div>
+                    </template>
+                    <template
+                        v-else-if="downloadForm.file.format === 'dwc'">
+                        <div class="form-row">
+                            <label for="download-dwc-core-ext">Core extension</label>
+                            <select id="download-dwc-core-ext" class="full-width-input"
+                                    v-model="downloadForm.file.format_args['core_extension_name']">
+                                <option value="gbif_occurrence">GBIF Occurrence
+                                                                (default)
+                                </option>
+                                <option value="gbif_taxon">GBIF Taxon</option>
+                                <option value="gbif_event">GBIF Event</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <b>Extensions:</b>
+                            <div class="input-list">
+                                <div v-for="(ext, name) in dwcExtensions">
+                                    <label :for="name">{{ ext.label }}</label>
+                                    <input type="checkbox" :value="name" :id="name"
+                                           v-model="downloadForm.file.format_args['extension_names']">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row"
+                             v-if="downloadForm.file.format_args['extension_names'].length > 0">
+                            <b>Extension fields:</b>
+                            <p><small>Which fields contain the extension data?
+                                      (comma-separated list)</small></p>
+                            <div class="input-list">
+                                <template
+                                    v-for="name in downloadForm.file.format_args['extension_names']">
+                                    <label :for="name + '-fields'">{{
+                                            dwcExtensions[name].label
+                                                                   }}</label>
+                                    <input type="text" :id="name + '-fields'"
+                                           v-model="dwcExtensions[name].fields">
+                                </template>
+                            </div>
+                        </div>
+
+                    </template>
                 </template>
             </div>
 
@@ -69,13 +102,18 @@
                     <label for="download-notifier">
                         Notification type
                     </label>
-                    <p><small>How should we notify you when your download is ready?</small></p>
+                    <p><small>How should we notify you when your download is
+                              ready?</small></p>
                     <select id="download-notifier"
-                            class="full-width"
-                            v-model="downloadForm.notifier.type" @change="setNotifierDefaults">
+                            class="full-width-input"
+                            v-model="downloadForm.notifier.type"
+                            @change="setNotifierDefaults">
                         <option value="email">Email</option>
-                        <option value="webhook">External webhook (e.g. IFTTT, Discord)</option>
-                        <option value="none">None; I'll check the download status manually</option>
+                        <option value="webhook">External webhook (e.g. IFTTT, Discord)
+                        </option>
+                        <option value="none">None; I'll check the download status
+                                             manually
+                        </option>
                     </select>
                 </div>
                 <template v-if="downloadForm.notifier.type === 'email'">
@@ -85,7 +123,7 @@
                         </label>
                         <input id="download-email"
                                type="text"
-                               class="full-width"
+                               class="full-width-input"
                                v-model="downloadForm.notifier.type_args['emails']"
                                placeholder="data@nhm.ac.uk">
                     </div>
@@ -97,7 +135,7 @@
                         </label>
                         <input id="download-webhook-url"
                                type="text"
-                               class="full-width"
+                               class="full-width-input"
                                v-model="downloadForm.notifier.type_args['url']">
                     </div>
                     <div class="form-row">
@@ -106,7 +144,7 @@
                         </label>
                         <input id="download-webhook-url-param"
                                type="text"
-                               class="full-width"
+                               class="full-width-input"
                                v-model="downloadForm.notifier.type_args['url_param']">
                     </div>
                     <div class="form-row">
@@ -115,10 +153,11 @@
                         </label>
                         <input id="download-webhook-text-param"
                                type="text"
-                               class="full-width"
+                               class="full-width-input"
                                v-model="downloadForm.notifier.type_args['text_param']">
                     </div>
-                    <small>This posts status updates in JSON format to the given URL.</small>
+                    <small>This posts status updates in JSON format to the given
+                           URL.</small>
                 </template>
             </div>
 
@@ -132,7 +171,7 @@
             </p>
         </div>
         <div class="text-right" v-if="download === null">
-            <a href="#" class="btn btn-primary text-right" @click="getDownload(downloadForm)"><i
+            <a href="#" class="btn btn-primary text-right" @click="submitForm"><i
                 class="fas"
                 :class="status.download.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']"></i>
                 Request Download
@@ -162,13 +201,48 @@ export default {
                     type_args: {}
                 }
             },
+            showAdvanced: false,
+            dwcExtensions: {  // this is essentially duplicated from dwc/urls.py in vds
+                'gbif_multimedia': {
+                    label: 'GBIF Multimedia',
+                    fields: 'associatedMedia'  // this should be a comma-separated list
+                },
+                'gbif_vernacular': {
+                    label: 'GBIF Vernacular',
+                    fields: 'vernacularName'
+                },
+                'gbif_references': {
+                    label: 'GBIF References',
+                    fields: 'references'
+                },
+                'gbif_description': {
+                    label: 'GBIF Description',
+                    fields: 'taxonDescription'
+                },
+                'gbif_distribution': {
+                    label: 'GBIF Distribution',
+                    fields: 'locality'
+                },
+                'gbif_species_profile': {
+                    label: 'GBIF Species Profile',
+                    fields: 'speciesProfile'
+                },
+                'gbif_types_and_specimen': {
+                    label: 'GBIF Types and Specimen',
+                    fields: 'typeStatus'
+                },
+                'gbif_identifier': {
+                    label: 'GBIF Identifier',
+                    fields: 'verbatimIdentification'
+                }
+            }
         };
     },
     computed: {
         ...mapState('results', ['download', 'downloadId']),
         statusPage() {
             if (this.downloadId !== null) {
-                return `/status/download/${this.downloadId}`;
+                return `/status/download/${ this.downloadId }`;
             }
         }
     },
@@ -186,7 +260,8 @@ export default {
                 case 'dwc':
                     formatArgs = {
                         extension_names: ['gbif_multimedia'],
-                        core_extension_name: 'gbif_occurrence'
+                        core_extension_name: 'gbif_occurrence',
+                        extension_map: {}
                     };
                     break;
             }
@@ -213,6 +288,23 @@ export default {
             }
 
             this.$set(this.downloadForm.notifier, 'type_args', typeArgs);
+        },
+        submitForm() {
+            // any pre-submission processing goes here
+            if (this.downloadForm.file.format === 'dwc') {
+                if (this.downloadForm.file.format_args.core_extension_name === 'none') {
+                    // remove any mention of core extensions if user has picked "none"
+                    delete this.downloadForm.file.format_args.core_extension_name;
+                }
+
+                this.downloadForm.file.format_args.extension_names.forEach(e => {
+                    // add fields to specify where the nested extension data is
+                    this.downloadForm.file.format_args.extension_map[e] = this.dwcExtensions[e].fields.split(',');
+                });
+            }
+
+            console.log(this.downloadForm);
+            //this.getDownload(this.downloadForm);
         }
     },
     created() {
