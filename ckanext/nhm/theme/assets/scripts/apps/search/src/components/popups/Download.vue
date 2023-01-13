@@ -247,7 +247,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions('results', ['getDownload']),
+        ...mapActions('results', ['getDownload', 'resetDownload']),
+        toggle(event) {
+            this.resetDownload();
+            this.showPopup = event;
+        },
         setFileDefaults() {
             let formatArgs = {};
 

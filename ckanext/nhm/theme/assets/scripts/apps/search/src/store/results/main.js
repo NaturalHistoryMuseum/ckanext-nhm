@@ -227,9 +227,7 @@ let results = {
             });
         },
         getDownload(context, payload) {
-            console.log(payload);
             payload['query'] = context.getters['query/requestBody']();
-            console.log(payload);
             context.dispatch('getMetadata', {
                 meta:     'download',
                 action:   'datastore_queue_download',
@@ -244,6 +242,10 @@ let results = {
                     return data.result;
                 }
             });
+        },
+        resetDownload(context) {
+            Vue.set(context.state, 'downloadId', null);
+            Vue.set(context.state, 'download', null);
         },
         reset(context) {
             context.commit('query/setSearch', null);
