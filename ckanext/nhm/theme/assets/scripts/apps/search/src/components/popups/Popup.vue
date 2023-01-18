@@ -4,10 +4,10 @@
             <div class="floating info-popup" :class="classes"
                  v-if="showPopup"
                  v-dismiss="dismiss">
-                <slot v-on:close-popup="closeMe" v-on:open-popup="showPopup = true"></slot>
+                <slot v-on:close-popup="endPopup" v-on:open-popup="startPopup"></slot>
             </div>
         </transition>
-        <a href="#" @click="showPopup = !showPopup" class="btn btn-disabled" :id="popupId">
+        <a href="#" @click="togglePopup" class="btn btn-disabled" :id="popupId">
             <i class="fas" :class="icon"></i>{{ label }}
         </a>
     </div>
@@ -49,6 +49,17 @@ export default {
             ignoreIds.push(this.popupId);
             ignoreIds = ignoreIds.map(i => `#${ i }`);
             return { switch: 'showPopup', ignore: ignoreIds };
+        }
+    },
+    methods: {
+        startPopup() {
+            this.showPopup = true;
+        },
+        endPopup() {
+            this.showPopup = false;
+        },
+        togglePopup() {
+            this.showPopup = !this.showPopup;
         }
     },
     watch: {
