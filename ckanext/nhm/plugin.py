@@ -86,6 +86,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'package_update': nhm_action.package_update,
             'resource_create': nhm_action.resource_create,
             'resource_update': nhm_action.resource_update,
+            'show_extension_versions': nhm_action.show_extension_versions,
         }
 
     ## IClick
@@ -675,8 +676,20 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return fields
 
     # IVersionedDatastoreDownloads
-    def download_modify_email_templates(self, plain_template, html_template):
+    def download_modify_notifier_start_templates(self, plain_template, html_template):
         # completely override the default datastore templates with our own ones
         base = Path(__file__).parent / 'src' / 'download_emails'
-        with (base / 'body.txt').open() as p, (base / 'body.html').open() as h:
+        with (base / 'start.txt').open() as p, (base / 'start.html').open() as h:
+            return p.read().strip(), h.read().strip()
+
+    def download_modify_notifier_end_templates(self, plain_template, html_template):
+        # completely override the default datastore templates with our own ones
+        base = Path(__file__).parent / 'src' / 'download_emails'
+        with (base / 'end.txt').open() as p, (base / 'end.html').open() as h:
+            return p.read().strip(), h.read().strip()
+
+    def download_modify_notifier_error_templates(self, plain_template, html_template):
+        # completely override the default datastore templates with our own ones
+        base = Path(__file__).parent / 'src' / 'download_emails'
+        with (base / 'error.txt').open() as p, (base / 'error.html').open() as h:
             return p.read().strip(), h.read().strip()
