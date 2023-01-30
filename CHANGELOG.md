@@ -1,5 +1,49 @@
 # Changelog
 
+## v5.0.0 (2023-01-30)
+
+### Feature
+
+- change featured dataset 4 to jtd
+- add a button for resetting the download
+- **search-app**: remove cached download when popup toggled
+- **search-app**: add new dwc options and improve UI
+- sort the show_extensions_versions by name
+- add action which lists installed package extensions and their versions
+- **search-app**: split popups into separate components, add new dl opts
+
+### Fix
+
+- use new download interface methods for replacing templates
+- **accessibility**: add aria labels/alt text for all featured datasets
+- **search-app**: actually trigger a download
+
+### Refactor
+
+- **search-app**: update node package versions
+
+### Docs
+
+- **citations**: add guidance on how to cite specimen collection images
+
+### Tests
+
+- go up one more dir to find src files
+- remove references to old interface method
+- add a test for the new show_extension_versions action
+
+### Build System(s)
+
+- **docker**: use 'latest' tag for test docker image
+
+### Chores/Misc
+
+- bump dependency versions
+- **contact form**: update email addresses for LS insects and ES verts
+- move tests into unit subdir
+- reorganise the imports
+- merge in new changes from dev
+
 ## v4.1.1 (2022-12-14)
 
 ### Build System(s)
