@@ -1,0 +1,8 @@
+Hello,
+
+Your download on {{ site_name }} has encountered an error and has stopped processing.
+More details can be viewed at: {{ status_page }}.
+Please try again later and contact us at {{ contact_email }} if the problem persists.
+
+Best Wishes,
+The NHM Data Portal Bot

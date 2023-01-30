@@ -1,10 +1,23 @@
 <template>
     <Popup classes="download-popup" icon="fa-cloud-download-alt" label="Download"
            popup-id="show-download" :parent-toggle="showPopup" v-on:toggle="toggle">
-        <p v-if="download !== null">
-            Success! Check the <a :href="statusPage">status page</a> to follow your
-            download's progress.
-        </p>
+        <div v-show="download !== null">
+            <!-- the download is set to null *before* the dismiss method runs, so if v-if
+            is used instead of v-show, the dismiss method can't find these buttons inside
+            the main popup and assumes they're outside of it. -->
+            <p v-if="download !== null">Success! Check the <a :href="statusPage">status page</a> to follow your
+               download's progress.</p>
+            <div class="flex-container flex-around pad-v">
+                <a :href="statusPage" class="btn btn-primary text-right" v-if="download !== null"><i
+                    class="fas fa-hourglass-half"></i>
+                    Download status
+                </a>
+                <a href="#" class="btn btn-primary text-right" @click="resetPopup"><i
+                    class="fas fa-undo-alt"></i>
+                    New download
+                </a>
+            </div>
+        </div>
         <p class="alert-error" v-if="status.download.failed">
             The download request failed. Please try again later. </p>
         <div v-if="download === null">
@@ -248,10 +261,11 @@ export default {
     },
     methods: {
         ...mapActions('results', ['getDownload', 'resetDownload']),
-        toggle(event) {
+
+        resetPopup() {
             this.resetDownload();
-            this.showPopup = event;
         },
+
         setFileDefaults() {
             let formatArgs = {};
 

@@ -1,0 +1,7 @@
+Hello,
+
+The resource data you requested on {{ site_name }} has started processing.
+The status of your download can be viewed here: {{ status_page }}
+
+Best Wishes,
+The NHM Data Portal Bot

@@ -32,9 +32,9 @@ dependencies = [
     "ckanext-graph~=2.1.0",
     "ckanext-iiif~=3.0.1",
     "ckanext-ldap~=3.2.0",
-    "ckanext-query-dois~=2.3.0",
-    "ckanext-statistics~=3.0.0",
-    "ckanext-versioned-datastore~=3.8.0"
+    "ckanext-query-dois~=2.4.0",
+    "ckanext-statistics~=3.1.0",
+    "ckanext-versioned-datastore~=4.0.0"
     # this also depends on ckanext-dcat==1.3.0 (see readme)
 ]
 

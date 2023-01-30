@@ -1,5 +1,5 @@
 <template>
-    <Popup classes="doi-popup" :ignore-additional="['use-a-doi']" icon="fa-book" label="Cite"
+    <Popup classes="doi-popup" icon="fa-book" label="Cite"
            popup-id="show-cite" :parent-toggle="showPopup" v-on:toggle="toggle">
         <p>Cite this search:</p>
         <Copyable :copy-text="'https://doi.org/' + doi" v-if="doi !== null">

@@ -256,6 +256,7 @@ let results = {
             context.state.resultData = {}
             Vue.set(context.rootState.appState.status.resultData, 'loading', false);
             Vue.set(context.rootState.appState.status.resultData, 'failed', false);
+            context.dispatch('resetDownload');
             context.dispatch('invalidate');
         },
         invalidate(context) {
