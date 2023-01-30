@@ -9,7 +9,13 @@ def test_download_modify_templates():
     original_plain = 'original plain'
     original_html = 'original html'
 
-    base = Path(__file__).parent.parent / 'ckanext' / 'nhm' / 'src' / 'download_emails'
+    base = (
+        Path(__file__).parent.parent.parent
+        / 'ckanext'
+        / 'nhm'
+        / 'src'
+        / 'download_emails'
+    )
     with (base / 'start.txt').open() as f:
         plain_start = f.read().strip()
     with (base / 'start.html').open() as f:
