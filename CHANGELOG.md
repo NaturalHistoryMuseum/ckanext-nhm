@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.1 (2023-01-31)
+
+### Build System(s)
+
+- bump query-dois version
+
 ## v5.0.0 (2023-01-30)
 
 ### Feature
