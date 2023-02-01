@@ -105,7 +105,7 @@
                                 </template>
                             </div>
                         </div>
-
+                        <div class="form-row"><small>See <a href="https://dwc.tdwg.org" target="_blank">TDWG</a> and <a href="https://www.gbif.org/darwin-core" target="_blank">GBIF</a> for more details on the Darwin Core format and what <a href="https://rs.gbif.org" target="_blank">these extensions</a> are.</small></div>
                     </template>
                 </template>
             </div>
