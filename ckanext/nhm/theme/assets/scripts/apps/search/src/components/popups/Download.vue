@@ -5,10 +5,13 @@
             <!-- the download is set to null *before* the dismiss method runs, so if v-if
             is used instead of v-show, the dismiss method can't find these buttons inside
             the main popup and assumes they're outside of it. -->
-            <p v-if="download !== null">Success! Check the <a :href="statusPage">status page</a> to follow your
-               download's progress.</p>
+            <p v-if="download !== null">Success! Check the <a :href="statusPage">status
+                                                                                 page</a>
+                                        to follow your
+                                        download's progress.</p>
             <div class="flex-container flex-around pad-v">
-                <a :href="statusPage" class="btn btn-primary text-right" v-if="download !== null"><i
+                <a :href="statusPage" class="btn btn-primary text-right"
+                   v-if="download !== null"><i
                     class="fas fa-hourglass-half"></i>
                     Download status
                 </a>
@@ -105,7 +108,14 @@
                                 </template>
                             </div>
                         </div>
-
+                        <div class="form-row"><small>See <a href="https://dwc.tdwg.org"
+                                                            target="_blank">TDWG</a> and
+                            <a href="https://www.gbif.org/darwin-core" target="_blank">GBIF</a>
+                                                     for more details on the Darwin Core
+                                                     format and what <a
+                                href="https://rs.gbif.org" target="_blank">these
+                                                                           extensions</a>
+                                                     are.</small></div>
                     </template>
                 </template>
             </div>
@@ -132,13 +142,15 @@
                 <template v-if="downloadForm.notifier.type === 'email'">
                     <div class="form-row">
                         <label for="download-email">
-                            Email address
+                            Email address(es)
                         </label>
                         <input id="download-email"
                                type="text"
                                class="full-width-input"
                                v-model="downloadForm.notifier.type_args['emails']"
                                placeholder="data@nhm.ac.uk">
+                        <p><small>Multiple email addresses can be added as a
+                                  comma-separated list.</small></p>
                     </div>
                 </template>
                 <template v-else-if="downloadForm.notifier.type === 'webhook'">
@@ -196,6 +208,7 @@
 <script>
 import BasePopup from './BasePopup.vue';
 import { mapActions, mapState } from 'vuex';
+import { trim } from 'core-js/internals/string-trim';
 
 export default {
     name: 'Download',
@@ -292,7 +305,7 @@ export default {
             switch (this.downloadForm.notifier.type) {
                 case 'email':
                     typeArgs = {
-                        email: ''
+                        emails: ''
                     };
                     break;
                 case 'webhook':
@@ -319,6 +332,11 @@ export default {
                     // add fields to specify where the nested extension data is
                     this.downloadForm.file.format_args.extension_map[e] = this.dwcExtensions[e].fields.split(',');
                 });
+            }
+
+            if (this.downloadForm.notifier.type === 'email') {
+                this.downloadForm.notifier.type_args.emails = this.downloadForm.notifier.type_args.emails.split(',')
+                                                                  .map(trim);
             }
 
             this.getDownload(this.downloadForm);
