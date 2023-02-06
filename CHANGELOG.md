@@ -1,5 +1,24 @@
 # Changelog
 
+## v5.1.0 (2023-02-06)
+
+### Feature
+
+- allow multiple emails in the download UI
+
+### Build System(s)
+
+- bump vds version
+- rebuild search app after merging dependabot updates
+- **deps**: bump node-forge and webpack-dev-server
+- **deps**: bump json5 in /ckanext/nhm/theme/assets/scripts/apps/search
+- **deps**: bump decode-uri-component
+- **deps**: bump loader-utils
+
+### Minor UI Changes
+
+- **search**: add links to tdwg and gbif for dwc
+
 ## v5.0.3 (2023-01-31)
 
 ### Docs
