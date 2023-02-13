@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.1.1 (2023-02-13)
+
+### Chores/Misc
+
+- remove an exclamation mark from the record IIIF info
+
 ## v5.1.0 (2023-02-06)
 
 ### Feature
