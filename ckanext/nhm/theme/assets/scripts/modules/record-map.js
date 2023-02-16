@@ -8,38 +8,41 @@
  * settings we want to use.
  */
 this.ckan.module('record-map', function () {
+  return {
+    initialize: function () {
+      const extent = this.el.data('extent');
 
-    return {
-        initialize: function () {
-            const extent = this.el.data('extent');
+      if (!!extent) {
+        const map = new L.Map('record-map-container');
 
-            if (!!extent) {
-                const map = new L.Map('record-map-container');
+        // create the base tile layer
+        const baseLayerUrl =
+          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const baseLayer = new L.TileLayer(baseLayerUrl, {
+          maxZoom: 18,
+          subdomains: 'abc',
+        });
+        map.addLayer(baseLayer);
 
-                // create the base tile layer
-                const baseLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                const baseLayer = new L.TileLayer(baseLayerUrl, {maxZoom: 18, subdomains: 'abc'});
-                map.addLayer(baseLayer);
+        // setup the icon point we want to use to show the location of the specimen
+        const pointOptions = {
+          iconUrl: '/images/leaflet/marker-icon-2x.png',
+          iconSize: [28, 50],
+          iconAnchor: [14, 50],
+        };
+        const ckanIcon = L.Icon.extend({ options: pointOptions });
 
-                // setup the icon point we want to use to show the location of the specimen
-                const pointOptions = {
-                    iconUrl: '/images/leaflet/marker-icon-2x.png',
-                    iconSize: [28, 50],
-                    iconAnchor: [14, 50]
-                };
-                const ckanIcon = L.Icon.extend({options: pointOptions});
+        // create the layer that shows the point and add it to the map
+        const extentLayer = L.geoJson(extent, {
+          pointToLayer: function (feature, latLng) {
+            return new L.Marker(latLng, { icon: new ckanIcon() });
+          },
+        });
+        extentLayer.addTo(map);
 
-                // create the layer that shows the point and add it to the map
-                const extentLayer = L.geoJson(extent, {
-                    pointToLayer: function (feature, latLng) {
-                        return new L.Marker(latLng, {icon: new ckanIcon});
-                    }
-                });
-                extentLayer.addTo(map);
-
-                // ensure we get a nice view of the marker
-                map.setView(L.latLng(extent.coordinates[1], extent.coordinates[0]), 9);
-            }
-        }
-    }
+        // ensure we get a nice view of the marker
+        map.setView(L.latLng(extent.coordinates[1], extent.coordinates[0]), 9);
+      }
+    },
+  };
 });

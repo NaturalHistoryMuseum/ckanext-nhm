@@ -7,39 +7,37 @@
  * See resource_form.html for usage
  *
  */
-this.ckan.module('toggle-select', function($, _) {
-  var self, $target
+this.ckan.module('toggle-select', function ($, _) {
+  var self, $target;
   return {
     options: {
-      target: ''
+      target: '',
     },
 
     initialize: function () {
-    /* Initialises the module setting up elements and event listeners.
-     *
-     * Returns nothing.
-     */
+      /* Initialises the module setting up elements and event listeners.
+       *
+       * Returns nothing.
+       */
       self = this;
       $target = $(self.options.target);
-      self.el.change(function(e){
-          self._toggleDisplay(e.target.value)
+      self.el.change(function (e) {
+        self._toggleDisplay(e.target.value);
       });
 
       // Show / Hide on load
       self._toggleDisplay($(self.el).val());
-
     },
 
-    _toggleDisplay: function(value){
-        /**
-         * Toggle display of target element
-         */
-        if(value && value != 0 && value != 'None'){
-            $target.show();
-        }else{
-            $target.hide();
-        }
-    }
-
-  }
+    _toggleDisplay: function (value) {
+      /**
+       * Toggle display of target element
+       */
+      if (value && value != 0 && value != 'None') {
+        $target.show();
+      } else {
+        $target.hide();
+      }
+    },
+  };
 });
