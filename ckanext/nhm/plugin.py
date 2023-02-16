@@ -320,10 +320,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         context = {'user': toolkit.c.user or toolkit.c.author}
 
-        # URL to provide as link to contact email body
-        # Over written by linking to record / resource etc., - see below
-        url = None
-
         # Has the user selected a department
         department = data_dict.get('department', None)
 
