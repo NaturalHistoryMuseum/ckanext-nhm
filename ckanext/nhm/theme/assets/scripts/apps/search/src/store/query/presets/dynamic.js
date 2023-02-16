@@ -51,7 +51,7 @@ let dynamicPresets = {
                 preset.content.error = 'The selected datasets do not have image fields.';
             }
 
-            return preset;
+            return [preset];
         }
     }
 };
