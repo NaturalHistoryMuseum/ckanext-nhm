@@ -366,8 +366,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     f'and we will respond.\nMany thanks, Data Portal '
                     f'team\n\n'
                 )
-                # If we have a package ID, load the package
         elif package_id:
+            # If we have a package ID, load the package
             package_dict = toolkit.get_action('package_show')(
                 context, {'id': package_id}
             )
