@@ -1,14 +1,18 @@
 /**
  * Add a full screen mode on the grid view for supported browsers
  */
-this.ckan.module('grid-view-fullscreen', function($, _) {
+this.ckan.module('grid-view-fullscreen', function ($, _) {
   var self;
 
   return {
-    initialize: function() {
+    initialize: function () {
       self = this;
       var body = $('body').get(0);
-      if (body.requestFullscreen || body.mozRequestFullScreen || body.webkitRequestFullscreen /*|| body.msRequestFullscreen*/) {
+      if (
+        body.requestFullscreen ||
+        body.mozRequestFullScreen ||
+        body.webkitRequestFullscreen /*|| body.msRequestFullscreen*/
+      ) {
         self._on_grid_init(function () {
           self._is_full_screen = false;
           self.controls = $('div.controls', self.el);
@@ -19,9 +23,12 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
             .appendTo(self.controls)
             .click(self._toggle_fullscreen);
           self._base_height = $('div.recline-slickgrid').height();
-          $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange', function(){
-            self._on_fs_changed();
-          });
+          $(document).on(
+            'webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange',
+            function () {
+              self._on_fs_changed();
+            },
+          );
         });
       }
     },
@@ -31,11 +38,11 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
      * Note that using an interval is the only reliable and cross browser
      * way to do this.
      */
-    _on_grid_init: function(callback){
-      if ($('div.controls', this.el).length > 0){
+    _on_grid_init: function (callback) {
+      if ($('div.controls', this.el).length > 0) {
         callback();
       } else {
-        setTimeout(function(){
+        setTimeout(function () {
           self._on_grid_init(callback);
         }, 250);
       }
@@ -44,7 +51,7 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
     /**
      * Toggle full screen on/off
      */
-    _toggle_fullscreen: function(e){
+    _toggle_fullscreen: function (e) {
       var body = $('body').get(0);
       if (self._is_full_screen) {
         if (document.exitFullscreen) {
@@ -75,9 +82,9 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
     /**
      * Event triggered when switching in/out of fullscreen
      */
-    _on_fs_changed: function(){
+    _on_fs_changed: function () {
       self._is_full_screen = !self._is_full_screen;
-      if (self._is_full_screen){
+      if (self._is_full_screen) {
         $('body').addClass('fullscreen');
       } else {
         $('body').removeClass('fullscreen');
@@ -85,7 +92,7 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
       // Run resize once for browsers that trigger the event when it's ready,
       // and in a second for browsers that trigger the event before it's ready.
       self._resize_slickgrid();
-      setTimeout(function(){
+      setTimeout(function () {
         self._resize_slickgrid();
       }, 1000);
     },
@@ -94,12 +101,12 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
      * Resize the grid canvas
      *
      */
-    _resize_slickgrid: function(){
+    _resize_slickgrid: function () {
       var $grid = $('div.recline-slickgrid');
-      if ($grid.length > 0 && typeof($grid.get(0).grid) !== 'undefined') {
+      if ($grid.length > 0 && typeof $grid.get(0).grid !== 'undefined') {
         var grid = $grid.get(0).grid;
         var height = 0;
-        if (self._is_full_screen){
+        if (self._is_full_screen) {
           height = $(document).height() - $('div.controls').height() - 32;
         } else {
           height = self._base_height;
@@ -108,6 +115,6 @@ this.ckan.module('grid-view-fullscreen', function($, _) {
         grid.resizeCanvas();
         grid.autosizeColumns();
       }
-    }
-  }
+    },
+  };
 });

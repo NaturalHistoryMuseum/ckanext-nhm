@@ -1,9 +1,9 @@
-@primary1: #0E4609;
-@primary2: #195D0D;
+@primary1: #0e4609;
+@primary2: #195d0d;
 @primary3: #188100;
-@primary4: #59B200;
-@primary5: #71C85B;
-@primary6: #BBEDA9;
+@primary4: #59b200;
+@primary5: #71c85b;
+@primary6: #bbeda9;
 
 //@primary3: #000000;
 //@primary1: shade(@primary3, 40%);
@@ -12,36 +12,35 @@
 //@primary5: tint(@primary3, 40%);
 //@primary6: tint(@primary3, 60%);
 
-@warning1: #6E001B;
+@warning1: #6e001b;
 @warning2: #890022;
 @warning3: #af5f62;
-@warning4: #E2B8B8;
-@warning5: #F8F0F0;
-
+@warning4: #e2b8b8;
+@warning5: #f8f0f0;
 
 @grey1: #343434;
 @grey2: #434343;
-@grey3: #5B5B5B;
+@grey3: #5b5b5b;
 @grey4: #656565;
-@grey5: #9A9A9A;
-@grey6: #AFAFAF;
-@grey7: #C3C3C3;
-@grey8: #DDDDDD;
-@grey9: #F2F2F2;
-@grey10: #FFFFFF;
-
+@grey5: #9a9a9a;
+@grey6: #afafaf;
+@grey7: #c3c3c3;
+@grey8: #dddddd;
+@grey9: #f2f2f2;
+@grey10: #ffffff;
 
 .palette-base-txt() {
   color: @grey1;
 
-    a {
-      color: @primary3;
+  a {
+    color: @primary3;
 
-      &:hover, &:focus {
-        color: @grey1;
-        text-decoration: none !important;
-      }
+    &:hover,
+    &:focus {
+      color: @grey1;
+      text-decoration: none !important;
     }
+  }
 }
 
 .palette-base() {
@@ -54,7 +53,8 @@
   a {
     color: @grey10;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: @primary6;
       text-decoration: none !important;
     }
@@ -72,7 +72,8 @@
   a {
     color: @grey10;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: @grey7;
       text-decoration: none !important;
     }
@@ -83,7 +84,8 @@
   a {
     color: @primary3;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: @grey1;
       text-decoration: none !important;
     }
@@ -94,7 +96,8 @@
   a {
     color: @primary3;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: @primary3;
       opacity: 0.7 !important;
       text-decoration: none !important;
@@ -109,7 +112,6 @@
   .palette-sidebar-links(@switch);
 }
 
-
 @keyframes colourShift {
   from {
     background-position: 0 0;
@@ -119,12 +121,12 @@
   }
 }
 
-.prideBg(@palette){
+.prideBg(@palette) {
   background: linear-gradient(90deg, @palette);
   background-size: 100%;
 }
 
-.prideBgShift(@palette){
+.prideBgShift(@palette) {
   background: linear-gradient(90deg, @palette, @palette);
   background-size: 300%;
 
@@ -136,5 +138,5 @@
   animation: @animation;
 }
 
-@rainbowFlag: #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D;
-@transFlag: #55CDFC, #F7A8B8, #FFFFFF, #F7A8B8, #55CDFC;
+@rainbowFlag: #ff0018, #ffa52c, #ffff41, #008018, #0000f9, #86007d;
+@transFlag: #55cdfc, #f7a8b8, #ffffff, #f7a8b8, #55cdfc;

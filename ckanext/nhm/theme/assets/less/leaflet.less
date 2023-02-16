@@ -1,13 +1,12 @@
-@import "variables.less";
+@import 'variables.less';
 
 /* Leaflet controls */
 
 .leaflet-container {
-
   .leaflet-bar {
     border: none;
     box-shadow: none;
-    background: rgba(255, 255, 255, .4);
+    background: rgba(255, 255, 255, 0.4);
     padding: 3px;
     border-radius: 20px;
     -webkit-border-radius: 20px;
@@ -31,7 +30,7 @@
   }
 
   .leaflet-control-draw-rectangle {
-    background-image: url("@{images}/leaflet/pencil.png");
+    background-image: url('@{images}/leaflet/pencil.png');
   }
 
   .leaflet-draw-section .leaflet-draw-toolbar a {
@@ -45,12 +44,11 @@
   }
 
   .leaflet-draw-actions {
-    left: 40px!important;
+    left: 40px !important;
   }
 
   .leaflet-top,
-  .leaflet-bottom{
+  .leaflet-bottom {
     z-index: 400;
   }
-
 }
