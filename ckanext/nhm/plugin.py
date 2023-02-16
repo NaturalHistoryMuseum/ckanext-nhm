@@ -12,7 +12,6 @@ from pathlib import Path
 from beaker.cache import cache_managers, cache_regions
 from importlib_resources import files
 
-import ckan.model as model
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
@@ -25,7 +24,11 @@ from ckanext.gallery.plugins.interfaces import IGalleryImage
 from ckanext.nhm import routes, cli
 from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
-from ckanext.nhm.settings import COLLECTION_CONTACTS
+from ckanext.nhm.lib.mail import (
+    create_indexlots_email,
+    create_department_email,
+    create_package_email,
+)
 from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastore,
     IVersionedDatastoreDownloads,
@@ -347,45 +350,12 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         # If this is an index lot enquiry, send to entom
         if package_name == 'collection-indexlots':
-            mail_dict['subject'] = 'Collection Index lot enquiry'
-            mail_dict['recipient_email'] = COLLECTION_CONTACTS['Insects']
-            mail_dict['recipient_name'] = 'Insects'
+            create_indexlots_email(mail_dict)
         elif department:
-            # User has selected the department
-            try:
-                mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
-            except KeyError:
-                # Other/unknown etc., - so don't set recipient email
-                mail_dict['body'] += f'\nDepartment: {department}\n'
-            else:
-                mail_dict['recipient_name'] = department
-                mail_dict['body'] += (
-                    f'\nThe contactee has chosen to send this to the {department} '
-                    f'department. Our apologies if this enquiry isn\'t '
-                    f'relevant - please forward this onto data@nhm.ac.uk '
-                    f'and we will respond.\nMany thanks, Data Portal '
-                    f'team\n\n'
-                )
+            create_department_email(mail_dict, department)
         elif package_id:
-            # If we have a package ID, load the package
-            package_dict = toolkit.get_action('package_show')(
-                context, {'id': package_id}
-            )
-            # Load the user - using model rather user_show API which loads all the
-            # users packages etc.,
-            user_obj = model.User.get(package_dict['creator_user_id'])
-            mail_dict['recipient_name'] = user_obj.fullname or user_obj.name
-            # Update send to with creator username
-            mail_dict['recipient_email'] = user_obj.email
-            pkg_title = package_dict['title'] or package_dict['name']
-            mail_dict['subject'] = f'Message regarding dataset: {pkg_title}'
-            mail_dict['body'] += (
-                '\n\nYou have been sent this enquiry via the data portal '
-                f'as you are the author of dataset {pkg_title}.  Our apologies '
-                'if this isn\'t relevant - please forward this onto '
-                'data@nhm.ac.uk and we will respond.\nMany thanks, '
-                'Data Portal team\n\n'
-            )
+            package = toolkit.get_action('package_show')(context, {'id': package_id})
+            create_package_email(mail_dict, package)
 
         for i, url in urls.items():
             mail_dict['body'] += f'\n{i.title()}: {url}'
