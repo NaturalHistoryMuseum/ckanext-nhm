@@ -18,6 +18,11 @@ root = 'ckanext'
 py_files = sorted(Path(root).rglob('*.py'))
 
 for path in py_files:
+    try:
+        path.relative_to('ckanext/nhm/migration')
+    except ValueError:
+        continue
+
     module_path = path.relative_to(root).with_suffix('')
     doc_path = path.relative_to(root).with_suffix('.md')
     full_doc_path = Path('API', doc_path)
