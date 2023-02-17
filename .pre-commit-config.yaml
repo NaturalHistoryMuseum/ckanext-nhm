@@ -30,5 +30,5 @@ repos:
     rev: v3.0.0-alpha.4
     hooks:
       - id: prettier
-        types_or: [javascript, vue, less]
-        args: ['--single-quote']
+        types_or: [ javascript, vue, less, sass, scss, css ]
+        args: [ '--single-quote' ]
