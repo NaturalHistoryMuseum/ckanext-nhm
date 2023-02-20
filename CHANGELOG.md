@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.2.1 (2023-02-20)
+
+### Fix
+
+- add empty content for group
+
 ## v5.2.0 (2023-02-20)
 
 ### Feature
