@@ -1,5 +1,28 @@
 # Changelog
 
+## v5.2.0 (2023-02-20)
+
+### Feature
+
+- **search-ui**: feat: enable adding multiple/nested filters in a preset
+
+### Docs
+
+- fix api docs generation script
+
+### Style
+
+- apply prettier to js/vue/less
+- fix line endings
+
+### CI System(s)
+
+- add prettier to pre-commit, exclude vendor/dist folders
+
+### Chores/Misc
+
+- small fixes to align with other extensions
+
 ## v5.1.1 (2023-02-13)
 
 ### Chores/Misc
