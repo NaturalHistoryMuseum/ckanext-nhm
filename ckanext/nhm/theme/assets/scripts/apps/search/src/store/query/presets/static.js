@@ -22,6 +22,7 @@ let staticPresets = {
         {
           type: 'group',
           key: 'not',
+          content: [],
         },
         {
           type: 'term',
