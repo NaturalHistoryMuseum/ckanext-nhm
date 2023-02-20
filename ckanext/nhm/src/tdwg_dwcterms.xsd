@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema 
+<xs:schema
     version="2013-10-22"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://rs.tdwg.org/dwc/terms/"
@@ -10,16 +10,16 @@
     <xs:annotation>
         <xs:documentation xml:lang="en">
             The Generic Darwin Core schema defining all property terms as global elements.
-            
-            Domain classes are not defined here, but in a separate schema (tdwg_dwcclasses.xsd) with the same namespace.            
+
+            Domain classes are not defined here, but in a separate schema (tdwg_dwcclasses.xsd) with the same namespace.
             There are two ways in which references to domains can be defined:
             a) through an abstract base term anyXXXTerm, which is derived from the type dwc:anyPropery and which all properties
-               for that domain use as their substitution group. If you refer to dwc:anyXXXTerm in your schema, you will be able 
-               to reference any of the terms, but it will be impossible to create a sequence of all terms occurring only once. 
-            b) through a group of elements called XXXTerms, which reference properties exactly once as a sequence. 
-               This group can be used to refer to all the domain properties only once. In order to make a property required, you 
-               must create your own group referring to the individual dwc terms. 
-               If you want to specify every term once at most and in any order, you will also have to refer to the individual dwc 
+               for that domain use as their substitution group. If you refer to dwc:anyXXXTerm in your schema, you will be able
+               to reference any of the terms, but it will be impossible to create a sequence of all terms occurring only once.
+            b) through a group of elements called XXXTerms, which reference properties exactly once as a sequence.
+               This group can be used to refer to all the domain properties only once. In order to make a property required, you
+               must create your own group referring to the individual dwc terms.
+               If you want to specify every term once at most and in any order, you will also have to refer to the individual dwc
                term yourself - a limitation of the xs:all model.
         </xs:documentation>
     </xs:annotation>
@@ -29,7 +29,7 @@
     <xs:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="http://dublincore.org/schemas/xmls/qdc/dc.xsd"/>
     <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/03/xml.xsd"/>
     <xs:import namespace="http://rs.tdwg.org/dwc/dwctype/" schemaLocation="tdwg_dwctypes.xsd"/>
-    
+
     <!-- ANY DWC TERM -->
     <xs:element name="any" abstract="true"/>
     <!-- ANY DWC IDENTIFIER -->
@@ -49,14 +49,14 @@
             <xs:element ref="dwc:resourceRelationshipID" minOccurs="0"/>
             <xs:element ref="dwc:measurementID" minOccurs="0"/>
         </xs:sequence>
-    </xs:group>    
+    </xs:group>
 
     <!-- ANY DWC PROPERTY TERM -->
     <xs:element name="anyProperty" abstract="true" substitutionGroup="dwc:any"/> <!-- type="dwc:simpleProperty"  -->
     <!-- ANY DWC CLASS TERM -->
     <xs:element name="anyClass" abstract="true" substitutionGroup="dwc:any"/>
-    
-    <!-- 
+
+    <!--
         All TERMS listed BY domain
         Every domain has its own substitutionGroup
     -->
@@ -124,7 +124,7 @@
     <xs:element name="associatedReferences" type="xs:string" substitutionGroup="dwc:anyOccurrenceTerm"/>
     <xs:element name="associatedOccurrences" type="xs:string" substitutionGroup="dwc:anyOccurrenceTerm"/>
     <xs:element name="associatedSequences" type="xs:string" substitutionGroup="dwc:anyOccurrenceTerm"/>
-    <xs:element name="associatedTaxa" type="xs:string" substitutionGroup="dwc:anyOccurrenceTerm"/>        
+    <xs:element name="associatedTaxa" type="xs:string" substitutionGroup="dwc:anyOccurrenceTerm"/>
     <xs:group name="OccurrenceTerms">
         <xs:sequence>
             <xs:element ref="dwc:institutionCode" minOccurs="0"/>
@@ -363,7 +363,7 @@
     <xs:element name="scientificNameID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyTaxonTerm"/>
     <xs:element name="acceptedNameUsageID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyTaxonTerm"/>
     <xs:element name="parentNameUsageID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyTaxonTerm"/>
-    <xs:element name="originalNameUsageID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyTaxonTerm"/>    
+    <xs:element name="originalNameUsageID" type="dwc:nonEmptyString" substitutionGroup="dwc:anyTaxonTerm"/>
     <xs:element name="nameAccordingToID" type="xs:string" substitutionGroup="dwc:anyTaxonTerm"/>
     <xs:element name="namePublishedInID" type="xs:string" substitutionGroup="dwc:anyTaxonTerm"/>
     <xs:element name="taxonConceptID" type="xs:string" substitutionGroup="dwc:anyTaxonTerm"/>
@@ -461,7 +461,7 @@
     <xs:element name="measurementDeterminedDate" type="dwc:dateTimeISO" substitutionGroup="dwc:anyMeasurementTerm"/>
     <xs:element name="measurementDeterminedBy" type="xs:string" substitutionGroup="dwc:anyMeasurementTerm"/>
     <xs:element name="measurementMethod" type="xs:string" substitutionGroup="dwc:anyMeasurementTerm"/>
-    <xs:element name="measurementRemarks" type="xs:string" substitutionGroup="dwc:anyMeasurementTerm"/>    
+    <xs:element name="measurementRemarks" type="xs:string" substitutionGroup="dwc:anyMeasurementTerm"/>
     <xs:group name="MeasurementTerms">
         <xs:sequence>
             <xs:element ref="dwc:measurementType" minOccurs="0"/>
@@ -474,5 +474,5 @@
             <xs:element ref="dwc:measurementRemarks" minOccurs="0"/>
         </xs:sequence>
     </xs:group>
-    
+
 </xs:schema>

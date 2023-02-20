@@ -1,6 +1,6 @@
-@import "variables";
-@import "mixins";
-@import "flex";
+@import 'variables';
+@import 'mixins';
+@import 'flex';
 
 .load-fonts();
 
@@ -65,7 +65,8 @@
     border-radius: @rounding;
   }
 
-  .form-row, .privacy-warning {
+  .form-row,
+  .privacy-warning {
     padding: 5px;
   }
 
@@ -141,7 +142,8 @@
       }
     }
 
-    & a, & a:active {
+    & a,
+    & a:active {
       color: @grey10;
     }
 
@@ -220,7 +222,7 @@
   overflow-y: scroll;
   margin-top: 5px;
 
-  & input[type="checkbox"] {
+  & input[type='checkbox'] {
     top: unset;
   }
 
@@ -246,17 +248,21 @@
 
 // TRANSITIONS -------------------------------------------------------------------------------------
 
-.slidedown-leave-active, .slidedown-enter-active,
-.slideright-leave-active, .slideright-enter-active {
-  transition: .2s;
+.slidedown-leave-active,
+.slidedown-enter-active,
+.slideright-leave-active,
+.slideright-enter-active {
+  transition: 0.2s;
 }
 
-.slidedown-enter, .slidedown-leave-to {
+.slidedown-enter,
+.slidedown-leave-to {
   transform: translateY(-10px);
   opacity: 0;
 }
 
-.slideright-enter, .slideright-leave-to {
+.slideright-enter,
+.slideright-leave-to {
   transform: translateX(-100px);
   opacity: 0;
 }
@@ -273,7 +279,8 @@
   line-height: 1;
 }
 
-.delete-field, & .move-field {
+.delete-field,
+& .move-field {
   color: @grey3;
   padding-left: 5px;
 }
@@ -355,7 +362,8 @@
       color: @grey1;
       white-space: nowrap;
 
-      &:hover, &:active {
+      &:hover,
+      &:active {
         color: @grey3;
       }
 
@@ -380,19 +388,22 @@
   }
 
   &.filter-type-and {
-    &, & > .group-type {
+    &,
+    & > .group-type {
       background-color: @primary6;
     }
   }
 
   &.filter-type-or {
-    &, & > .group-type {
+    &,
+    & > .group-type {
       background-color: #bee9ff;
     }
   }
 
   &.filter-type-not {
-    &, & > .group-type {
+    &,
+    & > .group-type {
       background-color: @warning4;
     }
   }
@@ -427,7 +438,6 @@
 }
 
 .term-editor {
-
   label {
     margin-bottom: 0;
 
@@ -495,11 +505,12 @@
     }
   }
 
-  & #greaterThanEq, & #lessThanEq {
+  & #greaterThanEq,
+  & #lessThanEq {
     display: none;
   }
 
-  input[type=number] {
+  input[type='number'] {
     width: 65px;
     padding-right: 0;
   }
@@ -532,7 +543,6 @@
     content: ' / ';
   }
 }
-
 
 // MAIN FORM ---------------------------------------------------------------------------------------
 
@@ -626,7 +636,8 @@
 .tiling-gallery {
   @col-gap: 10px;
 
-  & .gallery-column-sizer, & .gallery-tile {
+  & .gallery-column-sizer,
+  & .gallery-tile {
     @media (max-width: @sm - 1) {
       @n-cols: 1;
       width: 100%;
@@ -648,7 +659,6 @@
       width: 100% * (1 / @n-cols);
     }
   }
-
 
   & .gallery-tile {
     position: relative;
@@ -696,7 +706,6 @@
   }
 }
 
-
 .view-component {
   margin-top: 15px;
 
@@ -737,7 +746,8 @@
       align-self: end;
     }
 
-    & .record-res, & .record-name {
+    & .record-res,
+    & .record-name {
       align-self: start;
     }
 
@@ -764,8 +774,6 @@
         border-radius: @rounding;
       }
     }
-
-
   }
 }
 
@@ -782,7 +790,8 @@
 
 // COMPONENTS
 
-.copyable, .editable {
+.copyable,
+.editable {
   font-family: monospace;
   background-color: @grey9;
   border: 1px dashed @grey8;

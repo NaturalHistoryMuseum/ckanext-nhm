@@ -1,17 +1,17 @@
 // Track iframe content height changes and resize element accordingly
-this.ckan.module('iframe-resize', function(jQuery, _) {
+this.ckan.module('iframe-resize', function (jQuery, _) {
   return {
-    initialize: function() {
+    initialize: function () {
       var $iframe = this.el;
-      $iframe.ready(function(){
+      $iframe.ready(function () {
         var i_window = $iframe.get(0).contentWindow;
-        var set_height = function(){
+        var set_height = function () {
           // body is not always available on some browsers. True even if we did a jQuery(i_window.document).ready(...)
-          if (i_window.document && i_window.document.body){
+          if (i_window.document && i_window.document.body) {
             // without Math.ceil it will constantly switch between pixel fractions and make the page twitch
             var current = Math.ceil($iframe.height());
             var target = Math.ceil(jQuery(i_window.document).height());
-            if (current != target){
+            if (current != target) {
               $iframe.height(target);
             }
           }
@@ -21,6 +21,6 @@ this.ckan.module('iframe-resize', function(jQuery, _) {
         jQuery(i_window).resize(set_height);
         window.setInterval(set_height, 250);
       });
-    }
-  }
+    },
+  };
 });
