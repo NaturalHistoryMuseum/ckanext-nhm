@@ -26,6 +26,14 @@
         {% block page_header %}
         <header class="page-header">
             <div class="row flex-container flex-wrap flex-wrap-spacing flex-between flex-stretch-first flex-reverse">
+                {% if g.version and h.latest_item_version(resource_id=res.id, record_id=rec['_id']) != g.version %}
+                <div class="col-md-12 full-width alert-info margin-bottom">
+                    <p><b>This is not the most recent version of this record.</b></p>
+                    <p>This version is from {{ h.get_version_date(g.version) }}.</p>
+                    <p>If you have followed a link from a citation, this may be what you want. If it's not, you can <a href="{{ h.get_record_permalink(res, g.record_dict) }}">view the latest version here</a>.</p>
+                    <p class="no-margin">Please be aware that images on versions from before January 2022 may no longer be accessible.</p>
+                </div>
+                {% endif %}
                 <div class="col-md-6">
                     <ul class="list-unstyled flex-container flex-smallwrap flex-right inline-list-pad">
                         <li>
