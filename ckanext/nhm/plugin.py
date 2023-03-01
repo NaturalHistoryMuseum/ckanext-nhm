@@ -660,16 +660,23 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             helpers.get_specimen_resource_id() in resource_ids
             or helpers.get_indexlot_resource_id() in resource_ids
         ):
-            fields.force('collectionCode')
-            fields.force('typeStatus')
+            fields.force('scientificName')
             fields.force('family')
-            fields.force('genus')
+            fields.force('typeStatus')
+            fields.force('locality')
+            fields.force('country')
+            fields.force('recordedBy')
+            fields.force('catalogNumber')
+            fields.force('associatedMediaCount')
+            fields.force('preservative')
+            fields.force('collectionCode')
             for group in (
                 'created',
                 'modified',
                 'basisOfRecord',
                 'institutionCode',
                 'associatedMedia.*',
+                'barcode',
             ):
                 fields.ignore(group)
 
