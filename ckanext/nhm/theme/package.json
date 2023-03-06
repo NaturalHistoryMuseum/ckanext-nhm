@@ -1,6 +1,6 @@
 {
   "name": "ckanext-nhm",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "description": "A CKAN extension for the Natural History Museum's Data Portal.",
   "repository": {
     "type": "git",

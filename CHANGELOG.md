@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.2.2 (2023-03-06)
+
+### Fix
+
+- exclude unnecessary columns from search results
+
+### Refactor
+
+- change default fields for specimens/index lots
+
+### Chores/Misc
+
+- **contact form**: update email address for LS insects
+
 ## v5.2.1 (2023-02-20)
 
 ### Fix
