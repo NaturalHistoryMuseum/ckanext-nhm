@@ -93,7 +93,10 @@ let display = {
       let headers = [];
 
       d3.values(payload.filters).forEach((f) => {
-        if (f.content.fields !== undefined) {
+        if (
+          f.content.fields !== undefined &&
+          !['string_equals', 'number_equals'].includes(f.key)
+        ) {
           headers.push(f.content.fields);
         }
       });

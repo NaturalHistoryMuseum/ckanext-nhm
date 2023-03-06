@@ -13,7 +13,7 @@ COLLECTION_CONTACTS = OrderedDict(
         ('Economic & Environmental Earth Sciences', 'g.miller@nhm.ac.uk'),
         ('Fossil Invertebrates & Plants', 'z.hughes@nhm.ac.uk'),
         ('Fossil Vertebrates & Anthropology', 'h.bonney@nhm.ac.uk'),
-        ('Insects', 'g.martin@nhm.ac.uk'),
+        ('Insects', 'g.broad@nhm.ac.uk'),
         ('Invertebrates', 'm.lowe@nhm.ac.uk'),
         ('Library & Archives', 'library@nhm.ac.uk'),
         ('Mineral & Planetary Sciences', 'm.rumsey@nhm.ac.uk'),
