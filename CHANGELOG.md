@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.3.0 (2023-03-20)
+
+### Feature
+
+- add notice on non-current record pages
+
+### Build System(s)
+
+- **deps**: update vds
+
+### Minor UI Changes
+
+- add an alert-info class and some spacing utils
+
 ## v5.2.2 (2023-03-06)
 
 ### Fix
