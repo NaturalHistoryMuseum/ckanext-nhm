@@ -334,6 +334,14 @@ body {
   padding-right: 10px;
 }
 
+.margin-top {
+  margin-top: 10px;
+}
+
+.margin-bottom {
+  margin-bottom: 10px;
+}
+
 .pagination-wrapper .pagination {
   // this is for the numbered blobs at the bottom of, e.g. the datasets list, not the list view one
   border: none !important;
@@ -1859,7 +1867,7 @@ tr.empty {
 .alert-error {
   background-color: @warning5;
   color: @warning2;
-  padding: 3px;
+  padding: 5px;
   border: 1px dashed @warning4;
 }
 
@@ -1869,6 +1877,13 @@ tr.empty {
 
 .alert .close {
   opacity: 0.8;
+}
+
+.alert-info {
+  background-color: tint(@primary6, 70%);
+  color: @baseTextColor;
+  padding: 5px;
+  border: 1px dashed @primary5;
 }
 
 // SELECT2 -----------------------------------------------------------------------------------------
