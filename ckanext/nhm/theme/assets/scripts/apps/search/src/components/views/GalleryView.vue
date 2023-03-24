@@ -15,16 +15,19 @@
       <div class="gallery-column-sizer"></div>
       <div
         v-for="(record, recordIndex) in loadedImageRecords"
-        :key="record.id"
+        :key="`${record.record.data._id}-${record.image.id}`"
         class="gallery-tile"
       >
         <img
           @click="setViewerImage(recordIndex)"
           :src="record.image.thumb"
-          :alt="`Image associated with record ${record.id}`"
+          :alt="record.image.title"
         />
         <small class="gallery-tile-title">
-          <a :href="record.recordUrl" :aria-label="`Go to record ${record.id}`">
+          <a
+            :href="record.recordUrl"
+            :aria-label="`Go to record ${record.record.data._id}`"
+          >
             {{ record.recordTitle }}
           </a>
         </small>
@@ -58,7 +61,7 @@
     >
       <div
         v-for="(record, recordIndex) in brokenImageRecords"
-        :key="record.id"
+        :key="record.record.data._id"
         class="gallery-tile gallery-tile-tiny"
       >
         <img :src="record.image.thumb" :alt="record.image.preview" />
