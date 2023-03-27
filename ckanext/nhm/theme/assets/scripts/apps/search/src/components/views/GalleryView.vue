@@ -40,12 +40,17 @@
       class="flex-container flex-column flex-center pad-v space-children-v"
       v-if="brokenImageRecords.length > 0"
     >
-      <p>
-        {{ brokenImageRecords.length }} thumbnail{{
+      <Help
+        :label="`${brokenImageRecords.length} thumbnail${
           brokenImageRecords.length > 1 ? 's' : ''
-        }}
-        could not be loaded.
-      </p>
+        } could not be loaded.`"
+        popup-id="show-broken-imgs-help"
+        ><small
+          >If there are a lot of images not loading, check the banner at the top
+          of the page to see if there's a known issue. Otherwise you can
+          <a href="/contact">contact us</a>.</small
+        ></Help
+      >
       <small
         >View
         <i
@@ -84,6 +89,7 @@ import Loading from '../Loading.vue';
 import LoadError from '../LoadError.vue';
 
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
+import Help from '../popups/Help.vue';
 
 export default {
   extends: BaseView,
@@ -106,6 +112,7 @@ export default {
     };
   },
   components: {
+    Help,
     Loading,
     LoadError,
   },
