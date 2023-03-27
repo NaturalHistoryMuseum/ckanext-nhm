@@ -22,11 +22,10 @@
         <h3>{{ filteredRecordHeader(total) }}</h3>
         <small class="filtered-total">
           <template v-if="total > 0"
-            >showing {{ page * 100 + 1 }}-{{
-              page * 100 + records.length
-            }}</template
-          >
-          <template v-else>0</template> of
+            >showing {{ page * 100 + 1 }}-{{ page * 100 + records.length }}
+          </template>
+          <template v-else>0</template>
+          of
           {{ recordHeader(unfilteredTotal) }} total
         </small>
       </div>
@@ -35,7 +34,7 @@
       <Share />
       <Download v-if="total > 0" />
     </div>
-    <div v-if="hasResult" :class="{ disabled: invalidated }">
+    <div v-show="hasResult" :class="{ disabled: invalidated }">
       <div class="flex-container flex-stretch-first flex-center">
         <ul class="nav nav-tabs">
           <li
@@ -73,7 +72,7 @@
       </div>
 
       <div>
-        <component :is="viewComponent" v-if="hasRecords"></component>
+        <component :is="viewComponent" v-show="hasRecords"></component>
       </div>
     </div>
     <div v-if="hasResult && total === 0 && !invalidated" class="pad-h pad-v">

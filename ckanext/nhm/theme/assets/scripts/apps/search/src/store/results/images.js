@@ -1,41 +1,68 @@
+import Vue from 'vue';
 import axios from 'axios';
-import SparkMD5 from 'spark-md5';
 
 let images = {
   namespaced: true,
+  state: {
+    imageRecords: [],
+  },
   getters: {
+    loadedImageRecords: (state) => {
+      return state.imageRecords.filter(
+        (r) => r.image.canLoad && !r.image.loading,
+      );
+    },
     getItemImages:
       (state, getters, rootState, rootGetters) =>
       (item, first, recordIndex) => {
+        /* gets the images from a single record */
+
         let images;
 
+        // details of the resource this record is from
         let resourceDetails =
           rootGetters['results/query/resources/resourceDetails'][item.resource];
+
+        // for convenience
         let recordUrl = `${resourceDetails.resourceUrl}/record/${item.data._id}`;
         let recordTitle =
           item.data[resourceDetails.titleField] || item.data._id;
 
+        // define the image object
+        let defaultImg = {
+          download: null,
+          preview: null,
+          thumb: null,
+          title: recordTitle,
+          id: null,
+          licence: resourceDetails.imageLicence,
+          loading: true,
+          canLoad: false,
+        };
+
+        // specimen collections and index lots have a special media field
         if (item.data.associatedMedia !== undefined) {
           try {
             images = item.data.associatedMedia.map((img) => {
-              let imgLicence =
+              let imgRecord = { ...defaultImg };
+              imgRecord.download = `${img.identifier}/original`;
+              imgRecord.preview = `${img.identifier}/preview`;
+              imgRecord.thumb = `${img.identifier}/thumbnail`;
+              imgRecord.title = img.title || imgRecord.title;
+              imgRecord.id = img.identifier;
+              imgRecord.licence =
                 img.license === resourceDetails.imageLicence.url
                   ? resourceDetails.imageLicence
                   : { title: img.license, url: img.license };
-              return {
-                download: `${img.identifier}/original`,
-                preview: `${img.identifier}/preview`,
-                thumb: `${img.identifier}/thumbnail`,
-                title: img.title,
-                id: img._id,
-                licence: imgLicence,
-                isBroken: false,
-              };
+              return imgRecord;
             });
           } catch (e) {
             images = [];
           }
-        } else {
+        }
+
+        // everything else just uses a URL or a list of URLs in a string field
+        else {
           try {
             let imageFieldValue = item.data[resourceDetails.imageField];
             if (imageFieldValue === undefined) {
@@ -46,15 +73,12 @@ let images = {
               images = [imageFieldValue];
             }
             images = images.map((img, ix) => {
-              return {
-                download: img,
-                preview: img,
-                thumb: img,
-                title: item.data[resourceDetails.titleField],
-                id: `${item.data._id}_${ix}`,
-                licence: resourceDetails.imageLicence,
-                isBroken: false,
-              };
+              let imgRecord = { ...defaultImg };
+              imgRecord.download = img;
+              imgRecord.preview = img;
+              imgRecord.thumb = img;
+              imgRecord.id = `${item.data._id}_${ix}`;
+              return imgRecord;
             });
           } catch (e) {
             images = [];
@@ -79,6 +103,34 @@ let images = {
           return images;
         }
       },
+  },
+  actions: {
+    loadAndCheckImages(context) {
+      let imgRecords = [];
+
+      context.rootGetters['results/records'].forEach((r, rix) => {
+        context.getters.getItemImages(r, false, rix).forEach((i) => {
+          imgRecords.push(i);
+        });
+      });
+
+      let brokenChecks = imgRecords.map((r, ix) => {
+        return axios
+          .get(r.image.thumb)
+          .then(() => {
+            imgRecords[ix].image.canLoad = true;
+          })
+          .catch((e) => {
+            imgRecords[ix].image.canLoad = false;
+          })
+          .finally(() => {
+            imgRecords[ix].image.loading = false;
+          });
+      });
+      return Promise.all(brokenChecks).then(() => {
+        Vue.set(context.state, 'imageRecords', imgRecords);
+      });
+    },
   },
 };
 
