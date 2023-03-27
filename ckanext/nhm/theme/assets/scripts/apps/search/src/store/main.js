@@ -115,7 +115,7 @@ const store = new Vuex.Store({
         });
     },
     getUser(context) {
-      return get('user_show')
+      return post('user_show')
         .then((d) => {
           return {
             loggedIn: true,
