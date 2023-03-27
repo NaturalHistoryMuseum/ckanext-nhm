@@ -6,9 +6,10 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from 'vuex';
+import { mapGetters, mapMutations, mapState, mapActions } from 'vuex';
 import axios from 'axios';
 import SparkMD5 from 'spark-md5';
+import debounce from 'lodash.debounce';
 
 export default {
   name: 'BaseView',
@@ -20,13 +21,10 @@ export default {
   computed: {
     ...mapState('results', ['resultData', 'page']),
     ...mapState('results/display', ['headers']),
-    ...mapGetters('results', [
-      'total',
-      'records',
-      'imageRecords',
-      'loadedImageRecords',
-    ]),
+    ...mapState('results/images', ['imageRecords']),
+    ...mapGetters('results', ['total', 'records']),
     ...mapGetters('results/display', ['licenceFromId']),
+    ...mapGetters('results/images', ['loadedImageRecords']),
     ...mapGetters('results/query/resources', ['resourceDetails']),
   },
   methods: {
@@ -36,6 +34,7 @@ export default {
       'setViewerImage',
       'addPageImages',
     ]),
+    ...mapActions('results/images', ['loadAndCheckImages']),
     getValue(item, field) {
       let v = { ...item };
       let subFields = field.split('.');

@@ -42,20 +42,20 @@ let results = {
     records: (state, getters) => {
       return getters.hasResult ? state.resultData.result.records : [];
     },
-    imageRecords: (state, getters) => {
-      let imgRecords = [];
-
-      getters.records.forEach((r, rix) => {
-        getters['images/getItemImages'](r, false, rix).forEach((i) => {
-          imgRecords.push(i);
-        });
-      });
-
-      return imgRecords;
-    },
-    loadedImageRecords: (state, getters) => {
-      return getters.imageRecords.filter((r) => !r.image.isBroken);
-    },
+    // imageRecords: (state, getters) => {
+    //   let imgRecords = [];
+    //
+    //   getters.records.forEach((r, rix) => {
+    //     getters['images/getItemImages'](r, false, rix).forEach((i) => {
+    //       imgRecords.push(i);
+    //     });
+    //   });
+    //
+    //   return imgRecords;
+    // },
+    // loadedImageRecords: (state, getters) => {
+    //   return getters.imageRecords.filter((r) => !r.image.isBroken);
+    // },
     resultResourceIds: (state, getters) => {
       return getters.records.map((r) => r.resource);
     },

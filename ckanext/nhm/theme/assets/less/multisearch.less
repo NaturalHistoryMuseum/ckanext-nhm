@@ -664,6 +664,7 @@
     position: relative;
     min-height: 150px;
     padding: @col-gap / 2;
+    margin: 5px;
     .trans(0.2s);
 
     & > img {
@@ -683,6 +684,11 @@
 
   & .gallery-tile-tiny {
     width: 75px;
+    min-height: 75px;
+  }
+
+  & .gallery-tile-broken {
+    background-color: @grey7;
   }
 
   & .gallery-tile-title {
