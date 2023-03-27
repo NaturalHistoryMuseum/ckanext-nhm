@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.4.0 (2023-03-27)
+
+### Feature
+
+- add help popup for unloaded imgs
+
+### Fix
+
+- change user_show request method to post
+- detect whether images are broken
+- display something sensible in image alt text
+
 ## v5.3.0 (2023-03-20)
 
 ### Feature
