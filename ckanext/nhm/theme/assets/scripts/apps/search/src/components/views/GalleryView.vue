@@ -9,7 +9,6 @@
     </div>
     <div
       class="tiling-gallery full-width"
-      v-images-loaded:on.progress="loadImages"
       :class="{ processing: loading || loadError }"
     >
       <div class="gallery-column-sizer"></div>
@@ -84,7 +83,6 @@
 
 <script>
 import BaseView from './BaseView.vue';
-import imagesLoaded from 'vue-images-loaded';
 import Loading from '../Loading.vue';
 import LoadError from '../LoadError.vue';
 
@@ -116,9 +114,6 @@ export default {
     Loading,
     LoadError,
   },
-  directives: {
-    imagesLoaded,
-  },
   computed: {
     ...mapState('results/display', ['recordTag']),
     ...mapGetters('results/query/filters', ['hasFilter']),
@@ -144,18 +139,9 @@ export default {
       this.loading = false;
       this.loadError = true;
     },
-    loadImages(instance) {
-      this.nLoaded = instance.progressedCount;
-      if (
-        instance.isComplete ||
-        (this.loadTimeout &&
-          instance.progressedCount > Math.floor(instance.images.length * 0.1))
-      ) {
-        this.relayout(!instance.isComplete);
-      }
-    },
   },
   created() {
+    this.loading = true;
     this.addPreset(this.presetData)
       .then((wasAdded) => {
         if (wasAdded) {
@@ -173,7 +159,8 @@ export default {
         setTimeout(() => {
           this.loadTimeout = true;
         }, 1000);
-        this.loading = this.loadedImageRecords.length > 0;
+        this.loading = false;
+        this.relayout(true);
       });
   },
 };
