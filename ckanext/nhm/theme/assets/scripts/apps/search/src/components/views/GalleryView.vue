@@ -15,16 +15,19 @@
       <div class="gallery-column-sizer"></div>
       <div
         v-for="(record, recordIndex) in loadedImageRecords"
-        :key="record.id"
+        :key="`${record.record.data._id}-${record.image.id}`"
         class="gallery-tile"
       >
         <img
           @click="setViewerImage(recordIndex)"
           :src="record.image.thumb"
-          :alt="`Image associated with record ${record.id}`"
+          :alt="record.image.title"
         />
         <small class="gallery-tile-title">
-          <a :href="record.recordUrl" :aria-label="`Go to record ${record.id}`">
+          <a
+            :href="record.recordUrl"
+            :aria-label="`Go to record ${record.record.data._id}`"
+          >
             {{ record.recordTitle }}
           </a>
         </small>
@@ -37,12 +40,17 @@
       class="flex-container flex-column flex-center pad-v space-children-v"
       v-if="brokenImageRecords.length > 0"
     >
-      <p>
-        {{ brokenImageRecords.length }} thumbnail{{
+      <Help
+        :label="`${brokenImageRecords.length} thumbnail${
           brokenImageRecords.length > 1 ? 's' : ''
-        }}
-        could not be loaded.
-      </p>
+        } could not be loaded.`"
+        popup-id="show-broken-imgs-help"
+        ><small
+          >If there are a lot of images not loading, check the banner at the top
+          of the page to see if there's a known issue. Otherwise you can
+          <a href="/contact">contact us</a>.</small
+        ></Help
+      >
       <small
         >View
         <i
@@ -58,10 +66,11 @@
     >
       <div
         v-for="(record, recordIndex) in brokenImageRecords"
-        :key="record.id"
-        class="gallery-tile gallery-tile-tiny"
+        :key="`${record.record.data._id}-${record.image.id}`"
+        class="gallery-tile gallery-tile-tiny gallery-tile-broken"
+        alt="record.image.preview"
+        role="img"
       >
-        <img :src="record.image.thumb" :alt="record.image.preview" />
         <small class="gallery-tile-title">
           <a :href="record.recordUrl">{{ record.recordTitle }}</a>
         </small>
@@ -80,6 +89,7 @@ import Loading from '../Loading.vue';
 import LoadError from '../LoadError.vue';
 
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
+import Help from '../popups/Help.vue';
 
 export default {
   extends: BaseView,
@@ -102,6 +112,7 @@ export default {
     };
   },
   components: {
+    Help,
     Loading,
     LoadError,
   },
@@ -112,18 +123,9 @@ export default {
     ...mapState('results/display', ['recordTag']),
     ...mapGetters('results/query/filters', ['hasFilter']),
     brokenImageRecords() {
-      return this.imageRecords
-        .filter((r) => r.image.isBroken)
-        .map((r) => {
-          if (r.record.data.collectionCode !== undefined) {
-            let collectionCode =
-              r.record.data.collectionCode === 'BMNH(E)'
-                ? 'ent'
-                : r.record.data.collectionCode.toLowerCase();
-            r.image.thumb = '/images/icons/' + collectionCode + '.svg';
-          }
-          return r;
-        });
+      return this.imageRecords.filter(
+        (r) => !r.image.loading && !r.image.canLoad,
+      );
     },
   },
   methods: {
@@ -154,18 +156,25 @@ export default {
     },
   },
   created() {
-    this.addPreset(this.presetData).then((wasAdded) => {
-      if (wasAdded) {
-        this.runSearch(0);
-      }
-    });
-    this.setFilteredRecordTag(this.recordTag + '$ with images');
-    this.addPageImages(this.loadedImageRecords);
-    setTimeout(() => {
-      this.loadTimeout = true;
-    }, 1000);
-
-    this.loading = this.loadedImageRecords.length > 0;
+    this.addPreset(this.presetData)
+      .then((wasAdded) => {
+        if (wasAdded) {
+          return this.runSearch(0);
+        } else {
+          return new Promise((resolve) => {
+            resolve();
+          });
+        }
+      })
+      .then(this.loadAndCheckImages)
+      .then(() => {
+        this.setFilteredRecordTag(this.recordTag + '$ with images');
+        this.addPageImages(this.loadedImageRecords);
+        setTimeout(() => {
+          this.loadTimeout = true;
+        }, 1000);
+        this.loading = this.loadedImageRecords.length > 0;
+      });
   },
 };
 </script>

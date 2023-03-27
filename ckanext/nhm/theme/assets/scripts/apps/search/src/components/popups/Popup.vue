@@ -10,7 +10,7 @@
         <slot v-on:close-popup="endPopup" v-on:open-popup="startPopup"></slot>
       </div>
     </transition>
-    <a href="#" @click="togglePopup" class="btn btn-disabled" :id="popupId">
+    <a href="#" @click="togglePopup" :class="{ btn: isButton }" :id="popupId">
       <i class="fas" :class="icon"></i>{{ label }}
     </a>
   </div>
@@ -39,6 +39,10 @@ export default {
     parentToggle: {
       // toggle signal from parent
       type: Boolean,
+    },
+    isButton: {
+      type: Boolean,
+      default: true,
     },
   },
   data: function () {
