@@ -138,6 +138,11 @@ let images = {
           .finally(() => {
             r.image.loading = false;
             context.state.imageRecords.push(r);
+            if (r.image.canLoad) {
+              context.commit('results/display/appendPageImage', r, {
+                root: true,
+              });
+            }
           });
       });
       return Promise.allSettled(brokenChecks);
