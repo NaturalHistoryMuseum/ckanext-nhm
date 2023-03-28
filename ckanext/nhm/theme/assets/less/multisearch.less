@@ -636,35 +636,30 @@
 .tiling-gallery {
   @col-gap: 10px;
 
-  & .gallery-column-sizer,
+  @media (max-width: @sm - 1) {
+    column-count: 1;
+  }
+  @media (min-width: @sm) {
+    column-count: 3;
+  }
+  @media (min-width: @md) {
+    column-count: 4;
+  }
+  @media (min-width: @lg) {
+    column-count: 5;
+  }
+  @media (min-width: @xl) {
+    column-count: 6;
+  }
+
   & .gallery-tile {
-    @media (max-width: @sm - 1) {
-      @n-cols: 1;
-      width: 100%;
-    }
-    @media (min-width: @sm) {
-      @n-cols: 3;
-      width: 100% * (1 / @n-cols);
-    }
-    @media (min-width: @md) {
-      @n-cols: 4;
-      width: 100% * (1 / @n-cols);
-    }
-    @media (min-width: @lg) {
-      @n-cols: 5;
-      width: 100% * (1 / @n-cols);
-    }
-    @media (min-width: @xl) {
-      @n-cols: 6;
-      width: 100% * (1 / @n-cols);
-    }
+    width: 100%;
   }
 
   & .gallery-tile {
     position: relative;
-    min-height: 150px;
-    padding: @col-gap / 2;
-    margin: 5px;
+    display: inline-block;
+    margin: @col-gap;
     .trans(0.2s);
 
     & > img {
