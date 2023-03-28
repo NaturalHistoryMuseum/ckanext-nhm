@@ -1,4 +1,7 @@
-from ckan import model
+from dataclasses import dataclass
+from typing import List
+
+from ckan.plugins import toolkit
 from ..settings import COLLECTION_CONTACTS
 
 
@@ -38,26 +41,72 @@ def create_department_email(mail_dict: dict, department: str):
         )
 
 
+@dataclass
+class Recipient:
+    name: str
+    email: str
+
+    @classmethod
+    def from_user(cls, user: dict) -> 'Recipient':
+        name = user.get('fullname', user['name'])
+        email = user.get('email')
+        # if the recipient email is missing, just default to data@nhm.ac.uk
+        if email is None:
+            email = 'data@nhm.ac.uk'
+        return Recipient(name, email)
+
+    @classmethod
+    def from_user_id(cls, user_id: str) -> 'Recipient':
+        context = {'ignore_auth': True}
+        user = toolkit.get_action('user_show')(context, {'id': user_id})
+        return Recipient.from_user(user)
+
+    def __iter__(self):
+        return iter((self.name, self.email))
+
+
+def get_package_owners(package: dict) -> List[Recipient]:
+    """
+    Retrieve a list of the package owners for emailing.
+
+    Owners are defined as the package admins, or if no admins are specified, the
+    original creator of the package.
+
+    :param package: the package dict
+    """
+    collaborators = toolkit.get_action('package_collaborator_list')(
+        # ignore auth to ensure we can access the list of collaborators
+        {'ignore_auth': True},
+        # only email admins
+        {'id': package['id'], 'capacity': 'admin'},
+    )
+
+    recipient_ids = []
+    if collaborators:
+        recipient_ids.extend(collaborator['user_id'] for collaborator in collaborators)
+    else:
+        # if there aren't any collaborators, use the creator
+        recipient_ids.append(package['creator_user_id'])
+
+    return list(map(Recipient.from_user_id, recipient_ids))
+
+
 def create_package_email(mail_dict: dict, package: dict):
     """
-    Updates the given mail dict with the right details to contact the owner of the given
-    package.
+    Updates the given mail dict with the right details to contact the owner(s) of the
+    given package.
 
     :param mail_dict: the mail dict to update
     :param package: the package dict
     """
-    # Load the user - using model rather user_show API which loads all the
-    # users packages etc.,
-    user_obj = model.User.get(package['creator_user_id'])
-    mail_dict['recipient_name'] = user_obj.fullname or user_obj.name
-    # Update send to with creator username
-    mail_dict['recipient_email'] = user_obj.email
+    owners = get_package_owners(package)
+    mail_dict['recipient_name'], mail_dict['recipient_email'] = zip(*owners)
 
-    pkg_title = package['title'] or package['name']
-    mail_dict['subject'] = f'Message regarding dataset: {pkg_title}'
+    package_title = package['title'] or package['name']
+    mail_dict['subject'] = f'Message regarding dataset: {package_title}'
     mail_dict['body'] += (
         '\n\nYou have been sent this enquiry via the data portal '
-        f'as you are the author of dataset {pkg_title}.  Our apologies '
+        f'as you are the author of dataset {package_title}.  Our apologies '
         'if this isn\'t relevant - please forward this onto '
         'data@nhm.ac.uk and we will respond.\nMany thanks, '
         'Data Portal team\n\n'

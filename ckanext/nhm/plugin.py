@@ -348,7 +348,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                         qualified=True,
                     )
 
-        # If this is an index lot enquiry, send to entom
         if package_name == 'collection-indexlots':
             create_indexlots_email(mail_dict)
         elif department:
@@ -360,8 +359,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         for i, url in urls.items():
             mail_dict['body'] += f'\n{i.title()}: {url}'
 
-        # If this is being directed to someone other than @daat@nhm.ac.uk
-        # Ensure data@nhm.ac.uk is copied in
+        # If this is being directed to someone other than data@nhm.ac.uk ensure
+        # data@nhm.ac.uk is copied in
         if mail_dict['recipient_email'] != 'data@nhm.ac.uk':
             mail_dict['headers']['cc'] = 'data@nhm.ac.uk'
         return mail_dict
