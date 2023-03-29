@@ -64,6 +64,9 @@ let display = {
     addPageImages(state, images) {
       state.viewerImagePage = images;
     },
+    appendPageImage(state, image) {
+      state.viewerImagePage.push(image);
+    },
     hideImage(state) {
       state.showImage = false;
       state.viewerImage = 0;

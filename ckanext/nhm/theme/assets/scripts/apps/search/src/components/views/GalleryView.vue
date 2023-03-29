@@ -2,17 +2,12 @@
   <div class="view-component">
     <LoadError v-if="loadError"></LoadError>
     <div class="flex-container flex-right">
-      <small v-if="!loading"
+      <small v-if="imageRecords"
         >{{ imageRecords.length }} images associated with {{ recordTag }}s
         {{ page * 100 + 1 }} - {{ page * 100 + records.length }}</small
       >
     </div>
-    <div
-      class="tiling-gallery full-width"
-      v-images-loaded:on.progress="loadImages"
-      :class="{ processing: loading || loadError }"
-    >
-      <div class="gallery-column-sizer"></div>
+    <div class="tiling-gallery full-width">
       <div
         v-for="(record, recordIndex) in loadedImageRecords"
         :key="`${record.record.data._id}-${record.image.id}`"
@@ -84,7 +79,6 @@
 
 <script>
 import BaseView from './BaseView.vue';
-import imagesLoaded from 'vue-images-loaded';
 import Loading from '../Loading.vue';
 import LoadError from '../LoadError.vue';
 
@@ -98,8 +92,6 @@ export default {
     return {
       loading: true,
       loadError: false,
-      nLoaded: 0,
-      loadTimeout: false,
       presetData: {
         key: 'hasImage',
         parent: 'group_root',
@@ -116,9 +108,6 @@ export default {
     Loading,
     LoadError,
   },
-  directives: {
-    imagesLoaded,
-  },
   computed: {
     ...mapState('results/display', ['recordTag']),
     ...mapGetters('results/query/filters', ['hasFilter']),
@@ -132,30 +121,13 @@ export default {
     ...mapMutations('results/display', ['setFilteredRecordTag']),
     ...mapActions('results', ['runSearch']),
     ...mapActions('results/query/filters', ['addPreset']),
-    relayout(loadFinished) {
-      this.loading = loadFinished;
-      $('.tiling-gallery').masonry({
-        itemSelector: '.gallery-tile',
-        columnWidth: '.gallery-column-sizer',
-        percentPosition: true,
-      });
-    },
     loadFailed() {
       this.loading = false;
       this.loadError = true;
     },
-    loadImages(instance) {
-      this.nLoaded = instance.progressedCount;
-      if (
-        instance.isComplete ||
-        (this.loadTimeout &&
-          instance.progressedCount > Math.floor(instance.images.length * 0.1))
-      ) {
-        this.relayout(!instance.isComplete);
-      }
-    },
   },
   created() {
+    this.loading = true;
     this.addPreset(this.presetData)
       .then((wasAdded) => {
         if (wasAdded) {
@@ -169,11 +141,7 @@ export default {
       .then(this.loadAndCheckImages)
       .then(() => {
         this.setFilteredRecordTag(this.recordTag + '$ with images');
-        this.addPageImages(this.loadedImageRecords);
-        setTimeout(() => {
-          this.loadTimeout = true;
-        }, 1000);
-        this.loading = this.loadedImageRecords.length > 0;
+        this.loading = false;
       });
   },
 };

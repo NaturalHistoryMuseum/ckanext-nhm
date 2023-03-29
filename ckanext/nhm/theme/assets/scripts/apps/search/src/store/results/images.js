@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import axios from 'axios';
 
 let images = {
   namespaced: true,
@@ -108,28 +107,45 @@ let images = {
     loadAndCheckImages(context) {
       let imgRecords = [];
 
+      Vue.set(context.state, 'imageRecords', []);
+
       context.rootGetters['results/records'].forEach((r, rix) => {
         context.getters.getItemImages(r, false, rix).forEach((i) => {
           imgRecords.push(i);
         });
       });
 
-      let brokenChecks = imgRecords.map((r, ix) => {
-        return axios
-          .get(r.image.thumb)
+      function checkImageSrc(url) {
+        // using a requests library like axios doesn't work if the external server
+        // doesn't have CORS set up properly, and all we want to know is if it loads as
+        // an image anyway
+        return new Promise((resolve, reject) => {
+          let imageElement = new Image();
+          imageElement.onload = resolve;
+          imageElement.onerror = reject;
+          imageElement.src = url;
+        });
+      }
+
+      let brokenChecks = imgRecords.map((r) => {
+        return checkImageSrc(r.image.thumb)
           .then(() => {
-            imgRecords[ix].image.canLoad = true;
+            r.image.canLoad = true;
           })
-          .catch((e) => {
-            imgRecords[ix].image.canLoad = false;
+          .catch(() => {
+            r.image.canLoad = false;
           })
           .finally(() => {
-            imgRecords[ix].image.loading = false;
+            r.image.loading = false;
+            context.state.imageRecords.push(r);
+            if (r.image.canLoad) {
+              context.commit('results/display/appendPageImage', r, {
+                root: true,
+              });
+            }
           });
       });
-      return Promise.all(brokenChecks).then(() => {
-        Vue.set(context.state, 'imageRecords', imgRecords);
-      });
+      return Promise.allSettled(brokenChecks);
     },
   },
 };
