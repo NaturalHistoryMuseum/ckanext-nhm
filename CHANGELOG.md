@@ -1,5 +1,29 @@
 # Changelog
 
+## v5.5.0 (2023-03-29)
+
+### Feature
+
+- send dataset contact emails to admin collaborators
+
+### Fix
+
+- replace masonry with 4 lines of css
+- use Image instead of axios to check src, push to state when done
+
+### Refactor
+
+- move the mail logic out into its own module
+
+### Build System(s)
+
+- uninstall masonry
+
+### Chores/Misc
+
+- move comment to correct line
+- remove unused variable in mail_alter hook
+
 ## v5.4.0 (2023-03-27)
 
 ### Feature
