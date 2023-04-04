@@ -9,7 +9,6 @@ jobs:
   sync-branches:
     runs-on: ubuntu-latest
     name: "Sync dev and patch branches to latest commit"
-    needs: bump-version
     steps:
       - name: Check out
         uses: actions/checkout@v3
