@@ -1,5 +1,12 @@
 # Changelog
 
+## v5.5.1 (2023-04-04)
+
+### Chores/Misc
+
+- add branch sync workflow
+- **contact form**: remove EEES option and redirect ES FIP
+
 ## v5.5.0 (2023-03-29)
 
 ### Feature
