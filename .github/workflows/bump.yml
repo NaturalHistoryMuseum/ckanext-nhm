@@ -29,13 +29,3 @@ jobs:
           tag_name: v${{ env.REVISION }}
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - name: Sync dev branch
-        uses: connor-baer/action-sync-branch@main
-        with:
-          branch: dev
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - name: Sync patch branch
-        uses: connor-baer/action-sync-branch@main
-        with:
-          branch: patch
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
