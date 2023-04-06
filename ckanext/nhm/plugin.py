@@ -635,6 +635,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             fields.force('associatedMediaCount')
             fields.force('preservative')
             fields.force('collectionCode')
+            fields.force('year')
+            fields.force('month')
+            fields.force('day')
             for group in (
                 'created',
                 'modified',

@@ -104,6 +104,8 @@ let display = {
         }
       });
 
+      payload.request['size'] = 15;
+
       post('datastore_guess_fields', payload.request)
         .then((data) => {
           if (data.success) {
