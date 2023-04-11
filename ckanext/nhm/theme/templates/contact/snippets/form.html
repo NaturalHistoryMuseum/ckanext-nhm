@@ -100,6 +100,10 @@
 
     {% endif %}
 
+    {{ form.input('subject', label=_('Subject'), id='field-subject',
+                  value=data.subject, error=errors.subject, classes=['control-medium'],
+                  is_required=false, placeholder=_('Optional subject')) }}
+
     {# using a max length of of 1500 on the text box as the WAF has a 1500 character limit on #}
     {# this parameter and will block requests that exceed it #}
     {{ form.markdown('content', label=_('Your request'), id='field-content', value=data.content,
