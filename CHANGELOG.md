@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.6.1 (2023-04-11)
+
+### Build System(s)
+
+- update ckanext-contact version
+
 ## v5.6.0 (2023-04-11)
 
 ### Feature
