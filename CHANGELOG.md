@@ -1,5 +1,24 @@
 # Changelog
 
+## v5.6.0 (2023-04-11)
+
+### Feature
+
+- adds a subject line to the contact form
+
+### Build System(s)
+
+- fix postgres not loading when running tests in docker
+
+### Chores/Misc
+
+- remove "needs" from sync action
+- move branch sync into its own file
+
+### Minor UI Changes
+
+- add date fields to default columns
+
 ## v5.5.1 (2023-04-04)
 
 ### Chores/Misc
