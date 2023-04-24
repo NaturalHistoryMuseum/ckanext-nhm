@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.6.2 (2023-04-24)
+
+### Fix
+
+- add all loadable images to the previewer at the same time
+
 ## v5.6.1 (2023-04-11)
 
 ### Build System(s)
