@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.6.3 (2023-05-09)
+
+### Fix
+
+- use Mirador as an external IIIF viewer rather than UV
+
 ## v5.6.2 (2023-04-24)
 
 ### Fix
