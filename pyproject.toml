@@ -24,7 +24,6 @@ dependencies = [
     "cachetools>=4.2.4",
     "lxml>=4.4.2",
     "elasticsearch-dsl>=6.0.0,<7.0.0",
-    "ckanext-ckanpackager~=2.2.0",
     "ckanext-contact~=2.3.0",
     "ckanext-doi~=3.1.0",
     "ckanext-gallery~=2.2.0",
