@@ -10,7 +10,7 @@ window.slug_search =
      * @param resourceIds a list of resource ids
      */
     self.doSearch = function (query, resourceIds) {
-      var payload = {};
+      var payload = { nav_slug: true };
       if (!!query) {
         payload.query = query;
       }
