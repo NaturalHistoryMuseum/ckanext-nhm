@@ -3,149 +3,186 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-
-from collections import OrderedDict
-from typing import Callable
+import abc
+from collections import namedtuple
+from dataclasses import dataclass
+from typing import List, Optional
 
 import requests
+from cachetools import cached, TTLCache
 
 from ckanext.nhm.lib.taxonomy import extract_ranks
 
+Link = namedtuple("Link", ("text", "url"))
 
-class Site:
-    def __init__(
-        self,
-        name,
-        site_icon_url,
-        link_template: str = None,
-        link_callback: Callable[..., tuple] = None,
-    ):
-        self.name = name
-        self.site_icon_url = site_icon_url
-        if link_template:
-            self.get_link = lambda x: link_template.format(x)
-        elif link_callback:
-            self.get_link = link_callback
-        else:
-            raise ValueError('Site requires either template or callback.')
 
-    def rank_links(self, record):
+@dataclass
+class Site(abc.ABC):
+    """
+    An external site we can link to from a specimen record page.
+    """
+
+    name: str
+    icon_url: str
+
+    @abc.abstractmethod
+    def get_links(self, record: dict) -> List[Link]:
+        """
+        Returns a list of Links from the passed record.
+
+        :param record: the record dict
+        """
+        ...
+
+
+@dataclass
+class RankedTemplateSite(Site):
+    """
+    A site based on a templated URL filled in with the taxonomy ranks available in the
+    record.
+    """
+
+    url_template: str
+
+    def get_links(self, record: dict) -> List[Link]:
         ranks = extract_ranks(record)
-        if ranks:
-            return OrderedDict.fromkeys(
-                [(rank, self.get_link(rank)) for rank in ranks.values()]
-            )
-        else:
-            return []
+        return [Link(rank, self.url_template.format(rank)) for rank in ranks.values()]
 
 
-# Taxonomy searches
-BHL = Site(
-    name='Biodiversity Heritage Library',
-    site_icon_url='https://www.biodiversitylibrary.org/favicon.ico',
-    link_template='https://www.biodiversitylibrary.org/name/{}',
-)
-CoL = Site(
-    name='Catalogue of Life',
-    site_icon_url='https://www.catalogueoflife.org/images/col_square_logo.jpg',
-    link_template='https://www.catalogueoflife.org/col/search/all/key/{}',
-)
-PBDB = Site(
-    name='Paleobiology Database',
-    site_icon_url='https://paleobiodb.org/favicon.ico',
-    link_template='https://paleobiodb.org/classic/checkTaxonInfo?taxon_name={}',
-)
-Mindat = Site(
-    name='Mindat',
-    site_icon_url='https://www.mindat.org/favicon.ico',
-    link_template='https://www.mindat.org/search.php?search={}',
-)
-
-SEARCHES = {
-    'BMNH(E)': [BHL, CoL],
-    'BOT': [BHL, CoL],
-    'MIN': [Mindat],
-    'PAL': [PBDB],
-    'ZOO': [BHL, CoL],
-    # if there is no collection code, just check the BHL and CoL. This catches index lot entries.
-    None: [BHL, CoL],
-}
-
-
-def get_taxonomy_searches(record):
+@cached(cache=TTLCache(maxsize=1024, ttl=300))
+def _get_gbif_record(occurrence_id: str, institution_code: str) -> Optional[dict]:
     """
-    Given a record retuns the sites that are relevant to it.
+    Given an occurrence ID and an institution code, returns the GBIF record for it, or
+    None if exactly one GBIF record couldn't be found. This function is protected with a
+    TTL cache to avoid hitting GBIF over and over again for the same occurrence ID
+    query.
 
-    :param record: the record dict
-    :return: a list of sites
+    :param occurrence_id: an occurrence ID
+    :param institution_code: an institution code, this will probably be NHMUK really
     """
-    # if no collection code is available, default to None
-    relevant_searches = SEARCHES.get(record.get('collectionCode', None), [])
-    return [(s.name, s.site_icon_url, s.rank_links(record)) for s in relevant_searches]
-
-
-def _p10k_api(gbif_record):
-    gbif_key = gbif_record.get('key')
     r = requests.get(
-        'https://www.phenome10k.org/api/v1/scan/search',
-        params={'gbif_occurrence_id': gbif_key},
-    )
-    if not r.ok:
-        return False
-    results = r.json()
-    if results['query_success'] and results['count'] == 1:
-        p10k_record = results['records'][0]
-        return p10k_record.get('scientific_name'), p10k_record.get('url')
-    return False
-
-
-P10k = Site(
-    name='Phenome10k',
-    site_icon_url='https://www.phenome10k.org/static/icons/favicon.ico',
-    link_callback=_p10k_api,
-)
-
-
-def _get_gbif_record(record):
-    if 'occurrenceID' not in record:
-        return False
-    r = requests.get(
-        'https://api.gbif.org/v1/occurrence/search',
+        "https://api.gbif.org/v1/occurrence/search",
         params={
-            'occurrenceID': record.get('occurrenceID'),
-            'institutionCode': record.get('institutionCode', 'NHMUK'),
+            "occurrenceID": occurrence_id,
+            "institutionCode": institution_code,
         },
     )
     if r.ok:
         results = r.json()
-        if results.get('count') == 1:
-            return results['results'][0]
-    return False
+        if results.get("count") == 1:
+            return results["results"][0]
+
+    return None
 
 
-def get_gbif_links(record):
-    gbif_record = _get_gbif_record(record)
-    if not gbif_record:
-        return []
-    all_links = []
-    gbif_links = [
-        (
-            gbif_record.get('catalogNumber'),
-            f'https://gbif.org/occurrence/{gbif_record.get("key")}',
+class Phenome10kSite(Site):
+    """
+    Site which uses the GBIF API and Phenome10k API to find associated 3D data on
+    Phenome10k.
+    """
+
+    def get_links(self, record: dict) -> List[Link]:
+        gbif_record = _get_gbif_record(
+            record.get("occurrenceID"), record.get("institutionCode")
         )
-    ]
-    if 'acceptedTaxonKey' in gbif_record:
-        gbif_links.append(
-            (
-                gbif_record.get('scientificName'),
-                f'https://gbif.org/species/{gbif_record.get("acceptedTaxonKey")}',
+        links = []
+        if gbif_record and "key" in record:
+            gbif_key = gbif_record.get("key")
+            r = requests.get(
+                "https://www.phenome10k.org/api/v1/scan/search",
+                params={"gbif_occurrence_id": gbif_key},
             )
+            if r.ok:
+                results = r.json()
+                if results["query_success"] and results["count"] == 1:
+                    p10k_record = results["records"][0]
+                    links.append(
+                        Link(p10k_record.get("scientific_name"), p10k_record.get("url"))
+                    )
+
+        return links
+
+
+class GBIFSite(Site):
+    """
+    Site that provides links to species and occurrence pages associated with the given
+    record.
+    """
+
+    def get_links(self, record: dict) -> List[Link]:
+        links = []
+
+        gbif_record = _get_gbif_record(
+            record.get("occurrenceID"), record.get("institutionCode")
         )
-    all_links.append(('GBIF', 'https://gbif.org/favicon.ico', gbif_links))
-    try:
-        p10k_link = P10k.get_link(gbif_record)
-        if p10k_link:
-            all_links.append((P10k.name, P10k.site_icon_url, [p10k_link]))
-    except requests.RequestException:
-        pass
-    return all_links
+        if gbif_record:
+            links_parts = [
+                ("https://gbif.org/occurrence/{}", "catalogNumber", "key"),
+                (
+                    "https://gbif.org/species/{}",
+                    "scientificName",
+                    "acceptedTaxonKey",
+                ),
+            ]
+            for url_template, name_key, url_key in links_parts:
+                if name_key in gbif_record and url_key in gbif_record:
+                    links.append(
+                        Link(
+                            gbif_record[name_key],
+                            url_template.format(gbif_record[url_key]),
+                        )
+                    )
+
+        return links
+
+
+# Taxonomy searches
+BHL = RankedTemplateSite(
+    name="Biodiversity Heritage Library",
+    icon_url="https://www.biodiversitylibrary.org/favicon.ico",
+    url_template="https://www.biodiversitylibrary.org/name/{}",
+)
+CoL = RankedTemplateSite(
+    name="Catalogue of Life",
+    icon_url="https://www.catalogueoflife.org/images/col_square_logo.jpg",
+    url_template="https://www.catalogueoflife.org/col/search/all/key/{}",
+)
+PBDB = RankedTemplateSite(
+    name="Paleobiology Database",
+    icon_url="https://paleobiodb.org/favicon.ico",
+    url_template="https://paleobiodb.org/classic/checkTaxonInfo?taxon_name={}",
+)
+Mindat = RankedTemplateSite(
+    name="Mindat",
+    icon_url="https://www.mindat.org/favicon.ico",
+    url_template="https://www.mindat.org/search.php?search={}",
+)
+GBIF = GBIFSite(
+    name="GBIF",
+    icon_url="https://gbif.org/favicon.ico",
+)
+P10K = Phenome10kSite(
+    name="Phenome10k",
+    icon_url="https://www.phenome10k.org/static/icons/favicon.ico",
+)
+
+
+def get_sites(record: dict) -> List[Site]:
+    """
+    Given a record, returns a list of sites that may be able to provide relevant links.
+
+    :param record: a record dict
+    """
+    searches = {
+        "BMNH(E)": [BHL, CoL, GBIF, P10K],
+        "BOT": [BHL, CoL, GBIF, P10K],
+        "MIN": [Mindat],
+        "PAL": [PBDB, GBIF, P10K],
+        "ZOO": [BHL, CoL, GBIF, P10K],
+        # if there is no collection code, just check the BHL and CoL. This catches index
+        # lot entries
+        None: [BHL, CoL],
+    }
+
+    # if no collection code is available, default to None
+    return searches.get(record.get("collectionCode", None), [])
