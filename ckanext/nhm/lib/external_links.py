@@ -78,6 +78,27 @@ def _get_gbif_record(occurrence_id: str, institution_code: str) -> Optional[dict
     return None
 
 
+@cached(cache=TTLCache(maxsize=1024, ttl=300))
+def _get_phenome10k_record(gbif_key: str) -> Optional[dict]:
+    """
+    Given a gbif key, returns the Phenome10k record for it, or None if exactly one
+    Phenome10k record couldn't be found. This function is protected with a TTL cache to
+    avoid hitting Phenome10k over and over again for the same gbif key query.
+
+    :param gbif_key: the gbif key of the record
+    """
+    r = requests.get(
+        "https://www.phenome10k.org/api/v1/scan/search",
+        params={"gbif_occurrence_id": gbif_key},
+    )
+    if r.ok:
+        results = r.json()
+        if results["query_success"] and results["count"] == 1:
+            return results["records"][0]
+
+    return None
+
+
 class Phenome10kSite(Site):
     """
     Site which uses the GBIF API and Phenome10k API to find associated 3D data on
@@ -91,21 +112,10 @@ class Phenome10kSite(Site):
                 record.get("occurrenceID"), record.get("institutionCode", "NHMUK")
             )
             if gbif_record and "key" in record:
-                gbif_key = gbif_record.get("key")
-                r = requests.get(
-                    "https://www.phenome10k.org/api/v1/scan/search",
-                    params={"gbif_occurrence_id": gbif_key},
-                )
-                if r.ok:
-                    results = r.json()
-                    if results["query_success"] and results["count"] == 1:
-                        p10k_record = results["records"][0]
-                        links.append(
-                            Link(p10k_record["scientific_name"], p10k_record["url"])
-                        )
+                p10k_record = _get_phenome10k_record(gbif_record["key"])
+                links.append(Link(p10k_record["scientific_name"], p10k_record["url"]))
         except KeyError or requests.RequestException:
             pass
-
         return links
 
 
