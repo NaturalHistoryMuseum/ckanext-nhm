@@ -4,23 +4,29 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from collections import OrderedDict, defaultdict
-
 import itertools
 import json
 import logging
 import operator
-import os
 import re
 import time
+from collections import OrderedDict, defaultdict
+from datetime import datetime
+from operator import itemgetter
+from typing import List
+from urllib.parse import quote
+
 from beaker.cache import cache_region
+from jinja2.filters import do_truncate
+from lxml import etree, html
+
 from ckan import model
 from ckan.lib import helpers as core_helpers
 from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
-from ckanext.nhm.lib.external_links import Link, Site
+from ckanext.nhm.lib.external_links import Site
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.resource_view import (
     resource_view_get_filter_options,
@@ -28,12 +34,6 @@ from ckanext.nhm.lib.resource_view import (
 )
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from datetime import datetime
-from jinja2.filters import do_truncate
-from lxml import etree, html
-from operator import itemgetter
-from typing import Optional, List, Tuple
-from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
