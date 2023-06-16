@@ -141,7 +141,10 @@ def get_gbif_links(record):
             )
         )
     all_links.append(('GBIF', 'https://gbif.org/favicon.ico', gbif_links))
-    p10k_link = P10k.get_link(gbif_record)
-    if p10k_link:
-        all_links.append((P10k.name, P10k.site_icon_url, [p10k_link]))
+    try:
+        p10k_link = P10k.get_link(gbif_record)
+        if p10k_link:
+            all_links.append((P10k.name, P10k.site_icon_url, [p10k_link]))
+    except requests.RequestException:
+        pass
     return all_links
