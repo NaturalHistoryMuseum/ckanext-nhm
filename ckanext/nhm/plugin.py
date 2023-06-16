@@ -623,6 +623,47 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         return fields
 
+    def datastore_before_convert_basic_query(self, query):
+        # see lib.filter_options
+        custom_filters = ['_has_image', '_has_lat_long', '_exclude_mineralogy']
+        if 'filters' in query:
+            for f in custom_filters:
+                if f in query['filters']:
+                    del query['filters'][f]
+        return query
+
+    def datastore_after_convert_basic_query(self, basic_query, multisearch_query):
+        basic_filters = basic_query.get('filters')
+        if not basic_filters:
+            return multisearch_query
+
+        has_image = basic_filters.get('_has_image', False)
+        if has_image:
+            multisearch_query['filters']['and'].append(
+                {'exists': {'fields': ['associatedMedia']}}
+            )
+
+        has_lat_long = basic_filters.get('_has_lat_long', False)
+        if has_lat_long:
+            multisearch_query['filters']['and'].append({'exists': {'geo_field': True}})
+
+        exclude_mineralogy = basic_filters.get('_exclude_mineralogy', False)
+        if exclude_mineralogy:
+            multisearch_query['filters']['and'].append(
+                {
+                    'not': [
+                        {
+                            'string_equals': {
+                                'fields': ['collectionCode'],
+                                'value': 'min',
+                            }
+                        }
+                    ]
+                }
+            )
+
+        return multisearch_query
+
     # IVersionedDatastoreDownloads
     def download_modify_notifier_start_templates(self, plain_template, html_template):
         # completely override the default datastore templates with our own ones
