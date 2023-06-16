@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.6.4 (2023-06-16)
+
+### Fix
+
+- do not propogate errors from phenome10k api call
+
 ## v5.6.3 (2023-05-09)
 
 ### Fix
