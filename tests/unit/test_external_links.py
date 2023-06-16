@@ -1,6 +1,8 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from ckanext.nhm.lib.external_links import get_sites, RankedTemplateSite, Link
+from requests.exceptions import SSLError, Timeout
+
+from ckanext.nhm.lib.external_links import get_sites, RankedTemplateSite, Link, P10K
 
 
 class TestGetSites:
@@ -39,3 +41,49 @@ class TestRankedTemplateSite:
         record = {}
         links = templated.get_links(record)
         assert len(links) == 0
+
+
+class TestPhenome10kSite:
+    def test_no_gbif_record(self):
+        gbif_mock = MagicMock(return_value=None)
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            links = P10K.get_links({"occurrenceID": "x"})
+            assert len(links) == 0
+
+    def test_no_phenome10k_record(self):
+        gbif_mock = MagicMock(return_value={"key": "x"})
+        p10k_mock = MagicMock(return_value=None)
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            with patch(
+                "ckanext.nhm.lib.external_links._get_phenome10k_record", p10k_mock
+            ):
+                links = P10K.get_links({"occurrenceID": "x"})
+                assert len(links) == 0
+
+    def test_with_records(self):
+        gbif_mock = MagicMock(return_value={"key": "x"})
+        p10k_mock = MagicMock(return_value={"scientific_name": "y", "url": "z"})
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            with patch(
+                "ckanext.nhm.lib.external_links._get_phenome10k_record", p10k_mock
+            ):
+                links = P10K.get_links({"occurrenceID": "x"})
+                assert len(links) == 1
+                assert links[0].text == "y"
+                assert links[0].url == "z"
+
+    def test_catches_gbif_errors(self):
+        gbif_mock = MagicMock(side_effect=Timeout())
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            links = P10K.get_links({"occurrenceID": "x"})
+            assert len(links) == 0
+
+    def test_catches_phenome10k_errors(self):
+        gbif_mock = MagicMock(return_value={"key": "x"})
+        p10k_mock = MagicMock(side_effect=SSLError())
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            with patch(
+                "ckanext.nhm.lib.external_links._get_phenome10k_record", p10k_mock
+            ):
+                links = P10K.get_links({"occurrenceID": "x"})
+                assert len(links) == 0

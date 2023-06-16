@@ -111,10 +111,13 @@ class Phenome10kSite(Site):
             gbif_record = _get_gbif_record(
                 record.get("occurrenceID"), record.get("institutionCode", "NHMUK")
             )
-            if gbif_record and "key" in record:
+            if gbif_record and "key" in gbif_record:
                 p10k_record = _get_phenome10k_record(gbif_record["key"])
-                links.append(Link(p10k_record["scientific_name"], p10k_record["url"]))
-        except KeyError or requests.RequestException:
+                if p10k_record:
+                    links.append(
+                        Link(p10k_record["scientific_name"], p10k_record["url"])
+                    )
+        except (requests.RequestException, KeyError):
             pass
         return links
 
