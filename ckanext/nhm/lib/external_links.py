@@ -82,23 +82,26 @@ class Phenome10kSite(Site):
     """
 
     def get_links(self, record: dict) -> List[Link]:
-        gbif_record = _get_gbif_record(
-            record.get("occurrenceID"), record.get("institutionCode")
-        )
         links = []
-        if gbif_record and "key" in record:
-            gbif_key = gbif_record.get("key")
-            r = requests.get(
-                "https://www.phenome10k.org/api/v1/scan/search",
-                params={"gbif_occurrence_id": gbif_key},
+        try:
+            gbif_record = _get_gbif_record(
+                record.get("occurrenceID"), record.get("institutionCode")
             )
-            if r.ok:
-                results = r.json()
-                if results["query_success"] and results["count"] == 1:
-                    p10k_record = results["records"][0]
-                    links.append(
-                        Link(p10k_record.get("scientific_name"), p10k_record.get("url"))
-                    )
+            if gbif_record and "key" in record:
+                gbif_key = gbif_record.get("key")
+                r = requests.get(
+                    "https://www.phenome10k.org/api/v1/scan/search",
+                    params={"gbif_occurrence_id": gbif_key},
+                )
+                if r.ok:
+                    results = r.json()
+                    if results["query_success"] and results["count"] == 1:
+                        p10k_record = results["records"][0]
+                        links.append(
+                            Link(p10k_record["scientific_name"], p10k_record["url"])
+                        )
+        except KeyError or requests.RequestException:
+            pass
 
         return links
 
@@ -112,26 +115,29 @@ class GBIFSite(Site):
     def get_links(self, record: dict) -> List[Link]:
         links = []
 
-        gbif_record = _get_gbif_record(
-            record.get("occurrenceID"), record.get("institutionCode")
-        )
-        if gbif_record:
-            links_parts = [
-                ("https://gbif.org/occurrence/{}", "catalogNumber", "key"),
-                (
-                    "https://gbif.org/species/{}",
-                    "scientificName",
-                    "acceptedTaxonKey",
-                ),
-            ]
-            for url_template, name_key, url_key in links_parts:
-                if name_key in gbif_record and url_key in gbif_record:
-                    links.append(
-                        Link(
-                            gbif_record[name_key],
-                            url_template.format(gbif_record[url_key]),
+        try:
+            gbif_record = _get_gbif_record(
+                record.get("occurrenceID"), record.get("institutionCode")
+            )
+            if gbif_record:
+                links_parts = [
+                    ("https://gbif.org/occurrence/{}", "catalogNumber", "key"),
+                    (
+                        "https://gbif.org/species/{}",
+                        "scientificName",
+                        "acceptedTaxonKey",
+                    ),
+                ]
+                for url_template, name_key, url_key in links_parts:
+                    if name_key in gbif_record and url_key in gbif_record:
+                        links.append(
+                            Link(
+                                gbif_record[name_key],
+                                url_template.format(gbif_record[url_key]),
+                            )
                         )
-                    )
+        except requests.RequestException:
+            pass
 
         return links
 
