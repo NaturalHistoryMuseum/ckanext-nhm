@@ -60,6 +60,9 @@ def _get_gbif_record(occurrence_id: str, institution_code: str) -> Optional[dict
     :param occurrence_id: an occurrence ID
     :param institution_code: an institution code, this will probably be NHMUK really
     """
+    if occurrence_id is None or institution_code is None:
+        return None
+
     r = requests.get(
         "https://api.gbif.org/v1/occurrence/search",
         params={
