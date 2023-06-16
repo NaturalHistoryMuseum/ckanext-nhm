@@ -11,7 +11,7 @@ import requests
 from ckanext.nhm.lib.taxonomy import extract_ranks
 
 
-class Site(object):
+class Site:
     def __init__(
         self,
         name,
