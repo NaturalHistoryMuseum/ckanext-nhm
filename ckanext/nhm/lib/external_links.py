@@ -85,7 +85,7 @@ class Phenome10kSite(Site):
         links = []
         try:
             gbif_record = _get_gbif_record(
-                record.get("occurrenceID"), record.get("institutionCode")
+                record.get("occurrenceID"), record.get("institutionCode", "NHMUK")
             )
             if gbif_record and "key" in record:
                 gbif_key = gbif_record.get("key")
@@ -117,7 +117,7 @@ class GBIFSite(Site):
 
         try:
             gbif_record = _get_gbif_record(
-                record.get("occurrenceID"), record.get("institutionCode")
+                record.get("occurrenceID"), record.get("institutionCode", "NHMUK")
             )
             if gbif_record:
                 links_parts = [
