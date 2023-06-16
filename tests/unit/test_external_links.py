@@ -1,8 +1,14 @@
 from unittest.mock import MagicMock, patch
 
-from requests.exceptions import SSLError, Timeout
+from requests.exceptions import SSLError, Timeout, HTTPError
 
-from ckanext.nhm.lib.external_links import get_sites, RankedTemplateSite, Link, P10K
+from ckanext.nhm.lib.external_links import (
+    get_sites,
+    RankedTemplateSite,
+    Link,
+    P10K,
+    GBIF,
+)
 
 
 class TestGetSites:
@@ -87,3 +93,38 @@ class TestPhenome10kSite:
             ):
                 links = P10K.get_links({"occurrenceID": "x"})
                 assert len(links) == 0
+
+
+class TestGBIFSite:
+    def test_record_not_found(self):
+        gbif_mock = MagicMock(return_value=None)
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            links = GBIF.get_links({"occurrenceID": "x", "institutionCode": "y"})
+            assert len(links) == 0
+
+    def test_record_is_found(self):
+        gbif_mock = MagicMock(
+            return_value={
+                "catalogNumber": "a",
+                "key": "b",
+                "scientificName": "c",
+                "acceptedTaxonKey": "d",
+            }
+        )
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            links = GBIF.get_links({"occurrenceID": "x", "institutionCode": "y"})
+            assert len(links) == 2
+            assert links[0] == Link("a", "https://gbif.org/occurrence/b")
+            assert links[1] == Link("c", "https://gbif.org/species/d")
+
+    def test_record_institution_code_is_optional(self):
+        gbif_mock = MagicMock(return_value=None)
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            GBIF.get_links({"occurrenceID": "x"})
+        gbif_mock.assert_called_once_with("x", "NHMUK")
+
+    def test_catches_gbif_errors(self):
+        gbif_mock = MagicMock(side_effect=HTTPError())
+        with patch("ckanext.nhm.lib.external_links._get_gbif_record", gbif_mock):
+            links = GBIF.get_links({"occurrenceID": "x"})
+            assert len(links) == 0
