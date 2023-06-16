@@ -8,6 +8,7 @@ from collections import OrderedDict
 from typing import Callable
 
 import requests
+
 from ckanext.nhm.lib.taxonomy import extract_ranks
 
 
