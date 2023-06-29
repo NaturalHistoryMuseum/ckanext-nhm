@@ -9,7 +9,7 @@ from collections import OrderedDict
 # automatically selected in combo boxes that use this list as a source for options
 COLLECTION_CONTACTS = OrderedDict(
     [
-        ('Algae, Fungi & Plants', 'm.carine@nhm.ac.uk'),
+        ('Algae, Fungi & Plants', 'botany@nhm.ac.uk'),
         ('Fossil Invertebrates & Plants', 'g.miller@nhm.ac.uk'),
         ('Fossil Vertebrates & Anthropology', 'h.bonney@nhm.ac.uk'),
         ('Insects', 'g.broad@nhm.ac.uk'),
