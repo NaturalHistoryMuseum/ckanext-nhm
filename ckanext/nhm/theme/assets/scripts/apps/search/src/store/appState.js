@@ -16,30 +16,37 @@ let appState = {
       resultData: {
         loading: false,
         failed: false,
+        promise: null,
       },
       slug: {
         loading: false,
         failed: false,
+        promise: null,
       },
       slugEdit: {
         loading: false,
         failed: false,
+        promise: null,
       },
       doi: {
         loading: false,
         failed: false,
+        promise: null,
       },
       download: {
         loading: false,
         failed: false,
+        promise: null,
       },
       resources: {
         loading: false,
         failed: false,
+        promise: null,
       },
       queryEdit: {
         loading: false,
         failed: false,
+        promise: null,
       },
     },
   },
