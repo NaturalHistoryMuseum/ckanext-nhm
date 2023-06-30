@@ -44,10 +44,6 @@ let images = {
           try {
             images = item.data.associatedMedia.map((img) => {
               let imgRecord = { ...defaultImg };
-              img.identifier = img.identifier.replace(
-                '10.0.11.20',
-                'data.nhm.ac.uk',
-              );
               imgRecord.download = `${img.identifier}/original`;
               imgRecord.preview = `${img.identifier}/preview`;
               imgRecord.thumb = `${img.identifier}/thumbnail`;
