@@ -111,10 +111,8 @@ let images = {
 
       context.rootState.appState.status.resultData.promise.then(() => {
         let records = context.rootGetters['results/records'];
-        console.log(records);
 
         records.forEach((r, rix) => {
-          console.log('HELLO?');
           context.getters.getItemImages(r, false, rix).forEach((i) => {
             imgRecords.push(i);
           });
