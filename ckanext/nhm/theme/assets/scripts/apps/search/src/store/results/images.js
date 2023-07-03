@@ -109,43 +109,47 @@ let images = {
 
       Vue.set(context.state, 'imageRecords', []);
 
-      context.rootGetters['results/records'].forEach((r, rix) => {
-        context.getters.getItemImages(r, false, rix).forEach((i) => {
-          imgRecords.push(i);
-        });
-      });
+      context.rootState.appState.status.resultData.promise.then(() => {
+        let records = context.rootGetters['results/records'];
 
-      function checkImageSrc(url) {
-        // using a requests library like axios doesn't work if the external server
-        // doesn't have CORS set up properly, and all we want to know is if it loads as
-        // an image anyway
-        return new Promise((resolve, reject) => {
-          let imageElement = new Image();
-          imageElement.onload = resolve;
-          imageElement.onerror = reject;
-          imageElement.src = url;
-        });
-      }
-
-      let brokenChecks = imgRecords.map((r) => {
-        return checkImageSrc(r.image.thumb)
-          .then(() => {
-            r.image.canLoad = true;
-          })
-          .catch(() => {
-            r.image.canLoad = false;
-          })
-          .finally(() => {
-            r.image.loading = false;
-            context.state.imageRecords.push(r);
+        records.forEach((r, rix) => {
+          context.getters.getItemImages(r, false, rix).forEach((i) => {
+            imgRecords.push(i);
           });
-      });
-      return Promise.allSettled(brokenChecks).then(() => {
-        context.commit(
-          'results/display/addPageImages',
-          context.getters.loadedImageRecords,
-          { root: true },
-        );
+        });
+
+        function checkImageSrc(url) {
+          // using a requests library like axios doesn't work if the external server
+          // doesn't have CORS set up properly, and all we want to know is if it loads as
+          // an image anyway
+          return new Promise((resolve, reject) => {
+            let imageElement = new Image();
+            imageElement.onload = resolve;
+            imageElement.onerror = reject;
+            imageElement.src = url;
+          });
+        }
+
+        let brokenChecks = imgRecords.map((r) => {
+          return checkImageSrc(r.image.thumb)
+            .then(() => {
+              r.image.canLoad = true;
+            })
+            .catch(() => {
+              r.image.canLoad = false;
+            })
+            .finally(() => {
+              r.image.loading = false;
+              context.state.imageRecords.push(r);
+            });
+        });
+        return Promise.allSettled(brokenChecks).then(() => {
+          context.commit(
+            'results/display/addPageImages',
+            context.getters.loadedImageRecords,
+            { root: true },
+          );
+        });
       });
     },
   },

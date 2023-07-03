@@ -42,20 +42,6 @@ let results = {
     records: (state, getters) => {
       return getters.hasResult ? state.resultData.result.records : [];
     },
-    // imageRecords: (state, getters) => {
-    //   let imgRecords = [];
-    //
-    //   getters.records.forEach((r, rix) => {
-    //     getters['images/getItemImages'](r, false, rix).forEach((i) => {
-    //       imgRecords.push(i);
-    //     });
-    //   });
-    //
-    //   return imgRecords;
-    // },
-    // loadedImageRecords: (state, getters) => {
-    //   return getters.imageRecords.filter((r) => !r.image.isBroken);
-    // },
     resultResourceIds: (state, getters) => {
       return getters.records.map((r) => r.resource);
     },
@@ -104,113 +90,149 @@ let results = {
       page = page || 0;
       Vue.set(context.rootState.appState.status.resultData, 'loading', true);
       Vue.set(context.rootState.appState.status.resultData, 'failed', false);
-      if (page === 0) {
-        context.state._after = [];
-        // only get the headers on first page, subsequent pages just use the same headers
-        context.dispatch('display/getHeaders', {
-          filters: context.state.query.filters.items,
-          request: context.getters['query/requestBody'](false),
-        });
-      }
-      context.commit('setPage', page);
-      context.commit(
-        'query/setAfter',
-        context.getters.after[context.state.page - 1],
-      );
-
-      let tempFilters = context.getters['query/filters/temporaryFilters'];
-
-      post('datastore_multisearch', context.getters['query/requestBody'](false))
-        .then((data) => {
-          context.state.resultData = data;
-
-          if (data.success && data.result.after !== null) {
-            let afterToAdd = [
-              data.result.after[0],
-              data.result.after[1],
-              context.getters['query/resources/sortedResources'].indexOf(
-                data.result.after[2].replace('nhm-', ''),
-              ),
-            ];
-            context.commit('addPage', afterToAdd);
+      Vue.set(
+        context.rootState.appState.status.resultData,
+        'promise',
+        new Promise((resolve, reject) => {
+          if (page === 0) {
+            context.state._after = [];
+            // only get the headers on first page, subsequent pages just use the same headers
+            context.dispatch('display/getHeaders', {
+              filters: context.state.query.filters.items,
+              request: context.getters['query/requestBody'](false),
+            });
           }
-          if (!data.success) {
-            throw Error;
-          }
-
-          if (tempFilters.length === 0) {
-            if (data.success) {
-              context.state.unfilteredTotal = data.result.total;
-            } else {
-              context.state.unfilteredTotal = 0;
-            }
-          }
-        })
-        .catch((error) => {
-          Vue.set(context.rootState.appState.status.resultData, 'failed', true);
-        })
-        .finally(() => {
-          Vue.set(
-            context.rootState.appState.status.resultData,
-            'loading',
-            false,
+          context.commit('setPage', page);
+          context.commit(
+            'query/setAfter',
+            context.getters.after[context.state.page - 1],
           );
-          context.state.invalidated = false;
-        });
 
-      if (tempFilters.length > 0) {
-        post(
-          'datastore_multisearch',
-          context.getters['query/requestBody'](true),
-        )
-          .then((data) => {
-            if (data.success) {
-              context.state.unfilteredTotal = data.result.total;
-            } else {
-              throw Error;
-            }
-          })
-          .catch((error) => {
-            if (context.getters.hasResult) {
-              context.state.unfilteredTotal = context.getters.total;
-            } else {
-              context.state.unfilteredTotal = 0;
-            }
-          });
-      }
+          let tempFilters = context.getters['query/filters/temporaryFilters'];
+
+          let promises = [];
+
+          // get the total without any of the temporary/hidden filters
+          promises.push(
+            post(
+              'datastore_multisearch',
+              context.getters['query/requestBody'](false),
+            )
+              .then((data) => {
+                context.state.resultData = data;
+
+                if (data.success && data.result.after !== null) {
+                  let afterToAdd = [
+                    data.result.after[0],
+                    data.result.after[1],
+                    context.getters['query/resources/sortedResources'].indexOf(
+                      data.result.after[2].replace('nhm-', ''),
+                    ),
+                  ];
+                  context.commit('addPage', afterToAdd);
+                }
+                if (!data.success) {
+                  throw Error;
+                }
+
+                if (tempFilters.length === 0) {
+                  if (data.success) {
+                    context.state.unfilteredTotal = data.result.total;
+                  } else {
+                    context.state.unfilteredTotal = 0;
+                  }
+                }
+              })
+              .catch((error) => {
+                throw error;
+              }),
+          );
+
+          // get the total with the temporary/hidden filters, e.g. so we can say 10 of 20 records have images
+          if (tempFilters.length > 0) {
+            promises.push(
+              post(
+                'datastore_multisearch',
+                context.getters['query/requestBody'](true),
+              )
+                .then((data) => {
+                  if (data.success) {
+                    context.state.unfilteredTotal = data.result.total;
+                  } else {
+                    throw Error;
+                  }
+                })
+                .catch((error) => {
+                  if (context.getters.hasResult) {
+                    context.state.unfilteredTotal = context.getters.total;
+                  } else {
+                    context.state.unfilteredTotal = 0;
+                  }
+                  throw error;
+                }),
+            );
+          }
+
+          Promise.allSettled(promises)
+            .then(() => {
+              Vue.set(
+                context.rootState.appState.status.resultData,
+                'loading',
+                false,
+              );
+              context.state.invalidated = false;
+              resolve();
+            })
+            .catch((error) => {
+              Vue.set(
+                context.rootState.appState.status.resultData,
+                'failed',
+                true,
+              );
+              reject(error);
+            });
+        }),
+      );
     },
     getMetadata(context, payload) {
       Vue.set(context.rootState.appState.status[payload.meta], 'loading', true);
       Vue.set(context.rootState.appState.status[payload.meta], 'failed', false);
-
-      let body = context.getters['query/requestBody'](false);
-      if (payload.formData !== undefined) {
-        body = Object.assign(body, payload.formData);
-      }
-
-      post(payload.action, body)
-        .then((data) => {
-          if (data.success) {
-            context.state[payload.meta] = payload.extract(data);
-          } else {
-            throw Error;
+      Vue.set(
+        context.rootState.appState.status[payload.meta],
+        'promise',
+        new Promise((resolve, reject) => {
+          let body = context.getters['query/requestBody'](false);
+          if (payload.formData !== undefined) {
+            body = Object.assign(body, payload.formData);
           }
-        })
-        .catch((error) => {
-          context.state[payload.meta] = null;
-          Vue.set(
-            context.rootState.appState.status[payload.meta],
-            'failed',
-            true,
-          );
-        })
-        .finally(() => {
-          Vue.set(
-            context.rootState.appState.status[payload.meta],
-            'loading',
-            false,
-          );
-        });
+
+          post(payload.action, body)
+            .then((data) => {
+              if (data.success) {
+                context.state[payload.meta] = payload.extract(data);
+              } else {
+                throw Error;
+              }
+              resolve();
+            })
+            .catch((error) => {
+              context.state[payload.meta] = null;
+              Vue.set(
+                context.rootState.appState.status[payload.meta],
+                'failed',
+                true,
+              );
+              reject(error);
+            })
+            .finally(() => {
+              Vue.set(
+                context.rootState.appState.status[payload.meta],
+                'loading',
+                false,
+              );
+            });
+        }),
+      );
     },
     getSlug(context) {
       context.dispatch('getMetadata', {

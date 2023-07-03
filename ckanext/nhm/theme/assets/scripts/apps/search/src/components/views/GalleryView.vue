@@ -63,7 +63,7 @@
         v-for="(record, recordIndex) in brokenImageRecords"
         :key="`${record.record.data._id}-${record.image.id}`"
         class="gallery-tile gallery-tile-tiny gallery-tile-broken"
-        alt="record.image.preview"
+        :alt="record.image.preview"
         role="img"
       >
         <small class="gallery-tile-title">

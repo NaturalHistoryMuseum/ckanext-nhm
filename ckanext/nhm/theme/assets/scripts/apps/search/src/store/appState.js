@@ -16,30 +16,37 @@ let appState = {
       resultData: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
       slug: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
       slugEdit: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
       doi: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
       download: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
       resources: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
       queryEdit: {
         loading: false,
         failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
     },
   },
