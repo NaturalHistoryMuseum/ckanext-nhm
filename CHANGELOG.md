@@ -1,5 +1,41 @@
 # Changelog
 
+## v5.7.0 (2023-07-03)
+
+### Feature
+
+- add defensive code to ensure external sites don't prevent record pages loading
+
+### Fix
+
+- **search-app**: add default promises
+- remove debug code
+- **search-app**: add promises as status indicators for api requests
+- update botany contact email
+- prevent sending Nones to GBIF when looking up external site links
+
+### Refactor
+
+- move the code that retrieves a record from phenome10k into its own function to aid testing and caching
+- reorganise the external links module into to have a more formal interface
+
+### Style
+
+- reformat imports
+- reorganise imports
+- remove unecessary object base class in Site def
+
+### Tests
+
+- add tests for gbif site
+- add tests for p10k site and fix bugs found by adding tests
+- add some basic external links tests
+
+### Chores/Misc
+
+- remove more debug code
+- default the institutionCode to NHMUK
+
 ## v5.6.4 (2023-06-16)
 
 ### Fix

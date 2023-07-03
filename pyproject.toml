@@ -1,6 +1,6 @@
 [project]
 name = "ckanext-nhm"
-version = "5.6.4"
+version = "5.7.0"
 description = "A CKAN extension for the Natural History Museum's Data Portal."
 readme = "README.md"
 requires-python = ">=3.6"
@@ -75,7 +75,7 @@ exclude = ["tests", "docs"]
 
 [tool.commitizen]
 name = "cz_nhm"
-version = "5.6.4"
+version = "5.7.0"
 tag_format = "v$version"
 update_changelog_on_bump = true
 changelog_incremental = true
