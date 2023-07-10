@@ -1,22 +1,22 @@
 {% ckan_extends %}
 
 {% block footer_content %}
-<div class="row">
-    <div class="col-md-2 col-sm-3 col-xs-12">
+<div class="row flex-container gaps">
+    <div>
         <ul class="attribution list-unstyled">
             <li>
-                <a class="logo" href="{{ h.url_for('home.index') }}">
-                    <img src="{{ h.url_for_static_or_external(g.site_logo) }}"
-                         alt="{{ g.site_title }}"/>
+                <a class="logo nhm-logo" href="{{ h.url_for('home.index') }}"
+                   title="{{ g.site_title }}" aria-label="Home">
+                    <svg role="button" aria-label="Home"></svg>
                 </a>
             </li>
             <li>{% trans %}<strong>Powered by</strong> <a
-                    class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{%
+                class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{%
                 endtrans %}
             </li>
         </ul>
     </div>
-    <div class="col-md-10 col-sm-9 col-xs-12">
+    <div class="flex-child-grow">
         <div class="dev-info">
             <p>An open source project by the Natural History Museum's Biodiversity
                 Informatics Group.</p>
@@ -24,7 +24,8 @@
                                            href="https://github.com/NaturalHistoryMuseum/ckanext-nhm">Github</a>.
             </p>
             <p>Base tiles by <a class="external" target="_blank"
-                                href="http://www.mapquest.com">MapQuest</a> and &copy; <a
+                                href="http://www.mapquest.com">MapQuest</a> and &copy;
+                <a
                     class="external" target="_blank"
                     href="http://openstreetmap.org/copyright">OpenStreetMap</a>
                 contributors.</p>
@@ -42,24 +43,27 @@
             <li role="presentation" class="dropup">
                 <a href="{{ h.url_for('home.about') }}">About</a>
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
-                    aria-haspopup="true" aria-expanded="false" aria-label="About popup menu">
+                   aria-haspopup="true" aria-expanded="false"
+                   aria-label="About popup menu">
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
                     <li><a href="{{ h.url_for('about.citation') }}">Citation &amp;
                         attribution</a></li>
-                    <li><a href="{{ h.url_for('about.download') }}">Download &amp; API</a>
+                    <li><a href="{{ h.url_for('about.download') }}">Download &amp;
+                        API</a>
                     </li>
                     <li><a href="{{ h.url_for('statistics.resources') }}">Site
                         statistics</a></li>
                     <li><a href="{{ h.url_for('about.credits') }}">Credits</a></li>
                 </ul>
             </li>
-            <li role="presentation"><a href="{{ h.url_for('contact.form') }}">Contact</a>
+            <li role="presentation"><a
+                href="{{ h.url_for('contact.form') }}">Contact</a>
             </li>
             <li role="presentation">{{ h.api_doc_link() }}</li>
             <li role="presentation"><a
-                    href="{{ h.url_for('legal.privacy') }}">Privacy notice</a></li>
+                href="{{ h.url_for('legal.privacy') }}">Privacy notice</a></li>
             <li role="presentation"><a href="{{ h.url_for('legal.terms') }}">T&amp;C</a>
             </li>
             <li role="presentation">
@@ -69,13 +73,15 @@
             </li>
             {% if g.userobj %}
             <li role="presentation">
-                <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('My account') }}</a>
+                <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('My
+                    account') }}</a>
             </li>
             <li role="presentation">
                 <a href="{{ h.url_for('user.logout') }}">{{ _('Log out') }}</a>
             </li>
             {% else %}
-                <li role="presentation"><a href="{{ h.url_for('user.login') }}">Login</a></li>
+            <li role="presentation"><a href="{{ h.url_for('user.login') }}">Login</a>
+            </li>
             {% endif %}
         </ul>
     </div>
