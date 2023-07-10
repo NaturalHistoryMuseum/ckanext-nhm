@@ -114,6 +114,10 @@ body {
   }
 }
 
+.nhm-logo {
+  min-height: 80px;
+}
+
 // FLEX --------------------------------------------------------------------------------------------
 
 .flex-container {
@@ -501,6 +505,32 @@ span.caret {
   }
 }
 
+.logo svg {
+  mask-image: url('@{images}/nhm_logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url('@{images}/nhm_logo.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  background: @grey10;
+  //.prideBg(@transFlag);
+  .extended-masthead & {
+    @media (min-width: @sm) and (max-width: @lg - 1) {
+      height: 90px !important;
+      max-height: unset;
+      width: 180px;
+    }
+    @media (min-width: @lg) {
+      height: 100px !important;
+      max-height: unset;
+      width: 200px;
+    }
+  }
+
+  height: 80px;
+  width: 160px;
+}
+
 // LAYOUT/CONTAINERS -------------------------------------------------------------------------------
 
 .box {
@@ -604,34 +634,7 @@ iframe {
 
   & .logo {
     padding-left: 0;
-    margin-right: 15px;
     margin-bottom: 2px;
-
-    svg {
-      mask-image: url('@{images}/nhm_logo.svg');
-      mask-size: contain;
-      mask-repeat: no-repeat;
-      -webkit-mask-image: url('@{images}/nhm_logo.svg');
-      -webkit-mask-size: contain;
-      -webkit-mask-repeat: no-repeat;
-      background: @grey10;
-      //.prideBg(@transFlag);
-      .extended-masthead & {
-        @media (min-width: @sm) and (max-width: @lg - 1) {
-          height: 92px !important;
-          max-height: unset;
-          width: 197px;
-        }
-        @media (min-width: @lg) {
-          height: 98px !important;
-          max-height: unset;
-          width: 210px;
-        }
-      }
-
-      height: 60px;
-      width: 129px;
-    }
   }
 
   & .navigation {

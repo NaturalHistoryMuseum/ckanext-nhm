@@ -1,22 +1,22 @@
 {% ckan_extends %}
 
 {% block footer_content %}
-<div class="row">
-    <div class="col-md-2 col-sm-3 col-xs-12">
+<div class="row flex-container gaps">
+    <div>
         <ul class="attribution list-unstyled">
             <li>
-                <a class="logo" href="{{ h.url_for('home.index') }}">
-                    <img src="{{ h.url_for_static_or_external(g.site_logo) }}"
-                         alt="{{ g.site_title }}"/>
+                <a class="logo nhm-logo" href="{{ h.url_for('home.index') }}"
+                   title="{{ g.site_title }}" aria-label="Home">
+                    <svg role="button" aria-label="Home"></svg>
                 </a>
             </li>
             <li>{% trans %}<strong>Powered by</strong> <a
-                    class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{%
+                class="hide-text ckan-footer-logo" href="http://ckan.org">CKAN</a>{%
                 endtrans %}
             </li>
         </ul>
     </div>
-    <div class="col-md-10 col-sm-9 col-xs-12">
+    <div class="flex-child-grow">
         <div class="dev-info">
             <p>An open source project by the Natural History Museum's Biodiversity
                 Informatics Group.</p>
