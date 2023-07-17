@@ -11,25 +11,21 @@
 <header class="masthead" role="heading">
     <div
         class="container flex-container flex-wrap flex-wrap-spacing flex-stretch-first flex-bottom flex-right">
-        <div class="flex-container flex-smallwrap flex-bottom no-pad-h">
+        <div class="logo-block">
             {% block header_logo %}
             {% if g.site_logo %}
-            <a class="logo" href="{{ h.url_for('home.index') }}" title="{{ g.site_title }}" aria-label="Home">
+            <a class="logo nhm-logo" href="{{ h.url_for('home.index') }}"
+               title="{{ g.site_title }}" aria-label="Home">
                 <svg role="button" aria-label="Home"></svg>
             </a>
             {% endif %}
             {% endblock %}
-
-            <div class="flex-container flex-left flex-column flex-stretch-last no-pad-h">
-                <h1 class="site-title no-pad-h">
-                    <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
-                </h1>
-                <header class="no-pad-h">
-                    <h2 class="welcome">
-                        Explore and download the Museum’s research and collections data.
-                    </h2>
-                </header>
-            </div>
+            <h1 class="site-title">
+                <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+            </h1>
+            <span class="welcome">
+                Explore and download the Museum’s research and collections data.
+            </span>
         </div>
         <div class="no-pad-h" role="navigation">
             {% block header_site_navigation %} {{ super() }} {% endblock %}
@@ -40,11 +36,13 @@
         {# Accessibility fix - links need to have text #}
         {% block header_account_container_content %}
         {% if g.userobj %}
-        <div class="account avatar authed flex-container flex-right flex-smallwrap" data-module="me"
+        <div class="account avatar authed flex-container flex-right flex-smallwrap"
+             data-module="me"
              data-me="{{ g.userobj.id }}">
             {% block header_account_logged %}
             {% set new_activities = h.new_activities() %}
-            {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)', 'Dashboard
+            {% set notifications_tooltip = ngettext('Dashboard (%(num)d new item)',
+            'Dashboard
             (%(num)d new items)', new_activities) %}
 
             {# headway widget #}
@@ -88,7 +86,8 @@
             {# Sysadmin settings #}
             {% if g.userobj.sysadmin %}
             <div>
-                <a href="{{ h.url_for('admin.index') }}" title="{{ _('Sysadmin settings') }}">
+                <a href="{{ h.url_for('admin.index') }}"
+                   title="{{ _('Sysadmin settings') }}">
                     <span class="sr-only">{{ _('Sysadmin settings') }}</span>
                     <i class="fas fa-tools fa-lg"></i>
                 </a>

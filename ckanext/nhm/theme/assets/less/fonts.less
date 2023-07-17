@@ -3,47 +3,240 @@
 // FONT FACES
 
 .load-fonts() {
+  // TEXT REGULAR
+
   @font-face {
-    font-family: 'nhm_ingrid_lightregular';
-    src: url('@{fonts}/nhmingligreg-webfont.eot');
-    src: url('@{fonts}/nhmingligreg-webfont.woff') format('woff');
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-Thin.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-Thin.otf') format('opentype');
     font-style: normal;
+    font-weight: 100;
   }
 
   @font-face {
-    font-family: 'nhm_ingridregular';
-    src: url('@{fonts}/nhmingreg-webfont.eot');
-    src: url('@{fonts}/nhmingreg-webfont.woff') format('woff');
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-Light.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-Light.otf') format('opentype');
     font-style: normal;
+    font-weight: 300;
   }
 
   @font-face {
-    font-family: 'Elysio Light';
-    src: url('@{fonts}/2CFBF8_0_0.woff2') format('woff2');
-    src: url('@{fonts}/2CFBF8_0_0.woff') format('woff');
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-Regular.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-Regular.otf') format('opentype');
     font-style: normal;
+    font-weight: 400;
   }
+
   @font-face {
-    font-family: 'Elysio Medium';
-    src: url('@{fonts}/2CFBF8_1_0.woff2') format('woff2');
-    src: url('@{fonts}/2CFBF8_1_0.woff') format('woff');
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-Medium.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-Medium.otf') format('opentype');
     font-style: normal;
+    font-weight: 500;
   }
+
   @font-face {
-    font-family: 'Elysio Regular';
-    src: url('@{fonts}/2CFBF8_2_0.woff2') format('woff2');
-    src: url('@{fonts}/2CFBF8_2_0.woff') format('woff');
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-SemiBold.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-SemiBold.otf') format('opentype');
     font-style: normal;
+    font-weight: 600;
   }
+
   @font-face {
-    font-family: 'Elysio Thin';
-    src: url('@{fonts}/2CFBF8_3_0.woff2') format('woff2');
-    src: url('@{fonts}/2CFBF8_3_0.woff') format('woff');
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-Bold.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-Bold.otf') format('opentype');
     font-style: normal;
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-Heavy.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-Heavy.otf') format('opentype');
+    font-style: normal;
+    font-weight: 900;
+  }
+
+  // TEXT ITALIC
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-ThinItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-ThinItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 100;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-LightItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-LightItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-RegularItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-RegularItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-MediumItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-MediumItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-SemiBoldItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-SemiBoldItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-BoldItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-BoldItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Text';
+    src: url('@{fonts}/NHMWallopText-HeavyItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopText-HeavyItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 900;
+  }
+
+  // HEADLINE REGULAR
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-Thin.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-Thin.otf') format('opentype');
+    font-style: normal;
+    font-weight: 100;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-Light.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-Light.otf') format('opentype');
+    font-style: normal;
+    font-weight: 300;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-Regular.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-Regular.otf') format('opentype');
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-Medium.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-Medium.otf') format('opentype');
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-SemiBold.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-SemiBold.otf') format('opentype');
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-Bold.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-Bold.otf') format('opentype');
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-Heavy.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-Heavy.otf') format('opentype');
+    font-style: normal;
+    font-weight: 900;
+  }
+
+  // HEADLINE ITALIC
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-ThinItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-ThinItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 100;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-LightItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-LightItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-RegularItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-RegularItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-MediumItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-MediumItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-SemiBoldItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-SemiBoldItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 600;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-BoldItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-BoldItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  @font-face {
+    font-family: 'NHM Wallop Headline';
+    src: url('@{fonts}/NHMWallopHeadline-HeavyItalic.woff2') format('woff2');
+    src: url('@{fonts}/NHMWallopHeadline-HeavyItalic.otf') format('opentype');
+    font-style: italic;
+    font-weight: 900;
   }
 }
 
-@font-title: 'Elysio Regular', 'Open Sans', sans-serif;
+@font-title: 'NHM Wallop Headline', 'Open Sans', sans-serif;
 
 .mixin-font-symbol(@weight) {
   font-family: 'FontAwesome', sans-serif;
@@ -54,17 +247,17 @@
 }
 
 .mixin-font-body() {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'NHM Wallop Text', Helvetica, Arial, sans-serif;
 }
 
 // FONT SIZES
-@font-size-body-m: 14px;
-@font-size-body-s: ceil(@font-size-body-m * 0.8);
-@font-size-body-xs: @font-size-body-m / 2;
-@font-size-body-l: ceil(@font-size-body-m * 1.2);
+@font-size-body-m: 16px;
+@font-size-body-s: @font-size-body-m - 2;
+@font-size-body-xs: @font-size-body-m - 6;
+@font-size-body-l: @font-size-body-m + 2;
 
-@font-size-head-title: @font-size-body-m * 3;
-@font-size-head-m: ceil(@font-size-body-l * 2);
+@font-size-head-title: 48px;
+@font-size-head-m: 30px;
 @font-size-head-s: @font-size-head-m - 2;
 @font-size-head-xs: @font-size-head-m - 4;
 @font-size-head-xxs: @font-size-head-m - 8;

@@ -37,7 +37,7 @@ def generate_eml(package, resource):
         <gbif>
           <dateStamp>{{date_stamp}}</dateStamp>
           <citation identifier="https://doi.org/{doi}">{citation}</citation>
-          <resourceLogoUrl>http://data.nhm.ac.uk/images/logo.png</resourceLogoUrl>
+          <resourceLogoUrl>http://data.nhm.ac.uk/images/nhm_logo.svg</resourceLogoUrl>
         </gbif>
       </metadata>
     </additionalMetadata>
