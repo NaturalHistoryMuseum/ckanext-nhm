@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.8.2 (2023-07-17)
+
+### Fix
+
+- use hidden instead of clip so it works on ios
+- truncate long resource names better
+- improve spacing on header
+- truncate very long resource names
+
 ## v5.8.1 (2023-07-17)
 
 ### Fix
