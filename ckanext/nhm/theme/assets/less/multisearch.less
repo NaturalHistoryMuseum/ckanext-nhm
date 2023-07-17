@@ -568,6 +568,7 @@
 
 .resourceid-list {
   max-height: 50vh;
+  width: 100%;
   @media (min-width: @md) {
     max-width: 30vw;
   }
@@ -593,9 +594,15 @@
 
   & span {
     width: 100% !important;
-    overflow-x: clip;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    max-width: 100%;
+
+    & a {
+      width: 100%;
+      display: inline-block;
+      overflow-x: clip;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 
   & .disabled {
