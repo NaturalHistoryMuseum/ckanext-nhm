@@ -194,10 +194,16 @@ body {
 // UTILITY -----------------------------------------------------------------------------------------
 
 .account-icons {
-  position: absolute !important;
-  top: 10px;
-  left: 0;
-  right: 0;
+  @media (max-width: @sm - 1) {
+    width: 100%;
+  }
+
+  @media (min-width: @sm) {
+    position: absolute !important;
+    top: 10px;
+    left: 0;
+    right: 0;
+  }
 
   & a {
     color: @grey10;
@@ -606,6 +612,7 @@ iframe {
 }
 
 .masthead {
+  display: grid;
   @margin: 25px;
   padding: 5px 0 10px !important;
   .palette-header();
@@ -1421,8 +1428,8 @@ input[type='checkbox'] {
     right: @button-pad * 2;
 
     & i {
-      font-size: @button-size / 2;
-      line-height: @button-size / 2;
+      font-size: (@button-size / 2);
+      line-height: (@button-size / 2);
     }
   }
 }
@@ -1459,6 +1466,10 @@ input[type='checkbox'] {
       &:not(.selected) {
         overflow-x: hidden;
         text-overflow: ellipsis;
+      }
+
+      @media (max-width: @sm - 1) {
+        font-size: 0.9em;
       }
     }
   }
@@ -1947,8 +1958,14 @@ select,
   .logo {
     grid-column: 1;
 
-    .extended-masthead & {
-      grid-row: 1 / span 2;
+    @media (min-width: @md) {
+      .extended-masthead & {
+        grid-row: 1 / span 2;
+      }
+    }
+
+    @media (max-width: @sm - 1) {
+      height: 80px;
     }
   }
 
@@ -1961,8 +1978,14 @@ select,
     line-height: 0.8;
     white-space: nowrap;
 
-    .extended-masthead & {
-      align-self: end;
+    @media (min-width: @md) {
+      .extended-masthead & {
+        align-self: end;
+      }
+    }
+
+    @media (max-width: @sm - 1) {
+      font-size: @font-size-head-l;
     }
   }
 
