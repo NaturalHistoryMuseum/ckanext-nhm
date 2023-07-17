@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.8.1 (2023-07-17)
+
+### Fix
+
+- fix some display issues on mobile
+
 ## v5.8.0 (2023-07-17)
 
 ### Feature
