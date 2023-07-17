@@ -571,6 +571,9 @@
   @media (min-width: @md) {
     max-width: 30vw;
   }
+  @media (max-width: @md - 1) {
+    max-width: 90vw;
+  }
   overflow-y: auto;
   top: 100%;
   right: 0;
@@ -589,8 +592,10 @@
   }
 
   & span {
-    min-width: max-content;
     width: 100% !important;
+    overflow-x: clip;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   & .disabled {
