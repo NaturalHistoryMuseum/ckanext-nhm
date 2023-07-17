@@ -1,5 +1,20 @@
 # Changelog
 
+## v5.8.0 (2023-07-17)
+
+### Feature
+
+- update fonts
+
+### Docs
+
+- update logos
+
+### Minor UI Changes
+
+- disable contextual alternates everywhere
+- update logos
+
 ## v5.7.0 (2023-07-03)
 
 ### Feature
