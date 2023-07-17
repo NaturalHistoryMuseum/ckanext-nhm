@@ -9,29 +9,6 @@
 
 {% block header_wrapper %}
 <header class="masthead" role="heading">
-    <div
-        class="container flex-container flex-wrap flex-wrap-spacing flex-stretch-first flex-bottom flex-right">
-        <div class="logo-block">
-            {% block header_logo %}
-            {% if g.site_logo %}
-            <a class="logo nhm-logo" href="{{ h.url_for('home.index') }}"
-               title="{{ g.site_title }}" aria-label="Home">
-                <svg role="button" aria-label="Home"></svg>
-            </a>
-            {% endif %}
-            {% endblock %}
-            <h1 class="site-title">
-                <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
-            </h1>
-            <span class="welcome">
-                Explore and download the Museum’s research and collections data.
-            </span>
-        </div>
-        <div class="no-pad-h" role="navigation">
-            {% block header_site_navigation %} {{ super() }} {% endblock %}
-        </div>
-    </div>
-
     <div class="account-icons container">
         {# Accessibility fix - links need to have text #}
         {% block header_account_container_content %}
@@ -130,6 +107,28 @@
         <script async src="https://cdn.headwayapp.co/widget.js"></script>
 
         {% endblock %}
+    </div>
+    <div
+        class="container flex-container flex-wrap flex-wrap-spacing flex-stretch-first flex-bottom flex-right">
+        <div class="logo-block">
+            {% block header_logo %}
+            {% if g.site_logo %}
+            <a class="logo nhm-logo" href="{{ h.url_for('home.index') }}"
+               title="{{ g.site_title }}" aria-label="Home">
+                <svg role="button" aria-label="Home"></svg>
+            </a>
+            {% endif %}
+            {% endblock %}
+            <h1 class="site-title">
+                <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+            </h1>
+            <span class="welcome">
+                Explore and download the Museum’s research and collections data.
+            </span>
+        </div>
+        <div class="no-pad-h" role="navigation">
+            {% block header_site_navigation %} {{ super() }} {% endblock %}
+        </div>
     </div>
 </header>
 {% endblock %}
