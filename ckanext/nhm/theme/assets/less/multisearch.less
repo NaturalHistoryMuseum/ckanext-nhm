@@ -596,12 +596,24 @@
     width: 100% !important;
     max-width: 100%;
 
-    & a {
+    & a,
+    & label {
       width: 100%;
       display: inline-block;
       overflow-x: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+  }
+
+  & .fields > span {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    & > input,
+    & > label {
+      margin: 0;
+      top: unset;
     }
   }
 

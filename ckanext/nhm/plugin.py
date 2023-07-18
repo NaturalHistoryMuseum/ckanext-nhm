@@ -17,12 +17,10 @@ import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
 from ckan.lib.helpers import literal
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
-from ckanext.ckanpackager.interfaces import ICkanPackager
 from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
 from ckanext.nhm import routes, cli
-from ckanext.nhm.lib.eml import generate_eml
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.lib.mail import (
     create_indexlots_email,
@@ -58,7 +56,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(interfaces.IResourceController, inherit=True)
     implements(interfaces.IRoutes, inherit=True)
     implements(interfaces.ITemplateHelpers, inherit=True)
-    implements(ICkanPackager)
     implements(IContact)
     implements(IDoi, inherit=True)
     implements(IGalleryImage)
@@ -284,30 +281,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 if hasattr(func, '__call__'):
                     h[helper] = func
         return h
-
-    ## ICkanPackager
-    def before_package_request(
-        self, resource_id, package_id, packager_url, request_params
-    ):
-        """
-        Modify the request params that are about to be sent through to the ckanpackager
-        backend so that an EML param is included.
-
-        :param resource_id: the resource id of the resource that is about to be packaged
-        :param package_id: the package id of the resource that is about to be packaged
-        :param packager_url: the target url for this packaging request
-        :param request_params: a dict of parameters that will be sent with the request
-        :return: the url and the params as a tuple
-        """
-        resource = toolkit.get_action('resource_show')(None, {'id': resource_id})
-        package = toolkit.get_action('package_show')(None, {'id': package_id})
-        if (
-            resource.get('datastore_active', False)
-            and resource.get('format', '').lower() == 'dwc'
-        ):
-            # if it's a datastore resource and it's in the DwC format, add EML
-            request_params['eml'] = generate_eml(package, resource)
-        return packager_url, request_params
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
@@ -649,6 +622,47 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 fields.ignore(group)
 
         return fields
+
+    def datastore_before_convert_basic_query(self, query):
+        # see lib.filter_options
+        custom_filters = ['_has_image', '_has_lat_long', '_exclude_mineralogy']
+        if 'filters' in query:
+            for f in custom_filters:
+                if f in query['filters']:
+                    del query['filters'][f]
+        return query
+
+    def datastore_after_convert_basic_query(self, basic_query, multisearch_query):
+        basic_filters = basic_query.get('filters')
+        if not basic_filters:
+            return multisearch_query
+
+        has_image = basic_filters.get('_has_image', False)
+        if has_image:
+            multisearch_query['filters']['and'].append(
+                {'exists': {'fields': ['associatedMedia']}}
+            )
+
+        has_lat_long = basic_filters.get('_has_lat_long', False)
+        if has_lat_long:
+            multisearch_query['filters']['and'].append({'exists': {'geo_field': True}})
+
+        exclude_mineralogy = basic_filters.get('_exclude_mineralogy', False)
+        if exclude_mineralogy:
+            multisearch_query['filters']['and'].append(
+                {
+                    'not': [
+                        {
+                            'string_equals': {
+                                'fields': ['collectionCode'],
+                                'value': 'min',
+                            }
+                        }
+                    ]
+                }
+            )
+
+        return multisearch_query
 
     # IVersionedDatastoreDownloads
     def download_modify_notifier_start_templates(self, plain_template, html_template):

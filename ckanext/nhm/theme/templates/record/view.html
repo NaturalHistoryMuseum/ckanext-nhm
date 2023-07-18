@@ -45,15 +45,11 @@
                         </li>
 
                         <li>
-                            {% asset 'ckanext-ckanpackager/main-css' %}
-                            {% asset 'ckanext-ckanpackager/main-js' %}
-
-                            <a data-module="ckanpackager-download-link"
-                               data-module-resource-id="{{ res.id }}"
-                               data-module-is-record="true"
-                               class="packager-link btn btn-primary"
-                               href="{{ h.url_for_package_resource(g.pkg.id, res.id, extra_filters={'_id': rec['_id']}) }}">
-                                <i class="fas fa-download"></i> Download </a>
+                            {% snippet 'versioned_datastore/snippets/download_button.html',
+                                resources=res.id,
+                                query='{"filters": {"and": [{"string_equals": {"fields": ["_id"], "value": "' ~ rec['_id'] ~ '"}}]}}',
+                                icon_class="fas fa-download",
+                                label=_('Download') %}
                         </li>
 
                         <li>
