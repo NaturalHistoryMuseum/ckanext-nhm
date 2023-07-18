@@ -1,5 +1,37 @@
 # Changelog
 
+## v6.0.0 (2023-07-18)
+
+### Feature
+
+- use nav slugs for the homepage search
+- remove all references to ckanpackager
+
+### Fix
+
+- try once again to fix the overflowing text on resource list
+- modify vds queries before and after converting
+- allow for non-datastore resources in download button
+- do not propogate errors from phenome10k api call
+- set download button query from url
+
+### Style
+
+- data is plural
+
+### Build System(s)
+
+- update dependencies
+
+### Chores/Misc
+
+- pull in external link changes from #672
+
+### Minor UI Changes
+
+- replace record download link
+- replace resource download link
+
 ## v5.8.2 (2023-07-17)
 
 ### Fix
