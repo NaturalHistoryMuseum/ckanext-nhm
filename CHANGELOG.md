@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.0.1 (2023-07-18)
+
+### Fix
+
+- put the account icons on top
+
 ## v6.0.0 (2023-07-18)
 
 ### Feature
