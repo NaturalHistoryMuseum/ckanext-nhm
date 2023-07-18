@@ -21,7 +21,7 @@
 
     <div class="stat-item">
         <a href="{{ h.url_for('statistics.contributors') }}">
-            {{ h.SI_number_span(stats.contributor_count) }}
+            <div class="stat-number">{{ h.SI_number_span(stats.contributor_count) }}</div>
             <span class="stat-text">{{ _('author') if stats.contributor_count == 1 else _('authors') }}</span>
         </a>
     </div>

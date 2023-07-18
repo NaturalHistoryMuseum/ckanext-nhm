@@ -1,5 +1,77 @@
 # Changelog
 
+## v5.8.2 (2023-07-17)
+
+### Fix
+
+- use hidden instead of clip so it works on ios
+- truncate long resource names better
+- improve spacing on header
+- truncate very long resource names
+
+## v5.8.1 (2023-07-17)
+
+### Fix
+
+- fix some display issues on mobile
+
+## v5.8.0 (2023-07-17)
+
+### Feature
+
+- update fonts
+
+### Docs
+
+- update logos
+
+### Minor UI Changes
+
+- disable contextual alternates everywhere
+- update logos
+
+## v5.7.0 (2023-07-03)
+
+### Feature
+
+- add defensive code to ensure external sites don't prevent record pages loading
+
+### Fix
+
+- **search-app**: add default promises
+- remove debug code
+- **search-app**: add promises as status indicators for api requests
+- update botany contact email
+- prevent sending Nones to GBIF when looking up external site links
+
+### Refactor
+
+- move the code that retrieves a record from phenome10k into its own function to aid testing and caching
+- reorganise the external links module into to have a more formal interface
+
+### Style
+
+- reformat imports
+- reorganise imports
+- remove unecessary object base class in Site def
+
+### Tests
+
+- add tests for gbif site
+- add tests for p10k site and fix bugs found by adding tests
+- add some basic external links tests
+
+### Chores/Misc
+
+- remove more debug code
+- default the institutionCode to NHMUK
+
+## v5.6.4 (2023-06-16)
+
+### Fix
+
+- do not propogate errors from phenome10k api call
+
 ## v5.6.3 (2023-05-09)
 
 ### Fix

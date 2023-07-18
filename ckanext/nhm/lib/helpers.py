@@ -4,22 +4,29 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from collections import OrderedDict, defaultdict
-
 import itertools
 import json
 import logging
 import operator
-import os
 import re
 import time
+from collections import OrderedDict, defaultdict
+from datetime import datetime
+from operator import itemgetter
+from typing import List
+from urllib.parse import quote
+
 from beaker.cache import cache_region
+from jinja2.filters import do_truncate
+from lxml import etree, html
+
 from ckan import model
 from ckan.lib import helpers as core_helpers
 from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
+from ckanext.nhm.lib.external_links import Site
 from ckanext.nhm.lib.form import list_to_form_options
 from ckanext.nhm.lib.resource_view import (
     resource_view_get_filter_options,
@@ -27,12 +34,6 @@ from ckanext.nhm.lib.resource_view import (
 )
 from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
 from ckanext.nhm.settings import COLLECTION_CONTACTS
-from datetime import datetime
-from jinja2.filters import do_truncate
-from lxml import etree, html
-from operator import itemgetter
-from typing import Optional
-from urllib.parse import quote
 
 log = logging.getLogger(__name__)
 
@@ -1321,19 +1322,16 @@ def get_latest_update_for_package_resources(pkg_dict, date_format=None):
     return toolkit._('unknown')
 
 
-def get_external_links(record):
+def get_external_sites(record: dict) -> List[Site]:
     """
     Helper called on collection record pages (i.e. records in the specimens, indexlots
-    or artefacts resources) which is expected to return a list of tuples. Each tuple
-    provides a title and a list of links, respectively, which are relevant to the
-    record.
+    or artefacts resources) which is expected to return a list of Site objects. From
+    these sites, links can be generated which are relevant to the record.
 
-    :param record:
-    :return:
+    :param record: a record dict
+    :return: a list of Site objects
     """
-    taxonomy_search_links = external_links.get_taxonomy_searches(record)
-    gbif_links = external_links.get_gbif_links(record)
-    return taxonomy_search_links + gbif_links
+    return external_links.get_sites(record)
 
 
 def render_epoch(

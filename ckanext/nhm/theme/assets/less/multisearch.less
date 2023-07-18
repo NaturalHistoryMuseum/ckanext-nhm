@@ -349,7 +349,7 @@
   &.filter-group {
     border: @borders;
     padding-top: 30px;
-    min-width: 100px;
+    min-width: 125px;
 
     & > a.group-type {
       text-transform: uppercase;
@@ -358,7 +358,7 @@
       left: 0;
       padding: 5px;
       font-family: @font-title;
-      font-weight: bold;
+      font-weight: 600;
       color: @grey1;
       white-space: nowrap;
 
@@ -417,7 +417,7 @@
   margin-right: 1em;
   text-transform: uppercase;
   font-family: @font-title;
-  font-weight: bold;
+  font-weight: 600;
   color: @grey1;
 }
 
@@ -568,8 +568,12 @@
 
 .resourceid-list {
   max-height: 50vh;
+  width: 100%;
   @media (min-width: @md) {
     max-width: 30vw;
+  }
+  @media (max-width: @md - 1) {
+    max-width: 90vw;
   }
   overflow-y: auto;
   top: 100%;
@@ -589,8 +593,16 @@
   }
 
   & span {
-    min-width: max-content;
     width: 100% !important;
+    max-width: 100%;
+
+    & a {
+      width: 100%;
+      display: inline-block;
+      overflow-x: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 
   & .disabled {
@@ -668,7 +680,7 @@
       word-wrap: anywhere;
       font-size: 0.8em;
       color: @grey4;
-      font-weight: bold;
+      font-weight: 600;
     }
 
     &:hover {

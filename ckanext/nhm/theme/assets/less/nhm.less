@@ -12,7 +12,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: normal;
+  font-weight: 600;
   line-height: 1.2;
   font-family: @font-title;
 
@@ -30,34 +30,11 @@ h4 {
 
 h1 {
   font-size: @font-size-head-xxl;
-
-  &.site-title {
-    font-weight: normal;
-    margin: 0 0 0 0;
-    font-size: @font-size-head-title;
-    letter-spacing: 1px;
-  }
+  font-weight: 600;
 }
 
 h2 {
   font-size: @font-size-head-xl;
-
-  &.welcome {
-    margin: 0 !important;
-    line-height: 1.2;
-    color: @grey9;
-    display: none;
-    font-family: 'Elysio Light';
-    font-size: @font-size-head-xxs - 2;
-
-    @media (max-width: @lg - 1) {
-      font-size: @font-size-head-xxs - 4;
-    }
-
-    .extended-masthead & {
-      display: block;
-    }
-  }
 }
 
 h3 {
@@ -102,16 +79,22 @@ a {
 }
 
 body {
+  .mixin-font-body();
   min-height: 100vh;
   position: relative;
   line-height: 1.3;
   .palette-base();
+  font-variant-ligatures: no-contextual;
 
   &,
   .default-text {
     font-size: @font-size-body-m;
     .palette-base-txt();
   }
+}
+
+.nhm-logo {
+  min-height: 80px;
 }
 
 // FLEX --------------------------------------------------------------------------------------------
@@ -204,13 +187,23 @@ body {
   flex-grow: 1;
 }
 
+.gaps {
+  gap: 1em;
+}
+
 // UTILITY -----------------------------------------------------------------------------------------
 
 .account-icons {
-  position: absolute !important;
-  top: 10px;
-  left: 0;
-  right: 0;
+  @media (max-width: @sm - 1) {
+    width: 100%;
+  }
+
+  @media (min-width: @lg) {
+    position: absolute !important;
+    top: 10px;
+    left: 0;
+    right: 0;
+  }
 
   & a {
     color: @grey10;
@@ -430,6 +423,7 @@ span.caret {
 
   & .stat-number {
     display: inline;
+    font-weight: 500;
   }
 
   @media (min-width: @md) {
@@ -499,6 +493,32 @@ span.caret {
     .flex-child-grow;
     flex-shrink: 0;
   }
+}
+
+.logo svg {
+  mask-image: url('@{images}/nhm_logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url('@{images}/nhm_logo.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  background: @grey10;
+  //.prideBg(@transFlag);
+  .extended-masthead & {
+    @media (min-width: @sm) and (max-width: @lg - 1) {
+      height: 90px !important;
+      max-height: unset;
+      width: 180px;
+    }
+    @media (min-width: @lg) {
+      height: 100px !important;
+      max-height: unset;
+      width: 200px;
+    }
+  }
+
+  height: 80px;
+  width: 160px;
 }
 
 // LAYOUT/CONTAINERS -------------------------------------------------------------------------------
@@ -592,46 +612,16 @@ iframe {
 }
 
 .masthead {
+  display: grid;
   @margin: 25px;
   padding: 5px 0 10px !important;
   .palette-header();
   .palette-header-txt();
   .no-hover();
 
-  @media (max-width: @lg - 1) {
-    padding-top: 20px;
-  }
-
   & .logo {
     padding-left: 0;
-    margin-right: 15px;
     margin-bottom: 2px;
-
-    svg {
-      mask-image: url('@{images}/nhm_logo.svg');
-      mask-size: contain;
-      mask-repeat: no-repeat;
-      -webkit-mask-image: url('@{images}/nhm_logo.svg');
-      -webkit-mask-size: contain;
-      -webkit-mask-repeat: no-repeat;
-      background: @grey10;
-      //.prideBg(@transFlag);
-      .extended-masthead & {
-        @media (min-width: @sm) and (max-width: @lg - 1) {
-          height: 92px !important;
-          max-height: unset;
-          width: 197px;
-        }
-        @media (min-width: @lg) {
-          height: 98px !important;
-          max-height: unset;
-          width: 210px;
-        }
-      }
-
-      height: 60px;
-      width: 129px;
-    }
   }
 
   & .navigation {
@@ -1097,6 +1087,7 @@ iframe {
     & a {
       margin: 0 !important;
       font-family: @font-title;
+      font-weight: 500;
       font-size: @font-size-body-l;
 
       &:before {
@@ -1416,8 +1407,8 @@ input[type='checkbox'] {
     right: @button-pad * 2;
 
     & i {
-      font-size: @button-size / 2;
-      line-height: @button-size / 2;
+      font-size: (@button-size / 2);
+      line-height: (@button-size / 2);
     }
   }
 }
@@ -1437,7 +1428,7 @@ input[type='checkbox'] {
       text-align: center;
       font-family: @font-title;
       font-size: @font-size-body-l;
-      padding: 10px 5px 5px;
+      padding: 10px 5px;
       cursor: pointer;
       opacity: 0.9;
       border-radius: 0 0 @rounding @rounding;
@@ -1454,6 +1445,10 @@ input[type='checkbox'] {
       &:not(.selected) {
         overflow-x: hidden;
         text-overflow: ellipsis;
+      }
+
+      @media (max-width: @sm - 1) {
+        font-size: 0.9em;
       }
     }
   }
@@ -1933,6 +1928,81 @@ select,
 
 // HOMEPAGE ----------------------------------------------------------------------------------------
 
+.logo-block {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 5px 20px;
+  align-items: center;
+
+  .logo {
+    grid-column: 1;
+
+    @media (min-width: @md) {
+      .extended-masthead & {
+        grid-row: 1 / span 2;
+      }
+    }
+
+    @media (max-width: @sm - 1) {
+      height: 80px;
+    }
+  }
+
+  .site-title {
+    grid-row: 1;
+    grid-column: 2;
+    margin: -5px 0 0 0;
+    font-size: @font-size-head-title;
+    letter-spacing: 1px;
+    line-height: 0.8;
+    white-space: nowrap;
+
+    @media (min-width: @md) {
+      .extended-masthead & {
+        align-self: end;
+      }
+    }
+
+    @media (max-width: @sm - 1) {
+      font-size: @font-size-head-l;
+    }
+  }
+
+  .welcome {
+    grid-row: 2;
+    grid-column: 2;
+    margin: 0 !important;
+    line-height: 1.2;
+    color: @grey9;
+    display: none;
+    font-family: @font-title;
+    font-size: @font-size-head-xxs - 2;
+    align-self: start;
+
+    @media (max-width: @lg - 1) {
+      font-size: @font-size-head-xxs - 4;
+    }
+
+    .extended-masthead & {
+      display: block;
+    }
+  }
+
+  @media (max-width: @md - 1) {
+    .logo {
+      grid-row: 1;
+    }
+
+    .welcome {
+      grid-column: 1 / span 2;
+    }
+
+    .site-title {
+      align-self: center;
+    }
+  }
+}
+
 .action-box {
   .palette-header();
   .palette-header-txt();
@@ -2044,6 +2114,10 @@ select,
     .mixin-flex-container();
     font-family: @font-title;
 
+    & .collection-count {
+      font-weight: 500;
+    }
+
     @media (min-width: @lg) {
       .vertical-borders(1px, @grey7);
       .mixin-flex-row();
@@ -2061,10 +2135,6 @@ select,
 
       & .collection-block-text {
         .mixin-flex-top();
-      }
-
-      & .collection-name {
-        font-size: @font-size-body-l;
       }
     }
     @media (max-width: @lg - 1) and (min-width: @sm) {
@@ -2353,6 +2423,7 @@ select,
   text-transform: uppercase;
   font-size: @font-size-body-s;
   padding: 0.4em 0.6em 0.2em;
+  font-weight: 600;
 
   &.dataset-private {
     // wcag contrast requirement (the default color (black) is too low contrast)
