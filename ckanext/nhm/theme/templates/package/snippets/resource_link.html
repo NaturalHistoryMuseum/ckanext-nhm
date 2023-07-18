@@ -8,8 +8,7 @@
         <i class="fas fa-key"></i> {{ _('API Endpoint') }}
     </a>
   {% elif h.downloadable(res) %}
-    {% snippet 'ckanpackager/snippets/package_resource.html',
-   res=res, pkg=g.pkg, bt_class="fas fa-cloud-download-alt", bt_text=_('Download') %}
+    {% snippet 'versioned_datastore/snippets/download_button.html', resources=res.id, query="FROM URL" if res.datastore_active else {}, icon_class="fas fa-cloud-download-alt", label=_('Download'), non_datastore=not res.datastore_active %}
   {% else %}
     <a class="btn btn-primary resource-url-analytics resource-type-{{ res.resource_type }}" href="{{ res.url }}">
         <i class="fas fa-external-link-alt"></i> {{ _('Go to resource') }}
