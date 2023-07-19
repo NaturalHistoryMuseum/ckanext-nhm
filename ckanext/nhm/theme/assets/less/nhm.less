@@ -496,15 +496,8 @@ span.caret {
   }
 }
 
-.logo svg {
-  mask-image: url('@{images}/nhm_logo.svg');
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  -webkit-mask-image: url('@{images}/nhm_logo.svg');
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  background: @grey10;
-  //.prideBg(@transFlag);
+.nhm-logo,
+.nhm-logo svg {
   .extended-masthead & {
     @media (min-width: @sm) and (max-width: @lg - 1) {
       height: 90px !important;
@@ -520,6 +513,17 @@ span.caret {
 
   height: 80px;
   width: 160px;
+}
+
+.logo svg {
+  mask-image: url('@{images}/nhm_logo.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url('@{images}/nhm_logo.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  background: @grey10;
+  //.prideBg(@transFlag);
 }
 
 // LAYOUT/CONTAINERS -------------------------------------------------------------------------------
@@ -622,7 +626,6 @@ iframe {
 
   & .logo {
     padding-left: 0;
-    margin-bottom: 2px;
   }
 
   & .navigation {
@@ -885,7 +888,7 @@ iframe {
   @margin: 40px;
   min-height: @footer-size;
   .palette-footer();
-  padding: 0 0 30px;
+  padding: 30px 0;
   position: relative;
   bottom: 0;
   width: 100%;
@@ -932,7 +935,7 @@ iframe {
   }
 
   .dev-info {
-    margin-top: @margin;
+    margin-top: 10px;
   }
 
   p {
@@ -942,7 +945,11 @@ iframe {
   .attribution {
     .mixin-flex-container();
     .mixin-flex-smallwrap();
+    gap: 1em;
 
+    @media (min-width: @md) {
+      margin-right: 2em;
+    }
     @media (min-width: @sm) {
       .mixin-flex-column();
     }
@@ -953,12 +960,6 @@ iframe {
       & > * {
         margin: 0 !important;
       }
-    }
-    margin-top: @margin - 10;
-
-    & li {
-      margin-top: 10px;
-      margin-bottom: 20px;
     }
 
     & strong {
@@ -1929,49 +1930,30 @@ select,
 
 // HOMEPAGE ----------------------------------------------------------------------------------------
 
+// when the subtitle starts to wrap
+@wrap-width: 935px;
+
 .logo-block {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-gap: 5px 20px;
+  grid-template-areas: 'logo title';
   align-items: center;
 
   .logo {
-    grid-column: 1;
-
-    @media (min-width: @md) {
-      .extended-masthead & {
-        grid-row: 1 / span 2;
-      }
-    }
-
-    @media (max-width: @sm - 1) {
-      height: 80px;
-    }
+    grid-area: logo;
   }
 
   .site-title {
-    grid-row: 1;
-    grid-column: 2;
-    margin: -5px 0 0 0;
+    grid-area: title;
+    margin: 0;
     font-size: @font-size-head-title;
     letter-spacing: 1px;
     line-height: 0.8;
     white-space: nowrap;
-
-    @media (min-width: @md) {
-      .extended-masthead & {
-        align-self: end;
-      }
-    }
-
-    @media (max-width: @sm - 1) {
-      font-size: @font-size-head-l;
-    }
   }
 
   .welcome {
-    grid-row: 2;
-    grid-column: 2;
+    grid-area: subtitle;
     margin: 0 !important;
     line-height: 1.2;
     color: @grey9;
@@ -1980,26 +1962,60 @@ select,
     font-size: @font-size-head-xxs - 2;
     align-self: start;
 
-    @media (max-width: @lg - 1) {
-      font-size: @font-size-head-xxs - 4;
-    }
-
     .extended-masthead & {
       display: block;
     }
   }
 
-  @media (max-width: @md - 1) {
-    .logo {
-      grid-row: 1;
+  // small version only
+  @media (max-width: @wrap-width - 1) {
+    & {
+      grid-gap: 5px 20px;
+    }
+
+    .extended-masthead & {
+      grid-template-areas:
+        'logo title'
+        'subtitle subtitle';
     }
 
     .welcome {
-      grid-column: 1 / span 2;
+      padding-left: 5px;
+    }
+  }
+
+  // wide version only
+  @media (min-width: @wrap-width) {
+    & {
+      grid-gap: 5px 40px;
     }
 
+    .extended-masthead & {
+      grid-template-areas:
+        'logo title'
+        'logo subtitle';
+
+      .site-title {
+        align-self: end;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  @media (min-width: @lg) {
+    & {
+      margin: 20px 0 10px;
+    }
+  }
+
+  @media (max-width: @sm - 1) {
     .site-title {
-      align-self: center;
+      font-size: @font-size-head-l;
+      white-space: unset;
+    }
+
+    .welcome {
+      font-size: 1em;
     }
   }
 }
