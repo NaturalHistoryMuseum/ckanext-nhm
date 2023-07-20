@@ -10,7 +10,12 @@
         <slot v-on:close-popup="endPopup" v-on:open-popup="startPopup"></slot>
       </div>
     </transition>
-    <a href="#" @click="togglePopup" :class="{ btn: isButton }" :id="popupId">
+    <a
+      href="javascript:void(0);"
+      @click="togglePopup"
+      :class="{ btn: isButton }"
+      :id="popupId"
+    >
       <i class="fas" :class="icon"></i>{{ label }}
     </a>
   </div>

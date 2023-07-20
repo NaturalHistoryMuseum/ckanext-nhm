@@ -13,7 +13,7 @@
     </div>
     <span v-for="(pkg, index) in packageList" v-bind:key="pkg.id">
       <a
-        href="#"
+        href="javascript:void(0);"
         :id="pkg.id"
         :value="pkg.id"
         title="alt+click to select only this dataset"
