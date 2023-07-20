@@ -5,11 +5,11 @@
       <h3>Something went wrong!</h3>
       <p>
         Please
-        <a href="javascript:void();" @click="$emit('show-query')"
+        <a href="javascript:void(0);" @click="$emit('show-query')"
           >check your query</a
         >
         ,
-        <a href="javascript:void();" @click="$emit('reset')">try resetting</a>
+        <a href="javascript:void(0);" @click="$emit('reset')">try resetting</a>
         , and
         <a href="/contact">contact us</a>
         if you think you've found a problem.
@@ -50,7 +50,7 @@
         </ul>
         <div class="text-right">
           <a
-            href="javascript:void();"
+            href="javascript:void(0);"
             @click="showFields = !showFields"
             :id="'show-fields-' + _uid"
             v-if="view === 'Table'"
@@ -93,7 +93,7 @@
       <ul class="pagination">
         <li v-if="page > 0">
           <a
-            href="javascript:void();"
+            href="javascript:void(0);"
             aria-label="Show first results page"
             @click="runSearch(0)"
           >
@@ -102,7 +102,7 @@
         </li>
         <li v-if="page > 0">
           <a
-            href="javascript:void();"
+            href="javascript:void(0);"
             aria-label="Show previous results page"
             @click="runSearch(page - 1)"
           >
@@ -111,7 +111,7 @@
         </li>
         <li class="active">
           <a
-            href="javascript:void();"
+            href="javascript:void(0);"
             aria-label="Go to the top of this results page"
           >
             {{ page + 1 }}
@@ -119,7 +119,7 @@
         </li>
         <li v-if="_after.length > page">
           <a
-            href="javascript:void();"
+            href="javascript:void(0);"
             aria-label="Show next results page"
             @click="runSearch(page + 1)"
           >

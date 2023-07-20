@@ -11,7 +11,7 @@
       </div>
     </transition>
     <a
-      href="javascript:void();"
+      href="javascript:void(0);"
       @click="togglePopup"
       :class="{ btn: isButton }"
       :id="popupId"

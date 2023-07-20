@@ -24,7 +24,7 @@
           Download status
         </a>
         <a
-          href="javascript:void();"
+          href="javascript:void(0);"
           class="btn btn-primary text-right"
           @click="resetPopup"
           ><i class="fas fa-undo-alt"></i>
@@ -257,7 +257,7 @@
     </div>
     <div class="text-right" v-if="download === null">
       <a
-        href="javascript:void();"
+        href="javascript:void(0);"
         class="btn btn-primary text-right"
         @click="submitForm"
         ><i

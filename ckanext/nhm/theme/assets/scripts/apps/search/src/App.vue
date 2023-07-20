@@ -33,7 +33,7 @@
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
             <a
-              href="javascript:void();"
+              href="javascript:void(0);"
               @click="showAdvanced = !showAdvanced"
               class="collapse-to-icon"
             >
@@ -46,7 +46,7 @@
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
             <a
-              href="javascript:void();"
+              href="javascript:void(0);"
               @click="toggleQuery"
               class="collapse-to-icon"
             >
@@ -61,7 +61,7 @@
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
             <a
-              href="javascript:void();"
+              href="javascript:void(0);"
               @click="reset"
               class="collapse-to-icon"
             >
@@ -70,7 +70,7 @@
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
             <a
-              href="javascript:void();"
+              href="javascript:void(0);"
               @click="showResources = !showResources"
               id="btnResources"
               class="collapse-to-icon"
