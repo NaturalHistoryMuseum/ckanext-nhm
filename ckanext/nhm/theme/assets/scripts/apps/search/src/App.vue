@@ -33,7 +33,7 @@
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
             <a
-              href="#"
+              href="javascript:void(0);"
               @click="showAdvanced = !showAdvanced"
               class="collapse-to-icon"
             >
@@ -45,7 +45,11 @@
             </a>
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
-            <a href="#" @click="toggleQuery" class="collapse-to-icon">
+            <a
+              href="javascript:void(0);"
+              @click="toggleQuery"
+              class="collapse-to-icon"
+            >
               Query
               <i
                 class="inline-icon-right fas"
@@ -56,13 +60,17 @@
             </a>
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
-            <a href="#" @click="reset" class="collapse-to-icon">
+            <a
+              href="javascript:void(0);"
+              @click="reset"
+              class="collapse-to-icon"
+            >
               Reset <i class="inline-icon-right fas fa-trash"></i>
             </a>
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
             <a
-              href="#"
+              href="javascript:void(0);"
               @click="showResources = !showResources"
               id="btnResources"
               class="collapse-to-icon"

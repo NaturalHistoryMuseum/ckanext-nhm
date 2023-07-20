@@ -23,14 +23,20 @@
           ><i class="fas fa-hourglass-half"></i>
           Download status
         </a>
-        <a href="#" class="btn btn-primary text-right" @click="resetPopup"
+        <a
+          href="javascript:void(0);"
+          class="btn btn-primary text-right"
+          @click="resetPopup"
           ><i class="fas fa-undo-alt"></i>
           New download
         </a>
       </div>
     </div>
-    <p class="alert-error" v-if="status.download.failed">
-      The download request failed. Please try again later.
+    <p
+      class="alert-error"
+      v-if="status.download.failed || formErrors.length > 0"
+    >
+      {{ errorMessage }}
     </p>
     <div v-if="download === null">
       <div class="form-group">
@@ -250,7 +256,10 @@
       </p>
     </div>
     <div class="text-right" v-if="download === null">
-      <a href="#" class="btn btn-primary text-right" @click="submitForm"
+      <a
+        href="javascript:void(0);"
+        class="btn btn-primary text-right"
+        @click="submitForm"
         ><i
           class="fas"
           :class="
@@ -275,6 +284,7 @@ export default {
   extends: BasePopup,
   data: function () {
     return {
+      formErrors: [],
       downloadForm: {
         file: {
           format: 'csv',
@@ -332,6 +342,13 @@ export default {
         return `/status/download/${this.downloadId}`;
       }
     },
+    errorMessage() {
+      if (this.formErrors.length === 0) {
+        return 'The download request failed. Please try again later.';
+      } else {
+        return this.formErrors.join('; ');
+      }
+    },
   },
   methods: {
     ...mapActions('results', ['getDownload', 'resetDownload']),
@@ -381,7 +398,34 @@ export default {
 
       this.$set(this.downloadForm.notifier, 'type_args', typeArgs);
     },
+    validateForm() {
+      this.formErrors = [];
+      if (this.downloadForm.notifier.type === 'email') {
+        if (
+          !this.downloadForm.notifier.type_args ||
+          !this.downloadForm.notifier.type_args.emails
+        ) {
+          this.formErrors.push('Email address must be provided');
+        } else {
+          let emails = this.downloadForm.notifier.type_args.emails
+            .split(',')
+            .map(trim);
+          let emailRegex =
+            /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          emails.forEach((e) => {
+            if (!emailRegex.test(e)) {
+              this.formErrors.push(`${e} is not a valid email address`);
+            }
+          });
+        }
+      }
+      return this.formErrors.length === 0;
+    },
     submitForm() {
+      if (!this.validateForm()) {
+        return;
+      }
+
       // any pre-submission processing goes here
       if (this.downloadForm.file.format === 'dwc') {
         if (this.downloadForm.file.format_args.core_extension_name === 'none') {
