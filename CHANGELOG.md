@@ -1,5 +1,20 @@
 # Changelog
 
+## v6.0.2 (2023-07-20)
+
+### Fix
+
+- add arg to js void calls
+- change blank links to js void instead of hash
+- validate download form before submitting
+
+### Minor UI Changes
+
+- reduce margin on bottom of header
+- fiddle with header layout
+- improve layout of footer
+- set arial as the fallback font
+
 ## v6.0.1 (2023-07-18)
 
 ### Fix
