@@ -23,7 +23,10 @@
           ><i class="fas fa-hourglass-half"></i>
           Download status
         </a>
-        <a href="#" class="btn btn-primary text-right" @click="resetPopup"
+        <a
+          href="javascript:void();"
+          class="btn btn-primary text-right"
+          @click="resetPopup"
           ><i class="fas fa-undo-alt"></i>
           New download
         </a>
@@ -253,7 +256,10 @@
       </p>
     </div>
     <div class="text-right" v-if="download === null">
-      <a href="#" class="btn btn-primary text-right" @click="submitForm"
+      <a
+        href="javascript:void();"
+        class="btn btn-primary text-right"
+        @click="submitForm"
         ><i
           class="fas"
           :class="

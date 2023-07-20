@@ -39,7 +39,7 @@
     </div>
     <div class="text-right">
       <a
-        href="#"
+        href="javascript:void();"
         @click="getDOI(doiForm)"
         class="btn btn-primary"
         v-if="doi === null"

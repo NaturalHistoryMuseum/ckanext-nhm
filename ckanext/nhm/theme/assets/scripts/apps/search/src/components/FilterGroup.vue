@@ -8,7 +8,7 @@
   >
     <a
       class="group-type"
-      href="#"
+      href="javascript:void();"
       @click.self="changeGroupType"
       v-if="nestLevel > 0"
     >
