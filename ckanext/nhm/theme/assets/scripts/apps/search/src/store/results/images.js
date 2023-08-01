@@ -105,11 +105,10 @@ let images = {
   },
   actions: {
     loadAndCheckImages(context) {
-      let imgRecords = [];
-
-      Vue.set(context.state, 'imageRecords', []);
-
       context.rootState.appState.status.resultData.promise.then(() => {
+        let imgRecords = [];
+        Vue.set(context.state, 'imageRecords', []);
+
         let records = context.rootGetters['results/records'];
 
         records.forEach((r, rix) => {

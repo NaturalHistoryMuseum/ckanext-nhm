@@ -25,6 +25,7 @@ let results = {
     _after: [],
     page: 0,
     downloadId: null,
+    cancelSearch: null,
   },
   getters: {
     hasResult: (state) => {
@@ -87,112 +88,126 @@ let results = {
   },
   actions: {
     runSearch(context, page) {
-      page = page || 0;
-      Vue.set(context.rootState.appState.status.resultData, 'loading', true);
-      Vue.set(context.rootState.appState.status.resultData, 'failed', false);
-      Vue.set(
-        context.rootState.appState.status.resultData,
-        'promise',
-        new Promise((resolve, reject) => {
-          if (page === 0) {
-            context.state._after = [];
-            // only get the headers on first page, subsequent pages just use the same headers
-            context.dispatch('display/getHeaders', {
-              filters: context.state.query.filters.items,
-              request: context.getters['query/requestBody'](false),
-            });
-          }
-          context.commit('setPage', page);
-          context.commit(
-            'query/setAfter',
-            context.getters.after[context.state.page - 1],
-          );
+      // if there's already a search being run, cancel it
+      if (context.state.cancelSearch) {
+        context.state.cancelSearch();
+      }
+      const searchPromise = new Promise((rootResolve, rootReject) => {
+        // put the reject method into the state so we can call it outside of the promise
+        Vue.set(context.state, 'cancelSearch', rootReject);
 
-          let tempFilters = context.getters['query/filters/temporaryFilters'];
+        page = page || 0;
+        Vue.set(context.rootState.appState.status.resultData, 'loading', true);
+        Vue.set(context.rootState.appState.status.resultData, 'failed', false);
+        Vue.set(
+          context.rootState.appState.status.resultData,
+          'promise',
+          new Promise((resolve, reject) => {
+            if (page === 0) {
+              context.state._after = [];
+              // only get the headers on first page, subsequent pages just use the same headers
+              context.dispatch('display/getHeaders', {
+                filters: context.state.query.filters.items,
+                request: context.getters['query/requestBody'](false),
+              });
+            }
+            context.commit('setPage', page);
+            context.commit(
+              'query/setAfter',
+              context.getters.after[context.state.page - 1],
+            );
 
-          let promises = [];
+            let tempFilters = context.getters['query/filters/temporaryFilters'];
 
-          // get the total without any of the temporary/hidden filters
-          promises.push(
-            post(
-              'datastore_multisearch',
-              context.getters['query/requestBody'](false),
-            )
-              .then((data) => {
-                context.state.resultData = data;
+            let promises = [];
 
-                if (data.success && data.result.after !== null) {
-                  let afterToAdd = [
-                    data.result.after[0],
-                    data.result.after[1],
-                    context.getters['query/resources/sortedResources'].indexOf(
-                      data.result.after[2].replace('nhm-', ''),
-                    ),
-                  ];
-                  context.commit('addPage', afterToAdd);
-                }
-                if (!data.success) {
-                  throw Error;
-                }
-
-                if (tempFilters.length === 0) {
-                  if (data.success) {
-                    context.state.unfilteredTotal = data.result.total;
-                  } else {
-                    context.state.unfilteredTotal = 0;
-                  }
-                }
-              })
-              .catch((error) => {
-                throw error;
-              }),
-          );
-
-          // get the total with the temporary/hidden filters, e.g. so we can say 10 of 20 records have images
-          if (tempFilters.length > 0) {
+            // get the total without any of the temporary/hidden filters
             promises.push(
               post(
                 'datastore_multisearch',
-                context.getters['query/requestBody'](true),
+                context.getters['query/requestBody'](false),
               )
                 .then((data) => {
-                  if (data.success) {
-                    context.state.unfilteredTotal = data.result.total;
-                  } else {
+                  context.state.resultData = data;
+
+                  if (data.success && data.result.after !== null) {
+                    let afterToAdd = [
+                      data.result.after[0],
+                      data.result.after[1],
+                      context.getters[
+                        'query/resources/sortedResources'
+                      ].indexOf(data.result.after[2].replace('nhm-', '')),
+                    ];
+                    context.commit('addPage', afterToAdd);
+                  }
+                  if (!data.success) {
                     throw Error;
+                  }
+
+                  if (tempFilters.length === 0) {
+                    if (data.success) {
+                      context.state.unfilteredTotal = data.result.total;
+                    } else {
+                      context.state.unfilteredTotal = 0;
+                    }
                   }
                 })
                 .catch((error) => {
-                  if (context.getters.hasResult) {
-                    context.state.unfilteredTotal = context.getters.total;
-                  } else {
-                    context.state.unfilteredTotal = 0;
-                  }
                   throw error;
                 }),
             );
-          }
 
-          Promise.allSettled(promises)
-            .then(() => {
-              Vue.set(
-                context.rootState.appState.status.resultData,
-                'loading',
-                false,
+            // get the total with the temporary/hidden filters, e.g. so we can say 10 of 20 records have images
+            if (tempFilters.length > 0) {
+              promises.push(
+                post(
+                  'datastore_multisearch',
+                  context.getters['query/requestBody'](true),
+                )
+                  .then((data) => {
+                    if (data.success) {
+                      context.state.unfilteredTotal = data.result.total;
+                    } else {
+                      throw Error;
+                    }
+                  })
+                  .catch((error) => {
+                    if (context.getters.hasResult) {
+                      context.state.unfilteredTotal = context.getters.total;
+                    } else {
+                      context.state.unfilteredTotal = 0;
+                    }
+                    throw error;
+                  }),
               );
-              context.state.invalidated = false;
-              resolve();
-            })
-            .catch((error) => {
-              Vue.set(
-                context.rootState.appState.status.resultData,
-                'failed',
-                true,
-              );
-              reject(error);
-            });
-        }),
-      );
+            }
+
+            Promise.allSettled(promises)
+              .then(() => {
+                Vue.set(
+                  context.rootState.appState.status.resultData,
+                  'loading',
+                  false,
+                );
+                context.state.invalidated = false;
+                rootResolve();
+                resolve();
+              })
+              .catch((error) => {
+                Vue.set(
+                  context.rootState.appState.status.resultData,
+                  'failed',
+                  true,
+                );
+                rootReject();
+                reject(error);
+              });
+          }),
+        );
+      });
+      return searchPromise.always(() => {
+        Vue.set(context.state, 'cancelSearch', null);
+      });
     },
     getMetadata(context, payload) {
       Vue.set(context.rootState.appState.status[payload.meta], 'loading', true);
