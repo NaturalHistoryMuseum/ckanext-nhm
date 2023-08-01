@@ -7,11 +7,12 @@
         {{ page * 100 + 1 }} - {{ page * 100 + records.length }}</small
       >
     </div>
-    <div class="tiling-gallery full-width">
+    <div class="tiling-gallery full-width" ref="galleryContainer">
       <div
         v-for="(record, recordIndex) in loadedImageRecords"
         :key="`${record.record.data._id}-${record.image.id}`"
         class="gallery-tile"
+        :style="{ gridRowEnd: `span ${imageHeight(record)}` }"
       >
         <img
           @click="setViewerImage(recordIndex)"
@@ -56,7 +57,7 @@
       ></small>
     </div>
     <div
-      class="full-width flex-container flex-wrap flex-between tiling-gallery"
+      class="full-width flex-container flex-wrap flex-between tiling-gallery tiny-tiling-gallery"
       v-if="showBroken"
     >
       <div
@@ -85,6 +86,8 @@ import LoadError from '../LoadError.vue';
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import Help from '../popups/Help.vue';
 
+import debounce from 'lodash.debounce';
+
 export default {
   extends: BaseView,
   name: 'GalleryView',
@@ -101,6 +104,11 @@ export default {
         },
       },
       showBroken: false,
+      // we could get these automatically but they won't change much so it's just unnecessary processing
+      minColWidth: 260, // grid-col-gap + grid-template-cols; set in css
+      defaultRowHeight: 10, // grid-row-gap + grid-auto-rows; set in css
+      // this will be set automatically
+      colWidth: 0,
     };
   },
   components: {
@@ -125,6 +133,23 @@ export default {
       this.loading = false;
       this.loadError = true;
     },
+    imageHeight(imageRecord) {
+      const height = this.colWidth / imageRecord.image.ratio;
+      const rowHeight =
+        (height + this.defaultRowHeight) / this.defaultRowHeight;
+
+      // using Math.ceil completely breaks webpack so we have to do it this weird way
+      return rowHeight - (rowHeight % 1) + 1;
+    },
+    setColWidth() {
+      const currentWidth = this.$refs.galleryContainer.clientWidth;
+      // essentially Math.floor
+      const cols =
+        currentWidth / this.minColWidth -
+        ((currentWidth / this.minColWidth) % 1);
+      // Math.ceil
+      this.colWidth = currentWidth / cols - ((currentWidth / cols) % 1) + 1;
+    },
   },
   created() {
     this.loading = true;
@@ -143,6 +168,13 @@ export default {
         this.setFilteredRecordTag(this.recordTag + '$ with images');
         this.loading = false;
       });
+  },
+  mounted() {
+    this.setColWidth();
+    const debouncedSetColWidth = debounce(this.setColWidth, 100);
+    window.addEventListener('resize', () => {
+      debouncedSetColWidth();
+    });
   },
 };
 </script>
