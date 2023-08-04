@@ -1,9 +1,10 @@
 import display from './display';
 import query from '../query/main';
 import images from './images';
-import { post } from '../utils';
+import { post, AbortError } from '../utils';
 import Vue from 'vue';
 import pako from 'pako';
+import shortid from 'shortid';
 
 let results = {
   // would rather not namespace this but there's a vuex bug with non-namespaced states
@@ -25,7 +26,7 @@ let results = {
     _after: [],
     page: 0,
     downloadId: null,
-    cancelSearch: null,
+    searchControllers: {},
   },
   getters: {
     hasResult: (state) => {
@@ -88,126 +89,168 @@ let results = {
   },
   actions: {
     runSearch(context, page) {
-      // if there's already a search being run, cancel it
-      if (context.state.cancelSearch) {
-        context.state.cancelSearch();
-      }
-      const searchPromise = new Promise((rootResolve, rootReject) => {
-        // put the reject method into the state so we can call it outside of the promise
-        Vue.set(context.state, 'cancelSearch', rootReject);
+      const searchId = shortid.generate();
 
+      // if there's already a search being run, cancel it
+      if (Object.keys(context.state.searchControllers).length > 0) {
+        Object.entries(context.state.searchControllers).forEach((c) => {
+          c[1].controller.abort();
+        });
+      }
+
+      // add a controller to the state so this request can be cancelled by
+      // subsequent requests
+      let controller = {
+        controller: new AbortController(),
+      };
+      Vue.set(context.state.searchControllers, searchId, controller);
+
+      function setupSearch() {
         page = page || 0;
         Vue.set(context.rootState.appState.status.resultData, 'loading', true);
         Vue.set(context.rootState.appState.status.resultData, 'failed', false);
-        Vue.set(
-          context.rootState.appState.status.resultData,
-          'promise',
-          new Promise((resolve, reject) => {
-            if (page === 0) {
-              context.state._after = [];
-              // only get the headers on first page, subsequent pages just use the same headers
-              context.dispatch('display/getHeaders', {
-                filters: context.state.query.filters.items,
-                request: context.getters['query/requestBody'](false),
-              });
-            }
-            context.commit('setPage', page);
-            context.commit(
-              'query/setAfter',
-              context.getters.after[context.state.page - 1],
-            );
 
-            let tempFilters = context.getters['query/filters/temporaryFilters'];
-
-            let promises = [];
-
-            // get the total without any of the temporary/hidden filters
-            promises.push(
-              post(
-                'datastore_multisearch',
-                context.getters['query/requestBody'](false),
-              )
-                .then((data) => {
-                  context.state.resultData = data;
-
-                  if (data.success && data.result.after !== null) {
-                    let afterToAdd = [
-                      data.result.after[0],
-                      data.result.after[1],
-                      context.getters[
-                        'query/resources/sortedResources'
-                      ].indexOf(data.result.after[2].replace('nhm-', '')),
-                    ];
-                    context.commit('addPage', afterToAdd);
-                  }
-                  if (!data.success) {
-                    throw Error;
-                  }
-
-                  if (tempFilters.length === 0) {
-                    if (data.success) {
-                      context.state.unfilteredTotal = data.result.total;
-                    } else {
-                      context.state.unfilteredTotal = 0;
-                    }
-                  }
-                })
-                .catch((error) => {
-                  throw error;
-                }),
-            );
-
-            // get the total with the temporary/hidden filters, e.g. so we can say 10 of 20 records have images
-            if (tempFilters.length > 0) {
-              promises.push(
-                post(
-                  'datastore_multisearch',
-                  context.getters['query/requestBody'](true),
-                )
-                  .then((data) => {
-                    if (data.success) {
-                      context.state.unfilteredTotal = data.result.total;
-                    } else {
-                      throw Error;
-                    }
-                  })
-                  .catch((error) => {
-                    if (context.getters.hasResult) {
-                      context.state.unfilteredTotal = context.getters.total;
-                    } else {
-                      context.state.unfilteredTotal = 0;
-                    }
-                    throw error;
-                  }),
-              );
-            }
-
-            Promise.allSettled(promises)
-              .then(() => {
-                Vue.set(
-                  context.rootState.appState.status.resultData,
-                  'loading',
-                  false,
-                );
-                context.state.invalidated = false;
-                rootResolve();
-                resolve();
-              })
-              .catch((error) => {
-                Vue.set(
-                  context.rootState.appState.status.resultData,
-                  'failed',
-                  true,
-                );
-                rootReject();
-                reject(error);
-              });
-          }),
+        if (page === 0) {
+          context.state._after = [];
+          // only get the headers on first page, subsequent pages just use the same
+          // headers
+          context.dispatch('display/getHeaders', {
+            filters: context.state.query.filters.items,
+            request: context.getters['query/requestBody'](false),
+          });
+        }
+        context.commit('setPage', page);
+        context.commit(
+          'query/setAfter',
+          context.getters.after[context.state.page - 1],
         );
-      });
-      return searchPromise.always(() => {
-        Vue.set(context.state, 'cancelSearch', null);
-      });
+      }
+
+      async function getAllResults() {
+        // get the total without any of the temporary/hidden filters
+        return post(
+          'datastore_multisearch',
+          context.getters['query/requestBody'](false),
+          { signal: context.state.searchControllers[searchId].signal },
+        ).then((data) => {
+          // check to see if this request was aborted and don't add any data if so
+          if (
+            context.state.searchControllers[searchId].controller.signal.aborted
+          ) {
+            throw new AbortError(searchId);
+          }
+
+          // otherwise we can add the data
+          context.state.resultData = data;
+
+          if (data.success && data.result.after !== null) {
+            let afterToAdd = [
+              data.result.after[0],
+              data.result.after[1],
+              context.getters['query/resources/sortedResources'].indexOf(
+                data.result.after[2].replace('nhm-', ''),
+              ),
+            ];
+            context.commit('addPage', afterToAdd);
+          }
+          if (!data.success) {
+            throw Error;
+          }
+
+          if (context.getters['query/filters/temporaryFilters'].length === 0) {
+            if (data.success) {
+              context.state.unfilteredTotal = data.result.total;
+            } else {
+              context.state.unfilteredTotal = 0;
+            }
+          }
+        });
+      }
+
+      async function getFilteredResults() {
+        // get the total with the temporary/hidden filters, e.g. so we can say 10 of 20 records have images
+        return post(
+          'datastore_multisearch',
+          context.getters['query/requestBody'](true),
+          { signal: context.state.searchControllers[searchId].signal },
+        )
+          .then((data) => {
+            // check to see if this request was aborted and don't add any data if so
+            if (
+              context.state.searchControllers[searchId].controller.signal
+                .aborted
+            ) {
+              throw new AbortError(searchId);
+            }
+
+            // otherwise we can continue processing
+            if (data.success) {
+              context.state.unfilteredTotal = data.result.total;
+            } else {
+              throw Error;
+            }
+          })
+          .catch((error) => {
+            if (context.getters.hasResult) {
+              context.state.unfilteredTotal = context.getters.total;
+            } else {
+              context.state.unfilteredTotal = 0;
+            }
+            throw error;
+          });
+      }
+
+      // the above get combined into this promise
+      const runSearchPromise = new Promise((resolve, reject) => {
+        try {
+          setupSearch();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      })
+        .then(getAllResults)
+        .then(() => {
+          if (context.getters['query/filters/temporaryFilters'].length > 0) {
+            return getFilteredResults();
+          } else {
+            return new Promise((resolve) => resolve());
+          }
+        })
+        .then(() => {
+          Vue.set(
+            context.rootState.appState.status.resultData,
+            'loading',
+            false,
+          );
+          context.state.invalidated = false;
+          const aborted =
+            context.state.searchControllers[searchId].controller.signal.aborted;
+          Vue.delete(context.state.searchControllers, searchId);
+          if (aborted) {
+            throw new AbortError(searchId);
+          }
+          return searchId;
+        })
+        .catch((e) => {
+          if (!(e instanceof AbortError)) {
+            Vue.set(
+              context.rootState.appState.status.resultData,
+              'failed',
+              true,
+            );
+            throw e;
+          }
+          Vue.delete(context.state.searchControllers, searchId);
+        });
+
+      Vue.set(
+        context.rootState.appState.status.resultData,
+        'promise',
+        runSearchPromise,
+      );
+
+      return runSearchPromise;
     },
     getMetadata(context, payload) {
       Vue.set(context.rootState.appState.status[payload.meta], 'loading', true);

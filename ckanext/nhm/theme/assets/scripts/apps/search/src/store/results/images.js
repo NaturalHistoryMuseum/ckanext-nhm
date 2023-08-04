@@ -4,6 +4,7 @@ let images = {
   namespaced: true,
   state: {
     imageRecords: [],
+    locked: false,
   },
   getters: {
     loadedImageRecords: (state) => {
@@ -106,6 +107,12 @@ let images = {
   actions: {
     loadAndCheckImages(context) {
       context.rootState.appState.status.resultData.promise.then(() => {
+        if (context.state.locked) {
+          return;
+        } else {
+          Vue.set(context.state, 'locked', true);
+        }
+
         let imgRecords = [];
         Vue.set(context.state, 'imageRecords', []);
 
@@ -153,6 +160,7 @@ let images = {
             context.getters.loadedImageRecords,
             { root: true },
           );
+          Vue.set(context.state, 'locked', false);
         });
       });
     },
