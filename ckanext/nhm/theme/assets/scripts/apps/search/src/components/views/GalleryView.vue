@@ -142,7 +142,12 @@ export default {
       return rowHeight - (rowHeight % 1) + 1;
     },
     setColWidth() {
-      const currentWidth = this.$refs.galleryContainer.clientWidth;
+      let currentWidth = this.$refs.galleryContainer.clientWidth;
+      if (currentWidth === 0) {
+        // the container is about 88% of the full window width; this is here just in
+        // case the container hasn't loaded yet
+        currentWidth = window.innerWidth * 0.88;
+      }
       // essentially Math.floor
       const cols =
         currentWidth / this.minColWidth -
@@ -170,7 +175,8 @@ export default {
       });
   },
   mounted() {
-    this.setColWidth();
+    // give the container a chance to load
+    setTimeout(this.setColWidth, 500);
     const debouncedSetColWidth = debounce(this.setColWidth, 100);
     window.addEventListener('resize', () => {
       debouncedSetColWidth();
