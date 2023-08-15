@@ -174,6 +174,7 @@ export default {
           });
         }
       })
+      .then(this.loadAndCheckImages)
       .then(() => {
         this.setFilteredRecordTag(this.recordTag + '$ with images');
         this.loading = false;
