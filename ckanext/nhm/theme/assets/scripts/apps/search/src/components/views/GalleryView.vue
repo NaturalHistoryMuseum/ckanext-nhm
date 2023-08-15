@@ -142,7 +142,13 @@ export default {
       return rowHeight - (rowHeight % 1) + 1;
     },
     setColWidth() {
-      let currentWidth = this.$refs.galleryContainer.clientWidth;
+      let currentWidth = 0;
+      try {
+        currentWidth = this.$refs.galleryContainer.clientWidth;
+      } catch {
+        //
+      }
+
       if (currentWidth === 0) {
         // the container is about 88% of the full window width; this is here just in
         // case the container hasn't loaded yet
@@ -168,7 +174,6 @@ export default {
           });
         }
       })
-      .then(this.loadAndCheckImages)
       .then(() => {
         this.setFilteredRecordTag(this.recordTag + '$ with images');
         this.loading = false;

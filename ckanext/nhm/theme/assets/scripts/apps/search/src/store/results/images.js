@@ -106,62 +106,60 @@ let images = {
   },
   actions: {
     loadAndCheckImages(context) {
-      context.rootState.appState.status.resultData.promise.then(() => {
-        if (context.state.locked) {
-          return;
-        } else {
-          Vue.set(context.state, 'locked', true);
-        }
+      Vue.set(context.state, 'imageRecords', []);
+      if (context.state.locked) {
+        return;
+      } else {
+        Vue.set(context.state, 'locked', true);
+      }
 
-        let imgRecords = [];
-        Vue.set(context.state, 'imageRecords', []);
+      let imgRecords = [];
 
-        let records = context.rootGetters['results/records'];
+      let records = context.rootGetters['results/records'];
 
-        records.forEach((r, rix) => {
-          context.getters.getItemImages(r, false, rix).forEach((i) => {
-            imgRecords.push(i);
+      records.forEach((r, rix) => {
+        context.getters.getItemImages(r, false, rix).forEach((i) => {
+          imgRecords.push(i);
+        });
+      });
+
+      function checkImageSrc(url) {
+        // using a requests library like axios doesn't work if the external server
+        // doesn't have CORS set up properly, and all we want to know is if it loads as
+        // an image anyway
+        return new Promise((resolve, reject) => {
+          let imageElement = new Image();
+          imageElement.onload = () => {
+            let ratio = imageElement.width / imageElement.height;
+            resolve(ratio);
+          };
+          imageElement.onerror = reject;
+          imageElement.src = url;
+        });
+      }
+
+      let brokenChecks = imgRecords.map((r) => {
+        return checkImageSrc(r.image.thumb)
+          .then((ratio) => {
+            r.image.canLoad = true;
+            r.image.ratio = ratio;
+          })
+          .catch(() => {
+            r.image.canLoad = false;
+            r.image.ratio = 1;
+          })
+          .finally(() => {
+            r.image.loading = false;
+            context.state.imageRecords.push(r);
           });
-        });
-
-        function checkImageSrc(url) {
-          // using a requests library like axios doesn't work if the external server
-          // doesn't have CORS set up properly, and all we want to know is if it loads as
-          // an image anyway
-          return new Promise((resolve, reject) => {
-            let imageElement = new Image();
-            imageElement.onload = () => {
-              let ratio = imageElement.width / imageElement.height;
-              resolve(ratio);
-            };
-            imageElement.onerror = reject;
-            imageElement.src = url;
-          });
-        }
-
-        let brokenChecks = imgRecords.map((r) => {
-          return checkImageSrc(r.image.thumb)
-            .then((ratio) => {
-              r.image.canLoad = true;
-              r.image.ratio = ratio;
-            })
-            .catch(() => {
-              r.image.canLoad = false;
-              r.image.ratio = 1;
-            })
-            .finally(() => {
-              r.image.loading = false;
-              context.state.imageRecords.push(r);
-            });
-        });
-        return Promise.allSettled(brokenChecks).then(() => {
-          context.commit(
-            'results/display/addPageImages',
-            context.getters.loadedImageRecords,
-            { root: true },
-          );
-          Vue.set(context.state, 'locked', false);
-        });
+      });
+      return Promise.allSettled(brokenChecks).then(() => {
+        context.commit(
+          'results/display/addPageImages',
+          context.getters.loadedImageRecords,
+          { root: true },
+        );
+        Vue.set(context.state, 'locked', false);
       });
     },
   },

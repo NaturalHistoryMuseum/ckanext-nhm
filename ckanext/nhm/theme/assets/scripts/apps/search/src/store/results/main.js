@@ -230,7 +230,12 @@ let results = {
           if (aborted) {
             throw new AbortError(searchId);
           }
-          return searchId;
+          if (context.state.display.view === 'gallery') {
+            return context.dispatch('images/loadAndCheckImages');
+          }
+          return new Promise((r) => {
+            r();
+          });
         })
         .catch((e) => {
           if (!(e instanceof AbortError)) {
