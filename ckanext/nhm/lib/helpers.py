@@ -421,17 +421,6 @@ def api_doc_link():
     )
 
 
-def get_google_analytics_config():
-    """
-    Get Google Analytic configuration.
-    """
-
-    return {
-        'id': toolkit.config.get('googleanalytics.id'),
-        'domain': toolkit.config.get('googleanalytics.domain', 'auto'),
-    }
-
-
 def persistent_follow_button(obj_type, obj_id):
     """
     Replaces ckan.lib.follow_button which returns an empty string for anonymous users.
