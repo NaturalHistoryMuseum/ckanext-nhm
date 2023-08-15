@@ -33,3 +33,10 @@ export function camelCase(str) {
     })
     .join('');
 }
+
+export class AbortError extends Error {
+  constructor(jobId) {
+    super(`Aborted ${jobId}`);
+    this.name = 'AbortError';
+  }
+}
