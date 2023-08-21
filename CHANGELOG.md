@@ -1,5 +1,21 @@
 # Changelog
 
+## v6.0.3 (2023-08-21)
+
+### Fix
+
+- replace google analytics with adobe analytics
+- load images on create gallery
+- reload images on new search when view is gallery
+- delay gallery tile resizing
+- fix promise chaining on runSearch, lock image loading
+- tile the gallery with js again
+- make runSearch cancellable
+
+### Refactor
+
+- remove google analytics config
+
 ## v6.0.2 (2023-07-20)
 
 ### Fix
