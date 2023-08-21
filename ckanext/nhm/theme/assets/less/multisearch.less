@@ -658,32 +658,17 @@
 }
 
 .tiling-gallery {
-  @col-gap: 10px;
+  display: grid;
 
-  @media (max-width: @sm - 1) {
-    column-count: 1;
-  }
-  @media (min-width: @sm) {
-    column-count: 3;
-  }
-  @media (min-width: @md) {
-    column-count: 4;
-  }
-  @media (min-width: @lg) {
-    column-count: 5;
-  }
-  @media (min-width: @xl) {
-    column-count: 6;
-  }
+  // if these are changed then GalleryView.vue also needs to be updated (defaultRowHeight + defaultColWidth)
+  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-auto-rows: 0;
 
   & .gallery-tile {
+    grid-row-end: span 10; // default
     width: 100%;
-  }
-
-  & .gallery-tile {
     position: relative;
-    display: inline-block;
-    margin: @col-gap;
     .trans(0.2s);
 
     & > img {
@@ -701,13 +686,13 @@
     }
   }
 
-  & .gallery-tile-tiny {
-    width: 75px;
-    min-height: 75px;
+  &.tiny-tiling-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
   }
 
   & .gallery-tile-broken {
     background-color: @grey7;
+    height: 100%;
   }
 
   & .gallery-tile-title {
