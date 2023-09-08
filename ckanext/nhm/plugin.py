@@ -54,7 +54,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(interfaces.IFacets, inherit=True)
     implements(interfaces.IPackageController, inherit=True)
     implements(interfaces.IResourceController, inherit=True)
-    implements(interfaces.IRoutes, inherit=True)
     implements(interfaces.ITemplateHelpers, inherit=True)
     implements(IContact)
     implements(IDoi, inherit=True)
@@ -231,37 +230,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     # are updated
                     for _cache in cache_managers.values():
                         _cache.clear()
-
-    ## IRoutes
-    def before_map(self, _map):
-        '''
-        ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
-        :param _map:
-        '''
-
-        # Dataset metrics
-        _map.connect(
-            'dataset_metrics',
-            '/dataset/metrics/{id}',
-            controller='ckanext.nhm.controllers.stats:StatsController',
-            action='dataset_metrics',
-            ckan_icon='bar-chart',
-        )
-        # NOTE: Access to /datastore/dump/{resource_id} is prevented by NGINX
-
-        # The DCAT plugin breaks these links if enable content negotiation is enabled
-        # because it maps to /dataset/{_id} without excluding these actions
-        # So we re=add them here to make sure it's working
-        # TODO: are these still broken?
-        # _map.connect('add dataset', '/dataset/new', controller='dataset',
-        #              action='new')
-        _map.connect(
-            '/dataset/{action}',
-            controller='dataset',
-            requirements=dict(action='|'.join(['list', 'autocomplete'])),
-        )
-
-        return _map
 
     ## ITemplateHelpers
     def get_helpers(self):
