@@ -7,7 +7,7 @@
 
 {% block content_primary_nav %}
 {{ h.build_nav_icon('dataset.read', _('Dataset'), id=g.pkg.name) }}
-{{ h.build_nav_icon('dataset.activity', _('Activity Stream'), id=g.pkg.name) }}
+{{ h.build_nav_icon('activity.package_activity', _('Activity Stream'), id=g.pkg.name) }}
 {% endblock %}
 
 {# Reorder blocks so DOI and licence goes to top #}
