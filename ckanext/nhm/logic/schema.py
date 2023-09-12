@@ -14,16 +14,17 @@ from ckan.types import Validator
 
 DATASET_TYPE_VOCABULARY = "dataset_category"
 
-UPDATE_FREQUENCIES = [
-    ("", "None"),
-    ("daily", "Daily"),
-    ("weekly", "Weekly"),
-    ("monthly", "Monthly"),
-    ("quarterly", "Quarterly"),
-    ("annual", "Annual"),
-    ("discontinued", "Discontinued"),
-    ("never", "Never"),
-]
+# label: value
+UPDATE_FREQUENCIES = {
+    "None": "",
+    "Daily": "daily",
+    "Weekly": "weekly",
+    "Monthly": "monthly",
+    "Quarterly": "quarterly",
+    "Annual": "annual",
+    "Discontinued": "discontinued",
+    "Never": "never",
+}
 
 
 @validator_args
@@ -94,7 +95,7 @@ def _modify_schema(schema):
     schema["contributors"] = [ignore_missing, unicode_safe, convert_to_extras]
     schema["update_frequency"] = [
         ignore_missing,
-        one_of([v[0] for v in UPDATE_FREQUENCIES]),
+        one_of(UPDATE_FREQUENCIES.values()),
         convert_to_extras,
         unicode_safe,
     ]

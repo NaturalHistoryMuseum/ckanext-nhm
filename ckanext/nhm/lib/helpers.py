@@ -13,7 +13,7 @@ import time
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 from operator import itemgetter
-from typing import List
+from typing import List, Optional
 from urllib.parse import quote
 
 from beaker.cache import cache_region
@@ -165,17 +165,19 @@ def form_select_update_frequency_options():
     """
     Get update frequencies as a form list.
     """
-    return list_to_form_options(UPDATE_FREQUENCIES)
+    return list_to_form_options(UPDATE_FREQUENCIES.items())
 
 
-def update_frequency_get_label(value):
+def update_frequency_get_label(update_frequency: str) -> Optional[str]:
     """
     Get the label for this update frequency.
 
-    :param value: return:
+    :param update_frequency:
+    :return: None if the passed update frequency doesn't match, otherwise, the label for
+             the given value
     """
-    for v, label in UPDATE_FREQUENCIES:
-        if v == value:
+    for label, value in UPDATE_FREQUENCIES.items():
+        if value == update_frequency:
             return label
 
 
