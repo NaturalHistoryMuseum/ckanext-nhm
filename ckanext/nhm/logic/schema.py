@@ -12,17 +12,17 @@ from ckan.logic.schema import validator_args
 from ckan.plugins import toolkit
 from ckan.types import Validator
 
-DATASET_TYPE_VOCABULARY = 'dataset_category'
+DATASET_TYPE_VOCABULARY = "dataset_category"
 
 UPDATE_FREQUENCIES = [
-    ('', 'None'),
-    ('daily', 'Daily'),
-    ('weekly', 'Weekly'),
-    ('monthly', 'Monthly'),
-    ('quarterly', 'Quarterly'),
-    ('annual', 'Annual'),
-    ('discontinued', 'Discontinued'),
-    ('never', 'Never'),
+    ("", "None"),
+    ("daily", "Daily"),
+    ("weekly", "Weekly"),
+    ("monthly", "Monthly"),
+    ("quarterly", "Quarterly"),
+    ("annual", "Annual"),
+    ("discontinued", "Discontinued"),
+    ("never", "Never"),
 ]
 
 
