@@ -589,6 +589,26 @@ def resource_view_state(resource_view_json, resource_json):
     columns_order = ['_id']
     if 'gbifIssue' in fields:
         columns_order.append('gbifIssue')
+    # add other useful DwC fields
+    for f in [
+        'scientificName',
+        'class',
+        'order',
+        'family',
+        'typeStatus',
+        'locality',
+        'country',
+        'recordedBy',
+        'catalogNumber',
+        'associatedMedia',
+        'preservative',
+        'collectionCode',
+        'year',
+        'month',
+        'day',
+    ]:
+        if f in fields:
+            columns_order.append(f)
     # Add the rest of the columns to the columns order
     columns_order += [f for f in fields if f not in columns_order]
     resource_view['state']['columnsOrder'] = list(columns_order)
@@ -1257,7 +1277,7 @@ def _get_latest_update(package_or_resource_dicts):
     latest_date = None
     for package_or_resource_dict in package_or_resource_dicts:
         dates = [package_or_resource_dict.get(field, None) for field in fields]
-        
+
         # check if this is a datastore resource
         if package_or_resource_dict.get('datastore_active', False):
             pkg_version = get_rounded_version(
@@ -1268,7 +1288,7 @@ def _get_latest_update(package_or_resource_dicts):
                 continue
             version_date = datetime.fromtimestamp(pkg_version / 1000)
             dates.append(version_date)
-        
+
         for datestamp in dates:
             date = core_helpers._datestamp_to_datetime(datestamp)
             if date is not None and (latest_date is None or date > latest_date):
