@@ -590,12 +590,21 @@ def resource_view_state(resource_view_json, resource_json):
     if 'gbifIssue' in fields:
         columns_order.append('gbifIssue')
     # add other useful DwC fields
+    if 'currentScientificName' in fields:
+        # prefer current scientific name
+        columns_order.append('currentScientificName')
+    elif 'scientificName' in fields:
+        columns_order.append('scientificName')
     for f in [
-        'scientificName',
+        'typeStatus',
+        'type',
+        'phylum',
         'class',
         'order',
         'family',
-        'typeStatus',
+        'genus',
+        'specificEpithet',
+        'infraspecificEpithet',
         'locality',
         'country',
         'recordedBy',
