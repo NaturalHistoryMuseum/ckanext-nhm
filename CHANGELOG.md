@@ -1,5 +1,15 @@
 # Changelog
 
+## v6.0.4 (2023-09-18)
+
+### Fix
+
+- handle empty datastore resources
+
+### Minor UI Changes
+
+- edit site credits
+
 ## v6.0.3 (2023-08-21)
 
 ### Fix
