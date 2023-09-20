@@ -1,4 +1,4 @@
-FROM naturalhistorymuseum/ckantest:latest
+FROM naturalhistorymuseum/ckantest:next
 
 # required by python-ldap (via ckanext-ldap)
 RUN apt-get -q -y install libldap2-dev libsasl2-dev \
