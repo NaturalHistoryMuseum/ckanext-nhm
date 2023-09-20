@@ -71,7 +71,7 @@ def update_package_schema():
 
 
 def _modify_schema(schema):
-    convert_from_tags = toolkit.get_converter("convert_to_tags")
+    convert_to_tags = toolkit.get_converter("convert_to_tags")
     convert_to_extras = toolkit.get_converter("convert_to_extras")
     unicode_safe = toolkit.get_validator("unicode_safe")
     not_empty = toolkit.get_validator("not_empty")
@@ -88,7 +88,7 @@ def _modify_schema(schema):
     # Add new fields
     schema[DATASET_TYPE_VOCABULARY] = [
         not_empty,
-        convert_from_tags(DATASET_TYPE_VOCABULARY),
+        convert_to_tags(DATASET_TYPE_VOCABULARY),
     ]
     schema["temporal_extent"] = [ignore_missing, unicode_safe, convert_to_extras]
     schema["affiliation"] = [ignore_missing, unicode_safe, convert_to_extras]
@@ -107,11 +107,11 @@ def _modify_schema(schema):
 def show_package_schema(
     ignore_missing: Validator,
     convert_from_extras: Validator,
-    convert_to_tags: Validator,
+    convert_from_tags: Validator,
 ):
     schema = default_show_package_schema()
     schema["tags"]["__extras"].append(toolkit.get_converter("free_tags_only"))
-    schema[DATASET_TYPE_VOCABULARY] = [convert_to_tags(DATASET_TYPE_VOCABULARY)]
+    schema[DATASET_TYPE_VOCABULARY] = [convert_from_tags(DATASET_TYPE_VOCABULARY)]
     schema["temporal_extent"] = [convert_from_extras, ignore_missing]
     schema["update_frequency"] = [convert_from_extras, ignore_missing]
     schema["affiliation"] = [convert_from_extras, ignore_missing]
