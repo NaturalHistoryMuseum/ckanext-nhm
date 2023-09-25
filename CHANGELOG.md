@@ -1,5 +1,15 @@
 # Changelog
 
+## v6.1.0 (2023-09-25)
+
+### Feature
+
+- put some commonly useful DwC fields first in grid view
+
+### Fix
+
+- add other taxonomic ranks and prefer currentScientificName
+
 ## v6.0.4 (2023-09-18)
 
 ### Fix
