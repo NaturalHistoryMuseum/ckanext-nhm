@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: CKAN Nhm extension
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - name: Natural History Museum
+    city: London
+    country: GB
+    alias: NHM
+    email: data@nhm.ac.uk
+repository-code: 'https://github.com/NaturalHistoryMuseum/ckanext-nhm'
+abstract: A CKAN extension for the Natural History Museum's Data Portal.
+keywords:
+  - ckan
+  - ckanext
+  - nhm
+license: GPL-3.0-or-later
+version: 6.1.0
