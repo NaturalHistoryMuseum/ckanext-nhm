@@ -682,3 +682,24 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         base = Path(__file__).parent / 'src' / 'download_emails'
         with (base / 'error.txt').open() as p, (base / 'error.html').open() as h:
             return p.read().strip(), h.read().strip()
+
+    def download_modify_eml(self, eml_dict, query):
+        # remove the extra NHM creator caused by the attribution plugin
+        creators = [c for c in eml_dict['creator'] if c.get('userId') != '039zvsn29']
+        original_nhm = None
+        for ix, c in enumerate(creators):
+            if c['organizationName'] == toolkit.config.get(
+                'ckanext.versioned_datastore.dwc_org_name',
+                toolkit.config.get(
+                    'ckanext.doi.publisher', toolkit.config.get('ckan.site_title')
+                ),
+            ):
+                original_nhm = ix
+                break
+        if original_nhm is not None:
+            creators[original_nhm]['userId'] = (
+                '039zvsn29',
+                {'directory': 'https://ror.org/039zvsn29'},
+            )
+        eml_dict['creator'] = creators
+        return eml_dict
