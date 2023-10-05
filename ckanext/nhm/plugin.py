@@ -685,7 +685,14 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     def download_modify_eml(self, eml_dict, query):
         # remove the extra NHM creator caused by the attribution plugin
-        creators = [c for c in eml_dict['creator'] if c.get('userId') != '039zvsn29']
+        creators = []
+        for c in eml_dict.get('creator', []):
+            user_id = c.get('userId')
+            if isinstance(user_id, tuple):
+                user_id = user_id[0]
+            # there should be only one creator with this ID at this point
+            if user_id != '039zvsn29':
+                creators.append(c)
         original_nhm = None
         for ix, c in enumerate(creators):
             if c['organizationName'] == toolkit.config.get(
