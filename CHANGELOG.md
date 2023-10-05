@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.1.4 (2023-10-05)
+
+### Fix
+
+- extract user id from tuple
+
 ## v6.1.3 (2023-10-05)
 
 ### Build System(s)
