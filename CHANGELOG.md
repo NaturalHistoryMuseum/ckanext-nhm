@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.1.2 (2023-10-05)
+
+### Fix
+
+- remove additional nhm creator from generated eml
+
 ## v6.1.1 (2023-10-03)
 
 ### Fix
