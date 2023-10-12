@@ -21,6 +21,7 @@
       <FieldPicker
         :callback="addNewField"
         :resource-ids="resourceIds"
+        :selected-fields="newFields"
       ></FieldPicker>
     </div>
     <div class="term-editor-query term-editor-block space-children-v">

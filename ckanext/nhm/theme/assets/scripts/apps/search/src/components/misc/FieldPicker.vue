@@ -14,7 +14,7 @@
         placeholder="field name"
         v-model="fieldSearch"
       />
-      <button class="btn btn-mini" @click="addSelectedField">
+      <button class="btn btn-mini" @click="addCurrentField">
         <i class="fas fa-arrow-circle-up" style="margin: 0 !important"></i>
       </button>
     </div>
@@ -22,11 +22,11 @@
       class="full-width"
       size="10"
       title="Select a field"
-      v-model="selectedField"
-      @keyup.enter="addSelectedField"
+      v-model="currentField"
+      @keyup.enter="addCurrentField"
     >
       <option
-        v-for="field in fieldList"
+        v-for="field in selectableFields"
         v-bind:key="field.id"
         @click="callback(field)"
       >
@@ -46,12 +46,15 @@ export default {
     return {
       fieldSearch: null,
       fieldList: [],
-      selectedField: null,
+      currentField: null,
     };
   },
-  props: ['callback', 'resourceIds', 'classes'],
+  props: ['callback', 'resourceIds', 'classes', 'selectedFields'],
   computed: {
     ...mapState('results', ['resultData']),
+    selectableFields() {
+      return this.fieldList.filter((f) => !this.selectedFields.includes(f));
+    },
   },
   methods: {
     getFieldList() {
@@ -72,8 +75,8 @@ export default {
           vue.fieldList = [];
         });
     },
-    addSelectedField() {
-      this.callback(this.selectedField);
+    addCurrentField() {
+      this.callback(this.currentField);
     },
   },
   mounted: function () {
