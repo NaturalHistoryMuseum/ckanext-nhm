@@ -1,10 +1,11 @@
 <template>
-  <div
-    class="term-editor floating flex-container flex-smallwrap flex-stretch-height"
-  >
+  <div class="term-editor floating flex-container flex-stretch-height">
     <i class="fas fa-caret-square-left" @click="closeDialog" role="button"></i>
-    <div class="term-editor-fields space-children-v" v-if="fieldType !== 'geo'">
-      <div class="flex-container flex-wrap flex-wrap-spacing">
+    <div
+      class="term-editor-fields term-editor-block space-children-v"
+      v-if="fieldType !== 'geo'"
+    >
+      <div class="flex-container flex-wrap flex-wrap-spacing field-list">
         <span
           class="fields"
           v-for="(field, index) in newFields"
@@ -22,7 +23,7 @@
         :resource-ids="resourceIds"
       ></FieldPicker>
     </div>
-    <div class="term-editor-query space-children-v">
+    <div class="term-editor-query term-editor-block space-children-v">
       <div class="flex-container flex-nowrap flex-stretch-last">
         <span>As:</span>
         <select
@@ -64,15 +65,14 @@
         </keep-alive>
       </div>
       <div class="flex-container flex-column flex-stretch-height">
-        <span>
-          <label for="termNameInput">Name (optional)</label>
-          <input
-            id="termNameInput"
-            type="text"
-            v-model="termName"
-            @keyup.enter="submitTerm"
-          />
-        </span>
+        <label for="termNameInput" class="sr-only">Name (optional)</label>
+        <input
+          id="termNameInput"
+          type="text"
+          v-model="termName"
+          @keyup.enter="submitTerm"
+          placeholder="name (optional)"
+        />
       </div>
       <div class="query-submit">
         <button @click="submitTerm" class="btn btn-primary no-icon">

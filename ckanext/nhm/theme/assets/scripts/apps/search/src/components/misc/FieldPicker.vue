@@ -1,6 +1,8 @@
 <template>
   <div class="space-children-v field-picker" :class="classes">
-    <div class="flex-container flex-nowrap flex-stretch-first">
+    <div
+      class="flex-container flex-nowrap flex-stretch-first flex-stretch-height"
+    >
       <input
         type="text"
         class="full-width"
@@ -13,7 +15,7 @@
         v-model="fieldSearch"
       />
       <button class="btn btn-mini" @click="addSelectedField">
-        <i class="fas fa-arrow-circle-up no-margin"></i>
+        <i class="fas fa-arrow-circle-up" style="margin: 0 !important"></i>
       </button>
     </div>
     <select
