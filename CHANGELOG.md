@@ -1,5 +1,17 @@
 # Changelog
 
+## v6.1.5 (2023-10-16)
+
+### Fix
+
+- show root group when not 'and'
+- exclude fields that have already been selected
+- add a button to add currently selected field
+
+### Minor UI Changes
+
+- wrap the term editor up to lg screen size, hide label for name
+
 ## v6.1.4 (2023-10-05)
 
 ### Fix
