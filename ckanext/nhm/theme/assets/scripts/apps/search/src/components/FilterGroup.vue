@@ -2,7 +2,7 @@
   <div
     :class="[
       ...filterClasses,
-      nestLevel > 0 ? 'filter-group' : 'filter-group-root',
+      showGroup ? 'filter-group' : 'filter-group-root',
       'filter-type-' + filterKey,
     ]"
   >
@@ -10,7 +10,7 @@
       class="group-type"
       href="javascript:void(0);"
       @click.self="changeGroupType"
-      v-if="nestLevel > 0"
+      v-if="showGroup"
     >
       {{ readableGroupType }}
     </a>
@@ -77,6 +77,9 @@ export default {
     },
     readableGroupType() {
       return this.getGroup(this.filterKey);
+    },
+    showGroup() {
+      return this.filterKey !== 'and' || this.nestLevel > 0;
     },
   },
   methods: {
