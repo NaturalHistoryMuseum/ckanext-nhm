@@ -35,7 +35,7 @@ def prepare_image(image: RecordImage) -> dict:
     return {
         'title': image.title,
         'href': image.url,
-        'download': f'{image.url}/original',
+        'download': image.download_url,
         'copyright': f'{license_link}<br /><small>{image.rights}</small>',
         'record_id': image.record.id,
         'resource_id': image.record.resource_id,
