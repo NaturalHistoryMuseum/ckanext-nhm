@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.1.6 (2023-10-30)
+
+### Fix
+
+- use the download_url property
+
 ## v6.1.5 (2023-10-16)
 
 ### Fix
