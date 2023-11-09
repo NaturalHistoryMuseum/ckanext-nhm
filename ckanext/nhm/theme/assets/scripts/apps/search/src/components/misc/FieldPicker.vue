@@ -29,6 +29,7 @@
         v-for="field in selectableFields"
         v-bind:key="field.id"
         @click="callback(field)"
+        class="term-editor-option"
       >
         {{ field }}
       </option>
