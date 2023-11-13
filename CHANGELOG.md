@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.1.7 (2023-11-13)
+
+### Fix
+
+- explicitly ignore field picker options
+- add Google Analytics back into our analytics snippet
+
+### Style
+
+- reformat analytics snippet
+
 ## v6.1.6 (2023-10-30)
 
 ### Fix
