@@ -49,6 +49,7 @@
             '#show-editor-groups-' + _uid,
             '#show-editor-terms-' + _uid,
             '.delete-field',
+            '.term-editor-option',
           ],
         }"
       ></TermEditor>
