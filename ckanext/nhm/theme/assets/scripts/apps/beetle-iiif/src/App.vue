@@ -1,6 +1,12 @@
 <template>
   <div>
     <div class="secondary col-sm-3">
+      <h1>Beetle Drawers</h1>
+      <div class="biiif-page-description">
+        Use the filters below to search by drawer code or collection. Please
+        note that not all imaging has yet been completed, and this page will
+        update over time.
+      </div>
       <Filters />
     </div>
     <div class="col-sm-9 col-xs-12">
