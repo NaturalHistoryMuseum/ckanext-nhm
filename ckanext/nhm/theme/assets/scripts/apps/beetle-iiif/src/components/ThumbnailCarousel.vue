@@ -11,16 +11,7 @@
         <img src="/images/iiif.png" alt="IIIF Manifest" />
       </a>
     </div>
-    <div
-      class="biiif-thumbnail-track"
-      @mousedown="onMouseDown"
-      @mouseleave="onMouseLeave"
-      @mouseup="onMouseUp"
-      @mousemove="onMouseMove"
-      @scroll="onScroll"
-      @contextmenu="onRightClick"
-      ref="track"
-    >
+    <div class="biiif-thumbnail-track" ref="track" @scroll="onScroll">
       <div
         :class="{
           'biiif-thumbnail-container': true,
@@ -32,6 +23,7 @@
         :key="record.data._id"
         :data-thumbnail-index="index"
         ref="container"
+        @click="goto(index)"
       >
         <img
           class="biiif-thumbnail-image"
@@ -83,9 +75,6 @@ export default {
       total: 0,
       source: null,
       currentIndex: 0,
-      sliding: false,
-      isDown: false,
-      startX: 0,
       scrollLeft: 0,
       waitingForMore: false,
     };
@@ -169,50 +158,6 @@ export default {
         return `${baseUrl}/full/${this.thumbnailSize},/0/default.jpg`;
       }
       return '';
-    },
-    onMouseDown(event) {
-      this.isDown = true;
-      this.sliding = true;
-      this.startX = event.pageX;
-      this.scrollLeft = this.$refs.track.scrollLeft;
-    },
-    onRightClick() {
-      // just use the mouse leave logic
-      this.onMouseLeave();
-    },
-    onMouseLeave() {
-      this.isDown = false;
-      this.sliding = false;
-    },
-    onMouseUp(event) {
-      this.isDown = false;
-      this.sliding = false;
-      if (
-        this.startX >= event.pageX - this.mouseClickMoveThreshold &&
-        this.startX <= event.pageX + this.mouseClickMoveThreshold
-      ) {
-        let index = null;
-        if (
-          event.target.classList.contains('biiif-thumbnail-image') ||
-          event.target.classList.contains('biiif-thumbnail-label')
-        ) {
-          index = parseInt(event.target.parentElement.dataset.thumbnailIndex);
-        } else if (
-          event.target.classList.contains('biiif-thumbnail-container')
-        ) {
-          index = parseInt(event.target.dataset.thumbnailIndex);
-        }
-        if (index != null) {
-          this.goto(index);
-        }
-      }
-    },
-    onMouseMove(event) {
-      if (!this.isDown) return;
-      event.preventDefault();
-      const x = event.pageX;
-      const walk = x - this.startX;
-      this.$refs.track.scrollLeft = this.scrollLeft - walk;
     },
     onScroll(event) {
       if (!this.waitingForMore && this.moreRecordsAvailable) {
