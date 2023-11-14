@@ -11,33 +11,49 @@
         <img src="/images/iiif.png" alt="IIIF Manifest" />
       </a>
     </div>
-    <div class="biiif-thumbnail-track" ref="track" @scroll="onScroll">
+    <div
+      class="biiif-thumbnail-track-container"
+      ref="track"
+      @scroll="onScroll"
+      :style="{ height: `${rowHeight * 2.3}px` }"
+    >
       <div
-        :class="{
-          'biiif-thumbnail-container': true,
-          active: currentIndex === index,
+        class="biiif-thumbnail-track"
+        :style="{
+          gridTemplateColumns: `repeat(auto-fill, minmax(${colWidth}px, 1fr))`,
+          gridAutoRows: `${rowHeight}px`,
+          minHeight: `${rowHeight * 3}px`,
         }"
-        v-for="(record, index) in records"
-        role="button"
-        :aria-pressed="currentIndex === index ? 'true' : 'false'"
-        :key="record.data._id"
-        :data-thumbnail-index="index"
-        ref="container"
-        @click="goto(index)"
       >
-        <img
-          class="biiif-thumbnail-image"
-          :src="getRecordThumbnail(record)"
-          :width="`${thumbnailSize}px`"
-          draggable="false"
-          :alt="`Thumbnail of ${record.data['Barcode']} from ${record.data['Collection Name']}`"
-        />
-        <div class="biiif-thumbnail-label">
-          <div class="biiif-thumbnail-label-barcode">
-            {{ record.data['Barcode'] }}
-          </div>
-          <div class="biiif-thumbnail-label-collection">
-            {{ record.data['Collection Name'] }}
+        <div
+          :class="{
+            'biiif-thumbnail-container': true,
+            active: currentIndex === index,
+          }"
+          :style="{ height: `${rowHeight}px` }"
+          v-for="(record, index) in records"
+          role="button"
+          :aria-pressed="currentIndex === index ? 'true' : 'false'"
+          :key="record.data._id"
+          :data-thumbnail-index="index"
+          ref="container"
+          @click="goto(index)"
+        >
+          <img
+            class="biiif-thumbnail-image"
+            :style="{ height: `${thumbnailSize}px` }"
+            :src="getRecordThumbnail(record)"
+            :height="`${thumbnailSize}px`"
+            draggable="false"
+            :alt="`Thumbnail of ${record.data['Barcode']} from ${record.data['Collection Name']}`"
+          />
+          <div class="biiif-thumbnail-label">
+            <div class="biiif-thumbnail-label-barcode">
+              {{ record.data['Barcode'] }}
+            </div>
+            <div class="biiif-thumbnail-label-collection">
+              {{ record.data['Collection Name'] }}
+            </div>
           </div>
         </div>
       </div>
@@ -58,11 +74,7 @@ export default {
     },
     thumbnailSize: {
       type: Number,
-      default: 200,
-    },
-    mouseClickMoveThreshold: {
-      type: Number,
-      default: 5,
+      default: 150,
     },
     fetchImmediately: {
       type: Boolean,
@@ -75,7 +87,7 @@ export default {
       total: 0,
       source: null,
       currentIndex: 0,
-      scrollLeft: 0,
+      scrollDown: 0,
       waitingForMore: false,
     };
   },
@@ -100,6 +112,21 @@ export default {
      */
     moreRecordsAvailable() {
       return this.records.length < this.total;
+    },
+    rowHeight() {
+      // css vars
+      const vPadding = 20;
+      const gridGap = 5;
+      const labelHeight = 60; // this is an estimate
+
+      return this.thumbnailSize + vPadding + gridGap + labelHeight;
+    },
+    colWidth() {
+      // css vars
+      const hPadding = 20;
+
+      const imgWidthEstimate = this.thumbnailSize * (4 / 3); // most images are about 4:3
+      return imgWidthEstimate + hPadding;
     },
   },
   async created() {
@@ -155,14 +182,14 @@ export default {
       if (!!record.iiif) {
         // TODO: what about non-iiif images?
         const baseUrl = record.iiif.items[0].items[0].items[0].body.id;
-        return `${baseUrl}/full/${this.thumbnailSize},/0/default.jpg`;
+        return `${baseUrl}/full/,${this.thumbnailSize}/0/default.jpg`;
       }
       return '';
     },
     onScroll(event) {
       if (!this.waitingForMore && this.moreRecordsAvailable) {
-        const scroll = event.target.scrollLeft + event.target.offsetWidth;
-        if (scroll / event.target.scrollWidth >= 0.9) {
+        const scroll = event.target.scrollTop + event.target.offsetHeight;
+        if (scroll / event.target.scrollHeight >= 0.9) {
           this.waitingForMore = true;
           this.getRecords(true);
         }
@@ -192,7 +219,7 @@ export default {
         newRecords.length > 0 &&
         oldRecords[0]._id !== newRecords[0]._id
       ) {
-        this.$refs.track.scrollLeft = 0;
+        this.$refs.track.scrollDown = 0;
         this.goto(0);
       }
     },

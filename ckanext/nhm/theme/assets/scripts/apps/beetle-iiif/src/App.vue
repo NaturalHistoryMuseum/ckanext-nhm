@@ -12,8 +12,8 @@
     <div class="col-sm-9 col-xs-12">
       <OpenSeadragonView width="100%" height="550px" />
       <ThumbnailCarousel
-        :fetch-size="15"
-        :thumbnailSize="150"
+        :buffer-size="28"
+        :thumbnailSize="120"
         :fetchImmediately="false"
       />
     </div>

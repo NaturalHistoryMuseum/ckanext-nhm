@@ -120,18 +120,26 @@ button.btn[disabled].biiif-button {
   }
 }
 
+.biiif-thumbnail-track-container {
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+}
+
 .biiif-thumbnail-track {
   cursor: pointer;
-  display: flex;
-  overflow-x: auto;
-  flex-wrap: nowrap;
-  scroll-snap-type: x proximity;
+  display: grid;
 }
 
 .biiif-thumbnail-container {
+  flex-grow: 1;
   text-align: center;
   padding: 10px;
   scroll-snap-align: start;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: start;
+  gap: 5px;
 
   &.active {
     background-color: @primary6;
@@ -139,7 +147,8 @@ button.btn[disabled].biiif-button {
 }
 
 .biiif-thumbnail-image {
-  padding: 0 10px;
+  display: block;
+  width: auto;
 }
 
 .biiif-thumbnail-label {
@@ -149,5 +158,6 @@ button.btn[disabled].biiif-button {
 
   .biiif-thumbnail-label-collection {
     font-style: italic;
+    font-size: 0.9em;
   }
 }
