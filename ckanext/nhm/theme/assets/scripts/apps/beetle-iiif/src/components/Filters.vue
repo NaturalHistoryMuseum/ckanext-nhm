@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { api, SET_QUERY } from '../app';
+import { api } from '../app';
 
 export default {
   name: 'Filters',
@@ -171,7 +171,7 @@ export default {
           break;
       }
       // update the query in the store state
-      this.$store.commit(SET_QUERY, query);
+      this.$store.commit('SET_QUERY', query);
     },
     /**
      * Changes the current store state's query to a new query using the currently selected
@@ -179,7 +179,7 @@ export default {
      */
     changeBarcode() {
       this.activeFilter = 'barcode';
-      this.$store.commit(SET_QUERY, {
+      this.$store.commit('SET_QUERY', {
         string_equals: {
           fields: ['Barcode'],
           value: this.barcode,

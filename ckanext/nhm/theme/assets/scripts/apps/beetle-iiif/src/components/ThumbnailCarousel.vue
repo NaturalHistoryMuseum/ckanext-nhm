@@ -63,7 +63,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { api, SET_RECORD } from '../app';
+import { api } from '../app';
 
 export default {
   name: 'ThumbnailCarousel',
@@ -207,7 +207,7 @@ export default {
       if (this.records.length > 0) {
         newRecord = this.records[index];
       }
-      this.$store.commit(SET_RECORD, newRecord);
+      this.$store.commit('SET_RECORD', newRecord);
     },
   },
   watch: {
