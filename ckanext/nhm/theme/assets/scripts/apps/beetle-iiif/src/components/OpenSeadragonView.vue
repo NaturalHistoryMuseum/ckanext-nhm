@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>{{ viewerTitle }}</h2>
     <div :id="viewerId" :style="viewerStyle"></div>
   </div>
 </template>
@@ -32,6 +33,14 @@ export default {
         width: this.width,
         height: this.height,
       };
+    },
+    viewerTitle() {
+      try {
+        const record = this.$store.state.record.data;
+        return `${record['Collection Name']}: ${record['Barcode']}`;
+      } catch {
+        return '';
+      }
     },
   },
   watch: {
