@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="biiif-thumbnail-header">
-      <span class="biiif-status"> Found {{ total }} records </span>
+      <span class="biiif-status"> Found {{ total }} records</span>
       <a
         v-if="manifestLink"
         target="_blank"
@@ -56,14 +56,25 @@
             </div>
           </div>
         </div>
+        <div
+          class="biiif-thumbnail-container"
+          :style="{ height: `${rowHeight}px`, cursor: 'default' }"
+        >
+          <div
+            class="flex-container flex-center flex-around"
+            :style="{ height: `${thumbnailSize}px` }"
+            v-if="loading.results"
+          >
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import { api } from '../app';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'ThumbnailCarousel',
@@ -83,16 +94,13 @@ export default {
   },
   data() {
     return {
-      records: [],
-      total: 0,
-      source: null,
       currentIndex: 0,
       scrollDown: 0,
       waitingForMore: false,
     };
   },
   computed: {
-    ...mapState(['query']),
+    ...mapState(['query', 'total', 'records', 'loading']),
     /**
      * Returns the manifest URL for the current record, or false.
      *
@@ -131,47 +139,12 @@ export default {
   },
   async created() {
     if (this.fetchImmediately) {
-      await this.getRecords();
+      await this.getRecordCount();
+      await this.getRecords(this.bufferSize);
     }
   },
   methods: {
-    /**
-     * Retrieves records from the multisearch API.
-     *
-     * @param isMoreRequest whether this is a request for more data or not
-     */
-    async getRecords(isMoreRequest = false) {
-      if (this.query === null) {
-        // if there is now query, shortcut a no records update
-        this.records = [];
-        this.total = 0;
-        this.source = null;
-      } else {
-        if (!isMoreRequest) {
-          // if it's not a request for more records, reset the async iterable source
-          this.source = api.getRecords();
-          // and update the total
-          this.total = await api.getRecordCount();
-        }
-        // read bufferSize records from the API
-        let newRecords = [];
-        for (let i = 0; i < this.bufferSize; i++) {
-          const next = await this.source.next();
-          if (next.done) {
-            break;
-          }
-          newRecords.push(next.value);
-        }
-        // then update the records
-        if (isMoreRequest) {
-          this.records.push(...newRecords);
-        } else {
-          this.records = [...newRecords];
-          // we've reset the records, move the track back to the start
-          this.goto(0);
-        }
-      }
-    },
+    ...mapActions(['getRecords', 'getRecordCount']),
     /**
      * Returns the thumbnail URL for the given record.
      *
@@ -191,7 +164,7 @@ export default {
         const scroll = event.target.scrollTop + event.target.offsetHeight;
         if (scroll / event.target.scrollHeight >= 0.9) {
           this.waitingForMore = true;
-          this.getRecords(true);
+          this.getRecords(this.bufferSize);
         }
       }
     },
@@ -224,7 +197,8 @@ export default {
       }
     },
     '$store.state.query': function () {
-      this.getRecords();
+      this.getRecordCount();
+      this.getRecords(this.bufferSize);
     },
   },
 };

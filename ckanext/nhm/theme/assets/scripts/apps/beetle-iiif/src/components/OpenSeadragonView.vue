@@ -8,6 +8,7 @@
 <script>
 import OpenSeadragon from 'openseadragon';
 import axios from 'axios';
+import { mapState } from 'vuex';
 
 export default {
   name: 'OpenSeadragonView',
@@ -28,6 +29,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(['record']),
     viewerStyle() {
       return {
         width: this.width,
@@ -36,7 +38,7 @@ export default {
     },
     viewerTitle() {
       try {
-        const record = this.$store.state.record.data;
+        const record = this.record.data;
         return `${record['Collection Name']}: ${record['Barcode']}`;
       } catch {
         return '';

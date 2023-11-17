@@ -14,80 +14,85 @@
         time.
       </div>
       <hr />
-      <div
-        :class="{ 'biiif-filter': true, active: activeFilter === 'barcode' }"
-      >
-        <label
-          class="biiif-filter-barcode-label"
-          for="biiif-filter-barcode-select"
+      <template v-if="loading.filters">
+        <div class="flex-container flex-center flex-around">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+        </div>
+      </template>
+      <template v-else>
+        <div
+          :class="{ 'biiif-filter': true, active: activeFilter === 'barcode' }"
         >
-          Select a barcode:
-        </label>
-        <div class="biiif-filter-barcode-body">
-          <select id="biiif-filter-barcode-select" v-model="barcode">
-            <option disabled value="">Please select one</option>
-            <option v-for="option in barcodes" :value="option" :key="option">
-              {{ option }}
-            </option>
-          </select>
-          <button
-            class="btn btn-primary biiif-button"
-            :disabled="barcode == null"
-            @click="changeBarcode"
+          <label
+            class="biiif-filter-barcode-label"
+            for="biiif-filter-barcode-select"
           >
-            View drawer
-          </button>
-        </div>
-      </div>
-      <hr />
-      <div
-        :class="{
-          'biiif-filter': true,
-          active: activeFilter === 'collections',
-        }"
-      >
-        <div class="biiif-filter-collection-label-header">
-          Or choose one or more collections to view:
-        </div>
-        <div v-for="option in collectionNames">
-          <label class="biiif-filter-collection-label">
-            <input type="checkbox" :value="option" v-model="collections" />
-            {{ option }}
+            Select a barcode:
           </label>
-        </div>
-        <div class="biiif-filter-collection-actions">
-          <div class="biiif-filter-collection-selectors">
-            <span class="biiif-filter-collection-selector" @click="selectAll"
-              >Select all</span
+          <div class="biiif-filter-barcode-body">
+            <select id="biiif-filter-barcode-select" v-model="barcode">
+              <option disabled value="">Please select one</option>
+              <option v-for="option in barcodes" :value="option" :key="option">
+                {{ option }}
+              </option>
+            </select>
+            <button
+              class="btn btn-primary biiif-button"
+              :disabled="barcode == null"
+              @click="changeBarcode"
             >
-            <span class="biiif-filter-collection-selector" @click="deselectAll"
-              >Clear</span
-            >
+              View drawer
+            </button>
           </div>
-          <button
-            class="btn btn-primary biiif-button"
-            :disabled="collections.length === 0"
-            @click="changeCollections"
-          >
-            {{ 'View collection' | pluralize(collections) }}
-          </button>
         </div>
-      </div>
+        <hr />
+        <div
+          :class="{
+            'biiif-filter': true,
+            active: activeFilter === 'collections',
+          }"
+        >
+          <div class="biiif-filter-collection-label-header">
+            Or choose one or more collections to view:
+          </div>
+          <div v-for="option in collectionNames">
+            <label class="biiif-filter-collection-label">
+              <input type="checkbox" :value="option" v-model="collections" />
+              {{ option }}
+            </label>
+          </div>
+          <div class="biiif-filter-collection-actions">
+            <div class="biiif-filter-collection-selectors">
+              <span class="biiif-filter-collection-selector" @click="selectAll"
+                >Select all</span
+              >
+              <span
+                class="biiif-filter-collection-selector"
+                @click="deselectAll"
+                >Clear</span
+              >
+            </div>
+            <button
+              class="btn btn-primary biiif-button"
+              :disabled="collections.length === 0"
+              @click="changeCollections"
+            >
+              {{ 'View collection' | pluralize(collections) }}
+            </button>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-import { api } from '../app';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'Filters',
   data() {
     return {
-      // a list of all the available barcodes
-      barcodes: [],
-      // a list of all the available collection names
-      collectionNames: [],
       // the currently selected barcode (or null if no barcode is selected)
       barcode: null,
       // the list of currently selected collections (empty list if none are selected)
@@ -96,34 +101,19 @@ export default {
       activeFilter: null,
     };
   },
+  computed: {
+    ...mapState(['loading']),
+    ...mapGetters(['barcodes', 'collectionNames']),
+  },
   async created() {
-    // first, run through all the records and grab all the barcodes and all the available
-    // collection names. We could use the autocomplete API to get these values but because we
-    // want to get all the barcodes, and they are unique, we'll end up going through all records
-    // anyway and this way is more efficient than calling the autocomplete endpoint.
-    let barcodes = [];
-    let names = [];
-    for await (const record of api.getRecords(500, false)) {
-      const barcode = record.data['Barcode'];
-      // this is technically not needed but hey why not
-      if (!barcodes.includes(barcode)) {
-        barcodes.push(barcode);
-      }
-      const name = record.data['Collection Name'];
-      if (!names.includes(name)) {
-        names.push(name);
-      }
-    }
-
-    // add all the barcodes and collection names in alphabetical order
-    this.barcodes.push(...barcodes.sort());
-    this.collectionNames.push(...names.sort());
-
-    // start off with everything selected
-    this.selectAll();
-    this.changeCollections();
+    this.getFilterValues().then(() => {
+      // start off with everything selected
+      this.selectAll();
+      this.changeCollections();
+    });
   },
   methods: {
+    ...mapActions(['getFilterValues']),
     /**
      * Select all the available collections.
      */
