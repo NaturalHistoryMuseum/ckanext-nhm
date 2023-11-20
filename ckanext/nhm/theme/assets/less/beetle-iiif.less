@@ -121,11 +121,6 @@ button.btn[disabled].biiif-button {
   }
 }
 
-.biiif-thumbnail-track-container {
-  overflow-y: auto;
-  scroll-snap-type: y proximity;
-}
-
 .biiif-thumbnail-track {
   cursor: pointer;
   display: grid;
@@ -150,6 +145,7 @@ button.btn[disabled].biiif-button {
 .biiif-thumbnail-image {
   display: block;
   width: auto;
+  cursor: pointer;
 }
 
 .biiif-thumbnail-label {
@@ -161,4 +157,38 @@ button.btn[disabled].biiif-button {
     font-style: italic;
     font-size: 0.9em;
   }
+}
+
+.biiif-view-tab {
+  &.active {
+    color: white;
+  }
+
+  & > label {
+    margin: 0;
+    padding: 15px;
+
+    &::after {
+      content: '';
+    }
+  }
+
+  & input {
+    position: absolute !important;
+    margin: -1px !important;
+  }
+}
+
+.biiif-list-track-container {
+  height: 500px;
+
+  & tr {
+    scroll-snap-align: start;
+  }
+}
+
+.record-select-view {
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+  margin-top: 10px;
 }

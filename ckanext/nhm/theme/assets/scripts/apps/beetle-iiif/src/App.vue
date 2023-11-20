@@ -11,18 +11,14 @@
     </div>
     <div class="col-sm-9 col-xs-12">
       <OpenSeadragonView width="100%" height="550px" />
-      <ThumbnailCarousel
-        :buffer-size="28"
-        :thumbnailSize="120"
-        :fetchImmediately="false"
-      />
+      <RecordSelect />
     </div>
   </div>
 </template>
 
 <script>
 import OpenSeadragonView from './components/OpenSeadragonView.vue';
-import ThumbnailCarousel from './components/ThumbnailCarousel.vue';
+import RecordSelect from './components/RecordSelect.vue';
 import Filters from './components/Filters.vue';
 
 export default {
@@ -30,7 +26,7 @@ export default {
   components: {
     Filters,
     OpenSeadragonView,
-    ThumbnailCarousel,
+    RecordSelect,
   },
 };
 </script>

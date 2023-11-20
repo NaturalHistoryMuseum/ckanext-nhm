@@ -83,6 +83,20 @@ const store = new Vuex.Store({
     collectionNames: (state) => {
       return [...state._filterValues.collections].sort();
     },
+    manifestLink: (state) => {
+      if (!!state.record) {
+        return state.record.iiif.id;
+      }
+      return false;
+    },
+    columnNames: (state) => {
+      if (!state.records) {
+        return [];
+      }
+      return Object.keys(state.records[0].data).filter(
+        (k) => !k.startsWith('_') && k !== 'Image',
+      );
+    },
   },
   mutations: {
     SET_RECORD(state, newRecord) {
@@ -147,6 +161,10 @@ const store = new Vuex.Store({
         }
         context.state.records.push(next.value);
         i++;
+      }
+
+      if (!context.state.record) {
+        context.commit('SET_RECORD', context.state.records[0]);
       }
 
       Vue.set(context.state.loading, 'results', false);
