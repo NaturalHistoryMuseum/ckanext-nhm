@@ -42,6 +42,7 @@ slickgrid-js:
     preload:
       - base/main
       - base/ckan
+      - base/view-filters
   contents:
     - scripts/slickgrid.js
 
@@ -57,6 +58,7 @@ resource-view-field-filters:
   extra:
     preload:
       - base/main
+      - base/view-filters
   contents:
     - scripts/modules/resource-view-field-filters.js
 
@@ -66,6 +68,7 @@ resource-view-filter-options:
   extra:
     preload:
       - base/main
+      - base/view-filters
   contents:
     - scripts/modules/resource-view-filter-options.js
 
