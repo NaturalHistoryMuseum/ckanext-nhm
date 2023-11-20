@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.1.8 (2023-11-20)
+
+### Fix
+
+- include base/view-filters in all assets that require it to ensure ckan.views is available
+
 ## v6.1.7 (2023-11-13)
 
 ### Fix
