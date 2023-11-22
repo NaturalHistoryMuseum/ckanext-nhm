@@ -130,7 +130,6 @@ button.btn[disabled].biiif-button {
   flex-grow: 1;
   text-align: center;
   padding: 10px;
-  scroll-snap-align: start;
   display: grid;
   grid-template-rows: auto 1fr;
   justify-items: center;
@@ -181,14 +180,9 @@ button.btn[disabled].biiif-button {
 
 .biiif-list-track-container {
   height: 500px;
-
-  & tr {
-    scroll-snap-align: start;
-  }
 }
 
 .record-select-view {
   overflow-y: auto;
-  scroll-snap-type: y proximity;
   margin-top: 10px;
 }
