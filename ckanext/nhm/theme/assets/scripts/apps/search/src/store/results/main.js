@@ -230,7 +230,7 @@ let results = {
           if (aborted) {
             throw new AbortError(searchId);
           }
-          if (context.state.display.view === 'gallery') {
+          if (context.state.display.view.toLowerCase() === 'gallery') {
             return context.dispatch('images/loadAndCheckImages');
           }
           return new Promise((r) => {

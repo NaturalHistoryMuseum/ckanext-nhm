@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>{{ viewerTitle }}</h2>
     <div :id="viewerId" :style="viewerStyle"></div>
   </div>
 </template>
@@ -7,6 +8,7 @@
 <script>
 import OpenSeadragon from 'openseadragon';
 import axios from 'axios';
+import { mapState } from 'vuex';
 
 export default {
   name: 'OpenSeadragonView',
@@ -27,11 +29,20 @@ export default {
     };
   },
   computed: {
+    ...mapState(['record']),
     viewerStyle() {
       return {
         width: this.width,
         height: this.height,
       };
+    },
+    viewerTitle() {
+      try {
+        const record = this.record.data;
+        return `${record['Collection Name']}: ${record['Barcode']}`;
+      } catch {
+        return '';
+      }
     },
   },
   watch: {

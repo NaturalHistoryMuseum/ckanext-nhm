@@ -4,6 +4,10 @@
 
 .load-fonts();
 
+.biiif-page-description {
+  margin-bottom: 1em;
+}
+
 .biiif-intro-text-lower {
   margin-top: 15px;
 }
@@ -20,6 +24,7 @@
 .biiif-filter-collection-label {
   font-weight: normal;
   margin-left: 10px;
+  text-transform: capitalize;
 
   &:after {
     content: '';
@@ -118,16 +123,18 @@ button.btn[disabled].biiif-button {
 
 .biiif-thumbnail-track {
   cursor: pointer;
-  display: flex;
-  overflow-x: auto;
-  flex-wrap: nowrap;
-  scroll-snap-type: x proximity;
+  display: grid;
 }
 
 .biiif-thumbnail-container {
+  flex-grow: 1;
   text-align: center;
   padding: 10px;
-  scroll-snap-align: start;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  align-items: start;
+  gap: 5px;
 
   &.active {
     background-color: @primary6;
@@ -135,7 +142,9 @@ button.btn[disabled].biiif-button {
 }
 
 .biiif-thumbnail-image {
-  padding: 0 10px;
+  display: block;
+  width: auto;
+  cursor: pointer;
 }
 
 .biiif-thumbnail-label {
@@ -145,5 +154,35 @@ button.btn[disabled].biiif-button {
 
   .biiif-thumbnail-label-collection {
     font-style: italic;
+    font-size: 0.9em;
   }
+}
+
+.biiif-view-tab {
+  &.active {
+    color: white;
+  }
+
+  & > label {
+    margin: 0;
+    padding: 15px;
+
+    &::after {
+      content: '';
+    }
+  }
+
+  & input {
+    position: absolute !important;
+    margin: -1px !important;
+  }
+}
+
+.biiif-list-track-container {
+  height: 500px;
+}
+
+.record-select-view {
+  overflow-y: auto;
+  margin-top: 10px;
 }
