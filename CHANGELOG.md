@@ -1,5 +1,33 @@
 # Changelog
 
+## v6.2.0 (2023-11-27)
+
+### Feature
+
+- add list/table view for record selection
+
+### Fix
+
+- check for the correct tab name
+- remove scroll-snap from thumbnail select
+
+### Refactor
+
+- put records in the store, not in individual components
+- move store into separate file
+- simplify image selection from carousel
+
+### Build System(s)
+
+- fix build errors
+
+### Minor UI Changes
+
+- remove references to our twitter account
+- add title to iiif viewer
+- make the thumbnail carousel scroll vertically in a grid
+- add beetle viewer page title and description
+
 ## v6.1.8 (2023-11-20)
 
 ### Fix
