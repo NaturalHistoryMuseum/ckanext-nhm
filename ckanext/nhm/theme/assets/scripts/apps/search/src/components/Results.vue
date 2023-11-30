@@ -36,7 +36,7 @@
       <Share />
       <Download v-if="total > 0" />
     </div>
-    <div v-show="hasResult" :class="{ disabled: invalidated }">
+    <div v-show="hasResult" :class="{ disabled: invalidated }" key="resultView">
       <div class="flex-container flex-stretch-first flex-center">
         <ul class="nav nav-tabs">
           <li
