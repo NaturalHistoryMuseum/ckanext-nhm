@@ -1,5 +1,12 @@
 # Changelog
 
+## v6.2.1 (2023-12-04)
+
+### Fix
+
+- use the correct version number for ckanext-doi
+- use new test mode helper and update ckanext-doi
+
 ## v6.2.0 (2023-11-27)
 
 ### Feature
