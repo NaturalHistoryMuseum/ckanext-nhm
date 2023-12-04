@@ -25,7 +25,7 @@
             Retrieved: {{ h.render_datetime(h.now(), date_format='%H:%M %d %b %Y (%Z)') }}
         </small>
         {% if not res %}
-        {% set datacite_url = 'api.test.datacite.org' if config.get('ckanext.doi.test_mode', config.get('DEBUG', True)) else 'api.datacite.org' %}
+        {% set datacite_url = 'api.test.datacite.org' if h.doi_test_mode() else 'api.datacite.org' %}
         <a class="btn btn-mini" title="Download BibTeX" href="https://{{ datacite_url }}/dois/application/x-bibtex/{{ pkg_dict['doi'] }}">
             <small><i class="fas fa-file-code"></i>BibTeX</small>
         </a>
