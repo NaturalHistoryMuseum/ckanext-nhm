@@ -169,12 +169,9 @@ export default {
         if (wasAdded) {
           return this.runSearch(0);
         } else {
-          return new Promise((resolve) => {
-            resolve();
-          });
+          return this.loadAndCheckImages();
         }
       })
-      .then(this.loadAndCheckImages)
       .then(() => {
         this.setFilteredRecordTag(this.recordTag + '$ with images');
         this.loading = false;
