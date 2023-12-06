@@ -8,9 +8,16 @@ let images = {
   },
   getters: {
     loadedImageRecords: (state) => {
-      return state.imageRecords.filter(
+      let loadedImgRecords = state.imageRecords.filter(
         (r) => r.image.canLoad && !r.image.loading,
       );
+      loadedImgRecords.sort((a, b) => {
+        const recordOrder = a.recordIndex - b.recordIndex;
+        return recordOrder === 0
+          ? a.recordImageIndex - b.recordImageIndex
+          : recordOrder;
+      });
+      return loadedImgRecords;
     },
     getItemImages:
       (state, getters, rootState, rootGetters) =>
@@ -105,7 +112,8 @@ let images = {
       },
   },
   actions: {
-    loadAndCheckImages(context) {
+    loadAndCheckImages(context, searchId) {
+      const isAborted = context.rootGetters['results/isAborted'];
       Vue.set(context.state, 'imageRecords', []);
       if (context.state.locked) {
         return;
@@ -134,7 +142,13 @@ let images = {
             resolve(ratio);
           };
           imageElement.onerror = reject;
-          imageElement.src = url;
+          if (isAborted(searchId)) {
+            // don't try and load if this request has been aborted
+            reject();
+          } else {
+            // this starts the loading test
+            imageElement.src = url;
+          }
         });
       }
 
@@ -150,10 +164,17 @@ let images = {
           })
           .finally(() => {
             r.image.loading = false;
-            context.state.imageRecords.push(r);
+            if (!isAborted(searchId)) {
+              // only add to the state if the search is still ongoing
+              context.state.imageRecords.push(r);
+            }
           });
       });
       return Promise.allSettled(brokenChecks).then(() => {
+        if (isAborted(searchId)) {
+          // remove everything already added to the state
+          Vue.set(context.state, 'imageRecords', []);
+        }
         context.commit(
           'results/display/addPageImages',
           context.getters.loadedImageRecords,
