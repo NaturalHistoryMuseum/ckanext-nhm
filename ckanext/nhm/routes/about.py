@@ -49,3 +49,11 @@ def terms():
     Render the "about" page for terms and conditions.
     """
     return toolkit.render('about/terms.html', {'title': 'Terms and conditions'})
+
+
+@blueprint.route('/datacite')
+def datacite():
+    """
+    Render the "about" page for DataCite service provider.
+    """
+    return toolkit.render('about/datacite.html', {'title': 'DataCite Service Provider'})
