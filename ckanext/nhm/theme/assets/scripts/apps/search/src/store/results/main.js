@@ -75,6 +75,9 @@ let results = {
         return [a[0], a[1], getters['query/resources/sortedResources'][a[2]]];
       });
     },
+    isAborted: (state) => (searchId) => {
+      return state.searchControllers[searchId].controller.signal.aborted;
+    },
   },
   mutations: {
     addPage(state, after) {
@@ -134,9 +137,7 @@ let results = {
           { signal: context.state.searchControllers[searchId].signal },
         ).then((data) => {
           // check to see if this request was aborted and don't add any data if so
-          if (
-            context.state.searchControllers[searchId].controller.signal.aborted
-          ) {
+          if (context.getters.isAborted(searchId)) {
             throw new AbortError(searchId);
           }
 
@@ -218,20 +219,12 @@ let results = {
           }
         })
         .then(() => {
-          Vue.set(
-            context.rootState.appState.status.resultData,
-            'loading',
-            false,
-          );
           context.state.invalidated = false;
-          const aborted =
-            context.state.searchControllers[searchId].controller.signal.aborted;
-          Vue.delete(context.state.searchControllers, searchId);
-          if (aborted) {
+          if (context.getters.isAborted(searchId)) {
             throw new AbortError(searchId);
           }
           if (context.state.display.view.toLowerCase() === 'gallery') {
-            return context.dispatch('images/loadAndCheckImages');
+            return context.dispatch('images/loadAndCheckImages', searchId);
           }
           return new Promise((r) => {
             r();
@@ -246,6 +239,13 @@ let results = {
             );
             throw e;
           }
+        })
+        .finally(() => {
+          Vue.set(
+            context.rootState.appState.status.resultData,
+            'loading',
+            false,
+          );
           Vue.delete(context.state.searchControllers, searchId);
         });
 
