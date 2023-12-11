@@ -98,16 +98,22 @@ class RecordImage:
     is_mss_image: bool = False
 
     @property
+    def is_iiif_image(self) -> bool:
+        return self.is_mss_image or self.url.startswith(
+            toolkit.config.get('ckanext.iiif.image_server_url')
+        )
+
+    @property
     def download_url(self) -> str:
-        return f'{self.url}/original' if self.is_mss_image else self.url
+        return f'{self.url}/original' if self.is_iiif_image else self.url
 
     @property
     def preview_url(self) -> str:
-        return f'{self.url}/preview' if self.is_mss_image else self.url
+        return f'{self.url}/preview' if self.is_iiif_image else self.url
 
     @property
     def thumbnail_url(self) -> str:
-        return f'{self.url}/thumbnail' if self.is_mss_image else self.url
+        return f'{self.url}/thumbnail' if self.is_iiif_image else self.url
 
 
 class Record:
