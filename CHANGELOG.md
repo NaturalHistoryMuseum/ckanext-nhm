@@ -1,5 +1,21 @@
 # Changelog
 
+## v6.3.0 (2023-12-11)
+
+### Feature
+
+- update 4th dataset (aphid slides)
+
+### Fix
+
+- check for aborted requests, sort images, move loading
+- remove extra unnecessary image load in gallery component
+- add key to parent div to prevent view rerendering
+
+### Chores/Misc
+
+- add build section to read the docs config
+
 ## v6.2.1 (2023-12-04)
 
 ### Fix
