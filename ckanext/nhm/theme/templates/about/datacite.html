@@ -1,0 +1,59 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+<li>{% link_for _("About"), named_route="home.about" %}</li>
+<li class='active'>{% link_for _(title), named_route="about.datacite" %}</li>
+{% endblock %}
+
+{% block about_content %}
+<h1 class='page-heading'>{{ title }}</h1>
+
+<p>
+    The Natural History Museum Data Portal uses <a class='external'
+                                                   href='https://datacite.org'>DataCite</a>
+    to mint Digital Object Identifiers (DOIs) for each dataset created on the site.
+    This ensures there is a persistent identifier which can be used to cite and
+    reference each specific dataset.
+</p>
+<p>
+    The mechanism for minting and updating these DOIs is provided through an
+    extension we develop and maintain to the Comprehensive Knowledge Archive
+    Network (CKAN) software.
+    This extension is called <i>ckanext-doi</i> and is open sourced under the
+    <a class='external'
+       href='https://github.com/NaturalHistoryMuseum/ckanext-doi/blob/main/LICENSE'>GPL-3.0
+        license</a>
+    with the source code available on
+    <a class='external' href='https://github.com/NaturalHistoryMuseum/ckanext-doi'>GitHub</a>.
+</p>
+<p>
+    As part of our commitment to open source software as well as promoting the use
+    of persistent identifiers, we have joined the DataCite Service Providers
+    program.
+    You can find out more about the program and the other service providers on
+    <a class='external' href='https://datacite.org/service-providers/'>the DataCite
+        website</a>.
+</p>
+<p>
+    If you are using CKAN and would like to integrate with DataCite, the
+    <i>ckanext-doi</i> extension is the recommended way to do this.
+</p>
+<p>
+    More information about how to set the extension up is available in the
+    <a class='external' href='https://ckanext-doi.readthedocs.io/en/latest/'>documentation</a>.
+</p>
+<p>
+    If you have any questions or issues, or would like to contribute new features
+    to the extension, please create an issue in our
+    <a class='external'
+       href='https://github.com/NaturalHistoryMuseum/ckanext-doi/issues/new/choose'>GitHub
+        repository</a>.
+</p>
+<div class='flex-container flex-center gaps'>
+    <img class='datacite-provider-logo' src='/images/datacite_service_provider.svg'>
+    <img class='datacite-provider-logo' src='/images/nhm_logo_black.svg'>
+    <img class='datacite-provider-logo' src='/images/datacite_logo.svg'>
+</div>
+{% endblock %}
