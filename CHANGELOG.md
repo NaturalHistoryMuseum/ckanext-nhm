@@ -1,5 +1,17 @@
 # Changelog
 
+## v6.4.0 (2023-12-11)
+
+### Feature
+
+- use external class for links on new datacite page
+- add a page about being a DataCite service provider
+
+### Fix
+
+- use /original endpoint for all iiif images, not just mss
+- expand acronyms
+
 ## v6.3.0 (2023-12-11)
 
 ### Feature
