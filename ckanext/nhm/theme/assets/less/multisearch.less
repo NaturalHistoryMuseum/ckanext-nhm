@@ -431,6 +431,30 @@
   }
 }
 
+.term-editor,
+.field-picker {
+  input {
+    border: @lighter-borders;
+    border-radius: @rounding;
+  }
+
+  select {
+    width: 100%;
+    min-height: unset !important;
+    height: unset;
+    border: @lighter-borders;
+    padding: 1.2px 2px 2px;
+  }
+
+  label {
+    margin-bottom: 0;
+
+    &::after {
+      content: none;
+    }
+  }
+}
+
 .term-editor {
   @wrapSize: @lg;
 
@@ -462,29 +486,8 @@
     }
   }
 
-  label {
-    margin-bottom: 0;
-
-    &::after {
-      content: none;
-    }
-  }
-
   .term-editor-block {
     width: 300px;
-  }
-
-  select {
-    width: 100%;
-    min-height: unset !important;
-    height: unset;
-    border: @lighter-borders;
-    padding: 1.2px 2px 2px;
-  }
-
-  input {
-    border: @lighter-borders;
-    border-radius: @rounding;
   }
 
   & .comparison-types {
@@ -528,10 +531,10 @@
       padding: 10px 0;
     }
   }
+}
 
-  .field-picker button {
-    margin-left: 2px;
-  }
+.field-picker button {
+  margin-left: 2px;
 }
 
 .filter-buttons {
@@ -549,6 +552,11 @@
   &:not(:last-child)::after {
     content: ' / ';
   }
+}
+
+.header-picker {
+  min-width: 200px;
+  right: 0;
 }
 
 // MAIN FORM ---------------------------------------------------------------------------------------
@@ -617,6 +625,7 @@
     display: flex;
     justify-content: center;
     gap: 5px;
+
     & > input,
     & > label {
       margin: 0;

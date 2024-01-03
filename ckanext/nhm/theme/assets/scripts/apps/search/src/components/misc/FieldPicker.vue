@@ -54,7 +54,8 @@ export default {
   computed: {
     ...mapState('results', ['resultData']),
     selectableFields() {
-      return this.fieldList.filter((f) => !this.selectedFields.includes(f));
+      const existingFields = this.selectedFields || []; // just in case it's null
+      return this.fieldList.filter((f) => !existingFields.includes(f));
     },
   },
   methods: {
