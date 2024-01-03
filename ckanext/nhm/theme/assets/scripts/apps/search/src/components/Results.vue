@@ -63,11 +63,12 @@
               v-if="showFields"
               :callback="addCustomHeader"
               :resource-ids="resultResourceIds"
-              :classes="['floating']"
+              :classes="['floating', 'header-picker']"
               v-dismiss="{
                 switch: 'showFields',
                 ignore: ['#show-fields-' + _uid],
               }"
+              :selected-fields="headers.flat(1)"
             ></FieldPicker>
           </transition>
         </div>
