@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.4.1 (2024-01-15)
+
+### Fix
+
+- provide list of selected fields/headers to column picker
+
 ## v6.4.0 (2023-12-11)
 
 ### Feature
