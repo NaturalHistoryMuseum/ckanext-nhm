@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.4.2 (2024-01-22)
+
+### Refactor
+
+- remove mam patch and gallery overrides
+
 ## v6.4.1 (2024-01-15)
 
 ### Fix
