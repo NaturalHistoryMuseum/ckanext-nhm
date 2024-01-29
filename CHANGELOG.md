@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.5.0 (2024-01-29)
+
+### Feature
+
+- add aohc page
+
 ## v6.4.2 (2024-01-22)
 
 ### Refactor
