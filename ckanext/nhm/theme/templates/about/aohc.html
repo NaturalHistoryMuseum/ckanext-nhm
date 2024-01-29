@@ -1,0 +1,16 @@
+{% extends "home/about.html" %}
+
+{% block subtitle %}{{ title }}{% endblock %}
+
+{% block breadcrumb_content %}
+<li>{% link_for _("About"), named_route="home.about" %}</li>
+<li class='active'>{% link_for _(title), named_route="about.aohc" %}</li>
+{% endblock %}
+
+{% block about_content %}
+<h1 class='page-heading'>{{ title }}</h1>
+<p>As well as looking to the future, we’re committed to examining the past.</p>
+<p>We were founded within the context of empire, colonialism and exploration. We recognise that the hallmarks of this legacy exist in the collections we care for as well as in our galleries.</p>
+<p>The NHM Data Portal contains lots of data about the collections we look after and reveals instances and patterns of harmful or exploitative methods of collecting or describing the collection. For transparency, searchability and to preserve historical records, many items are presented in their original form and as a result, they may contain offensive language, images or other content.</p>
+<p>At times records are revised to bring them in line with new descriptive or cataloguing practices. If you would like to provide feedback on an item, email us at <a href="mailto:data@nhm.ac.uk">data@nhm.ac.uk</a>.</p>
+{% endblock %}
