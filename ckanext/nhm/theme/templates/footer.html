@@ -71,6 +71,11 @@
                     Website accessibility statement
                 </a>
             </li>
+            <li role="presentation">
+                <a href="{{ h.url_for('about.aohc') }}">
+                    Acknowledgement of harmful content
+                </a>
+            </li>
             {% if g.userobj %}
             <li role="presentation">
                 <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('My
