@@ -3,7 +3,7 @@ import * as d3 from 'd3-collection';
 let staticPresets = {
   namespaced: true,
   state: {
-    specimensHasImage: {
+    birdwingButterflies: {
       name: 'Birdwing Butterfly Digitisation',
       content: [
         {

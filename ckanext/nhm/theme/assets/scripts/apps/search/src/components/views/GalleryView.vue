@@ -118,6 +118,7 @@ export default {
   },
   computed: {
     ...mapState('results/display', ['recordTag']),
+    ...mapState('results/query/resources', ['resourceIds']),
     ...mapGetters('results/query/filters', ['hasFilter']),
     brokenImageRecords() {
       return this.imageRecords.filter(
@@ -184,6 +185,11 @@ export default {
     window.addEventListener('resize', () => {
       debouncedSetColWidth();
     });
+  },
+  watch: {
+    resourceIds() {
+      this.addPreset(this.presetData);
+    },
   },
 };
 </script>
