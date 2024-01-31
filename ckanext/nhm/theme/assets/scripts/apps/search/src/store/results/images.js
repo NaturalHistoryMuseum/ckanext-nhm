@@ -121,6 +121,9 @@ let images = {
         Vue.set(context.state, 'locked', true);
       }
 
+      // remove current page images
+      context.commit('results/display/addPageImages', [], { root: true });
+
       let imgRecords = [];
 
       let records = context.rootGetters['results/records'];
