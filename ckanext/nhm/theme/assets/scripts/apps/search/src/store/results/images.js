@@ -174,16 +174,19 @@ let images = {
           });
       });
       return Promise.allSettled(brokenChecks).then(() => {
-        if (isAborted(searchId)) {
-          // remove everything already added to the state
-          Vue.set(context.state, 'imageRecords', []);
-        }
-        context.commit(
-          'results/display/addPageImages',
-          context.getters.loadedImageRecords,
-          { root: true },
-        );
-        Vue.set(context.state, 'locked', false);
+        return new Promise((resolve) => {
+          if (isAborted(searchId)) {
+            // remove everything already added to the state
+            Vue.set(context.state, 'imageRecords', []);
+          }
+          context.commit(
+            'results/display/addPageImages',
+            context.getters.loadedImageRecords,
+            { root: true },
+          );
+          Vue.set(context.state, 'locked', false);
+          resolve();
+        });
       });
     },
   },
