@@ -1,5 +1,17 @@
 # Changelog
 
+## v6.5.1 (2024-02-05)
+
+### Fix
+
+- **search-ui**: return promise from loadAndCheckImages
+- **search-ui**: update image filter when resources are changed
+- **search-ui**: remove previous page's images when loading new set
+
+### Refactor
+
+- **search-ui**: rename birdwing preset
+
 ## v6.5.0 (2024-01-29)
 
 ### Feature
