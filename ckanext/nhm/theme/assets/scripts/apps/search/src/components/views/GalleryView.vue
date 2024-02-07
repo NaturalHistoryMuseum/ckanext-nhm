@@ -167,11 +167,7 @@ export default {
     this.loading = true;
     this.addPreset(this.presetData)
       .then((wasAdded) => {
-        if (wasAdded) {
-          return this.runSearch(0);
-        } else {
-          return this.loadAndCheckImages();
-        }
+        return this.runSearch(0);
       })
       .then(() => {
         this.setFilteredRecordTag(this.recordTag + '$ with images');
