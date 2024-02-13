@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.5.2 (2024-02-13)
+
+### Fix
+
+- **search-ui**: rerun search even if image preset not added
+
 ## v6.5.1 (2024-02-05)
 
 ### Fix
