@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.5.3 (2024-02-26)
+
+### Fix
+
+- allow json-ld as an rdf format
+
 ## v6.5.2 (2024-02-13)
 
 ### Fix
