@@ -176,8 +176,22 @@ export const useModeStore = defineStore('modes', () => {
 
   function defaultMode() {
     mainStore.setQuery({
-      query: {},
-      resource_ids: ['05ff2255-c38a-40c9-b657-4ccb55ab2feb'],
+      query: {
+        filters: {
+          and: [
+            {
+              string_equals: {
+                fields: ['associatedMedia.category'],
+                value: 'Drawer scan',
+              },
+            },
+          ],
+        },
+      },
+      resource_ids: [
+        '05ff2255-c38a-40c9-b657-4ccb55ab2feb',
+        'bb909597-dedf-427d-8c04-4c02b3a24db3',
+      ],
     });
   }
 

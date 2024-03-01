@@ -1,7 +1,8 @@
 import mitt from 'mitt';
 
 const events = {
-  recordsRetrieved: 'recordsRetrieved',
+  recordsRetrieved: 'RECORDS_RETRIEVED',
+  querySet: 'QUERY_SET',
 };
 
 const emitter = mitt();

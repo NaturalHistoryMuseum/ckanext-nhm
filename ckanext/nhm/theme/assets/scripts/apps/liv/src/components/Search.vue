@@ -19,14 +19,14 @@
         <zoa-input
           zoa-type="multiselect"
           label="Type status"
-          :options="{ options: typeStatusOptions }"
+          :options="{ options: typeStatusOptions, enableSearch: true }"
           v-model="typeStatus"
           :class="$style.input"
         />
         <zoa-input
           zoa-type="multiselect"
           label="Image category"
-          :options="{ options: imageCategoryOptions }"
+          :options="{ options: imageCategoryOptions, enableSearch: true }"
           v-model="imageCategory"
           :class="$style.input"
         />
@@ -35,7 +35,7 @@
     <zoa-input
       zoa-type="multiselect"
       label="Resources"
-      :options="{ options: resourceOptions }"
+      :options="{ options: resourceOptions, enableSearch: true }"
       v-model="resources"
       :class="$style.input"
       v-if="modes.mode && modes.mode.enableResources"
@@ -47,7 +47,8 @@
 <script setup>
 import { ZoaButton, ZoaInput } from '@nhm-data/zoa';
 import { useModeStore, useStore } from '../store';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { emitter, events } from '../utils/events';
 
 const store = useStore();
 const modes = useModeStore();
@@ -76,6 +77,19 @@ const enableDwcFilters = computed(() => {
 });
 
 const taxa = ref(null);
+const taxaFields = [
+  'scientificName',
+  'currentScientificName',
+  'kingdom',
+  'phylum',
+  'class',
+  'order',
+  'family',
+  'genus',
+  'specificEpithet',
+  'infraspecificEpithet',
+  'higherClassification',
+];
 
 const typeStatus = ref([]);
 const typeStatusOptions = ref([
@@ -104,11 +118,11 @@ const imageCategoryOptions = ref([
   { value: 'Other', order: 5 },
 ]);
 
-function _makeFilterDict(arr, fieldName) {
+function _makeFilterDict(arr, fieldNames) {
   if (arr.length === 1) {
     return {
       string_equals: {
-        fields: [fieldName],
+        fields: fieldNames,
         value: arr[0],
       },
     };
@@ -116,7 +130,7 @@ function _makeFilterDict(arr, fieldName) {
     return {
       or: arr.map((x) => ({
         string_equals: {
-          fields: [fieldName],
+          fields: fieldNames,
           value: x,
         },
       })),
@@ -125,6 +139,8 @@ function _makeFilterDict(arr, fieldName) {
 }
 
 function applyFilters() {
+  console.log(imageCategory.value);
+
   let newQ = {
     query: {},
     resource_ids: [...store.query.resource_ids],
@@ -141,33 +157,16 @@ function applyFilters() {
       }
       // now for the individual filters
       if (taxa.value) {
-        newQ.query.filters.and.push({
-          string_equals: {
-            fields: [
-              'scientificName',
-              'currentScientificName',
-              'kingdom',
-              'phylum',
-              'class',
-              'order',
-              'family',
-              'genus',
-              'specificEpithet',
-              'infraspecificEpithet',
-              'higherClassification',
-            ],
-            value: taxa.value,
-          },
-        });
+        newQ.query.filters.and.push(_makeFilterDict([taxa.value], taxaFields));
       }
       if (typeStatus.value.length > 0) {
         newQ.query.filters.and.push(
-          _makeFilterDict(typeStatus.value, 'typeStatus'),
+          _makeFilterDict(typeStatus.value, ['typeStatus']),
         );
       }
       if (imageCategory.value.length > 0) {
         newQ.query.filters.and.push(
-          _makeFilterDict(imageCategory.value, 'associatedMedia.category'),
+          _makeFilterDict(imageCategory.value, ['associatedMedia.category']),
         );
         newImageQ['category'] = imageCategory.value;
       }
@@ -180,9 +179,57 @@ function applyFilters() {
   store.setQuery(newQ, newImageQ);
 }
 
+function parseQuery() {
+  // NB this will only work for filters at the root, but this should only be shown for
+  // simple queries anyway
+  if (store.query.query) {
+    searchEverything.value = store.query.query.search;
+
+    if (store.query.query.filters && store.query.query.filters.and) {
+      let _typeStatus = [];
+      let _imageCategory = [];
+      let _taxa = null;
+      const _taxaFields = JSON.stringify(taxaFields.sort());
+
+      function _parseGroup(g) {
+        g.forEach((term) => {
+          const termParts = Object.entries(term)[0];
+          if (termParts[0] === 'or') {
+            _parseGroup(termParts[1]);
+          }
+          if (termParts[0] !== 'string_equals') {
+            return;
+          }
+          if (termParts[1].fields[0] === 'typeStatus') {
+            _typeStatus.push(termParts[1].value);
+          } else if (termParts[1].fields[0] === 'associatedMedia.category') {
+            _imageCategory.push(termParts[1].value);
+          } else if (
+            JSON.stringify(termParts[1].fields.sort()) === _taxaFields
+          ) {
+            _taxa = termParts[1].value;
+          }
+        });
+      }
+
+      _parseGroup(store.query.query.filters.and);
+      typeStatus.value = _typeStatus;
+      imageCategory.value = _imageCategory;
+      taxa.value = _taxa;
+    }
+  }
+}
+
+emitter.on(events.querySet, (newQuery) => {
+  parseQuery();
+});
+
 onMounted(() => {
   resources.value = [...store.query.resource_ids];
   store.getAllResources();
+  // wait for the multiselects to initialise or the values will be immediately
+  // overwritten; this is probably a zoa bug
+  setTimeout(parseQuery, 200);
 });
 </script>
 

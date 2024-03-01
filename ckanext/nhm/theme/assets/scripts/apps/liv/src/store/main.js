@@ -294,6 +294,7 @@ export const useStore = defineStore('liv', () => {
         ...imgQuery,
         size: pageSize,
       };
+      emitter.emit(events.querySet, query.value);
       return getRecords(4);
     });
   }
