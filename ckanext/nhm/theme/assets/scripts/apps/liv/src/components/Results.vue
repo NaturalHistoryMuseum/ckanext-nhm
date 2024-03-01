@@ -21,7 +21,7 @@
       />
     </div>
     <KeepAlive>
-      <Search v-if="showFilters" />
+      <Search v-if="showFilters" v-model="showFilters" />
     </KeepAlive>
     <KeepAlive>
       <TabComponent />

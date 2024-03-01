@@ -40,15 +40,21 @@
       :class="$style.input"
       v-if="modes.mode && modes.mode.enableResources"
     />
-    <zoa-button @click="applyFilters" :class="$style.apply">Apply</zoa-button>
+    <div :class="$style.buttons">
+      <zoa-button @click="clearAll">Clear</zoa-button>
+      <zoa-button @click="applyFilters">Apply</zoa-button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ZoaButton, ZoaInput } from '@nhm-data/zoa';
 import { useModeStore, useStore } from '../store';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { emitter, events } from '../utils/events';
+
+// links to a show/hide so the hide can be triggered from inside this component
+const model = defineModel();
 
 const store = useStore();
 const modes = useModeStore();
@@ -139,8 +145,6 @@ function _makeFilterDict(arr, fieldNames) {
 }
 
 function applyFilters() {
-  console.log(imageCategory.value);
-
   let newQ = {
     query: {},
     resource_ids: [...store.query.resource_ids],
@@ -177,6 +181,7 @@ function applyFilters() {
   }
 
   store.setQuery(newQ, newImageQ);
+  model.value = false;
 }
 
 function parseQuery() {
@@ -220,6 +225,16 @@ function parseQuery() {
   }
 }
 
+function clearAll() {
+  searchEverything.value = null;
+  taxa.value = null;
+  typeStatus.value = [];
+  imageCategory.value = [];
+  if (modes.mode.enableResources) {
+    resources.value = [];
+  }
+}
+
 emitter.on(events.querySet, (newQuery) => {
   parseQuery();
 });
@@ -241,17 +256,27 @@ onMounted(() => {
   padding: 1em 1em 2em;
 }
 
-.input label {
-  margin-bottom: 0;
+.input {
+  & li label {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
 
-  &::after {
-    content: '';
+  & label {
+    margin-bottom: 0;
+
+    &::after {
+      content: '';
+    }
   }
 }
 
-.apply {
+.buttons {
   grid-column: span 1/-1;
   justify-self: end;
   align-self: end;
+  display: flex;
+  gap: 1em;
 }
 </style>
