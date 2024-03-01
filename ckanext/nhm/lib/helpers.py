@@ -462,6 +462,7 @@ def filter_and_format_resource_items(resource):
     blacklist = {
         '_image_field',
         '_title_field',
+        '_subtitle_field',
         'datastore_active',
         'has_views',
         'on_same_domain',

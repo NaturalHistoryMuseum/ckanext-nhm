@@ -69,6 +69,7 @@ def get_specimen_by_uuid(
 
 # define some custom fields that are set on the resource
 TITLE_FIELD = '_title_field'
+SUBTITLE_FIELD = '_subtitle_field'
 IMAGE_FIELD = '_image_field'
 IMAGE_DELIMETER_FIELD = '_image_delimiter'
 IMAGE_LICENCE_FIELD = '_image_licence'
