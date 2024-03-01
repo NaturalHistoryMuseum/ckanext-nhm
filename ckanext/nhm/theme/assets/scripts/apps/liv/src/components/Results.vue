@@ -23,9 +23,14 @@
     <KeepAlive>
       <Search v-if="showFilters" v-model="showFilters" />
     </KeepAlive>
-    <KeepAlive>
-      <TabComponent />
-    </KeepAlive>
+    <template v-if="store.totalRecords > 0">
+      <KeepAlive>
+        <TabComponent />
+      </KeepAlive>
+    </template>
+    <div v-else-if="!store.state.loading" :class="$style.noResults">
+      No results.
+    </div>
   </div>
 </template>
 
@@ -38,7 +43,6 @@ import Search from './Search.vue';
 
 const store = useStore();
 const modes = useModeStore();
-const route = useRoute();
 
 // TABS
 const tabs = ref({
@@ -105,5 +109,11 @@ onMounted(() => {
   & > span {
     display: inline-block;
   }
+}
+
+.noResults {
+  text-align: center;
+  padding: 3em;
+  font-weight: bold;
 }
 </style>
