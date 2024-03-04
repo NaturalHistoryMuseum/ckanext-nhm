@@ -22,6 +22,13 @@
       </div>
     </div>
   </div>
+  <div
+    :class="$style.loadMore"
+    v-if="store.more && !store.pending"
+    @click="store.getRecords()"
+  >
+    <span><b>Load more...</b></span>
+  </div>
 </template>
 
 <script setup>
@@ -41,7 +48,7 @@ const gridGap = 10;
 useInfiniteScroll(
   galleryContainer,
   () => {
-    if (store.more) {
+    if (store.more && !store.pending && !store.disableAutoLoad) {
       store.getRecords();
     }
   },
@@ -150,6 +157,20 @@ useResizeObserver(galleryContainer, debounce(setColWidth, 200));
         font-size: 0.9em;
       }
     }
+  }
+}
+
+.loadMore {
+  width: 100%;
+  padding: 1em;
+  display: flex;
+  justify-content: center;
+
+  & > span {
+    cursor: pointer;
+    padding: 10px 20px;
+    background: #eee;
+    border-radius: 10px;
   }
 }
 </style>

@@ -29,8 +29,17 @@ export const useStore = defineStore('liv', () => {
   const request = ref(null);
   const after = ref(null);
   const _done = ref(false);
+  const pending = ref(false);
   const more = computed(() => {
     return request.value != null && !_done.value;
+  });
+  const requestedImgs = ref(0);
+  const failedImgs = ref(0);
+  const disableAutoLoad = computed(() => {
+    if (requestedImgs.value < bufferSize) {
+      return false;
+    }
+    return failedImgs.value / requestedImgs.value > 0.5;
   });
 
   // current image/record
@@ -135,6 +144,7 @@ export const useStore = defineStore('liv', () => {
 
   async function getRecords(batches = 1) {
     state.value.loading = true;
+    pending.value = true;
 
     return new Promise(async (resolve, reject) => {
       if (request.value == null) {
@@ -156,6 +166,7 @@ export const useStore = defineStore('liv', () => {
       }
 
       Promise.allSettled(imageRequests).then(() => {
+        pending.value = false;
         if (imageRequests.length > 0) {
           // only emit if records were actually retrieved
           emitter.emit(events.recordsRetrieved, {});
@@ -183,47 +194,52 @@ export const useStore = defineStore('liv', () => {
     const recordModel = recordRepo.value.save(record);
     const resource = resourceRepo.value.find(recordData.resource);
     const imageRequests = recordIIIF.map((img, ix) => {
+      requestedImgs.value++;
       const imgUrl = img.items[0].items[0].body.id;
       const infoUrl = imgUrl + '/info.json';
-      return get(infoUrl).then((data) => {
-        return new Promise((resolve) => {
-          let recordImgData = {};
-          if (resource && resource.dwc) {
-            recordImgData = recordData.data.associatedMedia.filter(
-              (m) => m.identifier === imgUrl,
-            )[0];
-          }
-
-          let addImage = Object.entries(imageQuery.value).every((q) => {
-            if (q[0] === 'ix') {
-              return ix.toString() === q[1];
+      return get(infoUrl)
+        .then((data) => {
+          return new Promise((resolve) => {
+            let recordImgData = {};
+            if (resource && resource.dwc) {
+              recordImgData = recordData.data.associatedMedia.filter(
+                (m) => m.identifier === imgUrl,
+              )[0];
             }
-            try {
-              // get record value
-              let keys = q[0].split('.');
-              let val = recordImgData;
-              for (const kIx in keys) {
-                val = val[keys[kIx]];
+
+            let addImage = Object.entries(imageQuery.value).every((q) => {
+              if (q[0] === 'ix') {
+                return ix.toString() === q[1];
               }
-              return q[1].includes(val);
-            } catch (e) {
-              return false;
-            }
-          });
-
-          if (addImage) {
-            imageRepo.value.save({
-              id: imgUrl,
-              ix,
-              url: imgUrl,
-              recordId: recordModel.id,
-              iiifData: data,
-              data: recordImgData,
+              try {
+                // get record value
+                let keys = q[0].split('.');
+                let val = recordImgData;
+                for (const kIx in keys) {
+                  val = val[keys[kIx]];
+                }
+                return q[1].includes(val);
+              } catch (e) {
+                return false;
+              }
             });
-          }
-          resolve();
+
+            if (addImage) {
+              imageRepo.value.save({
+                id: imgUrl,
+                ix,
+                url: imgUrl,
+                recordId: recordModel.id,
+                iiifData: data,
+                data: recordImgData,
+              });
+            }
+            resolve();
+          });
+        })
+        .catch(() => {
+          failedImgs.value++;
         });
-      });
     });
     return Promise.allSettled(imageRequests);
   }
@@ -278,6 +294,9 @@ export const useStore = defineStore('liv', () => {
     }
     query.value = newQuery;
 
+    requestedImgs.value = 0;
+    failedImgs.value = 0;
+    pending.value = false;
     after.value = null;
     _done.value = false;
     request.value = null;
@@ -302,14 +321,16 @@ export const useStore = defineStore('liv', () => {
     currentImage,
     currentRecord,
     currentResources,
+    disableAutoLoad,
     getAllResources,
     getRecords,
     imageQuery,
     imageRepo,
+    more,
+    pending,
+    query,
     recordRepo,
     resourceRepo,
-    more,
-    query,
     setQuery,
     showOverlay,
     state,
