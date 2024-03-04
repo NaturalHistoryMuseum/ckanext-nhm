@@ -260,7 +260,7 @@ export const useStore = defineStore('liv', () => {
 
   function getAllResources() {
     return get('current_package_list_with_resources', {
-      params: { limit: 10000 },
+      limit: 10000,
     }).then((data) => {
       data.result.forEach((p) => {
         p.resources.forEach((r) => addResource(r, p.title));
