@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { computed, ref, toRaw, watch } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 import { get, post } from '../utils/api';
 import { useRepo } from 'pinia-orm';
 import { Image, Record, Resource } from '../utils/models';
