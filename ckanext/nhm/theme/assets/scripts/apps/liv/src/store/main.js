@@ -4,12 +4,8 @@ import { get, post } from '../utils/api';
 import { useRepo } from 'pinia-orm';
 import { Image, Record, Resource } from '../utils/models';
 import { emitter, events } from '../utils/events';
-import { useModeStore } from './modes';
 
 export const useStore = defineStore('liv', () => {
-  // other stores
-  const modeStore = useModeStore();
-
   // repos
   const resourceRepo = computed(() => useRepo(Resource));
   const recordRepo = computed(() => useRepo(Record));
