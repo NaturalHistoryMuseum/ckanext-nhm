@@ -35,9 +35,14 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  ref,
+  shallowRef,
+} from 'vue';
 import { useStore, useModeStore } from '../store';
-import { useRoute } from 'vue-router';
 import { ZoaTabs, ZoaToggleButton } from '@nhm-data/zoa';
 import Search from './Search.vue';
 
@@ -45,7 +50,7 @@ const store = useStore();
 const modes = useModeStore();
 
 // TABS
-const tabs = ref({
+const tabs = shallowRef({
   gallery: defineAsyncComponent({
     loader: () => import('./views/Gallery.vue'),
   }),
