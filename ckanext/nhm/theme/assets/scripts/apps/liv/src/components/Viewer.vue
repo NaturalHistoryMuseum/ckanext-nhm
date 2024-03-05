@@ -20,6 +20,7 @@ onMounted(() => {
     showRotationControl: true,
     tileSources: [],
     defaultZoomLevel: 0.8,
+    minZoomLevel: 0.2,
   });
 });
 
