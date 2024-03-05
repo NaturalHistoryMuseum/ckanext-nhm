@@ -241,7 +241,6 @@ emitter.on(events.querySet, (newQuery) => {
 
 onMounted(() => {
   resources.value = [...store.query.resource_ids];
-  store.getAllResources();
   // wait for the multiselects to initialise or the values will be immediately
   // overwritten; this is probably a zoa bug
   setTimeout(parseQuery, 200);

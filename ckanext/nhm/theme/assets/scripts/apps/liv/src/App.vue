@@ -8,9 +8,12 @@
 
 <script setup>
 import Overlay from './components/Overlay.vue';
-import { useStore } from './store/main';
+import { useStore } from './store';
+import { onMounted } from 'vue';
 
 const store = useStore();
+
+onMounted(store.getAllResources);
 </script>
 
 <style></style>
