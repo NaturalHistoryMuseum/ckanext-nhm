@@ -47,7 +47,7 @@ useInfiniteScroll(
       store.getRecords();
     }
   },
-  { distance: 10, interval: 1000 },
+  { distance: 50, interval: 1000 },
 );
 </script>
 
