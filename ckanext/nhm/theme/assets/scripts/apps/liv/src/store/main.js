@@ -4,6 +4,7 @@ import { get, post } from '../utils/api';
 import { useRepo } from 'pinia-orm';
 import { Image, Record, Resource } from '../utils/models';
 import { emitter, events } from '../utils/events';
+import { cyrb53 } from '../utils/misc';
 
 export const useStore = defineStore('liv', () => {
   // repos
@@ -22,6 +23,9 @@ export const useStore = defineStore('liv', () => {
     return resourceRepo.value
       .where((r) => query.value.resource_ids.includes(r.id))
       .get();
+  });
+  const queryHash = computed(() => {
+    return cyrb53(JSON.stringify(query.value));
   });
 
   // current request
@@ -57,10 +61,10 @@ export const useStore = defineStore('liv', () => {
   // results
   const totalRecords = ref(0);
   const allImages = computed(() => {
-    return imageRepo.value.withAllRecursive().get();
+    return imageRepo.value.withAllRecursive(2).get();
   });
   const allRecords = computed(() => {
-    return recordRepo.value.withAllRecursive().get();
+    return recordRepo.value.withAll().get();
   });
 
   // state
@@ -146,6 +150,9 @@ export const useStore = defineStore('liv', () => {
     state.value.loading = true;
     pending.value = true;
 
+    // make a copy of the current query hash so requests can use it as an abort signal
+    const qH = queryHash.value.toString();
+
     return new Promise(async (resolve, reject) => {
       if (request.value == null) {
         request.value = multisearch();
@@ -161,7 +168,7 @@ export const useStore = defineStore('liv', () => {
           _done.value = true;
           break;
         }
-        imageRequests.push(addRecordAndImages(next.value));
+        imageRequests.push(addRecordAndImages(next.value, qH));
         i++;
       }
 
@@ -177,7 +184,7 @@ export const useStore = defineStore('liv', () => {
     });
   }
 
-  function addRecordAndImages(recordData) {
+  function addRecordAndImages(recordData, qH) {
     const recordIIIF = recordData.iiif ? recordData.iiif.items : [];
     if (recordIIIF.length === 0) {
       console.error('No IIIF data.');
@@ -185,14 +192,16 @@ export const useStore = defineStore('liv', () => {
       return new Promise((r) => r());
     }
 
+    const resource = resourceRepo.value.find(recordData.resource);
+    const recordId = `${recordData.resource}_${recordData.data._id}`;
     const record = {
-      id: recordData._id,
+      id: recordId,
       data: toRaw(recordData.data),
       manifest: recordData.iiif.id,
       resourceId: recordData.resource,
+      images: [],
     };
-    const recordModel = recordRepo.value.save(record);
-    const resource = resourceRepo.value.find(recordData.resource);
+
     const imageRequests = recordIIIF.map((img, ix) => {
       requestedImgs.value++;
       const imgUrl = img.items[0].items[0].body.id;
@@ -225,11 +234,11 @@ export const useStore = defineStore('liv', () => {
             });
 
             if (addImage) {
-              imageRepo.value.save({
+              record.images.push({
                 id: imgUrl,
                 ix,
                 url: imgUrl,
-                recordId: recordModel.id,
+                recordId: recordId,
                 iiifData: data,
                 data: recordImgData,
               });
@@ -241,7 +250,13 @@ export const useStore = defineStore('liv', () => {
           failedImgs.value++;
         });
     });
-    return Promise.allSettled(imageRequests);
+
+    return Promise.allSettled(imageRequests).then(() => {
+      if (queryHash.value.toString() === qH) {
+        // if it doesn't match, it's not from the current query
+        recordRepo.value.save(record);
+      }
+    });
   }
 
   function addResource(resourceData, packageName) {
@@ -329,6 +344,7 @@ export const useStore = defineStore('liv', () => {
     more,
     pending,
     query,
+    queryHash,
     recordRepo,
     resourceRepo,
     setQuery,

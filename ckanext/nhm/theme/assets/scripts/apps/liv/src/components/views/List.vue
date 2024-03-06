@@ -1,6 +1,10 @@
 <template>
   <div :class="$style.list" ref="listContainer">
-    <div :class="$style.item" v-for="record in store.allRecords">
+    <div
+      :class="$style.item"
+      v-for="record in store.allRecords"
+      :key="record.id"
+    >
       <div :class="$style.header">
         <span :class="$style.title">{{ record.title }}</span>
         <span :class="$style.subtitle">{{ record.subtitle }}</span>
@@ -33,7 +37,7 @@
 </template>
 
 <script setup>
-import { useStore } from '../../store/main';
+import { useStore } from '../../store';
 import { ref } from 'vue';
 import { useInfiniteScroll } from '@vueuse/core';
 
@@ -43,7 +47,12 @@ const listContainer = ref(null);
 useInfiniteScroll(
   listContainer,
   () => {
-    if (store.more) {
+    if (
+      listContainer.value &&
+      store.more &&
+      !store.pending &&
+      !store.disableAutoLoad
+    ) {
       store.getRecords();
     }
   },

@@ -5,6 +5,7 @@
       v-for="img in store.allImages"
       :style="{ gridRowEnd: `span ${imageHeight(img)}` }"
       role="button"
+      :key="img.id"
     >
       <img
         :src="img.thumbnail"
@@ -32,7 +33,7 @@
 </template>
 
 <script setup>
-import { useStore } from '../../store/main';
+import { useStore } from '../../store';
 import { onMounted, ref } from 'vue';
 import { useInfiniteScroll, useResizeObserver } from '@vueuse/core';
 import { debounce } from 'dettle';
@@ -48,7 +49,13 @@ const gridGap = 10;
 useInfiniteScroll(
   galleryContainer,
   () => {
-    if (store.more && !store.pending && !store.disableAutoLoad) {
+    if (
+      galleryContainer.value &&
+      store.more &&
+      !store.pending &&
+      !store.disableAutoLoad
+    ) {
+      // if the container element does not exist (e.g. because it's just reloading) it tries to scroll forever
       store.getRecords();
     }
   },
