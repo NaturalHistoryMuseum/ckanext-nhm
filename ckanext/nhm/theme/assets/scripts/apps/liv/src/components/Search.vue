@@ -124,22 +124,24 @@ const imageCategoryOptions = ref([
   { value: 'Other', order: 5 },
 ]);
 
-function _makeFilterDict(arr, fieldNames) {
+function _makeFilterDict(arr, fieldNames, matchType = 'string_equals') {
   if (arr.length === 1) {
-    return {
-      string_equals: {
-        fields: fieldNames,
-        value: arr[0],
-      },
+    let d = {};
+    d[matchType] = {
+      fields: fieldNames,
+      value: arr[0],
     };
+    return d;
   } else {
     return {
-      or: arr.map((x) => ({
-        string_equals: {
+      or: arr.map((x) => {
+        let d = {};
+        d[matchType] = {
           fields: fieldNames,
           value: x,
-        },
-      })),
+        };
+        return d;
+      }),
     };
   }
 }
@@ -161,7 +163,9 @@ function applyFilters() {
       }
       // now for the individual filters
       if (taxa.value) {
-        newQ.query.filters.and.push(_makeFilterDict([taxa.value], taxaFields));
+        newQ.query.filters.and.push(
+          _makeFilterDict([taxa.value], taxaFields, 'string_contains'),
+        );
       }
       if (typeStatus.value.length > 0) {
         newQ.query.filters.and.push(
