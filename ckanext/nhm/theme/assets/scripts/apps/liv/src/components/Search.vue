@@ -78,7 +78,10 @@ const resourceModels = computed(() => {
 });
 const enableDwcFilters = computed(() => {
   return resourceModels.value.length > 0
-    ? resourceModels.value.every((r) => r.dwc)
+    ? resourceModels.value.every((r) => {
+        // this is a horrible hack to make it work for index lots as well, because it's *almost* dwc
+        return r.dwc || r.id === 'bb909597-dedf-427d-8c04-4c02b3a24db3';
+      })
     : false;
 });
 
@@ -169,7 +172,7 @@ function applyFilters() {
       }
       if (typeStatus.value.length > 0) {
         newQ.query.filters.and.push(
-          _makeFilterDict(typeStatus.value, ['typeStatus']),
+          _makeFilterDict(typeStatus.value, ['typeStatus', 'materialType']),
         );
       }
       if (imageCategory.value.length > 0) {
