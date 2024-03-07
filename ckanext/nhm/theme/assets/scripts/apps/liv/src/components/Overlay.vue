@@ -4,9 +4,9 @@
     :style="{ top: showOverlay ? '20%' : '100%' }"
     ref="container"
   >
-    <ZoaButton size="sm" @click="showOverlay = false" :class="$style.close"
+    <zoa-button size="sm" @click="showOverlay = false" :class="$style.close"
       >close
-    </ZoaButton>
+    </zoa-button>
     <Viewer v-show="showOverlay" />
     <div
       :class="$style.record"
@@ -25,9 +25,16 @@
               v-if="currentRecord && currentRecord.url"
               >View record</a
             >
+            <form method="get" :action="`${currentImage.url}/original`">
+              <zoa-button size="sm">
+                <i class="fas fa-download" />
+                <span class="sr-only">Download image</span>
+              </zoa-button>
+            </form>
             <zoa-modal header="Sharing links" :button-args="{ size: 'sm' }">
               <template v-slot:button>
                 <i class="fas fa-share-alt" />
+                <span class="sr-only">Share</span>
               </template>
               <div :class="$style.shareLinks">
                 <span>Record</span>
@@ -92,9 +99,9 @@
     </div>
   </div>
   <div v-if="showClosed" :class="[$style.overlay, $style.closed]">
-    <ZoaButton size="sm" @click="showOverlay = true" :class="$style.open"
+    <zoa-button size="sm" @click="showOverlay = true" :class="$style.open"
       >open viewer
-    </ZoaButton>
+    </zoa-button>
   </div>
 </template>
 
