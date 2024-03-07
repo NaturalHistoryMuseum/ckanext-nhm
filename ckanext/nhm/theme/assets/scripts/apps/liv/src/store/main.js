@@ -318,6 +318,11 @@ export const useStore = defineStore('liv', () => {
     }
     query.value = newQuery;
 
+    state.value = {
+      loading: false,
+      error: false,
+      errorMsg: null,
+    };
     requestedImgs.value = 0;
     failedImgs.value = 0;
     pending.value = false;
