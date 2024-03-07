@@ -69,6 +69,7 @@ export const useStore = defineStore('liv', () => {
 
   // state
   const state = ref({
+    attempted: false,
     loading: false,
     error: false,
     errorMsg: null,
@@ -148,6 +149,7 @@ export const useStore = defineStore('liv', () => {
 
   async function getRecords(batches = 1) {
     state.value.loading = true;
+    state.value.attempted = true;
     pending.value = true;
 
     // make a copy of the current query hash so requests can use it as an abort signal
@@ -319,6 +321,7 @@ export const useStore = defineStore('liv', () => {
     query.value = newQuery;
 
     state.value = {
+      attempted: false,
       loading: false,
       error: false,
       errorMsg: null,

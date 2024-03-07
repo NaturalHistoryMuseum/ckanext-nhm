@@ -28,7 +28,10 @@
         <TabComponent />
       </KeepAlive>
     </template>
-    <div v-else-if="!store.state.loading" :class="$style.noResults">
+    <div
+      v-else-if="store.state.attempted && !store.state.loading"
+      :class="$style.noResults"
+    >
       No results.
     </div>
   </div>
