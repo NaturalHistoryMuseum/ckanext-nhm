@@ -162,13 +162,22 @@ export const useStore = defineStore('liv', () => {
 
       let batchSize = bufferSize * batches;
       let i = 0;
-      while (batchSize ? i < batchSize : true) {
-        const next = await request.value.next();
-        if (next.done) {
-          _done.value = true;
-          break;
-        }
-        imageRequests.push(addRecordAndImages(next.value, qH));
+      while (!_done.value && (batchSize ? i < batchSize : true)) {
+        imageRequests.push(
+          request.value
+            .next()
+            .then((next) => {
+              if (next.done) {
+                _done.value = true;
+              }
+              return addRecordAndImages(next.value, qH);
+            })
+            .catch((e) => {
+              // this doesn't currently do anything other than store the error
+              state.value.error = true;
+              state.value.errorMsg = e;
+            }),
+        );
         i++;
       }
 
