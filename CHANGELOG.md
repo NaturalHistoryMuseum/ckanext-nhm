@@ -1,4 +1,8 @@
-# Changelog
+## v6.5.4 (2024-03-11)
+
+### Fix
+
+- remove random root init
 
 ## v6.5.3 (2024-02-26)
 
@@ -232,35 +236,13 @@
 
 ## v6.0.0 (2023-07-18)
 
-### Feature
-
-- use nav slugs for the homepage search
-- remove all references to ckanpackager
-
 ### Fix
 
 - try once again to fix the overflowing text on resource list
-- modify vds queries before and after converting
-- allow for non-datastore resources in download button
-- do not propogate errors from phenome10k api call
-- set download button query from url
-
-### Style
-
-- data is plural
 
 ### Build System(s)
 
 - update dependencies
-
-### Chores/Misc
-
-- pull in external link changes from #672
-
-### Minor UI Changes
-
-- replace record download link
-- replace resource download link
 
 ## v5.8.2 (2023-07-17)
 
@@ -330,9 +312,31 @@
 
 ## v5.6.4 (2023-06-16)
 
+### Feature
+
+- use nav slugs for the homepage search
+- remove all references to ckanpackager
+
 ### Fix
 
 - do not propogate errors from phenome10k api call
+- modify vds queries before and after converting
+- allow for non-datastore resources in download button
+- do not propogate errors from phenome10k api call
+- set download button query from url
+
+### Style
+
+- data is plural
+
+### Chores/Misc
+
+- pull in external link changes from #672
+
+### Minor UI Changes
+
+- replace record download link
+- replace resource download link
 
 ## v5.6.3 (2023-05-09)
 
@@ -487,10 +491,10 @@
 
 - bump vds version
 - rebuild search app after merging dependabot updates
+- **deps**: bump loader-utils
+- **deps**: bump decode-uri-component
 - **deps**: bump node-forge and webpack-dev-server
 - **deps**: bump json5 in /ckanext/nhm/theme/assets/scripts/apps/search
-- **deps**: bump decode-uri-component
-- **deps**: bump loader-utils
 
 ### Minor UI Changes
 
@@ -521,17 +525,16 @@
 ### Feature
 
 - change featured dataset 4 to jtd
+- sort the show_extensions_versions by name
+- add action which lists installed package extensions and their versions
 - add a button for resetting the download
 - **search-app**: remove cached download when popup toggled
 - **search-app**: add new dwc options and improve UI
-- sort the show_extensions_versions by name
-- add action which lists installed package extensions and their versions
-- **search-app**: split popups into separate components, add new dl opts
 
 ### Fix
 
-- use new download interface methods for replacing templates
 - **accessibility**: add aria labels/alt text for all featured datasets
+- use new download interface methods for replacing templates
 - **search-app**: actually trigger a download
 
 ### Refactor
@@ -545,8 +548,8 @@
 ### Tests
 
 - go up one more dir to find src files
-- remove references to old interface method
 - add a test for the new show_extension_versions action
+- remove references to old interface method
 
 ### Build System(s)
 
@@ -586,6 +589,7 @@
 
 ### Build System(s)
 
+- **commitizen**: fix package.json path
 - **requirements**: use compatible release specifier for extensions
 
 ## v4.0.5 (2022-12-08)
@@ -595,6 +599,10 @@
 - fix patterns for package data
 
 ## v4.0.4 (2022-12-07)
+
+### Feature
+
+- **search-app**: split popups into separate components, add new dl opts
 
 ### Fix
 
@@ -629,6 +637,9 @@
 
 ### Build System(s)
 
+- remove ckanext-dcat from dependencies entirely
+- put dcat dependency link in setup.py
+- fix version number
 - **requirements**: add ckanext-iiif as a dependency
 
 ## v4.0.1 (2022-11-29)
@@ -639,31 +650,6 @@
 - change ckan.rdf.plugins to ckan.rdf.profiles
 
 ## v4.0.0 (2022-11-28)
-
-### Fix
-
-- **less**: add parentheses for less v4 compatibility
-- update less and less-loader in beetle-iiif
-
-### Docs
-
-- add section delimiters and include-markdown
-
-### Build System(s)
-
-- **requirements**: update versions of ckan extensions
-- set changelog generation to incremental
-- pin minor versions of dependencies
-
-### CI System(s)
-
-- add cz_nhm dependency
-
-### Chores/Misc
-
-- use cz_nhm commitizen config
-
-## v3.7.2 (2022-11-21)
 
 ### Breaking Changes
 
@@ -676,11 +662,16 @@
 
 ### Fix
 
-- ensure the geo_point radius is always passed as a number in queries
+- **less**: add parentheses for less v4 compatibility
+- update less and less-loader in beetle-iiif
 
 ### Refactor
 
 - switch all css to less
+
+### Docs
+
+- add section delimiters and include-markdown
 
 ### Style
 
@@ -688,18 +679,32 @@
 
 ### Build System(s)
 
-- rebuild the search app after previous change (prod build)
+- **requirements**: update versions of ckan extensions
+- set changelog generation to incremental
+- pin minor versions of dependencies
 
 ### CI System(s)
 
+- add cz_nhm dependency
 - **commitizen**: fix message template
 
 ### Chores/Misc
 
+- use cz_nhm commitizen config
 - update dcat version
 - improve commitizen message template
 - fix license in package.json
 - standardise package files
+
+## v3.7.2 (2022-11-21)
+
+### Fix
+
+- ensure the geo_point radius is always passed as a number in queries
+
+### Build System(s)
+
+- rebuild the search app after previous change (prod build)
 
 ## v3.7.1 (2022-10-24)
 
@@ -817,13 +822,13 @@
 
 ## v0.3.3 (2019-08-07)
 
-## v1.0.0-alpha (2019-07-23)
-
 ## v0.3.2 (2019-05-29)
 
 ## v0.3.1 (2019-05-01)
 
 ## v0.3.0 (2019-04-30)
+
+## v1.0.0-alpha (2019-07-23)
 
 ## v0.2.10 (2018-12-07)
 
