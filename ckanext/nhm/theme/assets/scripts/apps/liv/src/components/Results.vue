@@ -13,6 +13,10 @@
         v-model="currentTab"
         :class="$style.viewTabs"
       />
+      <zoa-button @click="resetAll" size="sm" :class="$style.resetButton">
+        <i class="fas fa-undo-alt" />
+        <span class="sr-only">Reset to defaults</span>
+      </zoa-button>
       <zoa-toggle-button
         label="Filters"
         v-model="showFilters"
@@ -46,11 +50,13 @@ import {
   shallowRef,
 } from 'vue';
 import { useStore, useModeStore } from '../store';
-import { ZoaTabs, ZoaToggleButton } from '@nhm-data/zoa';
+import { ZoaTabs, ZoaToggleButton, ZoaButton } from '@nhm-data/zoa';
 import Search from './Search.vue';
+import { useRouter } from 'vue-router';
 
 const store = useStore();
 const modes = useModeStore();
+const router = useRouter();
 
 // TABS
 const tabs = shallowRef({
@@ -75,6 +81,12 @@ const TabComponent = computed(() => {
 const showFilters = ref(false);
 
 // MODES
+function resetAll() {
+  router.push('/').then(() => {
+    window.location.reload();
+  });
+}
+
 onMounted(() => {
   modes.loadData();
 });
@@ -105,18 +117,20 @@ onMounted(() => {
 
 .buttons {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
+  gap: 5px;
 
   & > label::after {
     content: '';
   }
 }
 
+.resetButton {
+  margin-bottom: 10px;
+}
+
 .filterButton {
-  display: inline-block;
-  & > span {
-    display: inline-block;
-  }
+  margin-bottom: 5px;
 }
 
 .noResults {
