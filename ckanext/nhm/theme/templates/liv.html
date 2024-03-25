@@ -1,0 +1,22 @@
+{% extends "page.html" %}
+
+{% block title %}
+    {{ _('Image Viewer') }}
+{% endblock %}
+
+{% block breadcrumb_content %}
+    <li class="active">
+        <a class="active" href="{{ h.url_for('liv.index') }}">Image Viewer</a>
+    </li>
+{% endblock %}
+
+{# no secondary block here, we render it in the vue app instead #}
+{% block secondary %}
+{% endblock %}
+
+{% block primary %}
+    {% asset 'ckanext-nhm/liv-css' %}
+    {% asset 'ckanext-nhm/liv-js' %}
+    <div id="liv-app">
+    </div>
+{% endblock %}

@@ -240,3 +240,14 @@ resource-view-reorder:
       - base/main
   contents:
     - scripts/modules/resource-view-reorder.js
+
+liv-css:
+  output: ckanext-nhm/%(version)s_liv.css
+  contents:
+    - scripts/apps/liv/dist/*.css
+
+liv-js:
+  output: ckanext-nhm/%(version)s_liv.js
+  filters: rjsmin
+  contents:
+    - scripts/apps/liv/dist/*.js
