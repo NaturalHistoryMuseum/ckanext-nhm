@@ -1,3 +1,48 @@
+## v6.6.0 (2024-03-25)
+
+### Feature
+
+- add link to liv from search ui image viewer
+- add reset button
+- add download button to overlay
+- add no results message
+- add clear filters button
+- load filters from query
+- initial commit for large image viewer (liv)
+- add subtitle field to extras
+
+### Fix
+
+- only show no results message if search has been attempted
+- reset state when setting query
+- handle errors in multisearch request
+- use query hash as abort signal, insert records and imgs together
+- enable filters for index lots
+- use string_contains for taxa search
+- only show analytics when not debug
+- define view components with shallowref
+- make infinite scroll trigger earlier
+- set minimum zoom level to allow further zooming out
+- slow down repeated requests and disable auto load if many fail
+- rate limit api calls from liv
+- set limit param correctly
+- add a timeout to GBIF API requests
+
+### Refactor
+
+- get all resources on app mount
+
+### Chores/Misc
+
+- update zoa
+- remove extra multisearch
+- remove unnecessary store import
+
+### Minor UI Changes
+
+- change viewer link and image on homepage
+- add link to liv from beetle viewer
+
 ## v6.5.4 (2024-03-11)
 
 ### Fix
