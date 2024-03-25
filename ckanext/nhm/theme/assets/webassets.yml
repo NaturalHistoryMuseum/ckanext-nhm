@@ -248,6 +248,5 @@ liv-css:
 
 liv-js:
   output: ckanext-nhm/%(version)s_liv.js
-  filters: rjsmin
   contents:
     - scripts/apps/liv/dist/*.js
