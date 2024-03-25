@@ -63,13 +63,18 @@ def _get_gbif_record(occurrence_id: str, institution_code: str) -> Optional[dict
     if occurrence_id is None or institution_code is None:
         return None
 
-    r = requests.get(
-        "https://api.gbif.org/v1/occurrence/search",
-        params={
-            "occurrenceID": occurrence_id,
-            "institutionCode": institution_code,
-        },
-    )
+    try:
+        r = requests.get(
+            "https://api.gbif.org/v1/occurrence/search",
+            params={
+                "occurrenceID": occurrence_id,
+                "institutionCode": institution_code,
+            },
+            timeout=5
+        )
+    except requests.Timeout:
+        return None
+
     if r.ok:
         results = r.json()
         if results.get("count") == 1:

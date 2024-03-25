@@ -10,6 +10,16 @@
       <div class="info-popup-button">
         <a
           class="image-viewer-icon"
+          title="View in large image viewer"
+          :href="livUrl"
+          target="_blank"
+        >
+          <i class="fas fa-search-plus fa-2x"></i>
+        </a>
+      </div>
+      <div class="info-popup-button">
+        <a
+          class="image-viewer-icon"
           title="Download original image"
           :href="viewerImage.image.download"
         >
@@ -81,6 +91,12 @@ export default {
     },
     lastImage() {
       return this.viewerImagePage.length <= this.viewerImageIndex + 1;
+    },
+    livUrl() {
+      const resource = this.viewerImage.record.resource;
+      const recordId = this.viewerImage.record.data._id;
+      const imageIx = this.viewerImage.recordImageIndex;
+      return `/image-viewer/record/${resource}/${recordId}/${imageIx}`;
     },
   },
   methods: {

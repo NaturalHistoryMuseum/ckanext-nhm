@@ -1,6 +1,11 @@
 {% ckan_extends %}
 
-{% block skip %}{% snippet 'snippets/analytics.html' %}{{ super() }}{% endblock %}
+{% block skip %}
+{% if not g.debug %}
+{% snippet 'snippets/analytics.html' %}
+{% endif %}
+{{ super() }}
+{% endblock %}
 
 {# Move the breadcrumb to the header #}{% block header %}{{ super() }}
     {% if self.breadcrumb_content() | trim %}
