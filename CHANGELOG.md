@@ -1,3 +1,10 @@
+## v6.6.1 (2024-03-25)
+
+### Fix
+
+- use a smaller image for the goliath beetles
+- disable rjsmin on liv script
+
 ## v6.6.0 (2024-03-25)
 
 ### Feature
