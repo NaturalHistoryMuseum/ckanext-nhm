@@ -246,7 +246,7 @@ export const useStore = defineStore('liv', () => {
 
             if (addImage) {
               record.images.push({
-                id: imgUrl,
+                id: `${recordData.resource}/${recordId}/${ix}`,
                 ix,
                 url: imgUrl,
                 recordId: recordId,
