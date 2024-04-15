@@ -1,3 +1,9 @@
+## v6.6.2 (2024-04-15)
+
+### Fix
+
+- create unique id for image associated with record
+
 ## v6.6.1 (2024-03-25)
 
 ### Fix
