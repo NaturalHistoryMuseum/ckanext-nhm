@@ -18,7 +18,7 @@
     {% asset 'ckanext-nhm/beetle-iiif-css' %}
     {% asset 'ckanext-nhm/beetle-iiif-js' %}
     <div class="biiif-deprecation-banner">
-        You can view this dataset with our <a href="{{ h.url_for('liv.index', mode='resource/' + h.get_beetle_iiif_resource_id()) }}">new image viewer</a>.
+        You can view this dataset with our <a href="{{ h.url_for('liv.index', mode='resource', mode_params=h.get_beetle_iiif_resource_id()) }}">new image viewer</a>.
     </div>
     <div id="beetle-iiif-app" data-resource-id="{{ h.get_beetle_iiif_resource_id() }}">
     </div>

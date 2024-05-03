@@ -10,9 +10,14 @@ blueprint = Blueprint(name='liv', import_name=__name__, url_prefix='/image-viewe
 
 
 @blueprint.route('/')
-@blueprint.route('/<path:mode>')
-def index(mode=''):
+@blueprint.route('/<mode>')
+@blueprint.route('/<mode>/<path:mode_params>')
+def index(mode='', mode_params=''):
     """
     Render the image viewer page.
     """
-    return toolkit.render('liv.html', extra_vars={'mode': mode})
+    # the template doesn't actually do anything with the args but we may as well pass
+    # them in anyway
+    return toolkit.render(
+        'liv.html', extra_vars={'mode': mode, 'mode_params': mode_params}
+    )
