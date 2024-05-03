@@ -22,6 +22,12 @@
                             {% if 'datastore' in g.plugins and res.datastore_active %}
                                 <li>{% snippet 'package/snippets/data_api_button.html', resource=res, datastore_root_url=g.datastore_api %}</li>
                             {% endif %}
+                            {% if res._image_field %}
+                            <li><a class="btn btn-primary"
+                                   href="{{ h.url_for('liv.index', mode='resource', mode_params=res.id) }}">
+                                <i class="fas fa-images"></i> {{ _('Open in image viewer') }}
+                            </a></li>
+                            {% endif %}
                             <li>{% snippet "contact/snippets/modal_link.html", pkg=g.pkg, res=res %}</li>
                         {% endblock %}
                     </ul>

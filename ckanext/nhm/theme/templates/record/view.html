@@ -156,8 +156,8 @@
             View Manifest
         </a> |
         <a target="_blank"
-           href="https://projectmirador.org/embed/?iiif-content={{ iiif_manifest_url }}">
-            View in Mirador
+           href="{{ h.url_for('liv.index', mode='record', mode_params=res.id ~ '/' ~ rec['_id']) }}">
+            View in Image Viewer
         </a>
         {% endif %} {% endblock %}
 
