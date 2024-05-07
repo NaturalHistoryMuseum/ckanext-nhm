@@ -1,3 +1,15 @@
+## v6.7.0 (2024-05-07)
+
+### Feature
+
+- add LIV link for resources with image field
+- change mirador link to LIV
+
+### Fix
+
+- allow passing liv mode and params as separate arguments
+- remove "forgot password" button and replace with explanation
+
 ## v6.6.2 (2024-04-15)
 
 ### Fix
