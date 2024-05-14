@@ -36,10 +36,6 @@
 {% snippet 'package/snippets/info.html', pkg=g.pkg %}
 {% endblock %}
 
-{% block tweet %}
-{{ super() }}
-{% endblock %}
-
 {# TODO: add this back in when ckanext-spatial is python3 compatible, or rewrite into ckanext-nhm #}
 {#{% block package_extent_info %}#}
 {#{% set dataset_extent = g.pkg_dict.get('spatial', '') %}#}
