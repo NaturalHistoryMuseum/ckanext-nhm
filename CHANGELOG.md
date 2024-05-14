@@ -1,3 +1,9 @@
+## v6.7.1 (2024-05-14)
+
+### Fix
+
+- remove references to ckanext-twitter
+
 ## v6.7.0 (2024-05-07)
 
 ### Feature
