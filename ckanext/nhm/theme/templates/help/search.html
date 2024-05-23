@@ -1,7 +1,12 @@
-{% extends 'help/base.html' %} {% block breadcrumb_content %}
+{% extends 'help/base.html' %}
+
+{% block breadcrumb_content %}
 <li class="active">{% link_for _(title), named_route='help.search' %}</li>
-{% endblock %} {% block help_content %} {% set stats = h.get_site_statistics() %} {% set
-specimens_url = h.url_for_collection_view() %}
+{% endblock %}
+
+{% block help_content %}
+{% set stats = h.get_site_statistics() %}
+{% set specimens_url = h.url_for_collection_view() %}
 
 <p>
     This is the help page for our <em>Integrated Search</em> feature. Access it
