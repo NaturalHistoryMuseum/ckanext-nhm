@@ -32,20 +32,40 @@
 
         {% set existing_org = data.owner_org or data.group_id %}
 
-        <div class="control-group">
+        <div class="form-group">
           <label for="field-organizations" class="control-label">{{ _('Organization') }}</label>
-          <div class="controls">
-            <select id="field-organizations" name="owner_org" data-module="autocomplete">
-              {% if h.check_config_permission('create_unowned_dataset') %}
-                 <option value="" {% if not selected_org and data.id %} selected="selected" {% endif %}>{{ _('No organization') }}</option>
-              {% endif %}
-              {% for organization in organizations_available %}
-{#                get out first org from users list only if there is not an existing org#}
-                {% set selected_org = (existing_org and existing_org == organization.id) or (not existing_org and not data.id and organization.id == organizations_available[0].id) %}
-                <option value="{{ organization.id }}" {% if selected_org %} selected="selected" {% endif %}>{{ organization.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
+            <div class="controls">
+                <div class="row">
+                    <div class="col-md-6">
+                        <select id="field-organizations" name="owner_org"
+                                data-module="autocomplete">
+                            {% if h.check_config_permission('create_unowned_dataset') %}
+                            <option value="" {% if not selected_org and data.id %}
+                                    selected="selected" {% endif %}>{{ _('No
+                                organization') }}
+                            </option>
+                            {% endif %}
+                            {% for organization in organizations_available %}
+                            {# get out first org from users list only if there is not an
+                            existing org #}
+                            {% set selected_org = (existing_org and existing_org ==
+                            organization.id) or (not existing_org and not data.id and
+                            organization.id == organizations_available[0].id) %}
+                            <option value="{{ organization.id }}" {% if selected_org %}
+                                    selected="selected" {% endif %}>
+                                {{ organization.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                      <span class="info-block info-inline">
+                        <i class="fa fa-info-circle"></i>
+                         <a href="{{ h.url_for('help.permissions') }}" target="_blank">What is an organisation?</a>
+                      </span>
+                    </div>
+                </div>
+            </div>
         </div>
     {% endif %}
   {% endif %}

@@ -1,0 +1,93 @@
+{% extends 'help/base.html' %}
+
+{% block breadcrumb_content %}
+<li class="active">{% link_for _(title), named_route='help.permissions' %}</li>
+{% endblock %}
+
+{% block help_content %}
+<div class="help-section">
+    <p>This page covers dataset editing permissions: who's allowed to edit which datasets, and how to change who can edit a particular dataset.</p>
+</div>
+
+<div class="help-section">
+    <h3>Overview</h3>
+    <ul>
+        <li>You must be a user to create or own a dataset</li>
+        <li>Every dataset is owned by one (and only one) user, usually its creator (unless a portal admin has changed it)</li>
+        <li>Owners have full edit access to their dataset</li>
+        <li>You can give edit permissions to additional individual users by adding <em>collaborators</em></li>
+        <li>You can give edit permissions to additional groups of users by changing the <em>organisation</em>.</li>
+    </ul>
+</div>
+
+<div class="help-section">
+    <h3>Collaborators</h3>
+    <p><em>Collaborators</em> are individual users with additional permissions on a dataset. These users will also be emailed if someone clicks the "Contact dataset curator" button on the dataset overview page.</p>
+    <p><b>NB: collaborators are <em>not</em> the same as contributors.</b> Contributors are names of people who contributed to the dataset in some way, and are not necessarily users. As they are used for attribution, contributors are visible in the dataset overview and usually in the citation string, whereas collaborators are only visible to dataset editors.</p>
+
+    <h4>Collaborator permissions</h4>
+    <p>Collaborators can have one of three different levels of access: member, editor, or admin. Each builds on the previous level (admin being the highest level with the most permissions).</p>
+    <ul>
+        <li><em>Members</em> can see the dataset if it is private, but have no edit access.</li>
+        <li><em>Editors</em> can also edit the dataset and its resources.</li>
+        <li><em>Admins</em> can also manage collaborators.</li>
+    </ul>
+
+    <h4>Managing collaborators</h4>
+    <p>Collaborators cannot be set when creating a dataset, so you will have to finish creating it first, save, and then follow these steps to find the edit page.</p>
+    <ol>
+        <li>Log in and locate a dataset that you own or have admin permissions for</li>
+        <li>From the dataset overview page, click the "Manage" button</li>
+        <li>Click the "Collaborators" tab</li>
+        <li>From here, you can add, remove, and manage collaborators of this dataset.</li>
+    </ol>
+</div>
+
+<div class="help-section">
+    <h3>Organisations</h3>
+    <p><em>Organisations</em> are groups of users that "own" datasets. While there will still be one user who is the primary owner of the dataset, every dataset also belongs to one (and only one) organisation.</p>
+    <p>Most datasets on the portal belong to the <a href="{{ h.url_for('organization.read', id='nhm') }}">Natural History Museum</a> organisation, which is the default, and all users are members. If you are not a part of any other organisations on the portal, you will not have the option to change the organisation your dataset belongs to.</p>
+    <p>An example of an organisation is the Digitisation Team, who regularly produce new datasets that multiple team members need edit access to.</p>
+
+    <h4>A note on terminology</h4>
+    <p>The data portal runs on a platform called <a href="https://ckan.org" class="external" target="_blank">CKAN</a>. While we have extensively modified the software for our needs, there are certain things that are deceptively difficult to change - like the name of a feature embedded throughout the code.</p>
+    <p>Since all data on the portal has to be associated in some way with one real-world organisation (the Natural History Museum) calling this feature <em>organisations</em> does seem a bit confusing. Unfortunately, that's what the feature is called in the core platform, and it's referenced in too many places to make it a sensible idea to change.</p>
+
+    <h4>When to use an organisation</h4>
+    <p>For the majority of datasets, the default organisation is fine.</p>
+    <p>If you have several datasets and you would like to give the same people edit access to them then your team could benefit from an organisation.</p>
+    <p>Only system administrators can create organisations, so if you'd like to use this feature please <a href="/contact">contact us</a>.</p>
+
+    <h4>Organisation permissions</h4>
+    <p>As with collaborators, users in an organisation can have one of three levels of access: member, editor, or admin. Each builds on the previous level (admin being the highest level with the most permissions).</p>
+    <ul>
+        <li><em>Members</em> can see private datasets in the organisation and add new ones, but cannot edit existing ones (unless they have other permissions, e.g. they are the dataset owner).</li>
+        <li><em>Editors</em> can also edit organisation datasets.</li>
+        <li><em>Admins</em> can also delete datasets and administrate the organisation, e.g. managing members and changing the name.</li>
+    </ul>
+
+    <h4>Adding a dataset to an organisation</h4>
+    <ol>
+        <li>Log in and either: click the "Manage" button on a dataset that you have edit permissions for, OR; create a new dataset</li>
+        <li>Change the value of the "Organisation" dropdown to the desired organisation (if you can't find this dropdown, you may not have access to any other organisations)</li>
+        <li>Save your changes.</li>
+    </ol>
+
+    <h4>Viewing your organisations</h4>
+    <p>Organisations that you are part of (at any role) are listed in your user profile. We also have a full list of <a href="{{ h.url_for('organization.index') }}">organisations on the portal</a>.</p>
+    <p>To view your available organisations:</p>
+    <ol>
+        <li>Log in</li>
+        <li>Click your name at the top of the page</li>
+        <li>Click the "organisations" tab.</li>
+    </ol>
+
+    <h4>Managing organisation members</h4>
+    <ol>
+        <li>Log in and locate an organisation that you have admin permissions for</li>
+        <li>On the organisation overview page, click the "Manage" button</li>
+        <li>Click the "Members" tab</li>
+        <li>From here, you can add, remove, and manage the members of this organisation.</li>
+    </ol>
+</div>
+{% endblock %}
