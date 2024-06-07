@@ -397,12 +397,12 @@ class Record:
         if not lat_field or not lon_field:
             return None
 
-        latitude = self.data.get(lat_field)
-        longitude = self.data.get(lon_field)
-
-        if latitude is None or longitude is None:
+        try:
+            latitude = float(self.data.get(lat_field))
+            longitude = float(self.data.get(lon_field))
+        except (ValueError, TypeError):
             return None
 
-        # create a piece of GeoJSON to point at the specific record location on a map (note the
-        # longitude then latitude ordering required by GeoJSON)
-        return dict(type='Point', coordinates=[float(longitude), float(latitude)])
+        # create a piece of GeoJSON to point at the specific record location on a map
+        # (note the longitude then latitude ordering required by GeoJSON)
+        return dict(type="Point", coordinates=[longitude, latitude])
