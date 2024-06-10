@@ -52,3 +52,8 @@
     {% endblock %}
       </div>
 {% endblock %}
+
+{% block content_primary_nav %}
+    {{ super() }}
+    {{ h.build_nav_icon('nhm_user.orgs', _('Organisations'), username=user.name, icon='users') }}
+{% endblock %}

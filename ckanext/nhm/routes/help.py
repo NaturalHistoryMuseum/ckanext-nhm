@@ -26,3 +26,13 @@ def search():
     Render the help page for integrated search.
     """
     return toolkit.render('help/search.html', {'title': 'Integrated Search Help'})
+
+
+@blueprint.route('/dataset-permissions')
+def permissions():
+    """
+    Render the help page for dataset permissions.
+    """
+    return toolkit.render(
+        'help/permissions.html', {'title': 'Dataset Permissions Help'}
+    )

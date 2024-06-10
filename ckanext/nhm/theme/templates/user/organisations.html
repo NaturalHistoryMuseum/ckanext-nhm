@@ -1,0 +1,13 @@
+{% extends "user/read.html" %}
+
+{% block subtitle %}{{ _('Organisations') }} {{ g.template_title_delimiter }} {{ super() }}{% endblock %}
+
+{% block primary_content_inner %}
+<h1 class="hide-heading">
+    {% block page_heading -%}
+    {{ _('Organisations') }}
+    {%- endblock %}
+</h1>
+
+{% snippet "organization/snippets/organization_list.html", organizations=organizations %}
+{% endblock %}

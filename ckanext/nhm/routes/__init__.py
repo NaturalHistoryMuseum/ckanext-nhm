@@ -15,6 +15,7 @@ from . import (
     beetle_iiif,
     misc,
     liv,
+    user,
 )
 
 blueprints = [
@@ -29,4 +30,5 @@ blueprints = [
     beetle_iiif.blueprint,
     misc.blueprint,
     liv.blueprint,
+    user.blueprint,
 ]
