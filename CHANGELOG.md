@@ -1,3 +1,23 @@
+## v6.8.0 (2024-06-10)
+
+### Feature
+
+- add help page for dataset permissions
+- add org list to user profile
+
+### Fix
+
+- catch errors when parsing lat/lon for individual records
+- only show org selector if more than one is available
+- redirect /organisation to /organization
+- remove new user invitation from org new member form
+- allow non-sysadmin package editors to change org
+- update search help page
+
+### Style
+
+- reformat search help header
+
 ## v6.7.1 (2024-05-14)
 
 ### Fix
