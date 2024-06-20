@@ -1,3 +1,9 @@
+## v6.8.1 (2024-06-20)
+
+### Fix
+
+- add hidden org field when only one org available
+
 ## v6.8.0 (2024-06-10)
 
 ### Feature
