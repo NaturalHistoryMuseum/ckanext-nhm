@@ -727,13 +727,13 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         # overall image server status
         if iiif_health['ping'] and iiif_health['status'] == ':)':
-            status_text = toolkit._('connected')
+            status_text = toolkit._('available')
             status_type = 'good'
         elif iiif_health['ping'] and iiif_health['status'] != ':)':
-            status_text = toolkit._('connected (issues)')
+            status_text = toolkit._('available (issues)')
             status_type = 'ok'
         else:
-            status_text = toolkit._('disconnected')
+            status_text = toolkit._('unavailable')
             status_type = 'bad'
 
         status_reports.append(
@@ -750,10 +750,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         # specimen images
         if iiif_health['ping'] and iiif_health['specimens'] == ':)':
-            status_text = toolkit._('connected')
+            status_text = toolkit._('available')
             status_type = 'good'
         else:
-            status_text = toolkit._('disconnected')
+            status_text = toolkit._('unavailable')
             status_type = 'bad'
 
         status_reports.append(
