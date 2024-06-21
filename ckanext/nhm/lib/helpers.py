@@ -1599,3 +1599,27 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
         {'builder_id': 'record', 'resource_id': resource_id, 'record_id': record_id},
     )
     return toolkit.url_for('iiif.resource', identifier=manifest_id, _external=True)
+
+
+def get_status_indicator():
+    """
+    Check if we need to display a status indicator, and if so what type.
+
+    :return: 'red', 'amber', or None (if no alerts)
+    """
+    # is there a status message?
+    status_message = toolkit.config.get('ckanext.status.message', None)
+    if status_message:
+        return 'red'
+
+    status_reports = toolkit.get_action('status_list')({}, {})
+
+    # are there any 'bad' items?
+    red_status = [r for r in status_reports if r['state'] == 'bad']
+    if len(red_status) > 0:
+        return 'red'
+
+    # are there any reports with small issues?
+    amber_status = [r for r in status_reports if r['state'] == 'ok']
+    if len(amber_status) > 0:
+        return 'amber'

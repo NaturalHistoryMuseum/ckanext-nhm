@@ -236,6 +236,23 @@ body {
   & .notifications {
     padding-right: 10px;
   }
+
+  & .status-indicator {
+    font-size: @font-size-body-s;
+    position: absolute;
+    top: 0;
+    margin-left: 1.3em;
+    padding: 0 2px;
+    border-radius: @rounding;
+
+    &.status-indicator-red {
+      background: @warning2;
+    }
+
+    &.status-indicator-amber {
+      background: orange;
+    }
+  }
 }
 
 .icon-pad() {
