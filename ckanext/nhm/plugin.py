@@ -762,7 +762,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 'value': status_text,
                 'group': toolkit._('Images'),
                 'help': toolkit._(
-                    'Specimen images are a specific subset of images used in e.g. our Collection specimens dataset'
+                    'Specimen images are a specific subset of images used primarily in the Collection specimens and Index lots datasets'
                 ),
                 'state': status_type,
             }
