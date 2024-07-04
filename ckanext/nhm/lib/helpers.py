@@ -1613,7 +1613,7 @@ def get_status_indicator():
         return 'red'
 
     try:
-        status_reports = toolkit.get_action('status_list')({}, {})
+        status_reports = toolkit.get_action('status_list')({}, {}).get('reports', [])
     except KeyError:
         # if the action doesn't exist
         status_reports = []
