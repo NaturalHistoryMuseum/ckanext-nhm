@@ -31,6 +31,14 @@ from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastore,
     IVersionedDatastoreDownloads,
 )
+from ckanext.nhm.lib.utils import get_iiif_status
+
+try:
+    from ckanext.status.interfaces import IStatus
+
+    status_available = True
+except ImportError:
+    status_available = False
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +71,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     implements(interfaces.IClick)
     implements(interfaces.IConfigurable)
     implements(IVersionedDatastoreDownloads, inherit=True)
+    if status_available:
+        implements(IStatus)
 
     ## IConfigurable
     def configure(self, config):
@@ -710,3 +720,52 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             )
         eml_dict['creator'] = creators
         return eml_dict
+
+    ## IStatus
+    def modify_status_reports(self, status_reports):
+        iiif_health = get_iiif_status()
+
+        # overall image server status
+        if iiif_health['ping'] and iiif_health['status'] == ':)':
+            status_text = toolkit._('available')
+            status_type = 'good'
+        elif iiif_health['ping'] and iiif_health['status'] != ':)':
+            status_text = toolkit._('available (issues)')
+            status_type = 'ok'
+        else:
+            status_text = toolkit._('unavailable')
+            status_type = 'bad'
+
+        status_reports.append(
+            {
+                'label': toolkit._('Image server'),
+                'value': status_text,
+                'group': toolkit._('Images'),
+                'help': toolkit._(
+                    'The IIIF server provides most of the images in datasets (some are externally hosted)'
+                ),
+                'state': status_type,
+            }
+        )
+
+        # specimen images
+        if iiif_health['ping'] and iiif_health['specimens'] == ':)':
+            status_text = toolkit._('available')
+            status_type = 'good'
+        else:
+            status_text = toolkit._('unavailable')
+            status_type = 'bad'
+
+        status_reports.append(
+            {
+                'label': toolkit._('Specimen images'),
+                'value': status_text,
+                'group': toolkit._('Images'),
+                'help': toolkit._(
+                    'Specimen images are a specific subset of images used primarily in the Collection specimens and Index lots datasets'
+                ),
+                'state': status_type,
+            }
+        )
+
+        return status_reports
