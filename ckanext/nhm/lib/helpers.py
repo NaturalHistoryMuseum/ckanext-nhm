@@ -1612,7 +1612,11 @@ def get_status_indicator():
     if status_message:
         return 'red'
 
-    status_reports = toolkit.get_action('status_list')({}, {})
+    try:
+        status_reports = toolkit.get_action('status_list')({}, {})
+    except KeyError:
+        # if the action doesn't exist
+        status_reports = []
 
     # are there any 'bad' items?
     red_status = [r for r in status_reports if r['state'] == 'bad']
