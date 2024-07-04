@@ -8,7 +8,7 @@
 {# We do not want a search #}{% block header_site_search %}{% endblock %}
 
 {% set status_indicator = h.get_status_indicator() %}
-{% macro status_indicator() %}
+{% macro status_icon() %}
 <div>
     <a href="{{ h.url_for('status.index') }}"
        title="{{ _('System status') }}">
@@ -90,7 +90,7 @@
             {% endif %}
 
             {# Status page #}
-            {{ status_indicator() }}
+            {{ status_icon() }}
 
             {# Logout #}
             {% block header_account_log_out_link %}
@@ -107,7 +107,7 @@
             <div class="headway-container"></div>
 
             {# Status page #}
-            {{ status_indicator() }}
+            {{ status_icon() }}
 
             {% block header_account_notlogged %}
             <div>
