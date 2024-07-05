@@ -29,7 +29,7 @@ def create_department_email(mail_dict: dict, department: str):
         mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
     except KeyError:
         # Other/unknown etc., - so don't set recipient email
-        mail_dict['body'] += f'\nDepartment: {department}\n'
+        mail_dict['body'] += f'\nDepartment or team: {department}\n'
     else:
         mail_dict['recipient_name'] = department
         mail_dict['body'] += (
