@@ -66,25 +66,23 @@
             <li role="presentation"><a
                 href="{{ h.url_for('contact.form') }}">Contact</a>
             </li>
-            <li role="presentation">{{ h.api_doc_link() }}</li>
             <li role="presentation"><a
-                href="{{ h.url_for('legal.privacy') }}">Privacy notice</a></li>
+                href="{{ h.url_for('legal.privacy') }}">Privacy</a></li>
             <li role="presentation"><a href="{{ h.url_for('legal.terms') }}">T&amp;C</a>
             </li>
             <li role="presentation">
                 <a href="https://www.nhm.ac.uk/about-us/website-accessibility-statement.html">
-                    Website accessibility statement
+                    Accessibility
                 </a>
             </li>
             <li role="presentation">
                 <a href="{{ h.url_for('about.aohc') }}">
-                    Acknowledgement of harmful content
+                    Harmful content
                 </a>
             </li>
             {% if g.userobj %}
             <li role="presentation">
-                <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('My
-                    account') }}</a>
+                <a href="{{ h.url_for('user.read', id=g.userobj.name) }}">{{ _('Account') }}</a>
             </li>
             <li role="presentation">
                 <a href="{{ h.url_for('user.logout') }}">{{ _('Log out') }}</a>
