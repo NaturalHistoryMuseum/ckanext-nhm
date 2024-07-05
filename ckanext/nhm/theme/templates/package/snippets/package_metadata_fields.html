@@ -13,6 +13,11 @@
 {% endblock %}
 
 {% block package_metadata_fields_maintainer %}
+{{ form.input('maintainer_email', label=_('Contact email'), id='field-maintainer-email', placeholder=_('e.g. shared-inbox@nhm.ac.uk'), value=data.maintainer_email, error=errors.maintainer_email, classes=['control-medium']) }}
+{{ form.info('Enquiries about this dataset will be sent to this address. If not set, messages will go to the collaborators or creator of the dataset.', inline=False) }}
+
+{{ form.input('maintainer', label=_('Contact name'), id='field-maintainer', placeholder=_('e.g Project Y'), value=data.maintainer, error=errors.maintainer, classes=['control-medium']) }}
+{{ form.info('Name of the person or group receiving dataset enquiries (see above). Optional.', inline=False) }}
 {% endblock %}
 
 {% block custom_fields %}
