@@ -1,3 +1,29 @@
+## v6.9.0 (2024-07-08)
+
+### Feature
+
+- add link to help pages into footer
+- add contact email for bii
+- send enquiries to maintainer over collaborators or creator
+- allow setting maintainer/contact email
+- add link to status page in user icons, with indicator
+- add integration with ckanext-status
+
+### Fix
+
+- change department label to "department or team"
+- move temporal extent help message below the input
+- get the reports list from status_list action
+- catch error if status_list action doesn't exist
+- change name of macro
+- add status indicator when logged out as well
+- change wording of specimen images help text
+- use (un)available instead of (dis)connected
+
+### Refactor
+
+- remove api docs link, shorten some titles in footer
+
 ## v6.8.1 (2024-06-20)
 
 ### Fix
