@@ -1,3 +1,9 @@
+## v6.9.1 (2024-07-08)
+
+### Fix
+
+- get mss status from source cache
+
 ## v6.9.0 (2024-07-08)
 
 ### Feature
