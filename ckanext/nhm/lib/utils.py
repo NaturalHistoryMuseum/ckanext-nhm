@@ -21,7 +21,9 @@ def get_iiif_status():
 
     health['status'] = response_json.get('status')
     mss = response_json.get('profiles', {}).get('mss', {})
-    health['specimens'] = mss.get('mss_status', {}).get('status', ':(')
+    health['specimens'] = (
+        mss.get('source_cache', {}).get('mss_status', {}).get('status', ':(')
+    )
     health['es'] = mss.get('es', {'status': 'red', 'response_time': None})
 
     return health
