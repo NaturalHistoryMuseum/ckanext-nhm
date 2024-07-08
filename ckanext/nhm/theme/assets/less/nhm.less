@@ -236,6 +236,23 @@ body {
   & .notifications {
     padding-right: 10px;
   }
+
+  & .status-indicator {
+    font-size: @font-size-body-s;
+    position: absolute;
+    top: 0;
+    margin-left: 1.3em;
+    padding: 0 2px;
+    border-radius: @rounding;
+
+    &.status-indicator-red {
+      background: @warning2;
+    }
+
+    &.status-indicator-amber {
+      background: orange;
+    }
+  }
 }
 
 .icon-pad() {
@@ -1370,6 +1387,7 @@ iframe {
   margin: 5px 0;
 }
 
+.info-block,
 .form-group .info-block {
   color: @grey4;
   font-size: @font-size-body-s;
@@ -1377,6 +1395,11 @@ iframe {
   a {
     color: @primary3;
   }
+}
+
+.form-group + .info-block {
+  margin-top: -25px; // the margin-bottom for .form-group is 30px
+  margin-bottom: 30px;
 }
 
 input[type='radio'],
