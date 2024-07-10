@@ -224,7 +224,7 @@ function createPopup(latlng, specs) {
       '<a target="_blank" href="' +
       baseUrl +
       '/object/' +
-      specimen.occurrenceID
+      specimen.occurrenceID +
       '">View on the Data Portal</a>';
     popupContent += '</div>';
 
