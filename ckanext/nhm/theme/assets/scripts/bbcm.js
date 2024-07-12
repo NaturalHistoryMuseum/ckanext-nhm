@@ -225,8 +225,6 @@ function createPopup(latlng, specs) {
       baseUrl +
       '/object/' +
       specimen.occurrenceID +
-      '/' +
-      version.toString() +
       '">View on the Data Portal</a>';
     popupContent += '</div>';
 
