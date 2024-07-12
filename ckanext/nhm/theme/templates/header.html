@@ -9,6 +9,7 @@
 
 {% set status_indicator = h.get_status_indicator() %}
 {% macro status_icon() %}
+{% if h.route_exists('status.index') %}
 <div>
     <a href="{{ h.url_for('status.index') }}"
        title="{{ _('System status') }}">
@@ -22,6 +23,7 @@
         <i class="fas fa-heartbeat fa-lg"></i>
     </a>
 </div>
+{% endif %}
 {% endmacro %}
 
 
