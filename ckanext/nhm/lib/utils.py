@@ -6,17 +6,22 @@
 
 from ckan.plugins import toolkit
 import requests
+from cachetools import cached, TTLCache
 
 
+@cached(cache=TTLCache(maxsize=1024, ttl=300))
 def get_iiif_status():
-    health = {}
+    health = {'ping': False}
 
     url = toolkit.config.get('ckanext.iiif.image_server_url')
-    r = requests.get(url + '/status')
-    if r.ok:
-        health['ping'] = True
-        response_json = r.json()
-    else:
+    try:
+        r = requests.get(url + '/status', timeout=5)
+        if r.ok:
+            health['ping'] = True
+            response_json = r.json()
+        else:
+            response_json = {}
+    except requests.exceptions.RequestException as e:
         response_json = {}
 
     health['status'] = response_json.get('status')
