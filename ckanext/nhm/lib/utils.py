@@ -9,7 +9,7 @@ import requests
 from cachetools import cached, TTLCache
 
 
-@cached(cache=TTLCache(ttl=300))
+@cached(cache=TTLCache(maxsize=1024, ttl=300))
 def get_iiif_status():
     health = {'ping': False}
 
