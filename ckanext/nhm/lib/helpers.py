@@ -19,6 +19,7 @@ from urllib.parse import quote
 from beaker.cache import cache_region
 from jinja2.filters import do_truncate
 from lxml import etree, html
+from werkzeug.routing import BuildError
 
 from ckan import model
 from ckan.lib import helpers as core_helpers
@@ -1627,3 +1628,17 @@ def get_status_indicator():
     amber_status = [r for r in status_reports if r['state'] == 'ok']
     if len(amber_status) > 0:
         return 'amber'
+
+
+def route_exists(route):
+    """
+    Simple helper for checking if a flask route exists.
+
+    :param route: endpoint name, as passed to url_for
+    :return: bool
+    """
+    try:
+        url = toolkit.url_for(route)
+        return True
+    except BuildError:
+        return False
