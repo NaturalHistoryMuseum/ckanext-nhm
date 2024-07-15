@@ -62,8 +62,6 @@ def datacite():
 @blueprint.route('/harmful-content')
 def aohc():
     """
-    Render the Acknowledgement of harmful content statement page.
+    Redirect to the new location (in the legal section).
     """
-    return toolkit.render(
-        'about/aohc.html', {'title': 'Acknowledgement of harmful content'}
-    )
+    return toolkit.redirect_to('legal.aohc')

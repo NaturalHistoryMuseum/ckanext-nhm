@@ -1,15 +1,11 @@
-{% extends "page.html" %}
-
-{% block subtitle %}{{ title }}{% endblock %}
+{% extends "legal/base.html" %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _(title), named_route='legal.terms' %}</li>
+<li>{% link_for _("Legal"), named_route="legal.terms" %}</li>
+<li class='active'>{% link_for _(title), named_route="legal.terms" %}</li>
 {% endblock %}
 
-{% block pre_primary %}
-
-    <h1 class="page-heading">{{ title }}</h1>
-
+{% block legal_content %}
     <h4>Licensing</h4>
     <p>The data and information available through data.nhm.ac.uk are available under terms described in the licence field of individual dataset records (metadata).</p>
     <p>All dataset metadata published on data.nhm.ac.uk is licensed under <a class="external" target="_blank" href="http://www.opendefinition.org/licenses/cc-zero" rel="dc:rights">Creative Commons CC Zero</a>.</p>

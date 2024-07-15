@@ -15,7 +15,15 @@ def privacy():
     """
     Redirect to the museum's privacy notice page.
     """
-    return toolkit.redirect_to('http://www.nhm.ac.uk/about-us/privacy-notice.html')
+    return toolkit.redirect_to('https://www.nhm.ac.uk/about-us/privacy-notice.html')
+
+
+@blueprint.route('/accessibility')
+def a11y():
+    """
+    Redirect to the museum's accessibility statement page.
+    """
+    return toolkit.redirect_to('https://www.nhm.ac.uk/about-us/website-accessibility-statement.html')
 
 
 @blueprint.route('/terms-conditions')
@@ -24,3 +32,13 @@ def terms():
     Render the terms and conditions page.
     """
     return toolkit.render('legal/terms.html', {'title': 'Terms and conditions'})
+
+
+@blueprint.route('/harmful-content')
+def aohc():
+    """
+    Render the Acknowledgement of harmful content statement page.
+    """
+    return toolkit.render(
+        'legal/aohc.html', {'title': 'Acknowledgement of harmful content'}
+    )
