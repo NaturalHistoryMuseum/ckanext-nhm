@@ -1,3 +1,19 @@
+## v6.9.2 (2024-07-15)
+
+### Fix
+
+- apparently maxsize was not unnecessary
+- remove (probably) unnecessary maxsize of cache
+- test if status.index route exists
+- cache iiif status response for 300s
+- reinsert + to URL creation
+- remove GA code, don't need it anymore
+- remove version from BBCM specimen links
+
+### Refactor
+
+- reduce size of ttl cache
+
 ## v6.9.1 (2024-07-08)
 
 ### Fix
