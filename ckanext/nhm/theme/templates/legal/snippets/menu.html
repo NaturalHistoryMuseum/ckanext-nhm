@@ -1,0 +1,26 @@
+{#
+Displays the legal menu
+#}
+
+<section class="module module-narrow">
+    <div class="module context-info">
+        <nav class="section navigation">
+            <ul class="nav nav-simple" id="legal-menu">
+                {{ h.build_nav_main(
+                    ('legal.terms', _('Terms & Conditions')),
+                    ('legal.aohc', _('Acknowledgement of harmful content')),
+              ) }}
+                <li class="nav-item">
+                    <a href="{{ h.url_for('legal.privacy') }}" class="external">
+                        {{ _('Privacy notice') }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ h.url_for('legal.a11y') }}" class="external">
+                        {{ _('Website accessibility statement') }}
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>
