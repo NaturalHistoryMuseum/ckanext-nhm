@@ -1,3 +1,9 @@
+## v6.9.3 (2024-07-15)
+
+### Refactor
+
+- move pages into dedicated legal section
+
 ## v6.9.2 (2024-07-15)
 
 ### Fix
