@@ -1,3 +1,10 @@
+## v6.9.4 (2024-07-22)
+
+### Fix
+
+- only display warning if version is smaller than latest
+- point legal link at legal page
+
 ## v6.9.3 (2024-07-15)
 
 ### Refactor
