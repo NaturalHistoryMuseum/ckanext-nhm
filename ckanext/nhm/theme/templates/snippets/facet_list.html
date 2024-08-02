@@ -28,6 +28,7 @@
 
                             {{ nav_item_class or 'nav-item' }}{% if item.active %} active{% endif %}">
                             <a href="{{ href }}"
+                                rel="nofollow"
                                 title="{{ label if label != label_truncated else '' }}">
                                 <span>{{ label_truncated }} {{ count }}</span> </a>
                         </li>
@@ -36,11 +37,13 @@
                         {% if h.get_param_int('_%s_limit' % name) %}
                             {% if h.has_more_facets(name, g.search_facets) %}
                                 <a href="{{ h.remove_url_param('_%s_limit' % name, replace=0, extras=extras, alternative_url=alternative_url) }}"
+                                    rel="nofollow"
                                     class="read-more">{{ _('Show More {facet_type}').format(facet_type=title) }}
                                     <i class="fas fa-plus-circle"></i></a>
                             {% endif %}
                         {% else %}
                             <a href="{{ h.remove_url_param('_%s_limit' % name, extras=extras, alternative_url=alternative_url) }}"
+                                rel="nofollow"
                                 class="read-more">{{ _('Show Only Popular {facet_type}').format(facet_type=title) }}
                                 <i class="fas fa-minus-circle"></i></a>
                         {% endif %}
