@@ -1,3 +1,10 @@
+## v6.9.5 (2024-08-02)
+
+### Fix
+
+- add nofollow to resource tags
+- add nofollow to facet links
+
 ## v6.9.4 (2024-07-22)
 
 ### Fix
