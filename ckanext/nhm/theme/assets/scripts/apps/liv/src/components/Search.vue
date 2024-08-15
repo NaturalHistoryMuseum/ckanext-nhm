@@ -209,17 +209,18 @@ function parseQuery() {
           if (termParts[0] === 'or') {
             _parseGroup(termParts[1]);
           }
-          if (termParts[0] !== 'string_equals') {
-            return;
-          }
-          if (termParts[1].fields[0] === 'typeStatus') {
-            _typeStatus.push(termParts[1].value);
-          } else if (termParts[1].fields[0] === 'associatedMedia.category') {
-            _imageCategory.push(termParts[1].value);
-          } else if (
-            JSON.stringify(termParts[1].fields.sort()) === _taxaFields
-          ) {
-            _taxa = termParts[1].value;
+          if (termParts[0] === 'string_equals') {
+            if (termParts[1].fields[0] === 'typeStatus') {
+              _typeStatus.push(termParts[1].value);
+            } else if (termParts[1].fields[0] === 'associatedMedia.category') {
+              _imageCategory.push(termParts[1].value);
+            }
+          } else if (termParts[0] === 'string_contains') {
+            if (
+              JSON.stringify(termParts[1].fields.sort()) === _taxaFields
+            ) {
+              _taxa = termParts[1].value;
+            }
           }
         });
       }
