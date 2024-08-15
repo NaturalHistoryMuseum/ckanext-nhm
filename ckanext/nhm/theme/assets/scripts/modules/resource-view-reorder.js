@@ -58,9 +58,7 @@ this.ckan.module('resource-view-reorder', function ($) {
         .text(this._('Cancel'))
         .on('click', this._onHandleCancel);
 
-      this.html_handles = $(this.template.handle)
-        .hide()
-        .appendTo($('li', this.el));
+      this.html_handles = $(this.template.handle).hide().appendTo($('li', this.el));
 
       this.html_saving = $(this.template.saving)
         .hide()
@@ -74,10 +72,7 @@ this.ckan.module('resource-view-reorder', function ($) {
 
     _onHandleStartReorder: function () {
       if (!this.is_reordering) {
-        this.html_form_actions
-          .add(this.html_handles)
-          .add(this.html_title)
-          .show();
+        this.html_form_actions.add(this.html_handles).add(this.html_title).show();
         this.el.addClass('reordering').sortable('enable');
         $('.page_primary_action').hide();
         this.is_reordering = true;
@@ -114,9 +109,7 @@ this.ckan.module('resource-view-reorder', function ($) {
           },
           function () {
             module.html_saving.hide();
-            $('.save, .cancel', module.html_form_actions).removeClass(
-              'disabled',
-            );
+            $('.save, .cancel', module.html_form_actions).removeClass('disabled');
             module.reset();
             module.cache = module.el.html();
             module.is_reordering = false;
