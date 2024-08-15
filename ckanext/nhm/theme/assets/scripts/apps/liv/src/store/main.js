@@ -52,9 +52,7 @@ export const useStore = defineStore('liv', () => {
     if (currentImage.value == null) {
       return null;
     } else {
-      return recordRepo.value
-        .withAllRecursive()
-        .find(currentImage.value.recordId);
+      return recordRepo.value.withAllRecursive().find(currentImage.value.recordId);
     }
   });
 
@@ -82,10 +80,7 @@ export const useStore = defineStore('liv', () => {
     let promises = [];
 
     function _addImgField(resourceModel) {
-      if (
-        resourceModel.imgField &&
-        !imageFields.includes(resourceModel.imgField)
-      ) {
+      if (resourceModel.imgField && !imageFields.includes(resourceModel.imgField)) {
         imageFields.push(resourceModel.imgField);
       }
     }
@@ -173,7 +168,7 @@ export const useStore = defineStore('liv', () => {
                 _done.value = true;
               }
               if (next.value == null) {
-                return Promise.resolve(null)
+                return Promise.resolve(null);
               }
               return addRecordAndImages(next.value, qH);
             })
@@ -224,7 +219,11 @@ export const useStore = defineStore('liv', () => {
         .then((data) => {
           return new Promise((resolve) => {
             let recordImgData = {};
-            if (resource && resource.hasAssociatedMedia && recordData.data.associatedMedia) {
+            if (
+              resource &&
+              resource.hasAssociatedMedia &&
+              recordData.data.associatedMedia
+            ) {
               recordImgData = recordData.data.associatedMedia.filter(
                 (m) => m.identifier === imgUrl,
               )[0];
@@ -243,7 +242,7 @@ export const useStore = defineStore('liv', () => {
                 }
                 return q[1].includes(val);
               } catch (e) {
-                console.error(e)
+                console.error(e);
                 return false;
               }
             });

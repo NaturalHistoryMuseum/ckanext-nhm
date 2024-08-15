@@ -216,9 +216,7 @@ function parseQuery() {
               _imageCategory.push(termParts[1].value);
             }
           } else if (termParts[0] === 'string_contains') {
-            if (
-              JSON.stringify(termParts[1].fields.sort()) === _taxaFields
-            ) {
+            if (JSON.stringify(termParts[1].fields.sort()) === _taxaFields) {
               _taxa = termParts[1].value;
             }
           }

@@ -1,5 +1,5 @@
 import { Model } from 'pinia-orm';
-import {indexLotsId, specimensId} from './constants';
+import { indexLotsId, specimensId } from './constants';
 
 export class Resource extends Model {
   static entity = 'resources';
@@ -20,7 +20,7 @@ export class Resource extends Model {
   }
 
   get hasAssociatedMedia() {
-    return this.dwc || [indexLotsId, specimensId].includes(this.id)
+    return this.dwc || [indexLotsId, specimensId].includes(this.id);
   }
 }
 
@@ -178,8 +178,7 @@ export class Image extends Model {
 function transformData(obj, outputData, exclude = [], rootKey = []) {
   return Object.entries(obj)
     .filter(
-      (item) =>
-        item[0] !== 'id' && item[0] !== '_id' && !exclude.includes(item[0]),
+      (item) => item[0] !== 'id' && item[0] !== '_id' && !exclude.includes(item[0]),
     )
     .sort((a, b) => {
       return a[0].localeCompare(b[0]);
