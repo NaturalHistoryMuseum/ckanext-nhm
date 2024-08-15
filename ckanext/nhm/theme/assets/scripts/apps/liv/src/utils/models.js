@@ -1,4 +1,5 @@
 import { Model } from 'pinia-orm';
+import {indexLotsId, specimensId} from './constants';
 
 export class Resource extends Model {
   static entity = 'resources';
@@ -16,6 +17,10 @@ export class Resource extends Model {
       data: this.attr({}),
       records: this.hasMany(Record, 'resourceId'),
     };
+  }
+
+  get hasAssociatedMedia() {
+    return this.dwc || [indexLotsId, specimensId].includes(this.id)
   }
 }
 

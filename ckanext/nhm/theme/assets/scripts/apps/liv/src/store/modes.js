@@ -6,6 +6,7 @@ import { get, post } from '../utils/api';
 import { useRepo } from 'pinia-orm';
 import { Image, Record, Resource } from '../utils/models';
 import { useRoute } from 'vue-router';
+import {indexLotsId, specimensId} from '../utils/constants';
 
 export const useModeStore = defineStore('modes', () => {
   // other stores
@@ -189,8 +190,8 @@ export const useModeStore = defineStore('modes', () => {
         },
       },
       resource_ids: [
-        '05ff2255-c38a-40c9-b657-4ccb55ab2feb',
-        'bb909597-dedf-427d-8c04-4c02b3a24db3',
+        specimensId,
+        indexLotsId,
       ],
     });
   }
