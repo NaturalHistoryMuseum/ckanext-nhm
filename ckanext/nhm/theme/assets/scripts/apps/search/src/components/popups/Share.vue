@@ -43,8 +43,8 @@
       </div>
       <div class="alert-warning share-popup-warning">
         <small
-          >This link is for social sharing <em>only</em>. If you are intending
-          to reference this search in a publication, use a DOI.
+          >This link is for social sharing <em>only</em>. If you are intending to
+          reference this search in a publication, use a DOI.
         </small>
       </div>
     </div>

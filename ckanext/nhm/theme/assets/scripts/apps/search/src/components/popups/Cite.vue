@@ -30,9 +30,9 @@
     <div class="privacy-warning">
       <p><i>Data Protection</i></p>
       <p>
-        The Natural History Museum will use your personal data in accordance
-        with data protection legislation to process your requests. For more
-        information please read our
+        The Natural History Museum will use your personal data in accordance with data
+        protection legislation to process your requests. For more information please
+        read our
         <a href="/privacy">privacy notice</a>
         .
       </p>

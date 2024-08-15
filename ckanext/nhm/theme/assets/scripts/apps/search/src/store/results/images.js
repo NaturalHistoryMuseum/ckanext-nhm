@@ -20,8 +20,7 @@ let images = {
       return loadedImgRecords;
     },
     getItemImages:
-      (state, getters, rootState, rootGetters) =>
-      (item, first, recordIndex) => {
+      (state, getters, rootState, rootGetters) => (item, first, recordIndex) => {
         /* gets the images from a single record */
 
         let images;
@@ -32,8 +31,7 @@ let images = {
 
         // for convenience
         let recordUrl = `${resourceDetails.resourceUrl}/record/${item.data._id}`;
-        let recordTitle =
-          item.data[resourceDetails.titleField] || item.data._id;
+        let recordTitle = item.data[resourceDetails.titleField] || item.data._id;
 
         // define the image object
         let defaultImg = {
