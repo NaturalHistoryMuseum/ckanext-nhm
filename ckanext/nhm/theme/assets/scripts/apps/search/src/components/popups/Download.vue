@@ -32,10 +32,7 @@
         </a>
       </div>
     </div>
-    <p
-      class="alert-error"
-      v-if="status.download.failed || formErrors.length > 0"
-    >
+    <p class="alert-error" v-if="status.download.failed || formErrors.length > 0">
       {{ errorMessage }}
     </p>
     <div v-if="download === null">
@@ -105,9 +102,7 @@
                 class="full-width-input"
                 v-model="downloadForm.file.format_args['core_extension_name']"
               >
-                <option value="gbif_occurrence">
-                  GBIF Occurrence (default)
-                </option>
+                <option value="gbif_occurrence">GBIF Occurrence (default)</option>
                 <option value="gbif_taxon">GBIF Taxon</option>
                 <option value="gbif_event">GBIF Event</option>
                 <option value="none">None</option>
@@ -140,13 +135,9 @@
               </p>
               <div class="input-list">
                 <template
-                  v-for="name in downloadForm.file.format_args[
-                    'extension_names'
-                  ]"
+                  v-for="name in downloadForm.file.format_args['extension_names']"
                 >
-                  <label :for="name + '-fields'">{{
-                    dwcExtensions[name].label
-                  }}</label>
+                  <label :for="name + '-fields'">{{ dwcExtensions[name].label }}</label>
                   <input
                     type="text"
                     :id="name + '-fields'"
@@ -158,13 +149,9 @@
             <div class="form-row">
               <small
                 >See <a href="https://dwc.tdwg.org" target="_blank">TDWG</a> and
-                <a href="https://www.gbif.org/darwin-core" target="_blank"
-                  >GBIF</a
-                >
+                <a href="https://www.gbif.org/darwin-core" target="_blank">GBIF</a>
                 for more details on the Darwin Core format and what
-                <a href="https://rs.gbif.org" target="_blank"
-                  >these extensions</a
-                >
+                <a href="https://rs.gbif.org" target="_blank">these extensions</a>
                 are.</small
               >
             </div>
@@ -185,12 +172,8 @@
             @change="setNotifierDefaults"
           >
             <option value="email">Email</option>
-            <option value="webhook">
-              External webhook (e.g. IFTTT, Discord)
-            </option>
-            <option value="none">
-              None; I'll check the download status manually
-            </option>
+            <option value="webhook">External webhook (e.g. IFTTT, Discord)</option>
+            <option value="none">None; I'll check the download status manually</option>
           </select>
         </div>
         <template v-if="downloadForm.notifier.type === 'email'">
@@ -205,8 +188,7 @@
             />
             <p>
               <small
-                >Multiple email addresses can be added as a comma-separated
-                list.</small
+                >Multiple email addresses can be added as a comma-separated list.</small
               >
             </p>
           </div>
@@ -231,9 +213,7 @@
             />
           </div>
           <div class="form-row">
-            <label for="download-webhook-text-param">
-              Text parameter name
-            </label>
+            <label for="download-webhook-text-param"> Text parameter name </label>
             <input
               id="download-webhook-text-param"
               type="text"
@@ -241,18 +221,16 @@
               v-model="downloadForm.notifier.type_args['text_param']"
             />
           </div>
-          <small
-            >This posts status updates in JSON format to the given URL.</small
-          >
+          <small>This posts status updates in JSON format to the given URL.</small>
         </template>
       </div>
     </div>
     <div class="privacy-warning">
       <p><i>Data Protection</i></p>
       <p>
-        The Natural History Museum will use your personal data in accordance
-        with data protection legislation to process your requests. For more
-        information please read our <a href="/privacy">privacy notice</a>.
+        The Natural History Museum will use your personal data in accordance with data
+        protection legislation to process your requests. For more information please
+        read our <a href="/privacy">privacy notice</a>.
       </p>
     </div>
     <div class="text-right" v-if="download === null">
@@ -263,9 +241,7 @@
         ><i
           class="fas"
           :class="
-            status.download.loading
-              ? ['fa-pulse', 'fa-spinner']
-              : ['fa-download']
+            status.download.loading ? ['fa-pulse', 'fa-spinner'] : ['fa-download']
           "
         ></i>
         Request Download
@@ -407,9 +383,7 @@ export default {
         ) {
           this.formErrors.push('Email address must be provided');
         } else {
-          let emails = this.downloadForm.notifier.type_args.emails
-            .split(',')
-            .map(trim);
+          let emails = this.downloadForm.notifier.type_args.emails.split(',').map(trim);
           let emailRegex =
             /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           emails.forEach((e) => {

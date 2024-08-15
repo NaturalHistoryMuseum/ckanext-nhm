@@ -1,8 +1,6 @@
 <template>
   <div class="filter-term filter-term-geo">
-    <span v-if="showName" class="filter-term-name">{{
-      data.display.name
-    }}</span>
+    <span v-if="showName" class="filter-term-name">{{ data.display.name }}</span>
     <div class="flex-container" v-if="!showName">
       <i class="fas" :class="icon"></i>
       <span v-if="comparison === 'point'"

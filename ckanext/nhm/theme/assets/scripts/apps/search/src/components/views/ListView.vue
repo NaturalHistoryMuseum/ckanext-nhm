@@ -1,10 +1,6 @@
 <template>
   <div class="flex-container flex-column flex-left full-width view-component">
-    <div
-      v-for="(item, index) in records"
-      :key="item.id"
-      class="record-item full-width"
-    >
+    <div v-for="(item, index) in records" :key="item.id" class="record-item full-width">
       <div class="record-header">
         <h4 class="record-name">
           <a
@@ -12,10 +8,7 @@
               item.data._id
             }`"
           >
-            {{
-              item.data[resourceDetails[item.resource].titleField] ||
-              item.data._id
-            }}
+            {{ item.data[resourceDetails[item.resource].titleField] || item.data._id }}
           </a>
         </h4>
         <span class="record-pkg">
@@ -36,21 +29,13 @@
         <ul class="list-unstyled">
           <li v-for="(headerGroup, index) in headers" :key="headerGroup.id">
             <span>
-              <b
-                v-for="header in headerGroup"
-                :key="header.id"
-                class="term-group"
-              >
+              <b v-for="header in headerGroup" :key="header.id" class="term-group">
                 {{ header }}
               </b>
             </span>
             <b>:</b>
             <span>
-              <span
-                v-for="header in headerGroup"
-                :key="header.id"
-                class="term-group"
-              >
+              <span v-for="header in headerGroup" :key="header.id" class="term-group">
                 {{ getValue(item.data, header) || '--' }}
               </span>
             </span>

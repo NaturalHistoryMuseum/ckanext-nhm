@@ -2,17 +2,13 @@
   <div>
     <div :class="$style.resultsHeader">
       <span :class="$style.status"
-        >Loaded {{ store.allImages.length }} images from
-        {{ store.totalRecords }} total records</span
+        >Loaded {{ store.allImages.length }} images from {{ store.totalRecords }} total
+        records</span
       >
       <i class="fas fa-spinner fa-spin fa-lg" v-if="store.state.loading"></i>
     </div>
     <div :class="$style.buttons">
-      <zoa-tabs
-        :options="tabOptions"
-        v-model="currentTab"
-        :class="$style.viewTabs"
-      />
+      <zoa-tabs :options="tabOptions" v-model="currentTab" :class="$style.viewTabs" />
       <zoa-button @click="resetAll" size="sm" :class="$style.resetButton">
         <i class="fas fa-undo-alt" />
         <span class="sr-only">Reset to defaults</span>
@@ -42,13 +38,7 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  defineAsyncComponent,
-  onMounted,
-  ref,
-  shallowRef,
-} from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref, shallowRef } from 'vue';
 import { useStore, useModeStore } from '../store';
 import { ZoaTabs, ZoaToggleButton, ZoaButton } from '@nhm-data/zoa';
 import Search from './Search.vue';

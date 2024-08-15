@@ -36,11 +36,7 @@
         :key="headerGroup.id"
       >
         <div>
-          <span
-            v-for="header in headerGroup"
-            :key="header.id"
-            class="term-group"
-          >
+          <span v-for="header in headerGroup" :key="header.id" class="term-group">
             {{ header }}
           </span>
         </div>
@@ -67,9 +63,7 @@
         <div class="td small-column">
           <a
             :href="resourceDetails[item.resource].packageUrl"
-            :title="`View '${
-              resourceDetails[item.resource].package_name
-            }' dataset`"
+            :title="`View '${resourceDetails[item.resource].package_name}' dataset`"
           >
             {{ resourceDetails[item.resource].package_name }}
           </a>
@@ -93,11 +87,7 @@
           </a>
         </div>
         <div class="td" v-for="headerGroup in headers" :key="headerGroup.id">
-          <span
-            v-for="header in headerGroup"
-            :key="header.id"
-            class="term-group"
-          >
+          <span v-for="header in headerGroup" :key="header.id" class="term-group">
             {{ getValue(item.data, header) || '--' }}
           </span>
         </div>
@@ -136,8 +126,7 @@ export default {
       let fullWidth = this.$refs.tableGrid.scrollWidth;
       let viewWidth = Math.ceil(this.tableGrid.width());
       this.scrollableRight =
-        fullWidth > viewWidth &&
-        this.tableGrid.scrollLeft() < fullWidth - viewWidth;
+        fullWidth > viewWidth && this.tableGrid.scrollLeft() < fullWidth - viewWidth;
     },
   },
   mounted() {

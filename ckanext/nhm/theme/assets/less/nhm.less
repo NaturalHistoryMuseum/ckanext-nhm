@@ -1624,9 +1624,7 @@ select {
 .btn-group {
   &,
   & + .btn {
-    margin-top: floor(
-      (@min-pad / 3)
-    ); // to center it - looks better than halving
+    margin-top: floor((@min-pad / 3)); // to center it - looks better than halving
   }
 
   &.open .btn-primary.dropdown-toggle {
@@ -2939,7 +2937,9 @@ select,
   min-width: 350px;
   z-index: 1000;
   background: @baseBackgroundColor;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2);
   border: 0;
   border-radius: 3px;
 
