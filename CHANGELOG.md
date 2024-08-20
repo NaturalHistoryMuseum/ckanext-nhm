@@ -1,3 +1,16 @@
+## v6.9.6 (2024-08-20)
+
+### Fix
+
+- taxa match type is string_contains
+- add hasAssociatedMedia property to resource
+
+### Style
+
+- run prettier manually for other files
+- run prettier manually for search
+- run prettier manually for liv
+
 ## v6.9.5 (2024-08-02)
 
 ### Fix
