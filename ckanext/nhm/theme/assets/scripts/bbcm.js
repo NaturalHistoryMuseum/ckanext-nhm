@@ -215,8 +215,7 @@ function createPopup(latlng, specs) {
     popupContent += '<div class="specimenDetails">';
     const commonName = mapToCommonName(specimen.name);
     if (!!commonName) {
-      popupContent +=
-        '<span class="commonName">' + commonName + '</span><br />';
+      popupContent += '<span class="commonName">' + commonName + '</span><br />';
     }
     popupContent +=
       '<span class="scientificName">' + specimen.name + '</span><br /><br />';
@@ -234,17 +233,13 @@ function createPopup(latlng, specs) {
         specimen.media +
         '"/>';
     } else {
-      popupContent +=
-        '<span class="specimenMedia">No image available :(</span>';
+      popupContent += '<span class="specimenMedia">No image available :(</span>';
     }
     popupContent += '</div>';
   });
   popupContent += '</div>';
   // fire it out
-  L.popup({ minWidth: 500 })
-    .setLatLng(latlng)
-    .setContent(popupContent)
-    .openOn(map);
+  L.popup({ minWidth: 500 }).setLatLng(latlng).setContent(popupContent).openOn(map);
 }
 
 /**

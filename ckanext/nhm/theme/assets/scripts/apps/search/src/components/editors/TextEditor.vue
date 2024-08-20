@@ -2,12 +2,7 @@
   <div class="flex-container flex-center">
     <span class="fields"> field </span>
     <label for="queryValueText">
-      <i
-        :class="[
-          'fas',
-          comparisonType === 'equals' ? 'fa-equals' : 'fa-search',
-        ]"
-      ></i>
+      <i :class="['fas', comparisonType === 'equals' ? 'fa-equals' : 'fa-search']"></i>
     </label>
     <input
       type="text"

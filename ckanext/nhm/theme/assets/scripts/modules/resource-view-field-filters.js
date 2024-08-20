@@ -17,9 +17,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
 
     var fields = self.options.fields,
       fieldGroups = self.options.fieldGroups;
-    self.$select = $(
-      '<select aria-label="Select a field to filter" name="field" />',
-    );
+    self.$select = $('<select aria-label="Select a field to filter" name="field" />');
 
     // If we have field groups, separate the field select into option groups
     // Otherwise, just provide a long list of fields
@@ -29,18 +27,14 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
         var $optGroup = $('<optgroup />', { label: group });
         $.each(fieldGroups[group], function (fieldName, fieldLabel) {
           if (fields.indexOf(fieldName) !== -1) {
-            $optGroup.append(
-              $('<option>', { value: fieldName }).text(fieldLabel),
-            );
+            $optGroup.append($('<option>', { value: fieldName }).text(fieldLabel));
           }
         });
         self.$select.append($optGroup);
       }
     } else {
       $.each(fields, function (i, fieldName) {
-        self.$select.append(
-          $('<option>', { value: fieldName }).text(fieldName),
-        );
+        self.$select.append($('<option>', { value: fieldName }).text(fieldName));
       });
     }
     self.$filtersWrapper.append(self.$select);

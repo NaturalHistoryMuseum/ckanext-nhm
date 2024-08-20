@@ -50,8 +50,7 @@ let dynamicPresets = {
       };
 
       if (imageFields.length === 0) {
-        preset.content.error =
-          'The selected datasets do not have image fields.';
+        preset.content.error = 'The selected datasets do not have image fields.';
       }
 
       return [preset];

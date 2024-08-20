@@ -1,8 +1,6 @@
 <template>
   <div class="filter-term filter-term-number">
-    <span v-if="showName" class="filter-term-name">{{
-      data.display.name
-    }}</span>
+    <span v-if="showName" class="filter-term-name">{{ data.display.name }}</span>
     <div class="flex-container" v-if="!showName">
       <span v-if="isRange && data.content.greater_than !== undefined">{{
         data.content.greater_than

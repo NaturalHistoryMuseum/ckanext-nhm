@@ -1,8 +1,6 @@
 <template>
   <div class="space-children-v field-picker" :class="classes">
-    <div
-      class="flex-container flex-nowrap flex-stretch-first flex-stretch-height"
-    >
+    <div class="flex-container flex-nowrap flex-stretch-first flex-stretch-height">
       <input
         type="text"
         class="full-width"
