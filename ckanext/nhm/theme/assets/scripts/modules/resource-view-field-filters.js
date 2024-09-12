@@ -101,7 +101,7 @@ this.ckan.module('resource-view-field-filters', function ($, _) {
       minimumInputLength: 0,
       allowClear: true,
       ajax: {
-        url: '/api/3/action/datastore_autocomplete',
+        url: '/api/3/action/vds_basic_autocomplete',
         datatype: 'json',
         quietMillis: 200,
         cache: true,

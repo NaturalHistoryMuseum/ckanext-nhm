@@ -95,22 +95,28 @@ def get_record_count():
 
 
 @cache_region('collection_stats', 'record_stats')
-def get_record_stats():
-    start_version = 1501545600
-    end_version = int(time.time())
-    count_action = toolkit.get_action('datastore_count')
+def get_record_stats() -> List[dict]:
+    """
+    Returns a list of dictionaries containing statistics about the number of records
+    available each week starting from 01/08/2017 and ending now.
 
-    record_stats = []
+    :return: a list of dicts
+    """
+    # 01/08/2017 as ms epoch
+    start_version = 1501545600000
+    # now as ms epoch
+    end_version = int(time.time() * 1000)
+    # 1 week in ms
+    step = 604800000
+    count_action = toolkit.get_action("vds_multi_count")
 
-    for v in range(start_version, end_version, 604800):
-        record_stats.append(
-            {
-                'date': datetime.fromtimestamp(v),
-                'count': count_action({}, {'version': v * 1000}),
-            }
-        )
-
-    return record_stats
+    return [
+        {
+            'date': datetime.fromtimestamp(version / 1000),
+            'count': count_action({}, {'version': version})["total"],
+        }
+        for version in range(start_version, end_version, step)
+    ]
 
 
 def _get_action(action, params):
@@ -156,7 +162,7 @@ def get_record(resource_id, record_id):
     :param record_id: the ID of the record
     """
     record = _get_action(
-        'record_show', {'resource_id': resource_id, 'record_id': record_id}
+        "vds_data_get", {"resource_id": resource_id, "record_id": record_id}
     )
     return record.get('data', None)
 
@@ -278,7 +284,7 @@ def get_nhm_organisation_id():
 
     :returns: ID for the NHM organisation
     """
-    value = toolkit.config.get('ldap.organization.id')
+    value = toolkit.config.get("ldap.organization.id")
     return str(value) if value is not None else None
 
 
@@ -294,6 +300,7 @@ def is_collection_resource_id(resource_id: str) -> bool:
         get_artefact_resource_id(),
         get_indexlot_resource_id(),
         get_specimen_resource_id(),
+        get_sample_resource_id(),
     }
     return resource_id in resource_ids
 
@@ -319,10 +326,11 @@ def get_indexlot_resource_id():
 
 
 def get_artefact_resource_id():
-    '''
-    @return:  ID for artefact resource
-    '''
     return toolkit.config.get('ckanext.nhm.artefact_resource_id')
+
+
+def get_sample_resource_id() -> str:
+    return toolkit.config.get("ckanext.nhm.sample_resource_id")
 
 
 def get_beetle_iiif_resource_id():
@@ -331,20 +339,21 @@ def get_beetle_iiif_resource_id():
 
     :return: the resource id
     """
-    value = toolkit.config.get('ckanext.nhm.beetle_iiif_resource_id')
+    value = toolkit.config.get("ckanext.nhm.beetle_iiif_resource_id")
     return str(value) if value is not None else None
 
 
-@cache_region('collection_stats', 'collection_stats')
+@cache_region("collection_stats", "collection_stats")
 def collection_stats():
     """
     Get collection stats, including collection codes and collection totals.
     """
     stats = {}
     collections = [
-        ('artefacts', get_artefact_resource_id()),
-        ('indexlots', get_indexlot_resource_id()),
-        ('specimens', get_specimen_resource_id()),
+        ("artefacts", get_artefact_resource_id()),
+        ("indexlots", get_indexlot_resource_id()),
+        ("specimens", get_specimen_resource_id()),
+        ("samples", get_sample_resource_id()),
     ]
 
     collections_total = 0
@@ -353,7 +362,7 @@ def collection_stats():
             'resource_id': resource_id,
             'limit': 0,
         }
-        stats[name] = toolkit.get_action('datastore_search')({}, params)['total']
+        stats[name] = toolkit.get_action("vds_basic_count")({}, params)
         collections_total += stats[name]
     stats['total'] = collections_total
 
@@ -375,7 +384,7 @@ def collection_stats():
                 }
             },
         }
-        total = toolkit.get_action('datastore_multisearch')({}, params)['total']
+        total = toolkit.get_action("vds_multi_count")({}, params)["total"]
         collection_code_counts.append((collection_code, total))
 
     collection_code_counts.sort(key=operator.itemgetter(1), reverse=True)
@@ -553,7 +562,7 @@ def get_resource_fields(resource, version=None, use_request_version=False):
         if '__version__' in filters:
             data['version'] = int(filters['__version__'][0])
 
-    result = toolkit.get_action('datastore_search')({}, data)
+    result = toolkit.get_action("vds_basic_query")({}, data)
     return [field['id'] for field in result.get('fields', [])]
 
 
@@ -1031,7 +1040,7 @@ def get_resource_facets(resource):
         if toolkit.h.get_param_int('_{}_limit'.format(field_name)) == 0:
             search_params.setdefault('facet_limits', {})[field_name] = 50
 
-    search = toolkit.get_action('datastore_search')(context, search_params)
+    search = toolkit.get_action("vds_basic_query")(context, search_params)
     facets = []
 
     # dictionary of facet name => formatter function with camel_case_to_string defined
@@ -1249,7 +1258,7 @@ def resource_view_get_filterable_fields(resource):
         'resource_id': resource['id'],
         'limit': 0,
     }
-    fields = toolkit.get_action('datastore_search')({}, data).get('fields', [])
+    fields = toolkit.get_action("vds_basic_query")({}, data).get("fields", [])
 
     # sort and filter the fields ensuring we only return string type fields and don't
     # return the id
@@ -1280,7 +1289,7 @@ def _get_latest_update(package_or_resource_dicts):
     """
     # a list of fields on the resource that should contain update dates
     fields = ['last_modified', 'revision_timestamp', 'Created']
-    get_rounded_version = toolkit.get_action('datastore_get_rounded_version')
+    get_rounded_version = toolkit.get_action("vds_version_round")
 
     latest_dict = None
     latest_date = None
@@ -1398,7 +1407,7 @@ def get_object_url(resource_id, guid, version=None, include_version=True):
     :return: the object url
     """
     if include_version:
-        rounded_version = toolkit.get_action('datastore_get_rounded_version')(
+        rounded_version = toolkit.get_action("vds_version_round")(
             {},
             {
                 'resource_id': resource_id,
@@ -1537,13 +1546,12 @@ def group_resources(resource_list):
 
 
 def get_resource_size(resource_dict):
-    prefixes = 'KMGTPEZ'  # kilo, mega, giga, etc. I could make this a list but what's the point
-    if toolkit.get_action('datastore_is_datastore_resource')(
+    if toolkit.get_action("vds_resource_check")(
         {}, {'resource_id': resource_dict['id']}
     ):
         try:
-            records = toolkit.get_action('datastore_count')(
-                {}, {'resource_ids': [resource_dict['id']]}
+            records = toolkit.get_action("vds_basic_count")(
+                {}, {'resource_id': resource_dict['id']}
             )
             return f'{records} records'
         except:
@@ -1572,7 +1580,7 @@ def get_record_permalink(
             'record_id': record_dict['_id'],
         }
         if include_version:
-            rounded_version = toolkit.get_action('datastore_get_rounded_version')(
+            rounded_version = toolkit.get_action("vds_version_round")(
                 {},
                 {
                     'resource_id': resource_dict['id'],

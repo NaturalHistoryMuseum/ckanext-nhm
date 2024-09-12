@@ -117,6 +117,18 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="collection-block" href="/search/samples">
+                                    <div class="flex-container flex-smallwrap flex-center">
+                                        <svg class="zoology collection-icon"></svg>
+                                        <span class="collection-code">{{ _('Samples') }}</span>
+                                    </div>
+                                    <div class="flex-column collection-block-text">
+                                            <span class="collection-count"> {{ h.delimit_number(collection_stats['samples']) }}</span>
+                                        <span class="collection-name default-text">{{ _('Samples') }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
                                 <a class="collection-block" href="/search/artefacts">
                                     <div class="flex-container flex-smallwrap flex-center">
                                         <svg class="mineralogy collection-icon"></svg>

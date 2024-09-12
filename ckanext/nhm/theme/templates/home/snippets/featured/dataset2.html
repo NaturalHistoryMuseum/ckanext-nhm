@@ -1,17 +1,18 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set title = "Butterfly types" %}
-{% set url="/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb?view_id=6ba121d1-da26-4ee1-81fa-7da11e68f68e&filters=project%3Apapilionoidea+new+types+digitisation+project" %}
+{% set url = h.url_for('beetle-iiif.index') %}
+{% set title = "Beetle drawers" %}
 
 {% block image %}
-<div class="featured-image"
-     style="background-image:url('/images/Heraclides_rumiko_small.jpg')"
-     role="img"
-     aria-label="A top-down photograph of a large black and yellow butterfly (Heraclides rumiko). It is pinned to a grey tray and there are a set of small labels to its left."
-     title="NHMUK012824346, Heraclides rumiko">
-</div>
+    <div class="featured-image"
+         style="background-image:url('/images/iiif_drawer.jpg')"
+         role="img"
+         aria-label="A top-down photograph of several trays containing various whole or partial pinned insects."
+         title=""
+    ></div>
 {% endblock %}
 
 {% block description %}
-View some of the Museum’s invaluable butterfly reference material.
+    An interactive image viewer allowing users to zoom in on a selection of detailed drawer scans
+    from our Coleoptera collections.
 {% endblock %}

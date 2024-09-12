@@ -14,7 +14,6 @@ from ckanext.nhm.dcat.utils import (
     Namespaces,
     object_uri,
     as_dwc_list,
-    epoch_to_datetime,
 )
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.lib.helpers import get_department
@@ -95,7 +94,7 @@ class RecordGraphBuilder(object):
         self.version = version
 
         # figure out the rounded version of the record
-        self.rounded_version = toolkit.get_action('datastore_get_rounded_version')(
+        self.rounded_version = toolkit.get_action('vds_version_round')(
             {},
             {
                 'resource_id': self.record.resource_id,
@@ -261,7 +260,7 @@ class RecordGraphBuilder(object):
             yield (
                 self.record_ref,
                 self.namespaces.dc.created,
-                Literal(epoch_to_datetime(self.record.data['created'])),
+                Literal(self.record.data['created']),
             )
         yield self.record_ref, self.namespaces.dc.publisher, URIRef('https://nhm.ac.uk')
 
@@ -381,7 +380,7 @@ class RecordGraphBuilder(object):
             yield (
                 self.record_ref,
                 self.namespaces.dc.created,
-                Literal(epoch_to_datetime(self.record.data['created'])),
+                Literal(self.record.data['created']),
             )
 
         if self.record.data.get('modified', None) is not None:
@@ -389,7 +388,7 @@ class RecordGraphBuilder(object):
             yield (
                 self.record_ref,
                 self.namespaces.dwc.modified,
-                Literal(epoch_to_datetime(self.record.data['modified'])),
+                Literal(self.record.data['modified']),
             )
 
     def _version_info(self):

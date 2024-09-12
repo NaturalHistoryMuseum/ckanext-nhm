@@ -58,7 +58,7 @@ export class API {
    */
   async *getRecords(body) {
     while (true) {
-      const json = await this.post('datastore_multisearch', body);
+      const json = await this.post('vds_multi_query', body);
       yield* json.result.records;
       if (!json.result.after) {
         break;
@@ -77,7 +77,7 @@ export class API {
    */
   async getRecordCount(body) {
     body.size = 0;
-    const json = await this.post('datastore_multisearch', body);
+    const json = await this.post('vds_multi_query', body);
     return json.result.total;
   }
 

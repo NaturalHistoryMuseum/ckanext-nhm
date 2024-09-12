@@ -27,6 +27,7 @@ from ckanext.nhm.lib.mail import (
     create_department_email,
     create_package_email,
 )
+from ckanext.nhm.lib.record import LATITUDE_FIELD, LONGITUDE_FIELD
 from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastore,
     IVersionedDatastoreDownloads,
@@ -79,7 +80,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IActions.get_actions
         '''
         return {
-            'record_show': nhm_action.record_show,
             'object_rdf': nhm_action.object_rdf,
             'get_permanent_url': nhm_action.get_permanent_url,
             'user_show': nhm_action.user_show,
@@ -87,6 +87,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'resource_create': nhm_action.resource_create,
             'resource_update': nhm_action.resource_update,
             'show_extension_versions': nhm_action.show_extension_versions,
+            "datastore_search": nhm_action.datastore_search,
         }
 
     ## IClick
@@ -426,163 +427,103 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return images
 
     ## IVersionedDatastore
-    def datastore_modify_data_dict(self, context, data_dict):
-        """
-        This function allows overriding of the data dict before datastore_search gets to
-        it. We use this opportunity to:
+    def vds_before_search(self, request):
+        # we only want to operate on basic queries with a data_dict
+        if request.query.kind != "basic" or not request.data_dict:
+            return
 
-            - remove any of our custom filter options (has image, lat long only etc)
-            and add info
-              to the context so that we can pick them up and handle them in
-              datastore_modify_search.
-              This is necessary because we define the actual query the filter options
-              use in the
-              elasticsearch-dsl lib's objects and therefore need to modify the actual
-              search object
-              prior to it being sent to the elasticsearch server.
-
-            - alter the sort if the resource being searched is one of the EMu ones,
-            this allows us
-              to enforce a modified by sort order instead of the default and therefore
-              means we can
-              show the last changed EMu data first
-
-        :param context: the context dict
-        :param data_dict: the data dict
-        :return: the modified data dict
-        """
-        # remove our custom filters from the filters dict, we'll add them ourselves in
-        # the modify
-        # search function below
-        if 'filters' in data_dict:
+        if "filters" in request.data_dict:
             # figure out which options are available for this resource
-            resource_show = toolkit.get_action('resource_show')
-            resource = resource_show(context, {'id': data_dict['resource_id']})
+            resource_show = toolkit.get_action("resource_show")
+            resource = resource_show({}, {"id": request.data_dict["resource_id"]})
             options = resource_view_get_filter_options(resource)
-            # we'll store the filters that need applying on the context to avoid
-            # repeating our work
-            # in the modify search function below
-            context['option_filters'] = []
-            for option in options:
-                if option.name in data_dict['filters']:
-                    # if the option is in the filters, delete it and add it's filter
-                    # to the context
-                    del data_dict['filters'][option.name]
-                    context['option_filters'].append(option.filter_dsl)
 
-        if 'sort' not in data_dict:
+            for option in options:
+                if option.name in request.data_dict["filters"]:
+                    # if the option is in the filters, delete it
+                    del request.data_dict["filters"][option.name]
+                    # and add the appropriate additional query term to the extras
+                    request.extra_filter &= option.filter_dsl
+
+        if "sort" not in request.data_dict:
             # by default sort the EMu resources by modified so that the latest records
             # are first
-            if data_dict['resource_id'] in {
+            if request.data_dict["resource_id"] in {
                 helpers.get_specimen_resource_id(),
                 helpers.get_artefact_resource_id(),
                 helpers.get_indexlot_resource_id(),
+                helpers.get_sample_resource_id(),
             }:
-                data_dict['sort'] = ['modified desc']
+                request.add_sort("modified", False)
 
-        return data_dict
-
-    def datastore_modify_search(self, context, original_data_dict, data_dict, search):
-        """
-        This function allows us to modify the search object itself before it is
-        serialised and sent to elasticsearch. In this function we currently only do one
-        thing: add the actual elasticsearch query DSL for each filter option that was
-        removed in the datastore_modify_data_dict above (they are stored in the context
-        so that we can identify which ones to add in).
-
-        :param context: the context dict
-        :param original_data_dict: the original data dict before any plugins modified it
-        :param data_dict: the data dict after all plugins have had a chance to modify it
-        :param search: the search object itself
-        :return: the modified search object
-        """
-        # add our custom filters by looping through the filter dsl objects on the
-        # context. These are
-        # added by the datastore_modify_data_dict function above if any of our custom
-        # filters exist
-        for filter_dsl in context.pop('option_filters', []):
-            # add the filter to the search
-            search = search.filter(filter_dsl)
-        return search
-
-    def datastore_modify_result(self, context, original_data_dict, data_dict, result):
-        # if there's the include_urls parameter then include the permanent url of each specimen
-        if (
-            helpers.get_specimen_resource_id() == data_dict['resource_id']
-            and 'include_urls' in original_data_dict
-        ):
-            for hit in result.hits:
-                if 'occurrenceID' in hit.data:
-                    hit.data.permanentUrl = toolkit.url_for(
-                        'object_view', uuid=hit.data.occurrenceID
-                    )
-
-        return result
-
-    def datastore_modify_fields(self, resource_id, mapping, fields):
-        """
-        This function allows us to modify the field definitions before they are returned
-        as part of the datastore_search action. All we do here is just modify the
-        associatedMedia field if it exists to ensure it is treated as an array.
-
-        :param resource_id: the resource id
-        :param mapping: the original mapping dict returned by elasticsearch from which
-        the field
-                        info has been derived
-        :param fields: the fields dict itself
-        :return: the fields dict
-        """
-        # if we're dealing with one of our EMu backed resources and the
-        # associatedMedia field is
-        # present set its type to array rather than string (the default). This isn't
-        # really
-        # necessary from recline's point of view as we override the render of this
-        # field's data
-        # anyway, but for completeness and correctness we'll do the override
-        if resource_id in {
-            helpers.get_specimen_resource_id(),
-            helpers.get_artefact_resource_id(),
-            helpers.get_indexlot_resource_id(),
-        }:
-            for field_def in fields:
-                if field_def['id'] == 'associatedMedia':
-                    field_def['type'] = 'array'
-                    field_def['sortable'] = False
-        return fields
-
-    def datastore_is_read_only_resource(self, resource_id):
+    def vds_is_read_only_resource(self, resource_id) -> bool:
         # we don't want any of the versioned datastore ingestion and indexing code
-        # modifying the
-        # collections data as we manage it all through the data importer
+        # modifying the collections data as we manage it all through the data importer
         return resource_id in {
             helpers.get_specimen_resource_id(),
             helpers.get_artefact_resource_id(),
             helpers.get_indexlot_resource_id(),
+            helpers.get_sample_resource_id(),
         }
 
-    def datastore_reserve_slugs(self):
+    def vds_update_options(self, resource_id, builder):
+        # add some basic defaults for the parsing options
+        for true_value in ("true", "yes", "y"):
+            builder.with_true_value(true_value)
+        for false_value in ("false", "no", "n"):
+            builder.with_false_value(false_value)
+        date_formats = (
+            "%Y-%m-%d",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%dT%H:%M:%S.%f",
+            "%Y-%m-%dT%H:%M:%S%z",
+            "%Y-%m-%dT%H:%M:%S.%f%z",
+        )
+        for date_format in date_formats:
+            builder.with_date_format(date_format)
+
+        # remove any previously set geo hints. This isn't technically needed but given
+        # we have a page where users set the geo hints, it makes sense to make the way
+        # this works align with their view, which is just one lat/lon field pair set at
+        # a a time instead of more than one. When an interface is created for the
+        # options then we can not do this
+        builder.clear_geo_hints()
+
+        # grab the resource dict so that we can check for user specified options
+        context = {"ignore_auth": True}
+        resource = toolkit.get_action("resource_show")(context, {"id": resource_id})
+        # if the user specified latitude field already exists in the parsing options, we
+        # will override that set of options with these
+        latitude_field = resource.get(LATITUDE_FIELD, None)
+        longitude_field = resource.get(LONGITUDE_FIELD, None)
+        if latitude_field and longitude_field:
+            builder.with_geo_hint(latitude_field, longitude_field)
+
+    def vds_reserve_slugs(self):
         collection_resource_ids = [
             helpers.get_specimen_resource_id(),
             helpers.get_artefact_resource_id(),
             helpers.get_indexlot_resource_id(),
+            helpers.get_sample_resource_id(),
         ]
         slugs = {
-            'collections': dict(resource_ids=collection_resource_ids),
-            'everything': dict(resource_ids=[]),
-            'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
-            'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
-            'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
+            "collections": dict(resource_ids=collection_resource_ids),
+            "everything": dict(resource_ids=[]),
+            "specimens": dict(resource_ids=[helpers.get_specimen_resource_id()]),
+            "indexlots": dict(resource_ids=[helpers.get_indexlot_resource_id()]),
+            "artefacts": dict(resource_ids=[helpers.get_artefact_resource_id()]),
+            "samples": dict(resource_ids=[helpers.get_sample_resource_id()]),
         }
-        for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
+        for collection_code in ("PAL", "MIN", "BMNH(E)", "ZOO", "BOT"):
             slugs[helpers.get_department(collection_code).lower()] = {
-                'resource_ids': collection_resource_ids,
-                'query': {
-                    'filters': {
-                        'and': [
+                "resource_ids": collection_resource_ids,
+                "query": {
+                    "filters": {
+                        "and": [
                             {
-                                'string_equals': {
-                                    'fields': ['collectionCode'],
-                                    'value': collection_code,
+                                "string_equals": {
+                                    "fields": ["collectionCode"],
+                                    "value": collection_code,
                                 }
                             }
                         ]
@@ -591,37 +532,37 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             }
         return slugs
 
-    def datastore_modify_guess_fields(self, resource_ids, fields):
-        # if the index lots or specimens collections are in the resource ids list, remove a bunch
-        # of groups that we don't care about
+    def vds_modify_field_groups(self, resource_ids, field_groups):
+        # if the index lots or specimens collections are in the resource ids list,
+        # remove a bunch of groups that we don't care about
         if (
             helpers.get_specimen_resource_id() in resource_ids
             or helpers.get_indexlot_resource_id() in resource_ids
         ):
-            fields.force('scientificName')
-            fields.force('family')
-            fields.force('typeStatus')
-            fields.force('locality')
-            fields.force('country')
-            fields.force('recordedBy')
-            fields.force('catalogNumber')
-            fields.force('associatedMediaCount')
-            fields.force('preservative')
-            fields.force('collectionCode')
-            fields.force('year')
-            fields.force('month')
-            fields.force('day')
+            field_groups.force("scientificName")
+            field_groups.force("family")
+            field_groups.force("typeStatus")
+            field_groups.force("locality")
+            field_groups.force("country")
+            field_groups.force("recordedBy")
+            field_groups.force("catalogNumber")
+            field_groups.force("associatedMediaCount")
+            field_groups.force("preservative")
+            field_groups.force("collectionCode")
+            field_groups.force("year")
+            field_groups.force("month")
+            field_groups.force("day")
             for group in (
-                'created',
-                'modified',
-                'basisOfRecord',
-                'institutionCode',
-                'associatedMedia.*',
-                'barcode',
+                "created",
+                "modified",
+                "basisOfRecord",
+                "institutionCode",
+                "associatedMedia.*",
+                "barcode",
             ):
-                fields.ignore(group)
+                field_groups.ignore(group)
 
-        return fields
+        return field_groups
 
     def datastore_before_convert_basic_query(self, query):
         # see lib.filter_options

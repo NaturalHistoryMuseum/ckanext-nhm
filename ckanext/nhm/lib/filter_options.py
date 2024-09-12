@@ -5,6 +5,8 @@
 # Created by the Natural History Museum in London, UK
 
 from elasticsearch_dsl import Q
+from splitgill.indexing.fields import DocumentField
+from splitgill.search import exists_query, term_query
 
 
 class FilterOption:
@@ -43,18 +45,16 @@ class FilterOption:
 
 
 # define some simple, common filters
-has_image = FilterOption(
-    '_has_image', 'Has image', Q('exists', field='data.associatedMedia')
-)
+has_image = FilterOption("_has_image", "Has image", exists_query("associatedMedia"))
 
 has_lat_long = FilterOption(
-    '_has_lat_long', 'Has lat/long', Q('exists', field='meta.geo')
+    "_has_lat_long", "Has lat/long", Q("exists", field=DocumentField.ALL_POINTS)
 )
 
 exclude_mineralogy = FilterOption(
-    '_exclude_mineralogy',
-    'Exclude Mineralogy',
+    "_exclude_mineralogy",
+    "Exclude Mineralogy",
     # note the ~ which inverts the query
-    ~Q('term', **{'data.collectionCode': 'min'}),
+    ~term_query("collectionCode", "min", case_sensitive=False),
     hide=True,
 )

@@ -1,18 +1,18 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set url = h.url_for('beetle-iiif.index') %}
-{% set title = "Beetle drawers" %}
+{% set id = 'collection-samples' %}
+{% set title = "Samples collection" %}
+{% set url = h.url_for('resource.read', id=id, resource_id=h.get_sample_resource_id()) %}
 
 {% block image %}
-    <div class="featured-image"
-         style="background-image:url('/images/iiif_drawer.jpg')"
-         role="img"
-         aria-label="A top-down photograph of several trays containing various whole or partial pinned insects."
-         title=""
-    ></div>
+<div class="featured-image"
+     style="background-image: url('/images/featured-samples.jpg')"
+     role="img"
+     aria-label="A picture of a freezer drawer that is extended from the freezer. No specimens are visible, but the drawer is covered in ice."
+     title="Sample collection">
+</div>
 {% endblock %}
 
 {% block description %}
-    An interactive image viewer allowing users to zoom in on a selection of detailed drawer scans
-    from our Coleoptera collections.
+Access the catalogue of samples in the NHM collections.
 {% endblock %}

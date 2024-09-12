@@ -58,8 +58,11 @@
                                 {% elif field == 'collectionCode' %}
                                     {{ g.record_dict[field] }} (
                                     {{ h.get_department(g.record_dict[field]) }})
+                                {% elif field == 'associatedOccurrences' %}
+                                    {% set voucher_guid = h.get_sample_voucher_guid(g.record_dict[field]) %}
+                                    <a href="{{ h.get_object_url(h.get_specimen_resource_id(), voucher_guid) }}">{{ voucher_guid }}</a>
                                 {% elif field == 'created' or field == 'modified' %}
-                                    {{ h.render_epoch(g.record_dict[field]) }}
+                                    {{ g.record_dict[field] }}
                                 {% else %}
                                     {% taxonomy field, g.record_dict['collectionCode'], g.record_dict %}
                                         {{ g.record_dict[field] }}
@@ -106,13 +109,13 @@
     {% if 'created' in g.record_dict %}
     <tr>
         <th scope="row">{{ _('Created') }}</th>
-        <td>{{ h.render_epoch(g.record_dict['created']) }}</td>
+        <td>{{ g.record_dict['created'] }}</td>
     </tr>
     {% endif %}
     {% if 'modified' in g.record_dict %}
     <tr>
         <th scope="row">{{ _('Last updated') }}</th>
-        <td>{{ h.render_epoch(g.record_dict['modified']) }}</td>
+        <td>{{ g.record_dict['modified'] }}</td>
     </tr>
     {% endif %}
     {{ super() }}
