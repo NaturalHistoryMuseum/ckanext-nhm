@@ -1617,4 +1617,4 @@ def get_sample_voucher_guid(associated_occurrence_value: str) -> str:
     :return: the voucher specimen GUID
     """
     _, guid = associated_occurrence_value.split(":", 1)
-    return guid
+    return guid.strip()
