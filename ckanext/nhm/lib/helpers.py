@@ -1606,3 +1606,15 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
         {'builder_id': 'record', 'resource_id': resource_id, 'record_id': record_id},
     )
     return toolkit.url_for('iiif.resource', identifier=manifest_id, _external=True)
+
+
+def get_sample_voucher_guid(associated_occurrence_value: str) -> str:
+    """
+    Given an associatedOccurrence value from a Sample record, returns the associated
+    specimen GUID.
+
+    :param associated_occurrence_value: the associatedOccurrence value
+    :return: the voucher specimen GUID
+    """
+    _, guid = associated_occurrence_value.split(":", 1)
+    return guid
