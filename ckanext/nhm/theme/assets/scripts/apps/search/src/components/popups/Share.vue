@@ -77,7 +77,7 @@ export default {
     ...mapState('results', ['slug', 'slugReserved', 'page']),
     ...mapState('results/display', ['view']),
     shareUrl() {
-      let Url = `data.nhm.ac.uk/search/${this.slug}`;
+      let Url = `${window.location.hostname}/search/${this.slug}`;
 
       let params = [];
       if (this.includeShareView) {
