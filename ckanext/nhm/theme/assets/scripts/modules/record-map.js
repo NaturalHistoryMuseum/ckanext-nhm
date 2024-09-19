@@ -16,8 +16,7 @@ this.ckan.module('record-map', function () {
         const map = new L.Map('record-map-container');
 
         // create the base tile layer
-        const baseLayerUrl =
-          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const baseLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         const baseLayer = new L.TileLayer(baseLayerUrl, {
           maxZoom: 18,
           subdomains: 'abc',

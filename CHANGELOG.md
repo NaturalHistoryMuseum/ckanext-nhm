@@ -1,4 +1,227 @@
-# Changelog
+## v6.9.6 (2024-08-20)
+
+### Fix
+
+- taxa match type is string_contains
+- add hasAssociatedMedia property to resource
+
+### Style
+
+- run prettier manually for other files
+- run prettier manually for search
+- run prettier manually for liv
+
+## v6.9.5 (2024-08-02)
+
+### Fix
+
+- add nofollow to resource tags
+- add nofollow to facet links
+
+## v6.9.4 (2024-07-22)
+
+### Fix
+
+- only display warning if version is smaller than latest
+- point legal link at legal page
+
+## v6.9.3 (2024-07-15)
+
+### Refactor
+
+- move pages into dedicated legal section
+
+## v6.9.2 (2024-07-15)
+
+### Fix
+
+- apparently maxsize was not unnecessary
+- remove (probably) unnecessary maxsize of cache
+- test if status.index route exists
+- cache iiif status response for 300s
+- reinsert + to URL creation
+- remove GA code, don't need it anymore
+- remove version from BBCM specimen links
+
+### Refactor
+
+- reduce size of ttl cache
+
+## v6.9.1 (2024-07-08)
+
+### Fix
+
+- get mss status from source cache
+
+## v6.9.0 (2024-07-08)
+
+### Feature
+
+- add link to help pages into footer
+- add contact email for bii
+- send enquiries to maintainer over collaborators or creator
+- allow setting maintainer/contact email
+- add link to status page in user icons, with indicator
+- add integration with ckanext-status
+
+### Fix
+
+- change department label to "department or team"
+- move temporal extent help message below the input
+- get the reports list from status_list action
+- catch error if status_list action doesn't exist
+- change name of macro
+- add status indicator when logged out as well
+- change wording of specimen images help text
+- use (un)available instead of (dis)connected
+
+### Refactor
+
+- remove api docs link, shorten some titles in footer
+
+## v6.8.1 (2024-06-20)
+
+### Fix
+
+- add hidden org field when only one org available
+
+## v6.8.0 (2024-06-10)
+
+### Feature
+
+- add help page for dataset permissions
+- add org list to user profile
+
+### Fix
+
+- catch errors when parsing lat/lon for individual records
+- only show org selector if more than one is available
+- redirect /organisation to /organization
+- remove new user invitation from org new member form
+- allow non-sysadmin package editors to change org
+- update search help page
+
+### Style
+
+- reformat search help header
+
+## v6.7.1 (2024-05-14)
+
+### Fix
+
+- remove references to ckanext-twitter
+
+## v6.7.0 (2024-05-07)
+
+### Feature
+
+- add LIV link for resources with image field
+- change mirador link to LIV
+
+### Fix
+
+- allow passing liv mode and params as separate arguments
+- remove "forgot password" button and replace with explanation
+
+## v6.6.2 (2024-04-15)
+
+### Fix
+
+- create unique id for image associated with record
+
+## v6.6.1 (2024-03-25)
+
+### Fix
+
+- use a smaller image for the goliath beetles
+- disable rjsmin on liv script
+
+## v6.6.0 (2024-03-25)
+
+### Feature
+
+- add link to liv from search ui image viewer
+- add reset button
+- add download button to overlay
+- add no results message
+- add clear filters button
+- load filters from query
+- initial commit for large image viewer (liv)
+- add subtitle field to extras
+
+### Fix
+
+- only show no results message if search has been attempted
+- reset state when setting query
+- handle errors in multisearch request
+- use query hash as abort signal, insert records and imgs together
+- enable filters for index lots
+- use string_contains for taxa search
+- only show analytics when not debug
+- define view components with shallowref
+- make infinite scroll trigger earlier
+- set minimum zoom level to allow further zooming out
+- slow down repeated requests and disable auto load if many fail
+- rate limit api calls from liv
+- set limit param correctly
+- add a timeout to GBIF API requests
+
+### Refactor
+
+- get all resources on app mount
+
+### Chores/Misc
+
+- update zoa
+- remove extra multisearch
+- remove unnecessary store import
+
+### Minor UI Changes
+
+- change viewer link and image on homepage
+- add link to liv from beetle viewer
+
+## v6.5.4 (2024-03-11)
+
+### Fix
+
+- remove random root init
+
+## v6.5.3 (2024-02-26)
+
+### Fix
+
+- allow json-ld as an rdf format
+
+## v6.5.2 (2024-02-13)
+
+### Fix
+
+- **search-ui**: rerun search even if image preset not added
+
+## v6.5.1 (2024-02-05)
+
+### Fix
+
+- **search-ui**: return promise from loadAndCheckImages
+- **search-ui**: update image filter when resources are changed
+- **search-ui**: remove previous page's images when loading new set
+
+### Refactor
+
+- **search-ui**: rename birdwing preset
+
+## v6.5.0 (2024-01-29)
+
+### Feature
+
+- add aohc page
+
+## v6.4.2 (2024-01-22)
+
+### Refactor
+
+- remove mam patch and gallery overrides
 
 ## v6.4.1 (2024-01-15)
 
@@ -196,35 +419,13 @@
 
 ## v6.0.0 (2023-07-18)
 
-### Feature
-
-- use nav slugs for the homepage search
-- remove all references to ckanpackager
-
 ### Fix
 
 - try once again to fix the overflowing text on resource list
-- modify vds queries before and after converting
-- allow for non-datastore resources in download button
-- do not propogate errors from phenome10k api call
-- set download button query from url
-
-### Style
-
-- data is plural
 
 ### Build System(s)
 
 - update dependencies
-
-### Chores/Misc
-
-- pull in external link changes from #672
-
-### Minor UI Changes
-
-- replace record download link
-- replace resource download link
 
 ## v5.8.2 (2023-07-17)
 
@@ -294,9 +495,31 @@
 
 ## v5.6.4 (2023-06-16)
 
+### Feature
+
+- use nav slugs for the homepage search
+- remove all references to ckanpackager
+
 ### Fix
 
 - do not propogate errors from phenome10k api call
+- modify vds queries before and after converting
+- allow for non-datastore resources in download button
+- do not propogate errors from phenome10k api call
+- set download button query from url
+
+### Style
+
+- data is plural
+
+### Chores/Misc
+
+- pull in external link changes from #672
+
+### Minor UI Changes
+
+- replace record download link
+- replace resource download link
 
 ## v5.6.3 (2023-05-09)
 
@@ -451,10 +674,10 @@
 
 - bump vds version
 - rebuild search app after merging dependabot updates
+- **deps**: bump loader-utils
+- **deps**: bump decode-uri-component
 - **deps**: bump node-forge and webpack-dev-server
 - **deps**: bump json5 in /ckanext/nhm/theme/assets/scripts/apps/search
-- **deps**: bump decode-uri-component
-- **deps**: bump loader-utils
 
 ### Minor UI Changes
 
@@ -485,17 +708,16 @@
 ### Feature
 
 - change featured dataset 4 to jtd
+- sort the show_extensions_versions by name
+- add action which lists installed package extensions and their versions
 - add a button for resetting the download
 - **search-app**: remove cached download when popup toggled
 - **search-app**: add new dwc options and improve UI
-- sort the show_extensions_versions by name
-- add action which lists installed package extensions and their versions
-- **search-app**: split popups into separate components, add new dl opts
 
 ### Fix
 
-- use new download interface methods for replacing templates
 - **accessibility**: add aria labels/alt text for all featured datasets
+- use new download interface methods for replacing templates
 - **search-app**: actually trigger a download
 
 ### Refactor
@@ -509,8 +731,8 @@
 ### Tests
 
 - go up one more dir to find src files
-- remove references to old interface method
 - add a test for the new show_extension_versions action
+- remove references to old interface method
 
 ### Build System(s)
 
@@ -550,6 +772,7 @@
 
 ### Build System(s)
 
+- **commitizen**: fix package.json path
 - **requirements**: use compatible release specifier for extensions
 
 ## v4.0.5 (2022-12-08)
@@ -559,6 +782,10 @@
 - fix patterns for package data
 
 ## v4.0.4 (2022-12-07)
+
+### Feature
+
+- **search-app**: split popups into separate components, add new dl opts
 
 ### Fix
 
@@ -593,6 +820,9 @@
 
 ### Build System(s)
 
+- remove ckanext-dcat from dependencies entirely
+- put dcat dependency link in setup.py
+- fix version number
 - **requirements**: add ckanext-iiif as a dependency
 
 ## v4.0.1 (2022-11-29)
@@ -603,31 +833,6 @@
 - change ckan.rdf.plugins to ckan.rdf.profiles
 
 ## v4.0.0 (2022-11-28)
-
-### Fix
-
-- **less**: add parentheses for less v4 compatibility
-- update less and less-loader in beetle-iiif
-
-### Docs
-
-- add section delimiters and include-markdown
-
-### Build System(s)
-
-- **requirements**: update versions of ckan extensions
-- set changelog generation to incremental
-- pin minor versions of dependencies
-
-### CI System(s)
-
-- add cz_nhm dependency
-
-### Chores/Misc
-
-- use cz_nhm commitizen config
-
-## v3.7.2 (2022-11-21)
 
 ### Breaking Changes
 
@@ -640,11 +845,16 @@
 
 ### Fix
 
-- ensure the geo_point radius is always passed as a number in queries
+- **less**: add parentheses for less v4 compatibility
+- update less and less-loader in beetle-iiif
 
 ### Refactor
 
 - switch all css to less
+
+### Docs
+
+- add section delimiters and include-markdown
 
 ### Style
 
@@ -652,18 +862,32 @@
 
 ### Build System(s)
 
-- rebuild the search app after previous change (prod build)
+- **requirements**: update versions of ckan extensions
+- set changelog generation to incremental
+- pin minor versions of dependencies
 
 ### CI System(s)
 
+- add cz_nhm dependency
 - **commitizen**: fix message template
 
 ### Chores/Misc
 
+- use cz_nhm commitizen config
 - update dcat version
 - improve commitizen message template
 - fix license in package.json
 - standardise package files
+
+## v3.7.2 (2022-11-21)
+
+### Fix
+
+- ensure the geo_point radius is always passed as a number in queries
+
+### Build System(s)
+
+- rebuild the search app after previous change (prod build)
 
 ## v3.7.1 (2022-10-24)
 
@@ -781,13 +1005,13 @@
 
 ## v0.3.3 (2019-08-07)
 
-## v1.0.0-alpha (2019-07-23)
-
 ## v0.3.2 (2019-05-29)
 
 ## v0.3.1 (2019-05-01)
 
 ## v0.3.0 (2019-04-30)
+
+## v1.0.0-alpha (2019-07-23)
 
 ## v0.2.10 (2018-12-07)
 

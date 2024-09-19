@@ -55,6 +55,10 @@
 {{ form.info(_('Please select the field to use for the record title.'), inline=True) }}
 {% endcall %}
 
+{% call form.select('_subtitle_field', label=_('Subtitle field'), options=datastore_fields, selected=data._subtitle_field, error=errors._subtitle_field) %}
+{{ form.info(_('Please select the field to use for subtitles, e.g. on the LIV.'), inline=True) }}
+{% endcall %}
+
 {% call form.select('_image_field', label=_('Image field'), options=datastore_fields, selected=data._image_field, error=errors._image_field, attrs={'data-module': 'toggle-select', 'data-module-target': '#image-options'}) %}
 {{ form.info(_('Does your dataset contain images?  If so, please select the field here.'), inline=True) }}
 {% endcall %}

@@ -126,13 +126,6 @@ social:
   contents:
     - scripts/modules/social.js
 
-mam:
-  output: ckanext-nhm/%(version)s_mam.js
-  filters: rjsmin
-  contents:
-    - scripts/mam.js
-    - scripts/vendor/mustache/0.5.0-dev/mustache.js
-
 expand-authors:
   output: ckanext-nhm/%(version)s_expand-authors.js
   filters: rjsmin
@@ -247,3 +240,13 @@ resource-view-reorder:
       - base/main
   contents:
     - scripts/modules/resource-view-reorder.js
+
+liv-css:
+  output: ckanext-nhm/%(version)s_liv.css
+  contents:
+    - scripts/apps/liv/dist/*.css
+
+liv-js:
+  output: ckanext-nhm/%(version)s_liv.js
+  contents:
+    - scripts/apps/liv/dist/*.js

@@ -1,18 +1,18 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set url = h.url_for('beetle-iiif.index') %}
-{% set title = "Beetle drawers" %}
+{% set url = h.url_for('liv.index') %}
+{% set title = "Image viewer" %}
 
 {% block image %}
     <div class="featured-image"
-         style="background-image:url('/images/iiif_drawer.jpg')"
+         style="background-image:url('/images/L010225443_small.jpg')"
          role="img"
-         aria-label="A top-down photograph of several trays containing various whole or partial pinned insects."
+         aria-label="A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443."
          title=""
     ></div>
 {% endblock %}
 
 {% block description %}
-    An interactive image viewer allowing users to zoom in on a selection of detailed drawer scans
-    from our Coleoptera collections.
+    An interactive image viewer allowing users to zoom in on images in our datasets,
+    including high-resolution photographs of pinned insect drawers.
 {% endblock %}

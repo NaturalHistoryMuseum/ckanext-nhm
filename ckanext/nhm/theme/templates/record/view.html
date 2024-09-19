@@ -26,7 +26,7 @@
         {% block page_header %}
         <header class="page-header">
             <div class="row flex-container flex-wrap flex-wrap-spacing flex-between flex-stretch-first flex-reverse">
-                {% if g.version and h.latest_item_version(resource_id=res.id, record_id=rec['_id']) != g.version %}
+                {% if g.version and h.latest_item_version(resource_id=res.id, record_id=rec['_id']) > g.version %}
                 <div class="col-md-12 full-width alert-info margin-bottom">
                     <p><b>This is not the most recent version of this record.</b></p>
                     <p>This version is from {{ h.get_version_date(g.version) }}.</p>
@@ -156,8 +156,8 @@
             View Manifest
         </a> |
         <a target="_blank"
-           href="https://projectmirador.org/embed/?iiif-content={{ iiif_manifest_url }}">
-            View in Mirador
+           href="{{ h.url_for('liv.index', mode='record', mode_params=res.id ~ '/' ~ rec['_id']) }}">
+            View in Image Viewer
         </a>
         {% endif %} {% endblock %}
 

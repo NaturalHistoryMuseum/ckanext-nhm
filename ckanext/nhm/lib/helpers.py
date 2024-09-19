@@ -19,6 +19,7 @@ from urllib.parse import quote
 from beaker.cache import cache_region
 from jinja2.filters import do_truncate
 from lxml import etree, html
+from werkzeug.routing import BuildError
 
 from ckan import model
 from ckan.lib import helpers as core_helpers
@@ -471,6 +472,7 @@ def filter_and_format_resource_items(resource):
     blacklist = {
         '_image_field',
         '_title_field',
+        '_subtitle_field',
         'datastore_active',
         'has_views',
         'on_same_domain',
@@ -1606,6 +1608,48 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
         {'builder_id': 'record', 'resource_id': resource_id, 'record_id': record_id},
     )
     return toolkit.url_for('iiif.resource', identifier=manifest_id, _external=True)
+
+
+def get_status_indicator():
+    """
+    Check if we need to display a status indicator, and if so what type.
+
+    :return: 'red', 'amber', or None (if no alerts)
+    """
+    # is there a status message?
+    status_message = toolkit.config.get('ckanext.status.message', None)
+    if status_message:
+        return 'red'
+
+    try:
+        status_reports = toolkit.get_action('status_list')({}, {}).get('reports', [])
+    except KeyError:
+        # if the action doesn't exist
+        status_reports = []
+
+    # are there any 'bad' items?
+    red_status = [r for r in status_reports if r['state'] == 'bad']
+    if len(red_status) > 0:
+        return 'red'
+
+    # are there any reports with small issues?
+    amber_status = [r for r in status_reports if r['state'] == 'ok']
+    if len(amber_status) > 0:
+        return 'amber'
+
+
+def route_exists(route):
+    """
+    Simple helper for checking if a flask route exists.
+
+    :param route: endpoint name, as passed to url_for
+    :return: bool
+    """
+    try:
+        url = toolkit.url_for(route)
+        return True
+    except BuildError:
+        return False
 
 
 def get_sample_voucher_guid(associated_occurrence_value: str) -> str:

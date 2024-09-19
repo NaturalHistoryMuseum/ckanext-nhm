@@ -7,6 +7,26 @@
 
 {# We do not want a search #}{% block header_site_search %}{% endblock %}
 
+{% set status_indicator = h.get_status_indicator() %}
+{% macro status_icon() %}
+{% if h.route_exists('status.index') %}
+<div>
+    <a href="{{ h.url_for('status.index') }}"
+       title="{{ _('System status') }}">
+        <span class="sr-only">{{ _('System status') }}</span>
+        {% if status_indicator %}
+        <span class="status-indicator status-indicator-{{ status_indicator }}">
+            <span class="sr-only">{{ _('Status alert') }}</span>
+            <i class="fas fa-exclamation fa-xs"></i>
+        </span>
+        {% endif %}
+        <i class="fas fa-heartbeat fa-lg"></i>
+    </a>
+</div>
+{% endif %}
+{% endmacro %}
+
+
 {% block header_wrapper %}
 <header class="masthead" role="heading">
     <div class="account-icons container">
@@ -71,6 +91,9 @@
             </div>
             {% endif %}
 
+            {# Status page #}
+            {{ status_icon() }}
+
             {# Logout #}
             {% block header_account_log_out_link %}
             <a href="{{ h.url_for('user.logout') }}" title="{{ _('Log out') }}">
@@ -84,6 +107,9 @@
         <div class="account not-authed flex-container flex-right flex-smallwrap">
             {# headway widget #}
             <div class="headway-container"></div>
+
+            {# Status page #}
+            {{ status_icon() }}
 
             {% block header_account_notlogged %}
             <div>

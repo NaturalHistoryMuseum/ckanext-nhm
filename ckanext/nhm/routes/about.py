@@ -57,3 +57,11 @@ def datacite():
     Render the "about" page for DataCite service provider.
     """
     return toolkit.render('about/datacite.html', {'title': 'DataCite Service Provider'})
+
+
+@blueprint.route('/harmful-content')
+def aohc():
+    """
+    Redirect to the new location (in the legal section).
+    """
+    return toolkit.redirect_to('legal.aohc')

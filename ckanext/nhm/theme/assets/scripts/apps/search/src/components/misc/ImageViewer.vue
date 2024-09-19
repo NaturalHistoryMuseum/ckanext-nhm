@@ -10,17 +10,23 @@
       <div class="info-popup-button">
         <a
           class="image-viewer-icon"
+          title="View in large image viewer"
+          :href="livUrl"
+          target="_blank"
+        >
+          <i class="fas fa-search-plus fa-2x"></i>
+        </a>
+      </div>
+      <div class="info-popup-button">
+        <a
+          class="image-viewer-icon"
           title="Download original image"
           :href="viewerImage.image.download"
         >
           <i class="fas fa-cloud-download-alt fa-2x"></i>
         </a>
       </div>
-      <a
-        class="image-viewer-icon"
-        title="Close image viewer"
-        @click="hideImage"
-      >
+      <a class="image-viewer-icon" title="Close image viewer" @click="hideImage">
         <i class="fas fa-times fa-2x"></i>
       </a>
     </div>
@@ -82,6 +88,12 @@ export default {
     lastImage() {
       return this.viewerImagePage.length <= this.viewerImageIndex + 1;
     },
+    livUrl() {
+      const resource = this.viewerImage.record.resource;
+      const recordId = this.viewerImage.record.data._id;
+      const imageIx = this.viewerImage.recordImageIndex;
+      return `/image-viewer/record/${resource}/${recordId}/${imageIx}`;
+    },
   },
   methods: {
     ...mapMutations('results/display', ['hideImage', 'setViewerImage']),
@@ -97,8 +109,7 @@ export default {
     },
     changeImage(index) {
       this.loading =
-        this.viewerImage.image.preview !==
-        this.viewerImagePage[index].image.preview;
+        this.viewerImage.image.preview !== this.viewerImagePage[index].image.preview;
       this.setViewerImage(index);
     },
     keyListener(event) {

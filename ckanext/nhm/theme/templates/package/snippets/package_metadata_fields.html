@@ -13,6 +13,11 @@
 {% endblock %}
 
 {% block package_metadata_fields_maintainer %}
+{{ form.input('maintainer_email', label=_('Contact email'), id='field-maintainer-email', placeholder=_('e.g. shared-inbox@nhm.ac.uk'), value=data.maintainer_email, error=errors.maintainer_email, classes=['control-medium']) }}
+{{ form.info('Enquiries about this dataset will be sent to this address. If not set, messages will go to the collaborators or creator of the dataset.', inline=False) }}
+
+{{ form.input('maintainer', label=_('Contact name'), id='field-maintainer', placeholder=_('e.g Project Y'), value=data.maintainer, error=errors.maintainer, classes=['control-medium']) }}
+{{ form.info('Name of the person or group receiving dataset enquiries (see above). Optional.', inline=False) }}
 {% endblock %}
 
 {% block custom_fields %}
@@ -21,8 +26,8 @@
         {{ super() }}
     {% endblock %}
 
-    {{ form.info("What time period does this dataset cover? If not applicable, leave blank.", inline=True) }}
     {{ form.input('temporal_extent', label=_('Temporal extent'), id='field-temporal-extent', placeholder=_('1970 - 1985'), value=data.temporal_extent, error=errors.temporal_extent, classes=['control-medium']) }}
+    {{ form.info("What time period does this dataset cover? If not applicable, leave blank.", inline=True) }}
 
     {{ form.select('update_frequency', label=_('Update frequency'), id='field-update-frequency', options=h.form_select_update_frequency_options(), selected=data.update_frequency, error=errors.update_frequency, classes=['control-medium']) }}
     {#  TODO: Add map to pick spatial extent - hidden for non sysadmin until then  #}

@@ -1,0 +1,21 @@
+{% ckan_extends %}
+
+{% block help_forgotten %}
+<section class="module module-narrow module-shallow">
+    <h2 class="module-heading">{{ _('Accounts') }}</h2>
+    <div class="module-content">
+        <p>{% trans %}You do not need to log in to view or download data.{% endtrans %}</p>
+        <p>{% trans %}Accounts are used by Natural History Museum staff to create and administrate datasets. Only Natural History Museum staff can log in to the portal.{% endtrans %}</p>
+    </div>
+</section>
+<section class="module module-narrow module-shallow">
+{% block help_forgotten_inner %}
+<h2 class="module-heading">{{ _('Trouble logging in?') }}</h2>
+<div class="module-content">
+    <p>{% trans %}Use your regular Museum username and password.{% endtrans %}</p>
+    <p>{% trans %}Please check that your password has not expired, and if you have recently updated your password please wait a while before trying again.{% endtrans %}</p>
+    <p>{% trans %}If you are still having trouble, please <a href="/contact">contact us</a>.{% endtrans %}</p>
+</div>
+{% endblock %}
+</section>
+{% endblock %}

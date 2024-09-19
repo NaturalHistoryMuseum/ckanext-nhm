@@ -39,9 +39,7 @@ let filters = {
       return state.items[id];
     },
     getChildren: (state) => (id, asArray) => {
-      let children = d3
-        .entries(state.items)
-        .filter((f) => f.value.parent === id);
+      let children = d3.entries(state.items).filter((f) => f.value.parent === id);
       if (asArray) {
         return children;
       } else {
@@ -254,9 +252,7 @@ let filters = {
                 context.rootState.schema.groups.includes(item.key)
               ) {
                 let groupId =
-                  parent === null
-                    ? 'group_root'
-                    : `group_${shortid.generate()}`;
+                  parent === null ? 'group_root' : `group_${shortid.generate()}`;
                 itemList[groupId] = {
                   parent: parent,
                   key: item.key,

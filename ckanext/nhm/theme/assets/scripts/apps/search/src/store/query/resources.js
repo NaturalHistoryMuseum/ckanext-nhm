@@ -122,19 +122,11 @@ let resources = {
             resolve();
           })
           .catch(() => {
-            Vue.set(
-              context.rootState.appState.status.resources,
-              'failed',
-              true,
-            );
+            Vue.set(context.rootState.appState.status.resources, 'failed', true);
             reject();
           })
           .finally(() => {
-            Vue.set(
-              context.rootState.appState.status.resources,
-              'loading',
-              false,
-            );
+            Vue.set(context.rootState.appState.status.resources, 'loading', false);
           });
       });
     },

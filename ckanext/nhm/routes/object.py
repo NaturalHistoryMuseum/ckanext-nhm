@@ -78,6 +78,9 @@ specimen_blueprint = Blueprint(
     name='specimen', import_name=__name__, url_prefix='/specimen'
 )
 
+# add to the default rdf content types to include json-ld as an alias for jsonld
+rdf_content_types = {**CONTENT_TYPES, "json-ld": CONTENT_TYPES["jsonld"]}
+
 
 def _context():
     return {
@@ -106,7 +109,7 @@ def rdf(uuid, _format, version):
     }
     try:
         result = toolkit.get_action('object_rdf')(_context(), data_dict)
-        return Response(result, mimetype=CONTENT_TYPES[_format])
+        return Response(result, mimetype=rdf_content_types[_format])
     except toolkit.ValidationError as e:
         toolkit.abort(409, str(e))
 

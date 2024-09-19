@@ -29,7 +29,7 @@ def create_department_email(mail_dict: dict, department: str):
         mail_dict['recipient_email'] = COLLECTION_CONTACTS[department]
     except KeyError:
         # Other/unknown etc., - so don't set recipient email
-        mail_dict['body'] += f'\nDepartment: {department}\n'
+        mail_dict['body'] += f'\nDepartment or team: {department}\n'
     else:
         mail_dict['recipient_name'] = department
         mail_dict['body'] += (
@@ -74,6 +74,9 @@ def get_package_owners(package: dict) -> List[Recipient]:
 
     :param package: the package dict
     """
+    maintainer_name = package.get('maintainer', 'Maintainer')
+    maintainer_email = package.get('maintainer_email')
+
     collaborators = toolkit.get_action('package_collaborator_list')(
         # ignore auth to ensure we can access the list of collaborators
         {'ignore_auth': True},
@@ -81,14 +84,19 @@ def get_package_owners(package: dict) -> List[Recipient]:
         {'id': package['id'], 'capacity': 'admin'},
     )
 
-    recipient_ids = []
-    if collaborators:
-        recipient_ids.extend(collaborator['user_id'] for collaborator in collaborators)
+    recipients = []
+    if maintainer_email:
+        recipients.append(Recipient(maintainer_name, maintainer_email))
+    elif collaborators:
+        recipients = [
+            Recipient.from_user_id(collaborator['user_id'])
+            for collaborator in collaborators
+        ]
     else:
-        # if there aren't any collaborators, use the creator
-        recipient_ids.append(package['creator_user_id'])
+        # if there's no maintainer and there aren't any collaborators, use the creator
+        recipients.append(Recipient.from_user_id(package['creator_user_id']))
 
-    return list(map(Recipient.from_user_id, recipient_ids))
+    return recipients
 
 
 def create_package_email(mail_dict: dict, package: dict):

@@ -12,11 +12,12 @@ COLLECTION_CONTACTS = OrderedDict(
         ('Algae, Fungi & Plants', 'botany@nhm.ac.uk'),
         ('Fossil Invertebrates & Plants', 'g.miller@nhm.ac.uk'),
         ('Fossil Vertebrates & Anthropology', 'h.bonney@nhm.ac.uk'),
-        ('Insects', 'g.broad@nhm.ac.uk'),
+        ('Insects', 'g.martin@nhm.ac.uk'),
         ('Invertebrates', 'm.lowe@nhm.ac.uk'),
         ('Library & Archives', 'library@nhm.ac.uk'),
         ('Mineral & Planetary Sciences', 'm.rumsey@nhm.ac.uk'),
         ('Vertebrates', 'simon.loader@nhm.ac.uk'),
+        ('Biodiversity Intactness Index', 'biodiversityfuturesexplorer@nhm.ac.uk'),
         ('Data Portal / Other', 'data@nhm.ac.uk'),
     ]
 )
