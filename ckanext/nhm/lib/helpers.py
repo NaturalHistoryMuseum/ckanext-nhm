@@ -1548,6 +1548,8 @@ def group_resources(resource_list):
 
 
 def get_resource_size(resource_dict):
+    # kilo, mega, giga, etc. I could make this a list but what's the point
+    prefixes = "KMGTPEZ"
     if toolkit.get_action("vds_resource_check")(
         {}, {'resource_id': resource_dict['id']}
     ):
