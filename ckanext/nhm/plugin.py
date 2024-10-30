@@ -572,6 +572,15 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             ):
                 field_groups.ignore(group)
 
+        if helpers.get_sample_resource_id() in resource_ids:
+            field_groups.force("scientificName")
+            field_groups.force("identifier")
+            field_groups.force("preparationType")
+            field_groups.force("preparationContents")
+            field_groups.force("preservation")
+            field_groups.force("project")
+            field_groups.force("barcode")
+
         return field_groups
 
     def datastore_before_convert_basic_query(self, query):
