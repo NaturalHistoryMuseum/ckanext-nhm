@@ -36,6 +36,7 @@ from ckanext.nhm.lib.utils import get_iiif_status
 from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
 from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
 from ckanext.nhm.views.sample import modify_field_groups as sample_modify_groups
+from ckanext.nhm.views.artefact import modify_field_groups as artefact_modify_groups
 
 try:
     from ckanext.status.interfaces import IStatus
@@ -552,6 +553,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             indexlot_modify_groups(field_groups)
         if helpers.get_sample_resource_id() in resource_ids:
             sample_modify_groups(field_groups)
+        if helpers.get_artefact_resource_id() in resource_ids:
+            artefact_modify_groups(field_groups)
         return field_groups
 
     def datastore_before_convert_basic_query(self, query):
