@@ -50,9 +50,10 @@ class SampleView(DefaultView):
                         ("preparationDate", "Preparation Date"),
                         ("preparationType", "Preparation Type"),
                         ("preparationProcess", "Preparation Process"),
-                        ("preparationNumber", "Preparation Number"),
-                        ("mediumType", "Medium Type"),
+                        ("identifier", "Preparation Number"),
+                        ("preservation", "Preservation"),
                         ("preparationContents", "Preparation Contents"),
+                        ("occurrenceID", "Occurrence ID"),
                     ]
                 ),
             ),
