@@ -1,9 +1,8 @@
-import pytest
-
 from importlib.metadata import version
 
-from ckanext.nhm.logic.action import show_extension_versions
+import pytest
 
+from ckanext.nhm.logic.action import show_extension_versions
 
 PACKAGE_NAME = 'ckanext-nhm'
 

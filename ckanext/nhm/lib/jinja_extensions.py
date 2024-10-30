@@ -32,13 +32,11 @@ class TaxonomyFormatExtension(Extension):
     }
 
     def parse(self, parser):
-        '''The main function of the tag - mostly Jinja2 logic.
-
-        :param parser:
+        """The main function of the tag - mostly Jinja2 logic.
 
         :returns: the HTML-formatted body of the tag
 
-        '''
+        """
         lineno = next(parser.stream).lineno
 
         args = [parser.parse_expression()]
@@ -57,12 +55,11 @@ class TaxonomyFormatExtension(Extension):
         Controls the reformatting of the tag body.
 
         :param field_name: the name of the field whose value is being parsed currently,
-                            e.g. 'specificEpithet' or 'genus'
-        :param collection_code: the code for the collection this record belongs to
-                                (for collection-specific rules)
+            e.g. 'specificEpithet' or 'genus'
+        :param collection_code: the code for the collection this record belongs to (for
+            collection-specific rules)
         :param record_dict: the full record
         :param caller: the tag body
-
         :returns: HTML-formatted tag body
         """
         body = str(caller())
@@ -117,12 +114,12 @@ class TaxonomyFormatExtension(Extension):
         Helper method to merge two lists of field formats.
 
         :param ff1: a dict where the keys are functions taking and outputting a single
-                    string, and the values are the names of fields to which that
-                    function should be applied
+            string, and the values are the names of fields to which that function should
+            be applied
         :type ff1: <function, string[]> dict
         :param ff2: a dict where the keys are functions taking and outputting a single
-                    string, and the values are the names of fields to which that
-                    function should be applied
+            string, and the values are the names of fields to which that function should
+            be applied
         :type ff2: <function, string[]> dict
         :returns: a combined dict
         """
@@ -136,7 +133,7 @@ class TaxonomyFormatExtension(Extension):
         Zoology-specific rules.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
-                  and corresponding field names, and a list of fields to be parsed
+            and corresponding field names, and a list of fields to be parsed
         """
         formatted_fields = {
             self.common_strings['italics'].format: [
@@ -160,7 +157,7 @@ class TaxonomyFormatExtension(Extension):
         override them if necessary.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
-                  and corresponding field names, and a list of fields to be parsed
+            and corresponding field names, and a list of fields to be parsed
         """
         return self._zoo
 
@@ -171,7 +168,7 @@ class TaxonomyFormatExtension(Extension):
         override them if necessary.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
-                  and corresponding field names, and a list of fields to be parsed
+            and corresponding field names, and a list of fields to be parsed
         """
         return self._zoo
 
@@ -181,7 +178,7 @@ class TaxonomyFormatExtension(Extension):
         Botany-specific rules.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
-                  and corresponding field names, and a list of fields to be parsed
+            and corresponding field names, and a list of fields to be parsed
         """
         formatted_fields = {
             self.common_strings['italics'].format: [
@@ -204,7 +201,7 @@ class TaxonomyFormatExtension(Extension):
         Mineralogy-specific rules.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
-                  and corresponding field names, and a list of fields to be parsed
+            and corresponding field names, and a list of fields to be parsed
         """
         formatted_fields = {}
         parsed_fields = []
@@ -217,9 +214,8 @@ class TaxonomyFormatExtension(Extension):
 
         :param body: the tag body
         :param record_dict: the full record
-
         :returns: the tag body wrapped in italics tags, with certain parts deitalicised
-                  by wrapping in span tags
+            by wrapping in span tags
         """
         # abbreviations should not be italicised
         abbr = ['var', 'subsp', 'subvar', 'f', 'subf', 'ssp', 'cv']
@@ -241,12 +237,11 @@ class TaxonomyFormatExtension(Extension):
 
         :param body: the tag body
         :param record_dict: the full record
-
         :returns: the tag body with the authors wrapped in deitalicising tags
         """
         ix = find_author_split(body, record_dict)
         if ix:
             authors = body[ix:]
-            return f'{body[:ix]}' + self.common_strings["deitalicise"].format(authors)
+            return f'{body[:ix]}' + self.common_strings['deitalicise'].format(authors)
         else:
             return body

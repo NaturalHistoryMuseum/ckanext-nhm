@@ -4,9 +4,9 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from ckan.plugins import toolkit
 import requests
-from cachetools import cached, TTLCache
+from cachetools import TTLCache, cached
+from ckan.plugins import toolkit
 
 
 @cached(cache=TTLCache(maxsize=10, ttl=300))

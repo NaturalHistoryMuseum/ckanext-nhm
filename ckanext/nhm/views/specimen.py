@@ -265,7 +265,6 @@ class SpecimenView(DefaultView):
         """
         Render a record Called from record controller, when viewing a record page.
 
-        :param c:
         :returns: html
         """
 
@@ -287,25 +286,25 @@ class SpecimenView(DefaultView):
             'registeredWeightUnit', None
         ):
             # Create custom filter which acts on both weight and units
-            c.custom_filters[
-                'registeredWeight'
-            ] = f'registeredWeight:{c.record_dict["registeredWeight"]}|registeredWeightUnit:{c.record_dict["registeredWeightUnit"]}'
+            c.custom_filters['registeredWeight'] = (
+                f'registeredWeight:{c.record_dict["registeredWeight"]}|registeredWeightUnit:{c.record_dict["registeredWeightUnit"]}'
+            )
             # Merge unit into the field
-            c.record_dict[
-                'registeredWeight'
-            ] += f' {c.record_dict["registeredWeightUnit"]}'
+            c.record_dict['registeredWeight'] += (
+                f' {c.record_dict["registeredWeightUnit"]}'
+            )
 
         # add a meters unit to the coordinateUncertaintyInMeters value
         coordinate_uncertainty_in_meters = c.record_dict.get(
             'coordinateUncertaintyInMeters'
         )
         if coordinate_uncertainty_in_meters is not None:
-            c.record_dict[
-                'coordinateUncertaintyInMeters'
-            ] = f'{coordinate_uncertainty_in_meters}m'
-            c.custom_filters[
-                'coordinateUncertaintyInMeters'
-            ] = f'coordinateUncertaintyInMeters:{coordinate_uncertainty_in_meters}'
+            c.record_dict['coordinateUncertaintyInMeters'] = (
+                f'{coordinate_uncertainty_in_meters}m'
+            )
+            c.custom_filters['coordinateUncertaintyInMeters'] = (
+                f'coordinateUncertaintyInMeters:{coordinate_uncertainty_in_meters}'
+            )
 
         collection_date = []
         collection_date_filter = []

@@ -10,28 +10,28 @@ from contextlib import suppress
 from pathlib import Path
 
 from beaker.cache import cache_managers, cache_regions
+from ckan.lib.helpers import literal
+from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from importlib_resources import files
 
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-from ckan.lib.helpers import literal
-from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
-from ckanext.nhm import routes, cli
+from ckanext.nhm import cli, routes
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.lib.mail import (
-    create_indexlots_email,
     create_department_email,
+    create_indexlots_email,
     create_package_email,
 )
+from ckanext.nhm.lib.utils import get_iiif_status
 from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastore,
     IVersionedDatastoreDownloads,
 )
-from ckanext.nhm.lib.utils import get_iiif_status
 
 try:
     from ckanext.status.interfaces import IStatus
@@ -85,9 +85,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IActions
     def get_actions(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IActions.get_actions
-        '''
+        """
         return {
             'record_show': nhm_action.record_show,
             'object_rdf': nhm_action.object_rdf,
@@ -109,10 +109,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IConfigurer
     def update_config(self, config):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IConfigurer.update_config
-        :param config:
-        '''
+        """
         toolkit.add_template_directory(config, 'theme/templates')
         toolkit.add_public_directory(config, 'theme/public')
         toolkit.add_public_directory(
@@ -127,40 +126,40 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IDatasetForm
     def package_types(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.package_types
-        '''
+        """
         return []
 
     def is_fallback(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.is_fallback
-        '''
+        """
         return True
 
     def create_package_schema(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.create_package_schema
-        '''
+        """
         return nhm_schema.create_package_schema()
 
     def update_package_schema(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.update_package_schema
-        '''
+        """
         return nhm_schema.update_package_schema()
 
     def show_package_schema(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.show_package_schema
-        '''
+        """
         return nhm_schema.show_package_schema()
 
     ## IFacets
     def dataset_facets(self, facets_dict, package_type):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IFacets.dataset_facets
-        '''
+        """
 
         # Remove organisations and groups
         del facets_dict['organization']
@@ -176,9 +175,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IPackageController
     def before_search(self, data_dict):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IPackageController.before_search
-        '''
+        """
         # If there's no sort criteria specified, default to promoted and last modified
         if not data_dict.get('sort', None):
             data_dict['sort'] = 'promoted asc, metadata_modified desc'
@@ -186,9 +185,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return data_dict
 
     def after_search(self, search_results, search_params):
-        '''
+        """
         ...seealso:: ckan.plugins.interfaces.IPackageController.after_search
-        '''
+        """
         # set the collections datasets as top (above other promoted datasets)
         if search_params['sort'].startswith('promoted asc'):
             top_datasets_names = ['collection-specimens', 'collection-indexlots']
@@ -208,13 +207,13 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return search_results
 
     def before_view(self, pkg_dict):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IPackageController.before_view
 
         :returns: pkg_dict with full list of authors renamed to all_authors, and author
                   field truncated (with HTML!) if necessary
 
-        '''
+        """
         pkg_dict['all_authors'] = pkg_dict['author']
         pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
         return pkg_dict
@@ -226,8 +225,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         NB: Our version of ckan doesn't have the IResource after_update method
         But updating a resource calls IPackageController.after_update
         ..seealso:: ckan.plugins.interfaces.IPackageController.after_update
-        :param context:
-        :param pkg_dict:
         """
         for resource in pkg_dict.get('resources', []):
             # If this is the specimen resource ID, clear the collection stats
@@ -244,10 +241,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IRoutes
     def before_map(self, _map):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
-        :param _map:
-        '''
+        """
 
         # Dataset metrics
         _map.connect(
@@ -275,9 +271,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## ITemplateHelpers
     def get_helpers(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.ITemplateHelpers.get_helpers
-        '''
+        """
 
         h = {}
 
@@ -294,9 +290,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
-        '''
+        """
         ..seealso:: ckanext.contact.interfaces.IContact.mail_alter
-        '''
+        """
 
         # Get the submitted data values
         package_id = data_dict.get('package_id', None)
@@ -350,9 +346,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IDoi
     def build_metadata_dict(self, pkg_dict, metadata_dict, errors):
-        '''
+        """
         ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata_dict
-        '''
+        """
         try:
             category = pkg_dict.get('dataset_category', pkg_dict.get('type', 'Dataset'))
             if isinstance(category, list) and len(category) > 0:
@@ -400,9 +396,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         }
 
     def get_images(self, raw_images, record, data_dict):
-        '''
+        """
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
-        '''
+        """
         images = []
         title_field = data_dict['resource_view'].get('image_title', None)
         for image in raw_images:
@@ -459,7 +455,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         :param context: the context dict
         :param data_dict: the data dict
-        :return: the modified data dict
+        :returns: the modified data dict
         """
         # remove our custom filters from the filters dict, we'll add them ourselves in
         # the modify
@@ -504,7 +500,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         :param original_data_dict: the original data dict before any plugins modified it
         :param data_dict: the data dict after all plugins have had a chance to modify it
         :param search: the search object itself
-        :return: the modified search object
+        :returns: the modified search object
         """
         # add our custom filters by looping through the filter dsl objects on the
         # context. These are
@@ -537,10 +533,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         :param resource_id: the resource id
         :param mapping: the original mapping dict returned by elasticsearch from which
-        the field
-                        info has been derived
+            the field info has been derived
         :param fields: the fields dict itself
-        :return: the fields dict
+        :returns: the fields dict
         """
         # if we're dealing with one of our EMu backed resources and the
         # associatedMedia field is

@@ -33,7 +33,11 @@ export default {
       let existing = this.getFilterById(this.existingTermId);
 
       d3.keys(this.values[this.comparisonType]).forEach((k) => {
-        this.$set(this.values[this.comparisonType], k, existing.content[k] || null);
+        this.$set(
+          this.values[this.comparisonType],
+          k,
+          existing.content[k] || null,
+        );
       });
     },
     pressedEnter() {

@@ -5,7 +5,6 @@
 # Created by the Natural History Museum in London, UK
 from unittest.mock import MagicMock, patch
 
-import pytest
 from ckan.plugins import toolkit
 
 from ckanext.nhm.lib.helpers import (

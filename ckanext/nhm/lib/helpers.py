@@ -17,14 +17,14 @@ from typing import List
 from urllib.parse import quote
 
 from beaker.cache import cache_region
-from jinja2.filters import do_truncate
-from lxml import etree, html
-from werkzeug.routing import BuildError
-
 from ckan import model
 from ckan.lib import helpers as core_helpers
 from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
+from jinja2.filters import do_truncate
+from lxml import etree, html
+from werkzeug.routing import BuildError
+
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.external_links import Site
@@ -117,9 +117,6 @@ def get_record_stats():
 def _get_action(action, params):
     """
     Call basic get_action from template.
-
-    :param action:
-    :param params:
     """
     context = {'ignore_auth': True, 'for_view': True}
 
@@ -172,8 +169,6 @@ def form_select_update_frequency_options():
 def update_frequency_get_label(value):
     """
     Get the label for this update frequency.
-
-    :param value: return:
     """
     for v, label in UPDATE_FREQUENCIES:
         if v == value:
@@ -219,12 +214,9 @@ def url_for_indexlot_view():
 
 def url_for_resource_view(resource_id, view_type=None, filters={}):
     """
-    Get URL to link to resource view. If no view type is specified, the first view will
-    be used.
+    Get URL to link to resource view.
 
-    :param resource_id:
-    :param filters: (optional, default: {})
-    :param view_type:  (optional, default: None)
+    If no view type is specified, the first view will be used.
     """
 
     try:
@@ -289,7 +281,8 @@ def is_collection_resource_id(resource_id: str) -> bool:
     collection IDs.
 
     :param resource_id: the resource ID
-    :return: True if the resource ID is one of the collection resource IDs, False if not
+    :returns: True if the resource ID is one of the collection resource IDs, False if
+        not
     """
     resource_ids = {
         get_artefact_resource_id(),
@@ -320,9 +313,9 @@ def get_indexlot_resource_id():
 
 
 def get_artefact_resource_id():
-    '''
-    @return:  ID for artefact resource
-    '''
+    """
+    :returns: ID for artefact resource
+    """
     return toolkit.config.get('ckanext.nhm.artefact_resource_id')
 
 
@@ -330,7 +323,7 @@ def get_beetle_iiif_resource_id():
     """
     Get the ID for the beetle IIIF resource.
 
-    :return: the resource id
+    :returns: the resource id
     """
     value = toolkit.config.get('ckanext.nhm.beetle_iiif_resource_id')
     return str(value) if value is not None else None
@@ -406,8 +399,6 @@ def get_department(collection_code):
 def delimit_number(num):
     """
     Separate long number into thousands 1000000 => 1,000,000.
-
-    :param num:
     """
     return '{:,}'.format(num)
 
@@ -425,12 +416,9 @@ def api_doc_link():
 def persistent_follow_button(obj_type, obj_id):
     """
     Replaces ckan.lib.follow_button which returns an empty string for anonymous users.
+
     For anon users this function outputs a follow button which links through to the
     login page.
-
-    :param obj_type:
-    :param obj_id:
-    :returns:
     """
     obj_type = obj_type.lower()
     assert obj_type in toolkit.h._follow_objects
@@ -457,8 +445,8 @@ def filter_and_format_resource_items(resource):
     format them.
 
     :param resource: the resource dict
-    :return: a list of made up of 2-tuples containing formatted keys and values from
-    the resource
+    :returns: a list of made up of 2-tuples containing formatted keys and values from
+        the resource
     """
     blacklist = {
         '_image_field',
@@ -534,14 +522,15 @@ def get_resource_fields(resource, version=None, use_request_version=False):
     If the resource isn't a datastore resource then an empty list is returned.
 
     Because the versioned_datastore plugin guarantees that the fields returned in its
-    datastore_search responses will be in the order they were when they were ingested or sorted
-    alphabetically if no ingestion ordering is available, no field sorting occurs in this function.
+    datastore_search responses will be in the order they were when they were ingested or
+    sorted alphabetically if no ingestion ordering is available, no field sorting occurs
+    in this function.
 
     :param resource: the resource dict
     :param version: the version to request (default: None)
-    :param use_request_version: whether to look in the request parameters to find a version in the
-                                filters (default: False)
-    :return: a list of field names
+    :param use_request_version: whether to look in the request parameters to find a
+        version in the filters (default: False)
+    :returns: a list of field names
     """
     if not resource.get('datastore_active'):
         return []
@@ -563,9 +552,6 @@ def get_resource_fields(resource, version=None, use_request_version=False):
 def resource_view_state(resource_view_json, resource_json):
     """
     Alter the recline view resource, adding in state info.
-
-    :param resource_view_json: return:
-    :param resource_json:
     """
     resource_view = json.loads(resource_view_json)
     resource = json.loads(resource_json)
@@ -663,11 +649,6 @@ def resource_is_dwc(resource):
 
 
 def camel_case_to_string(camel_case_string):
-    '''
-
-    :param camel_case_string:
-
-    '''
     s = ' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
     return s[0].upper() + s[1:]
 
@@ -732,9 +713,6 @@ def get_allowed_view_types(resource, package):
     Overwrite ckan.lib.helpers.get_allowed_view_types.
 
     We want to edit some of the options - remove Image and change Tiled Map to Map
-
-    :param resource: param package:
-    :param package:
     """
 
     view_types = core_helpers.get_allowed_view_types(resource, package)
@@ -773,12 +751,6 @@ def get_facet_label_function(facet_name, multi=False):
     if facet_function and multi:
 
         def filter_facets(facet, filter_value):
-            '''
-
-            :param facet:
-            :param filter_value:
-
-            '''
             for f in facet:
                 if f['name'] == filter_value:
                     return facet_function(f)
@@ -805,12 +777,11 @@ def get_creator_id_facet_label(facet):
 
 
 def field_name_label(field_name):
-    '''Convert a field name into a label - replacing _s and upper casing first character
+    """
+    Convert a field name into a label - replacing _s and upper casing first character
 
-    :param field_name:
     :returns: str label
-
-    '''
+    """
     label = field_name.replace('_', ' ')
     label = label[0].upper() + label[1:]
     return label
@@ -820,7 +791,6 @@ def field_is_link(value):
     """
     Is a field a link (starts with http and is a valid URL)
 
-    :param value:
     :returns: boolean
     """
     try:
@@ -863,8 +833,6 @@ def record_display_field(field_name, value):
     """
     Decide whether to display a field Evaluates whether a field has value.
 
-    :param field_name:
-    :param value:
     :returns: bool - true to display field; false not to
     """
 
@@ -903,9 +871,6 @@ def get_image_licence_options():
 def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     """
     Generate social share text for a package.
-
-    @param pkg_dict:
-    @return:
     """
     text = []
     if rec_dict:
@@ -933,11 +898,6 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
     """
     Port of ckan helper gravatar Adds title text to the image so it passes accessibility
     checks.
-
-    :param email_hash:
-    :param default: (optional, default: None)
-    :param size:  (optional, default: 100)
-    :param userobj:  (optional, default: None)
     """
     gravatar_literal = toolkit.h.gravatar(email_hash, size, default)
     if userobj is not None:
@@ -958,13 +918,6 @@ def dataset_author_truncate(author_str):
     """
 
     def _truncate(author_str, separator=None):
-        '''
-
-        :param author_str:
-        :param separator:  (optional, default: None)
-
-        '''
-
         # If we have a separator, split string on it
         if separator:
             shortened = ';'.join(author_str.split(separator)[0:4])
@@ -979,7 +932,6 @@ def dataset_author_truncate(author_str):
         )
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
-
         if ';' in author_str:
             author_str = _truncate(author_str, ';')
         elif ',' in author_str:
@@ -993,8 +945,6 @@ def dataset_author_truncate(author_str):
 def get_resource_facets(resource):
     """
     Return a list of facets for a particular resource.
-
-    :param resource:
     """
     # Number of facets to display
     num_facets = 10
@@ -1098,7 +1048,7 @@ def remove_url_filter(field, value, extras=None):
     :param field: the field to remove the filter for
     :param value: the value of the field to remove the filter for
     :param extras: extra parameters to include in the created URL
-    :return: a URL
+    :returns: a URL
     """
 
     params = dict(toolkit.request.params)
@@ -1141,10 +1091,6 @@ def add_url_filter(field, value, extras=None):
     The CKAN built in functions remove_url_param / add_url_param cannot handle multiple
     filters which are concatenated with |, not separate query params This replaces
     add_url_param for filters.
-
-    :param field:
-    :param extras:
-    :param value:
     """
 
     params = {k: v for k, v in toolkit.request.params.items() if k != 'page'}
@@ -1184,10 +1130,6 @@ def get_resource_filter_pills(package, resource, resource_view=None):
 
     We don't want the field group pills - these are handled separately in
     get_resource_field_groups
-
-    :param resource: param package:
-    :param package:
-    :param resource_view:  (optional, default: None)
     """
 
     if not isinstance(package, dict):
@@ -1240,7 +1182,7 @@ def resource_view_get_filterable_fields(resource):
     """
     Retrieves the fields that can be filtered on.
 
-    @return: a list of sorted fields
+    :returns: a list of sorted fields
     """
     # if this isn't a datastore resource, return an empty list
     if not resource.get('datastore_active'):
@@ -1260,12 +1202,6 @@ def resource_view_get_filterable_fields(resource):
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
-    '''
-
-    :param resource:
-    :param allow_empty:  (optional, default: True)
-
-    '''
     fields = toolkit.h.resource_view_get_fields(resource)
     return list_to_form_options(fields, allow_empty)
 
@@ -1276,9 +1212,8 @@ def _get_latest_update(package_or_resource_dicts):
     datetime available from them, or None if there is no update datetime found.
 
     :param package_or_resource_dicts: a sequence of the package or resource dicts
-    :return: a 2-tuple containing the latest datetime and the dict from which it came,
-    if no times
-             are found then (None, None) is returned
+    :returns: a 2-tuple containing the latest datetime and the dict from which it came,
+        if no times are found then (None, None) is returned
     """
     # a list of fields on the resource that should contain update dates
     fields = ['last_modified', 'revision_timestamp', 'Created']
@@ -1315,9 +1250,9 @@ def get_latest_update_for_package(pkg_dict, date_format=None):
     its resources. If there is no update time found then 'unknown' is returned. If there
     is datetime found then it is rendered using the standard ckan helper.
 
-    :param pkg_dict:        the package dict
-    :param date_format:     date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime
+    :param pkg_dict: the package dict
+    :param date_format: date format for the return datetime
+    :returns: 'unknown' or a string containing the rendered datetime
     """
     latest_date, _ = _get_latest_update(
         itertools.chain([pkg_dict], pkg_dict.get('resources', []))
@@ -1334,9 +1269,10 @@ def get_latest_update_for_package_resources(pkg_dict, date_format=None):
     in this package. If there is no update time found then 'unknown' is returned. If
     there is datetime found then it is rendered using the standard ckan helper.
 
-    :param pkg_dict:        the package dict
-    :param date_format:     date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime and the resource name
+    :param pkg_dict: the package dict
+    :param date_format: date format for the return datetime
+    :returns: 'unknown' or a string containing the rendered datetime and the resource
+        name
     """
     latest_date, latest_resource = _get_latest_update(pkg_dict.get('resources', []))
     if latest_date is not None:
@@ -1353,7 +1289,7 @@ def get_external_sites(record: dict) -> List[Site]:
     these sites, links can be generated which are relevant to the record.
 
     :param record: a record dict
-    :return: a list of Site objects
+    :returns: a list of Site objects
     """
     return external_links.get_sites(record)
 
@@ -1366,17 +1302,14 @@ def render_epoch(
     UTC.
 
     :param epoch_timestamp: the timestamp, represented as the number of seconds (or
-    milliseconds if
-                            in_milliseconds is True) since the UNIX epoch
+        milliseconds if in_milliseconds is True) since the UNIX epoch
     :param in_milliseconds: whether the timestamp is in milliseconds or seconds. By
-    default this is
-                            True and therefore the timestamp is expected to be in
-                            milliseconds
+        default this is True and therefore the timestamp is expected to be in
+        milliseconds
     :param date_format: the output format. This will be passed straight to datetime's
-    strftime
-                        function and therefore uses its keywords etc. Defaults to:
-                        %Y-%m-%d %H:%M:%S (UTC)
-    :return: a string rendering of the timestamp using the
+        strftime function and therefore uses its keywords etc. Defaults to: %Y-%m-%d
+        %H:%M:%S (UTC)
+    :returns: a string rendering of the timestamp using the
     """
     if in_milliseconds:
         epoch_timestamp = epoch_timestamp / 1000
@@ -1388,16 +1321,16 @@ def get_object_url(resource_id, guid, version=None, include_version=True):
     Retrieves the object url for the given guid in the given resource with the given
     version. If the version is None then the latest version of the resource is used.
 
-    The version passed (if one is passed) is not used verbatim, a call to the versioned search
-    extension is put in to retrieve the rounded version of the resource so that the object url we
-    create is always correct.
+    The version passed (if one is passed) is not used verbatim, a call to the versioned
+    search extension is put in to retrieve the rounded version of the resource so that
+    the object url we create is always correct.
 
     :param resource_id: the resource id
     :param guid: the guid of the object
     :param version: the version (default: None which means use the latest version)
-    :param include_version: whether to include the version in the object URL or not. If this is
-                            False the version parameter is ignored (default: True)
-    :return: the object url
+    :param include_version: whether to include the version in the object URL or not. If
+        this is False the version parameter is ignored (default: True)
+    :returns: the object url
     """
     if include_version:
         rounded_version = toolkit.get_action('datastore_get_rounded_version')(
@@ -1423,7 +1356,7 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
     :param resource_id: the resource id
     :param record_id: the record id
     :param version: the version of the record, or None if no version is present
-    :return: a list of nav items
+    :returns: a list of nav items
     """
     link_definitions = [
         ('record.view', toolkit._('Normal view')),
@@ -1451,7 +1384,8 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     :param html_string: a literal or string of HTML code
     :param classes: CSS classes to add to each item
     :param kwargs: other attributes to add to each item
-    :return: a literal of HTML code where all the <li> nodes have "nav-item" added to their classes
+    :returns: a literal of HTML code where all the <li> nodes have "nav-item" added to
+        their classes
     """
     if classes is None:
         classes = ['nav-item']
@@ -1473,7 +1407,7 @@ def build_nav_main(*args):
     elements.
 
     :param args: tuples of (menu type, title) eg ('login', _('Login'))
-    :return: literal - <li class="nav-item"><a href="...">title</a></li>
+    :returns: literal - <li class="nav-item"><a href="...">title</a></li>
     """
     from_core = core_helpers.build_nav_main(*args)
     return _add_nav_item_class(from_core)
@@ -1486,7 +1420,7 @@ def get_specimen_jsonld(uuid, version=None):
 
     :param uuid: the uuid of the specimen record
     :param version: optional version for the record data
-    :return: string of dumped json-ld data
+    :returns: string of dumped json-ld data
     """
     data_dict = {
         'uuid': uuid,
@@ -1593,7 +1527,7 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
 
     :param resource_id: the resource ID
     :param record_id: the record ID
-    :return: the fully qualified URL
+    :returns: the fully qualified URL
     """
     manifest_id = toolkit.get_action('build_iiif_identifier')(
         {},
@@ -1606,7 +1540,7 @@ def get_status_indicator():
     """
     Check if we need to display a status indicator, and if so what type.
 
-    :return: 'red', 'amber', or None (if no alerts)
+    :returns: 'red', 'amber', or None (if no alerts)
     """
     # is there a status message?
     status_message = toolkit.config.get('ckanext.status.message', None)
@@ -1635,7 +1569,7 @@ def route_exists(route):
     Simple helper for checking if a flask route exists.
 
     :param route: endpoint name, as passed to url_for
-    :return: bool
+    :returns: bool
     """
     try:
         url = toolkit.url_for(route)

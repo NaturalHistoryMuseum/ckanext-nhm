@@ -94,10 +94,5 @@ class IndexLotView(DefaultView):
     )
 
     def render_record(self, c):
-        '''
-
-        :param c:
-
-        '''
         c.field_groups = self.field_groups
         return toolkit.render('record/collection.html')

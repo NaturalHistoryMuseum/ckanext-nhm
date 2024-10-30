@@ -45,7 +45,7 @@ class DefaultView(object):
         'columnsTitle': [
             {
                 'column': '_id',
-                'title': ''
+                'title': '',
                 # This is just converted into a link so lets hide the title
             }
         ],
@@ -56,8 +56,6 @@ class DefaultView(object):
     def get_ordered_fields(resource_id):
         """
         Get fields ordered the same as the uploaded dataset.
-
-        :param resource_id:
         """
         data = {'resource_id': resource_id, 'limit': 0}
         try:
@@ -70,8 +68,6 @@ class DefaultView(object):
     def render_record(self, c):
         """
         Render a record.
-
-        :param c:
         """
 
         # The record_dict does not have fields in the correct order

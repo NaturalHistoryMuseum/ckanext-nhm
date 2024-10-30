@@ -23,7 +23,9 @@ def a11y():
     """
     Redirect to the museum's accessibility statement page.
     """
-    return toolkit.redirect_to('https://www.nhm.ac.uk/about-us/website-accessibility-statement.html')
+    return toolkit.redirect_to(
+        'https://www.nhm.ac.uk/about-us/website-accessibility-statement.html'
+    )
 
 
 @blueprint.route('/terms-conditions')

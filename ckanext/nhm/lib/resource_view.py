@@ -13,8 +13,6 @@ def resource_view_get_view(resource):
 
     format so we can provide a custom controller for all format types - e.g. DwC.
 
-    :param resource:
-
     :returns: controller class
     """
 
@@ -39,7 +37,6 @@ def resource_view_get_filter_options(resource):
     Return additional filter options for a resource view.
 
     :param resource: resource dict
-
     :returns: OrderedDict of filter options
     """
     view_cls = resource_view_get_view(resource)

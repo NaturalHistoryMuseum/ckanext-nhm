@@ -14,7 +14,8 @@ const store = useStore();
 onMounted(() => {
   viewer.value = OpenSeadragon({
     id: 'osdViewer',
-    prefixUrl: 'https://cdn.jsdelivr.net/gh/Benomrans/openseadragon-icons@main/images/',
+    prefixUrl:
+      'https://cdn.jsdelivr.net/gh/Benomrans/openseadragon-icons@main/images/',
     sequenceMode: false,
     showRotationControl: true,
     tileSources: [],

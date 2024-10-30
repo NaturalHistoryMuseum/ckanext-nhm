@@ -15,7 +15,8 @@
         <i
           :class="[
             'fas',
-            'fa-less-than' + (values.range.greater_than_inclusive ? '-equal' : ''),
+            'fa-less-than' +
+              (values.range.greater_than_inclusive ? '-equal' : ''),
           ]"
         ></i>
       </label>

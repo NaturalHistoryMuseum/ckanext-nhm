@@ -67,7 +67,8 @@ export const useModeStore = defineStore('modes', () => {
 
     // validate by trying to retrieve a matching config
     let matching = modeConfigs.filter(
-      (m) => m.externalUrl === modeName && m.paramCount === modeParams.value.length,
+      (m) =>
+        m.externalUrl === modeName && m.paramCount === modeParams.value.length,
     );
     if (matching.length > 0) {
       return matching[0];
@@ -104,7 +105,11 @@ export const useModeStore = defineStore('modes', () => {
         break;
       case 'recordImage':
         // single image within a record
-        recordMode(modeParams.value[0], modeParams.value[1], modeParams.value[2]);
+        recordMode(
+          modeParams.value[0],
+          modeParams.value[1],
+          modeParams.value[2],
+        );
         break;
       case 'slug':
         // a search slug
@@ -202,7 +207,8 @@ class ModeConfig {
     this.paramCount = config.paramCount == null ? 0 : config.paramCount;
     this.enableResources =
       config.enableResources == null ? false : config.enableResources;
-    this.enableFilters = config.enableFilters == null ? false : config.enableFilters;
+    this.enableFilters =
+      config.enableFilters == null ? false : config.enableFilters;
   }
 
   get lockAll() {

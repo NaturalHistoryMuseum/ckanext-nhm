@@ -12,8 +12,6 @@ from ckan.plugins import toolkit
 def string_max_length(max_length):
     """
     Checks if a string is longer than a certain length.
-
-    :param max_length:
     """
 
     def callable(value, context):
@@ -39,11 +37,9 @@ uuid_re = re.compile(r'^[\w]{40}$')
 
 def uuid_validator(value, context):
     """
-    Checks if a UUID is valid (used for MAM asset IDs). We check with a regex as MAM
-    assets ids aren't valid UUIDs.
+    Checks if a UUID is valid (used for MAM asset IDs).
 
-    :param value:
-    :param context:
+    We check with a regex as MAM assets ids aren't valid UUIDs.
     """
     if uuid_re.match(value):
         return value

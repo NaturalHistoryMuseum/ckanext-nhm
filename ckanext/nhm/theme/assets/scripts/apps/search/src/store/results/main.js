@@ -50,12 +50,15 @@ let results = {
     pageParam: (state) => {
       function compressString(arr) {
         let str = JSON.stringify(arr);
-        let compressedString = Buffer.from(pako.deflate(str, { to: 'array' })).toString(
-          'base64',
+        let compressedString = Buffer.from(
+          pako.deflate(str, { to: 'array' }),
+        ).toString('base64');
+        let decompressedString = pako.inflate(
+          Buffer.from(compressedString, 'base64'),
+          {
+            to: 'string',
+          },
         );
-        let decompressedString = pako.inflate(Buffer.from(compressedString, 'base64'), {
-          to: 'string',
-        });
         if (str !== decompressedString) {
           console.error(decompressedString);
           if (arr.length === 1) {
@@ -122,7 +125,10 @@ let results = {
           });
         }
         context.commit('setPage', page);
-        context.commit('query/setAfter', context.getters.after[context.state.page - 1]);
+        context.commit(
+          'query/setAfter',
+          context.getters.after[context.state.page - 1],
+        );
       }
 
       async function getAllResults() {
@@ -173,7 +179,10 @@ let results = {
         )
           .then((data) => {
             // check to see if this request was aborted and don't add any data if so
-            if (context.state.searchControllers[searchId].controller.signal.aborted) {
+            if (
+              context.state.searchControllers[searchId].controller.signal
+                .aborted
+            ) {
               throw new AbortError(searchId);
             }
 
@@ -225,12 +234,20 @@ let results = {
         })
         .catch((e) => {
           if (!(e instanceof AbortError)) {
-            Vue.set(context.rootState.appState.status.resultData, 'failed', true);
+            Vue.set(
+              context.rootState.appState.status.resultData,
+              'failed',
+              true,
+            );
             throw e;
           }
         })
         .finally(() => {
-          Vue.set(context.rootState.appState.status.resultData, 'loading', false);
+          Vue.set(
+            context.rootState.appState.status.resultData,
+            'loading',
+            false,
+          );
           Vue.delete(context.state.searchControllers, searchId);
         });
 
@@ -265,7 +282,11 @@ let results = {
             })
             .catch((error) => {
               context.state[payload.meta] = null;
-              Vue.set(context.rootState.appState.status[payload.meta], 'failed', true);
+              Vue.set(
+                context.rootState.appState.status[payload.meta],
+                'failed',
+                true,
+              );
               reject(error);
             })
             .finally(() => {
@@ -295,7 +316,11 @@ let results = {
         new_reserved_slug: payload,
       })
         .then((d) => {
-          Vue.set(context.rootState.appState.status.slugEdit, 'failed', !d.success);
+          Vue.set(
+            context.rootState.appState.status.slugEdit,
+            'failed',
+            !d.success,
+          );
           if (d.success) {
             context.dispatch('getSlug');
           }

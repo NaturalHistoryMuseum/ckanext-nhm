@@ -8,8 +8,9 @@ import logging
 from importlib.metadata import distributions
 from typing import Dict
 
+from ckan.plugins import plugin_loaded, toolkit
+
 import ckanext.nhm.logic.schema as nhm_schema
-from ckan.plugins import toolkit, plugin_loaded
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.record import get_record_by_uuid
@@ -21,9 +22,6 @@ log = logging.getLogger(__name__)
 def record_show(context, data_dict):
     """
     Retrieve an individual record.
-
-    :param context:
-    :param data_dict:
     """
     context['user'] = toolkit.c.user or toolkit.c.author
     schema = context.get('schema', nhm_schema.record_show_schema())
@@ -57,9 +55,6 @@ def record_show(context, data_dict):
 def object_rdf(context, data_dict):
     """
     Get record RDF.
-
-    :param context:
-    :param data_dict:
     """
 
     # Validate the data
@@ -83,10 +78,6 @@ def object_rdf(context, data_dict):
 def _image_exists_on_record(resource, record, asset_id):
     """
     Check the image belongs to the record.
-
-    :param resource:
-    :param asset_id:
-    :param record:
     """
     # FIXME - If no image field use gallery
     image_field = resource.get('_image_field', None)
@@ -108,17 +99,13 @@ def get_permanent_url(context, data_dict):
     value combination. If more than 1 record is matched or if 0 records are matched then
     an error is returned.
 
-    **Params:**
-
     :param field: the name of the field you would like to filter the records on
     :type field: string
     :param value: the value of the field to filter by
     :type value: string
-    :param include_version: whether to include the version in the permanent URL (default: false)
+    :param include_version: whether to include the version in the permanent URL
+        (default: false)
     :type include_version: boolean
-
-    **Results:**
-
     :returns: the full URL of the specimen
     :rtype: string
     """
@@ -229,7 +216,7 @@ def show_extension_versions(context, data_dict) -> Dict[str, str]:
     """
     Find all the installed extension packages and return their names and versions.
 
-    :return: a dict of extension package name -> version
+    :returns: a dict of extension package name -> version
     """
     dists = []
 

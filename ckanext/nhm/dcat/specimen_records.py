@@ -3,24 +3,25 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-from typing import Optional
-
 import itertools
 import json
+from datetime import datetime
+from typing import Optional
+
 from ckan.plugins import toolkit
+from rdflib import Literal, URIRef
+
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.utils import url_to_rdflib_format, dataset_uri
+from ckanext.dcat.utils import dataset_uri, url_to_rdflib_format
 from ckanext.nhm.dcat.utils import (
     Namespaces,
-    object_uri,
     as_dwc_list,
     epoch_to_datetime,
+    object_uri,
 )
 from ckanext.nhm.lib.dwc import dwc_terms
 from ckanext.nhm.lib.helpers import get_department
 from ckanext.nhm.lib.record import Record
-from datetime import datetime
-from rdflib import URIRef, Literal
 
 
 class ObjectSerializer(RDFSerializer):
@@ -82,13 +83,13 @@ class RecordGraphBuilder(object):
         output_format: str,
         version: Optional[int],
     ):
-        '''
+        """
         :param record: a Record object
         :param namespaces: the namespaces object to use
         :param output_format: the format the generated graph will be output in. This will be used to
                               create the metadata URI (i.e. object_url + .{output_format})
         :param version: the version of the record in question, or None if there is no version
-        '''
+        """
         self.record = record
         self.namespaces = namespaces
         self.output_format = output_format
@@ -120,8 +121,8 @@ class RecordGraphBuilder(object):
         """
         Retrieve the GBIF representation of the record if we can.
 
-        :return: the GBIF record dict or None if we couldn't get it or didn't have a GBIF ID
-                 associated with the record
+        :returns: the GBIF record dict or None if we couldn't get it or didn't have a
+            GBIF ID associated with the record
         """
         gbif_id = self.record.data.get('gbifID', None)
 
@@ -138,7 +139,7 @@ class RecordGraphBuilder(object):
         """
         Iterating over this object will yield the triples that represent the record.
 
-        :return: yields 3-tuples
+        :returns: yields 3-tuples
         """
         triple_generators = [
             self._metadata(),
@@ -166,7 +167,8 @@ class RecordGraphBuilder(object):
 
         :param field: the field to get the value of
         :param source: the source dict to retrieve the field's value from
-        :return: the value wrapped in a Literal or None if the field doesn't exist on the source
+        :returns: the value wrapped in a Literal or None if the field doesn't exist on
+            the source
         """
         if source is None:
             source = self.record.data
@@ -180,13 +182,15 @@ class RecordGraphBuilder(object):
         """
         Yields triples which describe this RDF output, i.e. a meta-metadata description.
 
-        :return: yields triples
+        :returns: yields triples
         """
         metadata_uri = '{}.{}'.format(self.base_object_uri, self.output_format)
         meta_ref = URIRef(metadata_uri)
         yield meta_ref, self.namespaces.dc.subject, self.record_ref
-        yield meta_ref, self.namespaces.dc.creator, Literal(
-            'Natural History Museum, London'
+        yield (
+            meta_ref,
+            self.namespaces.dc.creator,
+            Literal('Natural History Museum, London'),
         )
         yield meta_ref, self.namespaces.dc.created, Literal(datetime.now())
 
@@ -196,10 +200,12 @@ class RecordGraphBuilder(object):
         CETAF CSPP recommendations, for more info see here:
         https://cetafidentifiers.biowikifarm.net/wiki/CSPP.
 
-        :return: yields triples
+        :returns: yields triples
         """
-        yield self.record_ref, self.namespaces.dc.title, self._get_value(
-            'scientificName'
+        yield (
+            self.record_ref,
+            self.namespaces.dc.title,
+            self._get_value('scientificName'),
         )
         yield self.record_ref, self.namespaces.dc.type, Literal('Specimen')
         yield (
@@ -225,11 +231,15 @@ class RecordGraphBuilder(object):
                 Literal(as_dwc_list(names)),
             )
 
-        yield self.record_ref, self.namespaces.dwc.fieldNumber, self._get_value(
-            'fieldNumber'
+        yield (
+            self.record_ref,
+            self.namespaces.dwc.fieldNumber,
+            self._get_value('fieldNumber'),
         )
-        yield self.record_ref, self.namespaces.dwc.recordedBy, self._get_value(
-            'recordedBy'
+        yield (
+            self.record_ref,
+            self.namespaces.dwc.recordedBy,
+            self._get_value('recordedBy'),
         )
 
         # if there is associated media, yield it as a list
@@ -272,7 +282,7 @@ class RecordGraphBuilder(object):
         connection and then the image is described in its own set of triples where the
         image URI is used as the subject.
 
-        :return: yields triples
+        :returns: yields triples
         """
         for image in self.record.images:
             image_uri = URIRef(image.url)
@@ -289,8 +299,10 @@ class RecordGraphBuilder(object):
             yield self.record_ref, self.namespaces.foaf.depiction, image_uri
             # add a thumbnail link
             if image.is_mss_image:
-                yield image_uri, self.namespaces.foaf.thumbnail, URIRef(
-                    image.thumbnail_url
+                yield (
+                    image_uri,
+                    self.namespaces.foaf.thumbnail,
+                    URIRef(image.thumbnail_url),
                 )
 
     def _gbif(self):
@@ -298,12 +310,18 @@ class RecordGraphBuilder(object):
         Yields triples describing the record using the GBIF record data associated with
         it.
 
-        :return: yields triples
+        :returns: yields triples
         """
         if self.gbif_record is not None:
             # assert equivalence with the GBIF record
-            yield self.record_ref, self.namespaces.owl.sameAs, URIRef(
-                'https://www.gbif.org/occurrence/{}'.format(self.gbif_record['gbifID'])
+            yield (
+                self.record_ref,
+                self.namespaces.owl.sameAs,
+                URIRef(
+                    'https://www.gbif.org/occurrence/{}'.format(
+                        self.gbif_record['gbifID']
+                    )
+                ),
             )
             # if we have a GBIF country code, add it
             yield (
@@ -316,10 +334,12 @@ class RecordGraphBuilder(object):
         """
         Yields triples describing the record using DWC (DarWin Core) terms.
 
-        :return: yields triples
+        :returns: yields triples
         """
-        yield self.record_ref, self.namespaces.dc.identifier, Literal(
-            self.record.data['occurrenceID']
+        yield (
+            self.record_ref,
+            self.namespaces.dc.identifier,
+            Literal(self.record.data['occurrenceID']),
         )
 
         dwc_terms_dict = dwc_terms(self.record.data.keys())
@@ -345,9 +365,11 @@ class RecordGraphBuilder(object):
                             Literal(self.record.data.get(term)),
                         )
                         # and associated our specimen object's DWC term with the GBIF URI
-                        yield self.record_ref, getattr(
-                            self.namespaces.dwc, term
-                        ), gbif_uri
+                        yield (
+                            self.record_ref,
+                            getattr(self.namespaces.dwc, term),
+                            gbif_uri,
+                        )
                 else:
                     yield (
                         self.record_ref,
@@ -365,15 +387,19 @@ class RecordGraphBuilder(object):
                     dynamic_property
                 )
         if dynamic_properties_dict:
-            yield self.record_ref, self.namespaces.dwc.dynamicProperties, Literal(
-                json.dumps(dynamic_properties_dict)
+            yield (
+                self.record_ref,
+                self.namespaces.dwc.dynamicProperties,
+                Literal(json.dumps(dynamic_properties_dict)),
             )
 
         # yield the associatedMedia term as a pipe-separated list of image URIs
         images = self.record.images
         if images:
-            yield self.record_ref, self.namespaces.dwc.associatedMedia, Literal(
-                as_dwc_list(image.url for image in images)
+            yield (
+                self.record_ref,
+                self.namespaces.dwc.associatedMedia,
+                Literal(as_dwc_list(image.url for image in images)),
             )
 
         if self.record.data.get('created', None) is not None:
@@ -396,20 +422,26 @@ class RecordGraphBuilder(object):
         """
         Yield simple version information about the record.
 
-        :return: yields triples
+        :returns: yields triples
         """
-        yield self.record_ref, self.namespaces.owl.versionInfo, Literal(
-            self.rounded_version
+        yield (
+            self.record_ref,
+            self.namespaces.owl.versionInfo,
+            Literal(self.rounded_version),
         )
 
         if self.version is None or self.version > self.rounded_version:
             # if there is no version given or the version requested is beyond the latest version the
             # data we're using is the same as the latest version's data, yield a same as to show
             # this
-            yield self.record_ref, self.namespaces.owl.sameAs, URIRef(
-                object_uri(
-                    self.record.data['occurrenceID'], version=self.rounded_version
-                )
+            yield (
+                self.record_ref,
+                self.namespaces.owl.sameAs,
+                URIRef(
+                    object_uri(
+                        self.record.data['occurrenceID'], version=self.rounded_version
+                    )
+                ),
             )
 
     def _extras(self):
@@ -417,15 +449,17 @@ class RecordGraphBuilder(object):
         Yields some additional triples that don't really fit under any of the other
         existing method groupings.
 
-        :return: yields triples
+        :returns: yields triples
         """
         yield (
             self.record_ref,
             self.namespaces.aiiso.Department,
             Literal(get_department(self.record.data['collectionCode'])),
         )
-        yield self.record_ref, self.namespaces.aiiso.Division, self._get_value(
-            'subDepartment'
+        yield (
+            self.record_ref,
+            self.namespaces.aiiso.Division,
+            self._get_value('subDepartment'),
         )
 
         yield (

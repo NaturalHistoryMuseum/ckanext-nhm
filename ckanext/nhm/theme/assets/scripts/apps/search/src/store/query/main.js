@@ -59,7 +59,9 @@ let query = {
           context.getters['resources/invalidResourceIds'](newBody.resource_ids),
         );
 
-        if (context.rootState.appState.query.parsingError.resourceIds === null) {
+        if (
+          context.rootState.appState.query.parsingError.resourceIds === null
+        ) {
           context.commit('resources/setResourceIds', newBody.resource_ids);
           resolve();
         } else {
@@ -75,11 +77,16 @@ let query = {
             'queryBody',
             context.state.filters.parsingError,
           );
-          if (context.rootState.appState.query.parsingError.queryBody !== null) {
+          if (
+            context.rootState.appState.query.parsingError.queryBody !== null
+          ) {
             throw Error;
           }
 
-          if (newBody.query !== undefined && newBody.query.search !== undefined) {
+          if (
+            newBody.query !== undefined &&
+            newBody.query.search !== undefined
+          ) {
             context.state.search = newBody.query.search.toString();
           }
         });

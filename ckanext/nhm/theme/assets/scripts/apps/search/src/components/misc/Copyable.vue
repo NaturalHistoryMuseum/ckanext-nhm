@@ -1,5 +1,8 @@
 <template>
-  <p class="copyable" :class="{ copied: copySuccess, 'copy-failed': copyFailure }">
+  <p
+    class="copyable"
+    :class="{ copied: copySuccess, 'copy-failed': copyFailure }"
+  >
     <slot></slot>
     <button
       v-clipboard:copy="copyText"

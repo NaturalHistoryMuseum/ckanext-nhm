@@ -16,14 +16,14 @@ class FilterOption:
     """
 
     def __init__(self, name, label, filter_dsl, hide=False):
-        '''
+        """
         :param name: the name of the option, this is the name passed through in the filter
         :param label: the text to show on the frontend to the user
         :param filter_dsl: an elasticsearch-dsl query object which actually does the filter. This is
                            applied in the ckanext-nhm plugin.
         :param hide: whether to hide the filter on the frontend or show it, default is False (i.e.
                      show the filter option)
-        '''
+        """
         self.name = name
         self.label = label
         self.filter_dsl = filter_dsl
@@ -34,7 +34,7 @@ class FilterOption:
         Produces a dict with the details required by the frontend to show the filter
         options to the user.
 
-        :return: a dict with the name and the label for the filter
+        :returns: a dict with the name and the label for the filter
         """
         return {
             'name': self.name,
