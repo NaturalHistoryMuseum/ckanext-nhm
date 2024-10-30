@@ -64,9 +64,14 @@
                                 {% elif field == 'created' or field == 'modified' %}
                                     {{ g.record_dict[field] }}
                                 {% else %}
-                                    {% taxonomy field, g.record_dict['collectionCode'], g.record_dict %}
-                                        {{ g.record_dict[field] }}
-                                    {% endtaxonomy %}
+                                    {% set value = g.record_dict[field] %}
+                                    {% if value is iterable and (value is not string and value is not mapping) %}
+                                        {{ value | join(", ") }}
+                                    {% else %}
+                                        {% taxonomy field, g.record_dict['collectionCode'], g.record_dict %}
+                                            {{ g.record_dict[field] }}
+                                        {% endtaxonomy %}
+                                    {% endif %}
                                 {% endif %}
 
                             </td>
