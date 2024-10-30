@@ -15,6 +15,36 @@ from ckanext.nhm.views.default import DefaultView
 log = logging.getLogger(__name__)
 
 
+def modify_field_groups(field_groups):
+    """
+    Given a FieldGroups object from the vds plugin, force certain field groups to show
+    in multisearch results and force certain field groups to be ignored and not shown.
+
+    :param field_groups: a FieldGroups object
+    """
+    # forces
+    field_groups.force("scientificName")
+    field_groups.force("identifier")
+    field_groups.force("preparationType")
+    field_groups.force("preparationContents")
+    field_groups.force("preparationProcess")
+    field_groups.force("preservation")
+    field_groups.force("preparationDate")
+    field_groups.force("barcode")
+    field_groups.force("occurrenceID")
+    field_groups.force("associatedOccurrences")
+    field_groups.force("associatedMediaCount")
+    field_groups.force("order")
+    field_groups.force("identifiedBy")
+    field_groups.force("locality")
+    field_groups.force("decimalLatitude")
+    field_groups.force("decimalLongitude")
+    # ignores
+    field_groups.ignore("created")
+    field_groups.ignore("modified")
+    field_groups.ignore("associatedMedia.*")
+
+
 class SampleView(DefaultView):
     """
     Controller for displaying a sample record.

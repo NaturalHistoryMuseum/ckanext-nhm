@@ -33,6 +33,9 @@ from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastoreDownloads,
 )
 from ckanext.nhm.lib.utils import get_iiif_status
+from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
+from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
+from ckanext.nhm.views.sample import modify_field_groups as sample_modify_groups
 
 try:
     from ckanext.status.interfaces import IStatus
@@ -543,44 +546,12 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return slugs
 
     def vds_modify_field_groups(self, resource_ids, field_groups):
-        # if the index lots or specimens collections are in the resource ids list,
-        # remove a bunch of groups that we don't care about
-        if (
-            helpers.get_specimen_resource_id() in resource_ids
-            or helpers.get_indexlot_resource_id() in resource_ids
-        ):
-            field_groups.force("scientificName")
-            field_groups.force("family")
-            field_groups.force("typeStatus")
-            field_groups.force("locality")
-            field_groups.force("country")
-            field_groups.force("recordedBy")
-            field_groups.force("catalogNumber")
-            field_groups.force("associatedMediaCount")
-            field_groups.force("preservative")
-            field_groups.force("collectionCode")
-            field_groups.force("year")
-            field_groups.force("month")
-            field_groups.force("day")
-            for group in (
-                "created",
-                "modified",
-                "basisOfRecord",
-                "institutionCode",
-                "associatedMedia.*",
-                "barcode",
-            ):
-                field_groups.ignore(group)
-
+        if helpers.get_specimen_resource_id() in resource_ids:
+            specimen_modify_groups(field_groups)
+        if helpers.get_indexlot_resource_id() in resource_ids:
+            indexlot_modify_groups(field_groups)
         if helpers.get_sample_resource_id() in resource_ids:
-            field_groups.force("scientificName")
-            field_groups.force("identifier")
-            field_groups.force("preparationType")
-            field_groups.force("preparationContents")
-            field_groups.force("preservation")
-            field_groups.force("project")
-            field_groups.force("barcode")
-
+            sample_modify_groups(field_groups)
         return field_groups
 
     def datastore_before_convert_basic_query(self, query):
