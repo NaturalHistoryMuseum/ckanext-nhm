@@ -1,3 +1,9 @@
+## v6.9.8 (2025-01-16)
+
+### Fix
+
+- slightly increase the timeout for iiif status
+
 ## v6.9.7 (2025-01-15)
 
 ### Fix
