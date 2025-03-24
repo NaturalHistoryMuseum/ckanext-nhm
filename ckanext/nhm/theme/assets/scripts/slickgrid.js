@@ -109,7 +109,10 @@ var NHMFormatter = function (row, cell, value, columnDef, dataContext) {
 
   // if we don't want to override the functionality, just return the value for the field
   if (value && typeof value === 'string') {
-    value = value.replace(/(https?:\/\/[^ ]+)/g, '<a href="$1">$1</a>');
+    value = value.replace(
+      /(https?:\/\/[^ ]+)/g,
+      '<a href="$1" onclick="window.top.location=this.href">$1</a>',
+    );
   }
   return value;
 };

@@ -15,7 +15,7 @@ def get_iiif_status():
 
     url = toolkit.config.get('ckanext.iiif.image_server_url')
     try:
-        r = requests.get(url + '/status', timeout=5)
+        r = requests.get(url + '/status', timeout=7)
         if r.ok:
             health['ping'] = True
             response_json = r.json()

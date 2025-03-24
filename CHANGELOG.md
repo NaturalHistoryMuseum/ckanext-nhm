@@ -1,3 +1,15 @@
+## v6.9.8 (2025-01-16)
+
+### Fix
+
+- slightly increase the timeout for iiif status
+
+## v6.9.7 (2025-01-15)
+
+### Fix
+
+- add js snippet to open slickgrid links in parent window
+
 ## v6.9.6 (2024-08-20)
 
 ### Fix
