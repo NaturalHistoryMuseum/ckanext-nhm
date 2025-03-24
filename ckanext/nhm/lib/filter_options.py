@@ -55,6 +55,6 @@ exclude_mineralogy = FilterOption(
     "_exclude_mineralogy",
     "Exclude Mineralogy",
     # note the ~ which inverts the query
-    ~term_query("collectionCode", "min", case_sensitive=False),
+    ~term_query("collectionCode", "min"),
     hide=True,
 )
