@@ -359,18 +359,22 @@ def collection_stats():
 
     collections_total = 0
     for name, resource_id in collections:
-        params = {
-            'resource_id': resource_id,
-            'limit': 0,
-        }
-        stats[name] = toolkit.get_action("vds_basic_count")({}, params)
+        # we use the same params for both the vds_resource_check and the vds_basic_count
+        # and the limit param is just ignored by vds_resource_check
+        params = {"resource_id": resource_id, "limit": 0}
+        # check if the resource is a valid datastore resource first otherwise the call
+        # to vds_basic_count could error out
+        if toolkit.get_action("vds_resource_check")({}, params):
+            stats[name] = toolkit.get_action("vds_basic_count")({}, params)
+        else:
+            stats[name] = 0
         collections_total += stats[name]
     stats['total'] = collections_total
 
     collection_code_counts = []
     for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
         params = {
-            'resource_id': get_specimen_resource_id(),
+            'resource_ids': [get_specimen_resource_id()],
             'limit': 0,
             'query': {
                 'filters': {
