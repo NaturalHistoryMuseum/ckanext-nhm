@@ -33,7 +33,8 @@ dependencies = [
     "ckanext-ldap>=3.2.0",
     "ckanext-query-dois>=4.0.0",
     "ckanext-statistics>=3.1.0",
-    "ckanext-versioned-datastore>=5.1.0",
+    # todo: once stable set back to pypi
+    "ckanext-versioned-datastore@git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore@josh/preps",
     # this also depends on ckanext-dcat==1.3.0 (see readme)
     "requests"
 ]
