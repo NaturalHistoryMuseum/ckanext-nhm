@@ -1,18 +1,17 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set url = h.url_for('liv.index') %}
-{% set title = "Image viewer" %}
+{% set title = "Butterfly types" %}
+{% set url="/dataset/collection-specimens/resource/05ff2255-c38a-40c9-b657-4ccb55ab2feb?view_id=6ba121d1-da26-4ee1-81fa-7da11e68f68e&filters=project%3Apapilionoidea+new+types+digitisation+project" %}
 
 {% block image %}
-    <div class="featured-image"
-         style="background-image:url('/images/L010225443_small.jpg')"
-         role="img"
-         aria-label="A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443."
-         title=""
-    ></div>
+<div class="featured-image"
+     style="background-image:url('/images/Heraclides_rumiko_small.jpg')"
+     role="img"
+     aria-label="A top-down photograph of a large black and yellow butterfly (Heraclides rumiko). It is pinned to a grey tray and there are a set of small labels to its left."
+     title="NHMUK012824346, Heraclides rumiko">
+</div>
 {% endblock %}
 
 {% block description %}
-    An interactive image viewer allowing users to zoom in on images in our datasets,
-    including high-resolution photographs of pinned insect drawers.
+View some of the Museum’s invaluable butterfly reference material.
 {% endblock %}

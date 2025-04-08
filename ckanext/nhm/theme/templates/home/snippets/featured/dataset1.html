@@ -1,18 +1,18 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set id = 'collection-samples' %}
-{% set title = "Samples collection" %}
-{% set url = h.url_for('resource.read', id=id, resource_id=h.get_sample_resource_id()) %}
+{% set url = h.url_for('liv.index') %}
+{% set title = "Image viewer" %}
 
 {% block image %}
-<div class="featured-image"
-     style="background-image: url('/images/featured-samples.jpg')"
-     role="img"
-     aria-label="A picture of a freezer drawer that is extended from the freezer. No specimens are visible, but the drawer is covered in ice."
-     title="Sample collection">
-</div>
+    <div class="featured-image"
+         style="background-image:url('/images/L010225443_small.jpg')"
+         role="img"
+         aria-label="A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443."
+         title=""
+    ></div>
 {% endblock %}
 
 {% block description %}
-Access the catalogue of samples in the NHM collections.
+    An interactive image viewer allowing users to zoom in on images in our datasets,
+    including high-resolution photographs of pinned insect drawers.
 {% endblock %}

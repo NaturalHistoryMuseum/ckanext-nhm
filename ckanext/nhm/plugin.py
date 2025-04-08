@@ -10,33 +10,32 @@ from contextlib import suppress
 from pathlib import Path
 
 from beaker.cache import cache_managers, cache_regions
+from ckan.lib.helpers import literal
+from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from importlib_resources import files
 
 import ckanext.nhm.lib.helpers as helpers
 import ckanext.nhm.logic.action as nhm_action
 import ckanext.nhm.logic.schema as nhm_schema
-from ckan.lib.helpers import literal
-from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.contact.interfaces import IContact
 from ckanext.doi.interfaces import IDoi
 from ckanext.gallery.plugins.interfaces import IGalleryImage
-from ckanext.nhm import routes, cli
+from ckanext.nhm import cli, routes
 from ckanext.nhm.lib.helpers import resource_view_get_filter_options
 from ckanext.nhm.lib.mail import (
-    create_indexlots_email,
     create_department_email,
+    create_indexlots_email,
     create_package_email,
 )
 from ckanext.nhm.lib.record import LATITUDE_FIELD, LONGITUDE_FIELD
+from ckanext.nhm.lib.utils import get_iiif_status
+from ckanext.nhm.views.artefact import modify_field_groups as artefact_modify_groups
+from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
+from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
 from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastore,
     IVersionedDatastoreDownloads,
 )
-from ckanext.nhm.lib.utils import get_iiif_status
-from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
-from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
-from ckanext.nhm.views.sample import modify_field_groups as sample_modify_groups
-from ckanext.nhm.views.artefact import modify_field_groups as artefact_modify_groups
 
 try:
     from ckanext.status.interfaces import IStatus
@@ -90,9 +89,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IActions
     def get_actions(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IActions.get_actions
-        '''
+        """
         return {
             'object_rdf': nhm_action.object_rdf,
             'get_permanent_url': nhm_action.get_permanent_url,
@@ -101,7 +100,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'resource_create': nhm_action.resource_create,
             'resource_update': nhm_action.resource_update,
             'show_extension_versions': nhm_action.show_extension_versions,
-            "datastore_search": nhm_action.datastore_search,
+            'datastore_search': nhm_action.datastore_search,
         }
 
     ## IClick
@@ -114,10 +113,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IConfigurer
     def update_config(self, config):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IConfigurer.update_config
         :param config:
-        '''
+        """
         toolkit.add_template_directory(config, 'theme/templates')
         toolkit.add_public_directory(config, 'theme/public')
         toolkit.add_public_directory(
@@ -132,40 +131,40 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IDatasetForm
     def package_types(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.package_types
-        '''
+        """
         return []
 
     def is_fallback(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.is_fallback
-        '''
+        """
         return True
 
     def create_package_schema(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.create_package_schema
-        '''
+        """
         return nhm_schema.create_package_schema()
 
     def update_package_schema(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.update_package_schema
-        '''
+        """
         return nhm_schema.update_package_schema()
 
     def show_package_schema(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IDatasetForm.show_package_schema
-        '''
+        """
         return nhm_schema.show_package_schema()
 
     ## IFacets
     def dataset_facets(self, facets_dict, package_type):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IFacets.dataset_facets
-        '''
+        """
 
         # Remove organisations and groups
         del facets_dict['organization']
@@ -181,9 +180,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IPackageController
     def before_search(self, data_dict):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IPackageController.before_search
-        '''
+        """
         # If there's no sort criteria specified, default to promoted and last modified
         if not data_dict.get('sort', None):
             data_dict['sort'] = 'promoted asc, metadata_modified desc'
@@ -191,9 +190,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return data_dict
 
     def after_search(self, search_results, search_params):
-        '''
+        """
         ...seealso:: ckan.plugins.interfaces.IPackageController.after_search
-        '''
+        """
         # set the collections datasets as top (above other promoted datasets)
         if search_params['sort'].startswith('promoted asc'):
             top_datasets_names = ['collection-specimens', 'collection-indexlots']
@@ -213,13 +212,13 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         return search_results
 
     def before_view(self, pkg_dict):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IPackageController.before_view
 
         :returns: pkg_dict with full list of authors renamed to all_authors, and author
                   field truncated (with HTML!) if necessary
 
-        '''
+        """
         pkg_dict['all_authors'] = pkg_dict['author']
         pkg_dict['author'] = helpers.dataset_author_truncate(pkg_dict['author'])
         return pkg_dict
@@ -249,10 +248,10 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IRoutes
     def before_map(self, _map):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
         :param _map:
-        '''
+        """
 
         # Dataset metrics
         _map.connect(
@@ -280,9 +279,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## ITemplateHelpers
     def get_helpers(self):
-        '''
+        """
         ..seealso:: ckan.plugins.interfaces.ITemplateHelpers.get_helpers
-        '''
+        """
 
         h = {}
 
@@ -299,9 +298,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IContact
     def mail_alter(self, mail_dict, data_dict):
-        '''
+        """
         ..seealso:: ckanext.contact.interfaces.IContact.mail_alter
-        '''
+        """
 
         # Get the submitted data values
         package_id = data_dict.get('package_id', None)
@@ -355,9 +354,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
     ## IDoi
     def build_metadata_dict(self, pkg_dict, metadata_dict, errors):
-        '''
+        """
         ..seealso:: ckanext.doi.interfaces.IDoi.build_metadata_dict
-        '''
+        """
         try:
             category = pkg_dict.get('dataset_category', pkg_dict.get('type', 'Dataset'))
             if isinstance(category, list) and len(category) > 0:
@@ -405,9 +404,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         }
 
     def get_images(self, raw_images, record, data_dict):
-        '''
+        """
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
-        '''
+        """
         images = []
         title_field = data_dict['resource_view'].get('image_title', None)
         for image in raw_images:
@@ -443,32 +442,31 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     ## IVersionedDatastore
     def vds_before_search(self, request):
         # we only want to operate on basic queries with a data_dict
-        if request.query.kind != "basic" or not request.data_dict:
+        if request.query.kind != 'basic' or not request.data_dict:
             return
 
-        if "filters" in request.data_dict:
+        if 'filters' in request.data_dict:
             # figure out which options are available for this resource
-            resource_show = toolkit.get_action("resource_show")
-            resource = resource_show({}, {"id": request.data_dict["resource_id"]})
+            resource_show = toolkit.get_action('resource_show')
+            resource = resource_show({}, {'id': request.data_dict['resource_id']})
             options = resource_view_get_filter_options(resource)
 
             for option in options:
-                if option.name in request.data_dict["filters"]:
+                if option.name in request.data_dict['filters']:
                     # if the option is in the filters, delete it
-                    del request.data_dict["filters"][option.name]
+                    del request.data_dict['filters'][option.name]
                     # and add the appropriate additional query term to the extras
                     request.extra_filter &= option.filter_dsl
 
-        if "sort" not in request.data_dict:
+        if 'sort' not in request.data_dict:
             # by default sort the EMu resources by modified so that the latest records
             # are first
-            if request.data_dict["resource_id"] in {
+            if request.data_dict['resource_id'] in {
                 helpers.get_specimen_resource_id(),
                 helpers.get_artefact_resource_id(),
                 helpers.get_indexlot_resource_id(),
-                helpers.get_sample_resource_id(),
             }:
-                request.add_sort("modified", False)
+                request.add_sort('modified', False)
 
     def vds_is_read_only_resource(self, resource_id) -> bool:
         # we don't want any of the versioned datastore ingestion and indexing code
@@ -477,21 +475,20 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             helpers.get_specimen_resource_id(),
             helpers.get_artefact_resource_id(),
             helpers.get_indexlot_resource_id(),
-            helpers.get_sample_resource_id(),
         }
 
     def vds_update_options(self, resource_id, builder):
         # add some basic defaults for the parsing options
-        for true_value in ("true", "yes", "y"):
+        for true_value in ('true', 'yes', 'y'):
             builder.with_true_value(true_value)
-        for false_value in ("false", "no", "n"):
+        for false_value in ('false', 'no', 'n'):
             builder.with_false_value(false_value)
         date_formats = (
-            "%Y-%m-%d",
-            "%Y-%m-%dT%H:%M:%S",
-            "%Y-%m-%dT%H:%M:%S.%f",
-            "%Y-%m-%dT%H:%M:%S%z",
-            "%Y-%m-%dT%H:%M:%S.%f%z",
+            '%Y-%m-%d',
+            '%Y-%m-%dT%H:%M:%S',
+            '%Y-%m-%dT%H:%M:%S.%f',
+            '%Y-%m-%dT%H:%M:%S%z',
+            '%Y-%m-%dT%H:%M:%S.%f%z',
         )
         for date_format in date_formats:
             builder.with_date_format(date_format)
@@ -504,8 +501,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         builder.clear_geo_hints()
 
         # grab the resource dict so that we can check for user specified options
-        context = {"ignore_auth": True}
-        resource = toolkit.get_action("resource_show")(context, {"id": resource_id})
+        context = {'ignore_auth': True}
+        resource = toolkit.get_action('resource_show')(context, {'id': resource_id})
         # if the user specified latitude field already exists in the parsing options, we
         # will override that set of options with these
         latitude_field = resource.get(LATITUDE_FIELD, None)
@@ -518,26 +515,24 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             helpers.get_specimen_resource_id(),
             helpers.get_artefact_resource_id(),
             helpers.get_indexlot_resource_id(),
-            helpers.get_sample_resource_id(),
         ]
         slugs = {
-            "collections": dict(resource_ids=collection_resource_ids),
-            "everything": dict(resource_ids=[]),
-            "specimens": dict(resource_ids=[helpers.get_specimen_resource_id()]),
-            "indexlots": dict(resource_ids=[helpers.get_indexlot_resource_id()]),
-            "artefacts": dict(resource_ids=[helpers.get_artefact_resource_id()]),
-            "samples": dict(resource_ids=[helpers.get_sample_resource_id()]),
+            'collections': dict(resource_ids=collection_resource_ids),
+            'everything': dict(resource_ids=[]),
+            'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
+            'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
+            'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
         }
-        for collection_code in ("PAL", "MIN", "BMNH(E)", "ZOO", "BOT"):
+        for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
             slugs[helpers.get_department(collection_code).lower()] = {
-                "resource_ids": collection_resource_ids,
-                "query": {
-                    "filters": {
-                        "and": [
+                'resource_ids': collection_resource_ids,
+                'query': {
+                    'filters': {
+                        'and': [
                             {
-                                "string_equals": {
-                                    "fields": ["collectionCode"],
-                                    "value": collection_code,
+                                'string_equals': {
+                                    'fields': ['collectionCode'],
+                                    'value': collection_code,
                                 }
                             }
                         ]
@@ -551,8 +546,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             specimen_modify_groups(field_groups)
         if helpers.get_indexlot_resource_id() in resource_ids:
             indexlot_modify_groups(field_groups)
-        if helpers.get_sample_resource_id() in resource_ids:
-            sample_modify_groups(field_groups)
         if helpers.get_artefact_resource_id() in resource_ids:
             artefact_modify_groups(field_groups)
         return field_groups
