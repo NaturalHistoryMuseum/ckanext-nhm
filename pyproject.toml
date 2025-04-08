@@ -85,9 +85,9 @@ version_files = [
     "CITATION.cff:^version"
 ]
 
-[tool.black]
-line-length = 88
-skip_string_normalization = true
+
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.pylint]
 max-line-length = 88
