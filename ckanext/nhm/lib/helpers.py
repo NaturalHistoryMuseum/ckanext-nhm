@@ -1514,7 +1514,7 @@ def get_resource_group(resource):
         if linked_specimen_record and group_name:
             tokens = [
                 t
-                for t in re.findall('\$[a-zA-Z]+', group_name)
+                for t in re.findall(r'\$[a-zA-Z]+', group_name)
                 if t.strip('$') in linked_specimen_record.data
             ]
             for token in tokens:

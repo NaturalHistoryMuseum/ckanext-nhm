@@ -73,11 +73,11 @@ class TaxonomyFormatExtension(Extension):
         global_parsed_fields = []
 
         collections = {
-            '(?i)zoo': self._zoo,
-            '(?i)bmnh\(e\)': self._ent,
-            '(?i)pal': self._pal,
-            '(?i)bot': self._bot,
-            '(?i)min': self._min,
+            r'(?i)zoo': self._zoo,
+            r'(?i)bmnh\(e\)': self._ent,
+            r'(?i)pal': self._pal,
+            r'(?i)bot': self._bot,
+            r'(?i)min': self._min,
         }
 
         # get collection-specific rules
@@ -225,7 +225,7 @@ class TaxonomyFormatExtension(Extension):
         abbr = ['var', 'subsp', 'subvar', 'f', 'subf', 'ssp', 'cv']
         for a in abbr:
             body = re.sub(
-                '(\s?{0}\.?\s)'.format(a),
+                r'(\s?{0}\.?\s)'.format(a),
                 '<span style="font-style: normal;">\\1</span>',
                 body,
             )
