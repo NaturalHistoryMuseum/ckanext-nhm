@@ -18,42 +18,6 @@ from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY
 log = logging.getLogger(__name__)
 
 
-def record_show(context, data_dict):
-    """
-    Retrieve an individual record.
-
-    :param context:
-    :param data_dict:
-    """
-    context['user'] = toolkit.c.user or toolkit.c.author
-    schema = context.get('schema', nhm_schema.record_show_schema())
-    data_dict, errors = toolkit.navl_validate(data_dict, schema, context)
-
-    if errors:
-        raise toolkit.ValidationError(errors)
-
-    resource_id = toolkit.get_or_bust(data_dict, 'resource_id')
-    record_id = toolkit.get_or_bust(data_dict, 'record_id')
-
-    # Retrieve datastore record
-    record_data_dict = {'resource_id': resource_id, 'filters': {'_id': record_id}}
-    if 'version' in data_dict:
-        record_data_dict['version'] = data_dict['version']
-    search_result = toolkit.get_action('datastore_search')(context, record_data_dict)
-
-    try:
-        record = {
-            'data': search_result['records'][0],
-            'fields': search_result['fields'],
-            'resource_id': resource_id,
-        }
-    except IndexError:
-        # If we don't have a result, raise not found
-        raise toolkit.ObjectNotFound
-
-    return record
-
-
 def object_rdf(context, data_dict):
     """
     Get record RDF.
@@ -157,7 +121,7 @@ def get_permanent_url(context, data_dict):
         uuid = records[0]['occurrenceID']
         if include_version:
             # figure out the latest rounded version of the specimen resource data
-            version = toolkit.get_action('datastore_get_rounded_version')(
+            version = toolkit.get_action("vds_version_round")(
                 context, {'resource_id': helpers.get_specimen_resource_id()}
             )
             # create a path with the version included
@@ -248,3 +212,32 @@ def show_extension_versions(context, data_dict) -> Dict[str, str]:
 
     # sort the result alphabetically
     return {dist.name: dist.version for dist in sorted(dists, key=lambda d: d.name)}
+
+
+@toolkit.chained_action
+@toolkit.side_effect_free
+def datastore_search(original_action, context, data_dict):
+    """
+    This chains the datastore_search action provided by the vds extension so that we can
+    provide an "include_urls" parameter to users which, if included on a search of the
+    specimen collection, adds a "permanentUrl" key and value to each record dict in the
+    result.
+    """
+    # check for include_urls and the resource_id before calling the original action just
+    # to make sure we get a view of them before the vds action potentially changes them
+    should_add_urls = (
+        "include_urls" in data_dict
+        and helpers.get_specimen_resource_id() == data_dict.get("resource_id")
+    )
+
+    # call vds action
+    result = original_action(context, data_dict)
+
+    if should_add_urls:
+        for record in result["records"]:
+            if "occurrenceID" in record:
+                record["permanentUrl"] = toolkit.url_for(
+                    "object_view", uuid=record["occurrenceID"]
+                )
+
+    return result

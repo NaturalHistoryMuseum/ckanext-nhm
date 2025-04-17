@@ -23,7 +23,7 @@ dependencies = [
     "ckantools>=0.3.0",
     "cachetools>=4.2.4",
     "lxml>=4.4.2",
-    "elasticsearch-dsl>=6.0.0,<7.0.0",
+    "elasticsearch-dsl==8.9.0",
     "ckanext-contact>=2.3.0",
     "ckanext-doi>=3.1.10",
     "ckanext-gallery>=3.0.0",
@@ -33,7 +33,8 @@ dependencies = [
     "ckanext-ldap>=3.2.0",
     "ckanext-query-dois>=4.0.0",
     "ckanext-statistics>=3.1.0",
-    "ckanext-versioned-datastore>=5.1.0",
+    # todo: once stable set back to pypi
+    "ckanext-versioned-datastore@git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore@74f921bee205ba9b49b78a077d90841127d8288e",
     # this also depends on ckanext-dcat==1.3.0 (see readme)
     "requests"
 ]
@@ -85,9 +86,9 @@ version_files = [
     "CITATION.cff:^version"
 ]
 
-[tool.black]
-line-length = 88
-skip_string_normalization = true
+
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.pylint]
 max-line-length = 88

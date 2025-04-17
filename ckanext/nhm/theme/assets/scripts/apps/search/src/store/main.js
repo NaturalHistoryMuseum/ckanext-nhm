@@ -73,7 +73,7 @@ const store = new Vuex.Store({
         context.commit('results/query/filters/resetFilters');
         return;
       }
-      post('datastore_resolve_slug', {
+      post('vds_slug_resolve', {
         slug: slug,
       })
         .then((data) => {

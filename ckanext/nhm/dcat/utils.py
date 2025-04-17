@@ -4,11 +4,10 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from ckanext.nhm.lib.helpers import get_specimen_resource_id
-from datetime import datetime
 from rdflib import namespace
 
 from ckan.plugins import toolkit
+from ckanext.nhm.lib.helpers import get_specimen_resource_id
 
 
 def object_uri(uuid, version=None):
@@ -35,18 +34,7 @@ def as_dwc_list(objects):
     :param objects: the objects
     :return: a | separated string
     """
-    return ' | '.join(objects)
-
-
-def epoch_to_datetime(epoch_timestamp):
-    """
-    Converts the given epoch timestamp into a datetime object. The timestamp passed in
-    is assumed to be the integer number of milliseconds since the UNIX epoch.
-
-    :param epoch_timestamp: the integer number of milliseconds since the UNIX epoch
-    :return: a datetime object
-    """
-    return datetime.fromtimestamp(epoch_timestamp / 1000.0)
+    return " | ".join(objects)
 
 
 class Namespaces:

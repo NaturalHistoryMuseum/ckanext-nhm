@@ -18,6 +18,36 @@ from ckanext.nhm.views.dwc import DarwinCoreView
 log = logging.getLogger(__name__)
 
 
+def modify_field_groups(field_groups):
+    """
+    Given a FieldGroups object from the vds plugin, force certain field groups to show
+    in multisearch results and force certain field groups to be ignored and not shown.
+
+    :param field_groups: a FieldGroups object
+    """
+    # forces
+    field_groups.force("scientificName")
+    field_groups.force("family")
+    field_groups.force("typeStatus")
+    field_groups.force("locality")
+    field_groups.force("country")
+    field_groups.force("recordedBy")
+    field_groups.force("catalogNumber")
+    field_groups.force("associatedMediaCount")
+    field_groups.force("preservative")
+    field_groups.force("collectionCode")
+    field_groups.force("year")
+    field_groups.force("month")
+    field_groups.force("day")
+    # ignores
+    field_groups.ignore("created")
+    field_groups.ignore("modified")
+    field_groups.ignore("basisOfRecord")
+    field_groups.ignore("institutionCode")
+    field_groups.ignore("associatedMedia.*")
+    field_groups.ignore("barcode")
+
+
 class SpecimenView(DefaultView):
     """
     Controller for displaying a specimen record.

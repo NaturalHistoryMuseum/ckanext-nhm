@@ -128,7 +128,7 @@ let results = {
       async function getAllResults() {
         // get the total without any of the temporary/hidden filters
         return post(
-          'datastore_multisearch',
+          'vds_multi_query',
           context.getters['query/requestBody'](false),
           { signal: context.state.searchControllers[searchId].signal },
         ).then((data) => {
@@ -167,7 +167,7 @@ let results = {
       async function getFilteredResults() {
         // get the total with the temporary/hidden filters, e.g. so we can say 10 of 20 records have images
         return post(
-          'datastore_multisearch',
+          'vds_multi_query',
           context.getters['query/requestBody'](true),
           { signal: context.state.searchControllers[searchId].signal },
         )
@@ -281,7 +281,7 @@ let results = {
     getSlug(context) {
       context.dispatch('getMetadata', {
         meta: 'slug',
-        action: 'datastore_create_slug',
+        action: 'vds_slug_create',
         extract: (data) => {
           Vue.set(context.state, 'slugReserved', data.result.is_reserved);
           return data.result.slug;
@@ -290,7 +290,7 @@ let results = {
     },
     editSlug(context, payload) {
       Vue.set(context.rootState.appState.status.slugEdit, 'loading', true);
-      return post('datastore_edit_slug', {
+      return post('vds_slug_edit', {
         current_slug: context.state.slug,
         new_reserved_slug: payload,
       })
@@ -323,7 +323,7 @@ let results = {
       payload['query'] = context.getters['query/requestBody']();
       context.dispatch('getMetadata', {
         meta: 'download',
-        action: 'datastore_queue_download',
+        action: 'vds_download_queue',
         formData: payload,
         extract: (data) => {
           if (data.success) {

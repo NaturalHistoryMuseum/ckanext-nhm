@@ -106,7 +106,7 @@ let display = {
 
       payload.request['size'] = 15;
 
-      post('datastore_guess_fields', payload.request)
+      post('vds_multi_fields', payload.request)
         .then((data) => {
           if (data.success) {
             headers = headers.concat(data.result.map((f) => d3.keys(f.fields)));

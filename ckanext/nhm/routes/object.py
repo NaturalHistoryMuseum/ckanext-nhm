@@ -163,7 +163,7 @@ def abyssline_object_redirect(uuid, version):
         'resource_id': resource_id,
         'version': version,
     }
-    version = toolkit.get_action('datastore_get_rounded_version')(_context(), data_dict)
+    version = toolkit.get_action("vds_version_round")(_context(), data_dict)
 
     # search for the record
     search_data_dict = {'resource_id': resource_id, 'filters': {'catalogNumber': uuid}}
