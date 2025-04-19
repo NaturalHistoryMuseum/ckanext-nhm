@@ -1,3 +1,54 @@
+## v7.0.0 (2025-04-19)
+
+### Breaking Changes
+
+- update nhm plugin to work with vds vNext
+
+### Feature
+
+- update ckanext-versioned-datastore dep to dev head
+- remove preps
+- add artefact multisearch group management
+- update field names to match new preparation mapping
+- update nhm plugin to work with vds vNext
+
+### Fix
+
+- use r-strings for regexes with escape sequences
+- allow collection resources to not exist when updating homepage stat counts
+- remove case sensitive param
+- fix missing line
+- use the current hostname for slugs, not always data.nhm.ac.uk
+- strip the specimen GUID to avoid including spaces
+- add missing helper
+- rebuild search app
+
+### Refactor
+
+- move field group management to the dataset views
+
+### Docs
+
+- add --rm to example test run docker compose cmd
+
+### Tests
+
+- fix the tests
+
+### Build System(s)
+
+- update iiif, query-dois, vds extensions
+- remove unecessary version from docker compose def
+- reference the vds preps branch not pypi version
+- update mongo/elasticsearch
+- update pyproject and pre-commit
+
+### Minor UI Changes
+
+- change the forced and ignored for index lots
+- force specific groups for the sample dataset
+- if the value on a record is a list, join it with a comma
+
 ## v6.9.8 (2025-01-16)
 
 ### Fix
