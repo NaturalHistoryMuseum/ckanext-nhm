@@ -29,12 +29,11 @@ dependencies = [
     "ckanext-gallery>=3.0.0",
     "ckanext-gbif>=2.1.0",
     "ckanext-graph>=2.1.0",
-    "ckanext-iiif>=3.0.1",
+    "ckanext-iiif>=4.0.0",
     "ckanext-ldap>=3.2.0",
-    "ckanext-query-dois>=4.0.0",
+    "ckanext-query-dois>=5.0.0",
     "ckanext-statistics>=3.1.0",
-    # todo: once stable set back to pypi
-    "ckanext-versioned-datastore@git+https://github.com/NaturalHistoryMuseum/ckanext-versioned-datastore@74f921bee205ba9b49b78a077d90841127d8288e",
+    "ckanext-versioned-datastore>=6.0.0",
     # this also depends on ckanext-dcat==1.3.0 (see readme)
     "requests"
 ]
