@@ -5,7 +5,6 @@
 # Created by the Natural History Museum in London, UK
 from unittest.mock import MagicMock, patch
 
-import pytest
 from ckan.plugins import toolkit
 
 from ckanext.nhm.lib.helpers import (
@@ -68,16 +67,14 @@ class TestGetObjectURL(object):
 
     def test_get_object_url_default(self):
         mock_rounded_version = 10
-        mock_datastore_get_rounded_version = MagicMock(
-            return_value=mock_rounded_version
-        )
-        mock_get_action = MagicMock(return_value=mock_datastore_get_rounded_version)
+        mock_vds_version_round = MagicMock(return_value=mock_rounded_version)
+        mock_get_action = MagicMock(return_value=mock_vds_version_round)
         mock_url_for = MagicMock()
         mock_toolkit = MagicMock(get_action=mock_get_action, url_for=mock_url_for)
         with patch('ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
             get_object_url('a resource', 'a guid')
-            mock_get_action.assert_called_once_with('datastore_get_rounded_version')
-            mock_datastore_get_rounded_version.assert_called_once_with(
+            mock_get_action.assert_called_once_with('vds_version_round')
+            mock_vds_version_round.assert_called_once_with(
                 {},
                 {
                     'resource_id': 'a resource',
@@ -93,16 +90,14 @@ class TestGetObjectURL(object):
 
     def test_get_object_url_passed_version(self):
         mock_rounded_version = 10
-        mock_datastore_get_rounded_version = MagicMock(
-            return_value=mock_rounded_version
-        )
-        mock_get_action = MagicMock(return_value=mock_datastore_get_rounded_version)
+        mock_vds_version_round = MagicMock(return_value=mock_rounded_version)
+        mock_get_action = MagicMock(return_value=mock_vds_version_round)
         mock_url_for = MagicMock()
         mock_toolkit = MagicMock(get_action=mock_get_action, url_for=mock_url_for)
         with patch('ckanext.nhm.lib.helpers.toolkit', mock_toolkit):
             get_object_url('a resource', 'a guid', version=15)
-            mock_get_action.assert_called_once_with('datastore_get_rounded_version')
-            mock_datastore_get_rounded_version.assert_called_once_with(
+            mock_get_action.assert_called_once_with('vds_version_round')
+            mock_vds_version_round.assert_called_once_with(
                 {},
                 {
                     'resource_id': 'a resource',

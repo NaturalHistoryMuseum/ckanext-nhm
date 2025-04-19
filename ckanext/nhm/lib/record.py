@@ -36,7 +36,7 @@ def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
                 'version': version,
             }
             # retrieve datastore record
-            search_result = toolkit.get_action('datastore_search')(
+            search_result = toolkit.get_action("vds_basic_query")(
                 context, search_data_dict
             )
             records = search_result['records']
@@ -184,7 +184,7 @@ class Record:
             data_dict = dict(record_id=self.id, resource_id=self.resource_id)
             if self.version is not None:
                 data_dict['version'] = self.version
-            self._data = toolkit.get_action('record_show')(self._context, data_dict)[
+            self._data = toolkit.get_action("vds_data_get")(self._context, data_dict)[
                 'data'
             ]
         return self._data
@@ -385,7 +385,8 @@ class Record:
         extract the values from the record data and return a GeoJSON compatible Point
         where the record is located.
 
-        :return: None if the latitude and longitude couldn't be identified or a GeoJSON Point
+        :return: None if the latitude and longitude couldn't be identified or a GeoJSON
+                 Point
         """
         lat_field = self.resource.get(
             LATITUDE_FIELD, DWC_LATITUDE if self.is_dwc else None

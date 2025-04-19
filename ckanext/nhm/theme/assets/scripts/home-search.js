@@ -16,7 +16,7 @@ window.slug_search =
       }
       payload.resource_ids = resourceIds;
 
-      $.ajax('/api/3/action/datastore_create_slug', {
+      $.ajax('/api/3/action/vds_slug_create', {
         method: 'POST',
         data: JSON.stringify(payload),
         contentType: 'application/json',

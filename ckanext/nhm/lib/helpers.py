@@ -17,14 +17,14 @@ from typing import List
 from urllib.parse import quote
 
 from beaker.cache import cache_region
-from jinja2.filters import do_truncate
-from lxml import etree, html
-from werkzeug.routing import BuildError
-
 from ckan import model
 from ckan.lib import helpers as core_helpers
 from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
+from jinja2.filters import do_truncate
+from lxml import etree, html
+from werkzeug.routing import BuildError
+
 from ckanext.gbif.lib.errors import GBIF_ERRORS
 from ckanext.nhm.lib import external_links
 from ckanext.nhm.lib.external_links import Site
@@ -96,22 +96,28 @@ def get_record_count():
 
 
 @cache_region('collection_stats', 'record_stats')
-def get_record_stats():
-    start_version = 1501545600
-    end_version = int(time.time())
-    count_action = toolkit.get_action('datastore_count')
+def get_record_stats() -> List[dict]:
+    """
+    Returns a list of dictionaries containing statistics about the number of records
+    available each week starting from 01/08/2017 and ending now.
 
-    record_stats = []
+    :return: a list of dicts
+    """
+    # 01/08/2017 as ms epoch
+    start_version = 1501545600000
+    # now as ms epoch
+    end_version = int(time.time() * 1000)
+    # 1 week in ms
+    step = 604800000
+    count_action = toolkit.get_action('vds_multi_count')
 
-    for v in range(start_version, end_version, 604800):
-        record_stats.append(
-            {
-                'date': datetime.fromtimestamp(v),
-                'count': count_action({}, {'version': v * 1000}),
-            }
-        )
-
-    return record_stats
+    return [
+        {
+            'date': datetime.fromtimestamp(version / 1000),
+            'count': count_action({}, {'version': version})['total'],
+        }
+        for version in range(start_version, end_version, step)
+    ]
 
 
 def _get_action(action, params):
@@ -157,7 +163,7 @@ def get_record(resource_id, record_id):
     :param record_id: the ID of the record
     """
     record = _get_action(
-        'record_show', {'resource_id': resource_id, 'record_id': record_id}
+        'vds_data_get', {'resource_id': resource_id, 'record_id': record_id}
     )
     return record.get('data', None)
 
@@ -224,7 +230,7 @@ def url_for_resource_view(resource_id, view_type=None, filters={}):
 
     :param resource_id:
     :param filters: (optional, default: {})
-    :param view_type:  (optional, default: None)
+    :param view_type: (optional, default: None)
     """
 
     try:
@@ -320,9 +326,6 @@ def get_indexlot_resource_id():
 
 
 def get_artefact_resource_id():
-    '''
-    @return:  ID for artefact resource
-    '''
     return toolkit.config.get('ckanext.nhm.artefact_resource_id')
 
 
@@ -350,18 +353,22 @@ def collection_stats():
 
     collections_total = 0
     for name, resource_id in collections:
-        params = {
-            'resource_id': resource_id,
-            'limit': 0,
-        }
-        stats[name] = toolkit.get_action('datastore_search')({}, params)['total']
+        # we use the same params for both the vds_resource_check and the vds_basic_count
+        # and the limit param is just ignored by vds_resource_check
+        params = {'resource_id': resource_id, 'limit': 0}
+        # check if the resource is a valid datastore resource first otherwise the call
+        # to vds_basic_count could error out
+        if toolkit.get_action('vds_resource_check')({}, params):
+            stats[name] = toolkit.get_action('vds_basic_count')({}, params)
+        else:
+            stats[name] = 0
         collections_total += stats[name]
     stats['total'] = collections_total
 
     collection_code_counts = []
     for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
         params = {
-            'resource_id': get_specimen_resource_id(),
+            'resource_ids': [get_specimen_resource_id()],
             'limit': 0,
             'query': {
                 'filters': {
@@ -376,7 +383,7 @@ def collection_stats():
                 }
             },
         }
-        total = toolkit.get_action('datastore_multisearch')({}, params)['total']
+        total = toolkit.get_action('vds_multi_count')({}, params)['total']
         collection_code_counts.append((collection_code, total))
 
     collection_code_counts.sort(key=operator.itemgetter(1), reverse=True)
@@ -457,8 +464,8 @@ def filter_and_format_resource_items(resource):
     format them.
 
     :param resource: the resource dict
-    :return: a list of made up of 2-tuples containing formatted keys and values from
-    the resource
+    :return: a list of made up of 2-tuples containing formatted keys and values from the
+        resource
     """
     blacklist = {
         '_image_field',
@@ -534,13 +541,14 @@ def get_resource_fields(resource, version=None, use_request_version=False):
     If the resource isn't a datastore resource then an empty list is returned.
 
     Because the versioned_datastore plugin guarantees that the fields returned in its
-    datastore_search responses will be in the order they were when they were ingested or sorted
-    alphabetically if no ingestion ordering is available, no field sorting occurs in this function.
+    datastore_search responses will be in the order they were when they were ingested or
+    sorted alphabetically if no ingestion ordering is available, no field sorting occurs
+    in this function.
 
     :param resource: the resource dict
     :param version: the version to request (default: None)
-    :param use_request_version: whether to look in the request parameters to find a version in the
-                                filters (default: False)
+    :param use_request_version: whether to look in the request parameters to find a
+        version in the filters (default: False)
     :return: a list of field names
     """
     if not resource.get('datastore_active'):
@@ -555,7 +563,7 @@ def get_resource_fields(resource, version=None, use_request_version=False):
         if '__version__' in filters:
             data['version'] = int(filters['__version__'][0])
 
-    result = toolkit.get_action('datastore_search')({}, data)
+    result = toolkit.get_action('vds_basic_query')({}, data)
     return [field['id'] for field in result.get('fields', [])]
 
 
@@ -663,11 +671,11 @@ def resource_is_dwc(resource):
 
 
 def camel_case_to_string(camel_case_string):
-    '''
+    """
 
     :param camel_case_string:
 
-    '''
+    """
     s = ' '.join(re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)', camel_case_string))
     return s[0].upper() + s[1:]
 
@@ -773,12 +781,12 @@ def get_facet_label_function(facet_name, multi=False):
     if facet_function and multi:
 
         def filter_facets(facet, filter_value):
-            '''
+            """
 
             :param facet:
             :param filter_value:
 
-            '''
+            """
             for f in facet:
                 if f['name'] == filter_value:
                     return facet_function(f)
@@ -805,12 +813,12 @@ def get_creator_id_facet_label(facet):
 
 
 def field_name_label(field_name):
-    '''Convert a field name into a label - replacing _s and upper casing first character
+    """Convert a field name into a label - replacing _s and upper casing first character
 
     :param field_name:
     :returns: str label
 
-    '''
+    """
     label = field_name.replace('_', ' ')
     label = label[0].upper() + label[1:]
     return label
@@ -904,8 +912,7 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     """
     Generate social share text for a package.
 
-    @param pkg_dict:
-    @return:
+    @param pkg_dict: @return:
     """
     text = []
     if rec_dict:
@@ -936,8 +943,8 @@ def accessible_gravatar(email_hash, size=100, default=None, userobj=None):
 
     :param email_hash:
     :param default: (optional, default: None)
-    :param size:  (optional, default: 100)
-    :param userobj:  (optional, default: None)
+    :param size: (optional, default: 100)
+    :param userobj: (optional, default: None)
     """
     gravatar_literal = toolkit.h.gravatar(email_hash, size, default)
     if userobj is not None:
@@ -958,12 +965,12 @@ def dataset_author_truncate(author_str):
     """
 
     def _truncate(author_str, separator=None):
-        '''
+        """
 
         :param author_str:
         :param separator:  (optional, default: None)
 
-        '''
+        """
 
         # If we have a separator, split string on it
         if separator:
@@ -979,7 +986,6 @@ def dataset_author_truncate(author_str):
         )
 
     if author_str and len(author_str) > AUTHOR_MAX_LENGTH:
-
         if ';' in author_str:
             author_str = _truncate(author_str, ';')
         elif ',' in author_str:
@@ -1033,7 +1039,7 @@ def get_resource_facets(resource):
         if toolkit.h.get_param_int('_{}_limit'.format(field_name)) == 0:
             search_params.setdefault('facet_limits', {})[field_name] = 50
 
-    search = toolkit.get_action('datastore_search')(context, search_params)
+    search = toolkit.get_action('vds_basic_query')(context, search_params)
     facets = []
 
     # dictionary of facet name => formatter function with camel_case_to_string defined
@@ -1251,7 +1257,7 @@ def resource_view_get_filterable_fields(resource):
         'resource_id': resource['id'],
         'limit': 0,
     }
-    fields = toolkit.get_action('datastore_search')({}, data).get('fields', [])
+    fields = toolkit.get_action('vds_basic_query')({}, data).get('fields', [])
 
     # sort and filter the fields ensuring we only return string type fields and don't
     # return the id
@@ -1260,12 +1266,12 @@ def resource_view_get_filterable_fields(resource):
 
 
 def form_select_datastore_field_options(resource, allow_empty=True):
-    '''
+    """
 
     :param resource:
     :param allow_empty:  (optional, default: True)
 
-    '''
+    """
     fields = toolkit.h.resource_view_get_fields(resource)
     return list_to_form_options(fields, allow_empty)
 
@@ -1277,12 +1283,11 @@ def _get_latest_update(package_or_resource_dicts):
 
     :param package_or_resource_dicts: a sequence of the package or resource dicts
     :return: a 2-tuple containing the latest datetime and the dict from which it came,
-    if no times
-             are found then (None, None) is returned
+        if no times are found then (None, None) is returned
     """
     # a list of fields on the resource that should contain update dates
     fields = ['last_modified', 'revision_timestamp', 'Created']
-    get_rounded_version = toolkit.get_action('datastore_get_rounded_version')
+    get_rounded_version = toolkit.get_action('vds_version_round')
 
     latest_dict = None
     latest_date = None
@@ -1315,8 +1320,8 @@ def get_latest_update_for_package(pkg_dict, date_format=None):
     its resources. If there is no update time found then 'unknown' is returned. If there
     is datetime found then it is rendered using the standard ckan helper.
 
-    :param pkg_dict:        the package dict
-    :param date_format:     date format for the return datetime
+    :param pkg_dict: the package dict
+    :param date_format: date format for the return datetime
     :return: 'unknown' or a string containing the rendered datetime
     """
     latest_date, _ = _get_latest_update(
@@ -1334,9 +1339,10 @@ def get_latest_update_for_package_resources(pkg_dict, date_format=None):
     in this package. If there is no update time found then 'unknown' is returned. If
     there is datetime found then it is rendered using the standard ckan helper.
 
-    :param pkg_dict:        the package dict
-    :param date_format:     date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime and the resource name
+    :param pkg_dict: the package dict
+    :param date_format: date format for the return datetime
+    :return: 'unknown' or a string containing the rendered datetime and the resource
+        name
     """
     latest_date, latest_resource = _get_latest_update(pkg_dict.get('resources', []))
     if latest_date is not None:
@@ -1366,16 +1372,13 @@ def render_epoch(
     UTC.
 
     :param epoch_timestamp: the timestamp, represented as the number of seconds (or
-    milliseconds if
-                            in_milliseconds is True) since the UNIX epoch
+        milliseconds if in_milliseconds is True) since the UNIX epoch
     :param in_milliseconds: whether the timestamp is in milliseconds or seconds. By
-    default this is
-                            True and therefore the timestamp is expected to be in
-                            milliseconds
+        default this is True and therefore the timestamp is expected to be in
+        milliseconds
     :param date_format: the output format. This will be passed straight to datetime's
-    strftime
-                        function and therefore uses its keywords etc. Defaults to:
-                        %Y-%m-%d %H:%M:%S (UTC)
+        strftime function and therefore uses its keywords etc. Defaults to: %Y-%m-%d
+        %H:%M:%S (UTC)
     :return: a string rendering of the timestamp using the
     """
     if in_milliseconds:
@@ -1388,19 +1391,19 @@ def get_object_url(resource_id, guid, version=None, include_version=True):
     Retrieves the object url for the given guid in the given resource with the given
     version. If the version is None then the latest version of the resource is used.
 
-    The version passed (if one is passed) is not used verbatim, a call to the versioned search
-    extension is put in to retrieve the rounded version of the resource so that the object url we
-    create is always correct.
+    The version passed (if one is passed) is not used verbatim, a call to the versioned
+    search extension is put in to retrieve the rounded version of the resource so that
+    the object url we create is always correct.
 
     :param resource_id: the resource id
     :param guid: the guid of the object
     :param version: the version (default: None which means use the latest version)
-    :param include_version: whether to include the version in the object URL or not. If this is
-                            False the version parameter is ignored (default: True)
+    :param include_version: whether to include the version in the object URL or not. If
+        this is False the version parameter is ignored (default: True)
     :return: the object url
     """
     if include_version:
-        rounded_version = toolkit.get_action('datastore_get_rounded_version')(
+        rounded_version = toolkit.get_action('vds_version_round')(
             {},
             {
                 'resource_id': resource_id,
@@ -1451,7 +1454,8 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     :param html_string: a literal or string of HTML code
     :param classes: CSS classes to add to each item
     :param kwargs: other attributes to add to each item
-    :return: a literal of HTML code where all the <li> nodes have "nav-item" added to their classes
+    :return: a literal of HTML code where all the <li> nodes have "nav-item" added to
+        their classes
     """
     if classes is None:
         classes = ['nav-item']
@@ -1510,7 +1514,7 @@ def get_resource_group(resource):
         if linked_specimen_record and group_name:
             tokens = [
                 t
-                for t in re.findall('\$[a-zA-Z]+', group_name)
+                for t in re.findall(r'\$[a-zA-Z]+', group_name)
                 if t.strip('$') in linked_specimen_record.data
             ]
             for token in tokens:
@@ -1539,13 +1543,14 @@ def group_resources(resource_list):
 
 
 def get_resource_size(resource_dict):
-    prefixes = 'KMGTPEZ'  # kilo, mega, giga, etc. I could make this a list but what's the point
-    if toolkit.get_action('datastore_is_datastore_resource')(
+    # kilo, mega, giga, etc. I could make this a list but what's the point
+    prefixes = 'KMGTPEZ'
+    if toolkit.get_action('vds_resource_check')(
         {}, {'resource_id': resource_dict['id']}
     ):
         try:
-            records = toolkit.get_action('datastore_count')(
-                {}, {'resource_ids': [resource_dict['id']]}
+            records = toolkit.get_action('vds_basic_count')(
+                {}, {'resource_id': resource_dict['id']}
             )
             return f'{records} records'
         except:
@@ -1574,7 +1579,7 @@ def get_record_permalink(
             'record_id': record_dict['_id'],
         }
         if include_version:
-            rounded_version = toolkit.get_action('datastore_get_rounded_version')(
+            rounded_version = toolkit.get_action('vds_version_round')(
                 {},
                 {
                     'resource_id': resource_dict['id'],
@@ -1642,3 +1647,15 @@ def route_exists(route):
         return True
     except BuildError:
         return False
+
+
+def get_sample_voucher_guid(associated_occurrence_value: str) -> str:
+    """
+    Given an associatedOccurrence value from a Sample record, returns the associated
+    specimen GUID.
+
+    :param associated_occurrence_value: the associatedOccurrence value
+    :return: the voucher specimen GUID
+    """
+    _, guid = associated_occurrence_value.split(':', 1)
+    return guid.strip()
