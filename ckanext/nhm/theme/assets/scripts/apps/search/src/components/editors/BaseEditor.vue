@@ -14,6 +14,9 @@ export default {
       values: {
         // different comparison types and query entries go here
       },
+      defaults: {
+        // non-null defaults go here, in the same format as values
+      },
     };
   },
   computed: {
@@ -33,7 +36,15 @@ export default {
       let existing = this.getFilterById(this.existingTermId);
 
       d3.keys(this.values[this.comparisonType]).forEach((k) => {
-        this.$set(this.values[this.comparisonType], k, existing.content[k] || null);
+        let existingValue = existing.content[k];
+        let { [k]: defaultValue = null } =
+          this.defaults[this.comparisonType] || {};
+        let setDefault = existingValue == null;
+        this.$set(
+          this.values[this.comparisonType],
+          k,
+          setDefault ? defaultValue : existingValue,
+        );
       });
     },
     pressedEnter() {

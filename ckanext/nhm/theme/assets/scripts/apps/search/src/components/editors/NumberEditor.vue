@@ -15,7 +15,8 @@
         <i
           :class="[
             'fas',
-            'fa-less-than' + (values.range.greater_than_inclusive ? '-equal' : ''),
+            'fa-less-than' +
+              (values.range.greater_than_inclusive ? '-equal' : ''),
           ]"
         ></i>
       </label>
@@ -56,7 +57,6 @@
 
 <script>
 import BaseEditor from './BaseEditor.vue';
-import * as d3 from 'd3-collection';
 
 export default {
   extends: BaseEditor,
@@ -70,24 +70,50 @@ export default {
         range: {
           greater_than: null,
           less_than: null,
-          greater_than_inclusive: null,
-          less_than_inclusive: null,
+          greater_than_inclusive: true,
+          less_than_inclusive: true,
+        },
+      },
+      defaults: {
+        range: {
+          greater_than_inclusive: true,
+          less_than_inclusive: true,
         },
       },
     };
   },
   computed: {
     queryValues() {
-      d3.keys(this.values[this.comparisonType]).forEach((k) => {
-        let v = this.values[this.comparisonType][k];
-        if (
-          ['value', 'less_than', 'greater_than'].includes(k) &&
-          this.values[this.comparisonType][k] !== null
-        ) {
-          this.$set(this.values[this.comparisonType], k, Number(v));
+      // ensure these fields are numbers
+      const numberFields = {
+        equals: ['value'],
+        range: ['greater_than', 'less_than'],
+      };
+      numberFields[this.comparisonType].forEach((f) => {
+        let v = this.values[this.comparisonType][f];
+        if (v != null) {
+          this.$set(this.values[this.comparisonType], f, Number(v));
         }
       });
-      return this.values[this.comparisonType];
+
+      // copy to secondary object, filtering out nulls
+      let query = Object.fromEntries(
+        Object.entries(this.values[this.comparisonType]).filter(
+          (e) => e != null,
+        ),
+      );
+
+      // remove any unnecessary fields that aren't nulls
+      if (this.comparisonType === 'range') {
+        if (query.greater_than == null) {
+          delete query.greater_than_inclusive;
+        }
+        if (query.less_than == null) {
+          delete query.less_than_inclusive;
+        }
+      }
+
+      return query;
     },
   },
 };
