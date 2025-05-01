@@ -47,7 +47,6 @@
           >
             <option value="csv">CSV/TSV</option>
             <option value="dwc">Darwin Core</option>
-            <option value="xlsx">Excel (XLSX)</option>
             <option value="json">JSON</option>
           </select>
         </div>
