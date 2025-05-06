@@ -52,7 +52,9 @@ export const useStore = defineStore('liv', () => {
     if (currentImage.value == null) {
       return null;
     } else {
-      return recordRepo.value.withAllRecursive().find(currentImage.value.recordId);
+      return recordRepo.value
+        .withAllRecursive()
+        .find(currentImage.value.recordId);
     }
   });
 
@@ -80,7 +82,10 @@ export const useStore = defineStore('liv', () => {
     let promises = [];
 
     function _addImgField(resourceModel) {
-      if (resourceModel.imgField && !imageFields.includes(resourceModel.imgField)) {
+      if (
+        resourceModel.imgField &&
+        !imageFields.includes(resourceModel.imgField)
+      ) {
         imageFields.push(resourceModel.imgField);
       }
     }
@@ -131,7 +136,7 @@ export const useStore = defineStore('liv', () => {
 
   async function* multisearch() {
     while (true) {
-      const json = await post('datastore_multisearch', requestQuery.value);
+      const json = await post('vds_multi_query', requestQuery.value);
       totalRecords.value = json.result.total;
       yield* json.result.records;
       if (json.result.after) {

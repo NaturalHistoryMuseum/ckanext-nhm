@@ -1,21 +1,29 @@
 <template>
   <div class="filter-term filter-term-number">
-    <span v-if="showName" class="filter-term-name">{{ data.display.name }}</span>
+    <span v-if="showName" class="filter-term-name">{{
+      data.display.name
+    }}</span>
     <div class="flex-container" v-if="!showName">
       <span v-if="isRange && data.content.greater_than !== undefined">{{
         data.content.greater_than
       }}</span>
       <span v-if="isRange && data.content.greater_than !== undefined">{{
-        data.content.greater_than_inclusive ? '≤' : '<'
+        data.content.greater_than_inclusive ||
+        data.content.greater_than_inclusive == null
+          ? '≤'
+          : '<'
       }}</span>
       <FieldsDropdown v-bind:fields="data.content.fields"></FieldsDropdown>
       <span v-if="isRange && data.content.less_than !== undefined">{{
-        data.content.less_than_inclusive ? '≤' : '<'
+        data.content.less_than_inclusive ||
+        data.content.less_than_inclusive == null
+          ? '≤'
+          : '<'
       }}</span>
       <span v-if="isRange && data.content.less_than !== undefined">{{
         data.content.less_than
       }}</span>
-      <span v-if="!isRange">{{ comparison === 'contains' ? '~' : '=' }}</span>
+      <span v-if="!isRange">=</span>
       <span v-if="!isRange">{{ data.content.value }}</span>
     </div>
   </div>
