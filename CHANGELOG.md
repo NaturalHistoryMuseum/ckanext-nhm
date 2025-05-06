@@ -1,3 +1,15 @@
+## v7.0.1 (2025-05-06)
+
+### Fix
+
+- consider _inclusive fields true by default
+- use unique resource ids from record list
+- update vds endpoints
+
+### Minor UI Changes
+
+- change name, roles, and move people around
+
 ## v7.0.0 (2025-04-19)
 
 ### Breaking Changes
