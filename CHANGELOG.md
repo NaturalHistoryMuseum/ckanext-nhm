@@ -1,3 +1,9 @@
+## v7.0.2 (2025-05-07)
+
+### Fix
+
+- remove excel as a download option
+
 ## v7.0.1 (2025-05-06)
 
 ### Fix
