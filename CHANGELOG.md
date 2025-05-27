@@ -1,3 +1,9 @@
+## v7.0.3 (2025-05-27)
+
+### Minor UI Changes
+
+- update aphid dataset text
+
 ## v7.0.2 (2025-05-07)
 
 ### Fix
