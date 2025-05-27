@@ -11,6 +11,7 @@ let query = {
   state: {
     search: null,
     after: null,
+    version: null,
   },
   getters: {
     requestBody: (state, getters) => (ignoreTemp) => {
@@ -20,8 +21,12 @@ let query = {
         resource_ids: getters['resources/sortedResources'],
       };
 
-      if (state.after !== null && state.after !== undefined) {
+      if (state.after != null) {
         body.after = state.after;
+      }
+
+      if (state.version != null) {
+        body.version = state.version;
       }
 
       return body;
@@ -59,7 +64,9 @@ let query = {
           context.getters['resources/invalidResourceIds'](newBody.resource_ids),
         );
 
-        if (context.rootState.appState.query.parsingError.resourceIds === null) {
+        if (
+          context.rootState.appState.query.parsingError.resourceIds === null
+        ) {
           context.commit('resources/setResourceIds', newBody.resource_ids);
           resolve();
         } else {
@@ -75,17 +82,26 @@ let query = {
             'queryBody',
             context.state.filters.parsingError,
           );
-          if (context.rootState.appState.query.parsingError.queryBody !== null) {
+          if (
+            context.rootState.appState.query.parsingError.queryBody !== null
+          ) {
             throw Error;
           }
 
-          if (newBody.query !== undefined && newBody.query.search !== undefined) {
+          if (
+            newBody.query !== undefined &&
+            newBody.query.search !== undefined
+          ) {
             context.state.search = newBody.query.search.toString();
           }
         });
 
-      if (newBody.after !== undefined) {
+      if (newBody.after != null) {
         context.state.after = newBody.after;
+      }
+
+      if (newBody.version != null) {
+        context.state.version = newBody.version;
       }
 
       return Promise.all([resourceIdsPromise, filtersPromise]);
