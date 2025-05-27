@@ -1,3 +1,9 @@
+## v7.0.4 (2025-05-27)
+
+### Fix
+
+- add versions to queries
+
 ## v7.0.3 (2025-05-27)
 
 ### Minor UI Changes
