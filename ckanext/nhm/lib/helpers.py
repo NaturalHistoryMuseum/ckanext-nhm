@@ -570,7 +570,7 @@ def resource_view_state(resource_view_json, resource_json):
     """
     Alter the recline view resource, adding in state info.
 
-    :param resource_view_json: return:
+    :param resource_view_json:
     :param resource_json:
     """
     resource_view = json.loads(resource_view_json)
@@ -739,7 +739,7 @@ def get_allowed_view_types(resource, package):
 
     We want to edit some of the options - remove Image and change Tiled Map to Map
 
-    :param resource: param package:
+    :param resource:
     :param package:
     """
 
@@ -811,7 +811,8 @@ def get_creator_id_facet_label(facet):
 
 
 def field_name_label(field_name):
-    """Convert a field name into a label - replacing _s and upper casing first character
+    """
+    Convert a field name into a label - replacing _s and upper casing first character.
 
     :param field_name:
     :returns: str label
@@ -824,7 +825,7 @@ def field_name_label(field_name):
 
 def field_is_link(value):
     """
-    Is a field a link (starts with http and is a valid URL)
+    Is a field a link (starts with http and is a valid URL).
 
     :param value:
     :returns: boolean
@@ -910,7 +911,8 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     """
     Generate social share text for a package.
 
-    @param pkg_dict: @return:
+    :param pkg_dict:
+    :returns:
     """
     text = []
     if rec_dict:
@@ -1189,7 +1191,7 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     We don't want the field group pills - these are handled separately in
     get_resource_field_groups
 
-    :param resource: param package:
+    :param resource:
     :param package:
     :param resource_view:  (optional, default: None)
     """
@@ -1244,7 +1246,7 @@ def resource_view_get_filterable_fields(resource):
     """
     Retrieves the fields that can be filtered on.
 
-    @return: a list of sorted fields
+    :returns: a list of sorted fields
     """
     # if this isn't a datastore resource, return an empty list
     if not resource.get('datastore_active'):

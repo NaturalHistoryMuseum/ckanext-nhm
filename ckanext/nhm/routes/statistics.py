@@ -32,7 +32,7 @@ def _context():
 @blueprint.before_request
 def before_request():
     """
-    set context and check authorization.
+    Set context and check authorization.
     """
     try:
         toolkit.check_access('site_read', _context())

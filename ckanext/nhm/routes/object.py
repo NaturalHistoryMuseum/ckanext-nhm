@@ -4,7 +4,7 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 """
-Routes for handling stable objects - those with GUIDs in KE EMu
+Routes for handling stable objects - those with GUIDs in KE EMu.
 
 If someone accesses URL:
     object/73f450db-46b3-45a0-ac18-f00547be5af1
