@@ -45,16 +45,26 @@
             </a>
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
-            <a href="javascript:void(0);" @click="toggleQuery" class="collapse-to-icon">
+            <a
+              href="javascript:void(0);"
+              @click="toggleQuery"
+              class="collapse-to-icon"
+            >
               Query
               <i
                 class="inline-icon-right fas"
-                :class="[showQuery || showEditQuery ? 'fa-eye-slash' : 'fa-eye']"
+                :class="[
+                  showQuery || showEditQuery ? 'fa-eye-slash' : 'fa-eye',
+                ]"
               ></i>
             </a>
           </div>
           <div class="text-right nowrap" style="margin-left: 10px">
-            <a href="javascript:void(0);" @click="reset" class="collapse-to-icon">
+            <a
+              href="javascript:void(0);"
+              @click="reset"
+              class="collapse-to-icon"
+            >
               Reset <i class="inline-icon-right fas fa-trash"></i>
             </a>
           </div>

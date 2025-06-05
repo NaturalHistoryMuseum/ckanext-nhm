@@ -5,7 +5,9 @@
       <h3>Something went wrong!</h3>
       <p>
         Please
-        <a href="javascript:void(0);" @click="$emit('show-query')">check your query</a>
+        <a href="javascript:void(0);" @click="$emit('show-query')"
+          >check your query</a
+        >
         ,
         <a href="javascript:void(0);" @click="$emit('reset')">try resetting</a>
         , and
@@ -78,9 +80,9 @@
     </div>
     <div v-if="hasResult && total === 0 && !invalidated" class="pad-h pad-v">
       <small
-        >Try removing some filters, or use different search terms. Have a look at our
-        <a href="/help/search">search help</a> page to learn more about how searches are
-        constructed.</small
+        >Try removing some filters, or use different search terms. Have a look
+        at our <a href="/help/search">search help</a> page to learn more about
+        how searches are constructed.</small
       >
     </div>
 
@@ -109,7 +111,10 @@
           </a>
         </li>
         <li class="active">
-          <a href="javascript:void(0);" aria-label="Go to the top of this results page">
+          <a
+            href="javascript:void(0);"
+            aria-label="Go to the top of this results page"
+          >
             {{ page + 1 }}
           </a>
         </li>

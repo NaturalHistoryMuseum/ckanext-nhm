@@ -42,8 +42,8 @@
         } could not be loaded.`"
         popup-id="show-broken-imgs-help"
         ><small
-          >If there are a lot of images not loading, check the banner at the top of the
-          page to see if there's a known issue. Otherwise you can
+          >If there are a lot of images not loading, check the banner at the top
+          of the page to see if there's a known issue. Otherwise you can
           <a href="/contact">contact us</a>.</small
         ></Help
       >
@@ -121,7 +121,9 @@ export default {
     ...mapState('results/query/resources', ['resourceIds']),
     ...mapGetters('results/query/filters', ['hasFilter']),
     brokenImageRecords() {
-      return this.imageRecords.filter((r) => !r.image.loading && !r.image.canLoad);
+      return this.imageRecords.filter(
+        (r) => !r.image.loading && !r.image.canLoad,
+      );
     },
   },
   methods: {
@@ -134,7 +136,8 @@ export default {
     },
     imageHeight(imageRecord) {
       const height = this.colWidth / imageRecord.image.ratio;
-      const rowHeight = (height + this.defaultRowHeight) / this.defaultRowHeight;
+      const rowHeight =
+        (height + this.defaultRowHeight) / this.defaultRowHeight;
 
       // using Math.ceil completely breaks webpack so we have to do it this weird way
       return rowHeight - (rowHeight % 1) + 1;
@@ -154,7 +157,8 @@ export default {
       }
       // essentially Math.floor
       const cols =
-        currentWidth / this.minColWidth - ((currentWidth / this.minColWidth) % 1);
+        currentWidth / this.minColWidth -
+        ((currentWidth / this.minColWidth) % 1);
       // Math.ceil
       this.colWidth = currentWidth / cols - ((currentWidth / cols) % 1) + 1;
     },
