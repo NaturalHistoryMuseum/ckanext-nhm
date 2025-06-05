@@ -36,7 +36,7 @@ class FilterOption:
         Produces a dict with the details required by the frontend to show the filter
         options to the user.
 
-        :return: a dict with the name and the label for the filter
+        :returns: a dict with the name and the label for the filter
         """
         return {
             'name': self.name,

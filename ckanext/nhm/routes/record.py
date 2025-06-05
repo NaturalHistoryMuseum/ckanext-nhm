@@ -3,7 +3,6 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-
 """
 Controller for displaying an individual record Loads all the data and then defers render
 function to view objects.
@@ -31,7 +30,7 @@ def prepare_image(image: RecordImage) -> dict:
     Given an image object, return a dict of information about it for the view.
 
     :param image: the RecordImage object
-    :return: a dict of info
+    :returns: a dict of info
     """
     license_link = link_to(image.title, image.url, target='_blank')
     return {
@@ -92,8 +91,10 @@ def json_view(package_name, resource_id, record_id, version):
     :param package_name: the package name or ID, we don't actually need this
     :param resource_id: the resource ID, we do need this!
     :param record_id: the record ID, stunningly enough we need this too
-    :param version: optional record version, defaults to None which will be interpreted as now
-    :return: the record data as a dict which will be turned into JSON automatically by Flask, huzzah
+    :param version: optional record version, defaults to None which will be interpreted
+        as now
+    :returns: the record data as a dict which will be turned into JSON automatically by
+        Flask, huzzah
     """
     return Record(record_id, resource_id=resource_id, version=version).data
 
@@ -112,8 +113,9 @@ def view(package_name, resource_id, record_id, version):
     :param package_name: the package name or ID, doesn't matter which
     :param record_id: the record ID
     :param resource_id: the resource ID
-    :param version: optional record version, defaults to None which will be interpreted as now
-    :return: the rendered view template from the correct record view class
+    :param version: optional record version, defaults to None which will be interpreted
+        as now
+    :returns: the rendered view template from the correct record view class
     """
     record = Record(
         record_id,
@@ -140,8 +142,9 @@ def dwc(package_name, resource_id, record_id, version):
     :param package_name: the package name or ID, doesn't matter which
     :param record_id: the record ID
     :param resource_id: the resource ID
-    :param version: optional record version, defaults to None which will be interpreted as now
-    :return: the rendered view template from the correct record view class
+    :param version: optional record version, defaults to None which will be interpreted
+        as now
+    :returns: the rendered view template from the correct record view class
     """
     record = Record(
         record_id,

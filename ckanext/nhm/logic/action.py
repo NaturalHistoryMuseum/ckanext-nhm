@@ -79,11 +79,9 @@ def get_permanent_url(context, data_dict):
     :type field: string
     :param value: the value of the field to filter by
     :type value: string
-    :param include_version: whether to include the version in the permanent URL (default: false)
-    :type include_version: boolean
-
-    **Results:**
-
+    :param include_version: whether to include the version in the permanent URL
+        (default: false)
+    :type include_version: boolean  **Results:**
     :returns: the full URL of the specimen
     :rtype: string
     """
@@ -194,7 +192,7 @@ def show_extension_versions(context, data_dict) -> Dict[str, str]:
     """
     Find all the installed extension packages and return their names and versions.
 
-    :return: a dict of extension package name -> version
+    :returns: a dict of extension package name -> version
     """
     dists = []
 

@@ -3,7 +3,6 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
-
 """
 Routes for handling stable objects - those with GUIDs in KE EMu
 
@@ -99,8 +98,9 @@ def rdf(uuid, _format, version):
 
     :param uuid: the object's uuid
     :param _format: the format requested
-    :param version: the version of the record to retrieve, or None if the current version is desired
-    :return: the data to display
+    :param version: the version of the record to retrieve, or None if the current
+        version is desired
+    :returns: the data to display
     """
     data_dict = {
         'uuid': uuid,

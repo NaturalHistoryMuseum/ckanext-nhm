@@ -120,8 +120,8 @@ class RecordGraphBuilder(object):
         """
         Retrieve the GBIF representation of the record if we can.
 
-        :return: the GBIF record dict or None if we couldn't get it or didn't have a GBIF ID
-                 associated with the record
+        :returns: the GBIF record dict or None if we couldn't get it or didn't have a
+            GBIF ID associated with the record
         """
         gbif_id = self.record.data.get('gbifID', None)
 
@@ -138,7 +138,7 @@ class RecordGraphBuilder(object):
         """
         Iterating over this object will yield the triples that represent the record.
 
-        :return: yields 3-tuples
+        :returns: yields 3-tuples
         """
         triple_generators = [
             self._metadata(),
@@ -166,7 +166,8 @@ class RecordGraphBuilder(object):
 
         :param field: the field to get the value of
         :param source: the source dict to retrieve the field's value from
-        :return: the value wrapped in a Literal or None if the field doesn't exist on the source
+        :returns: the value wrapped in a Literal or None if the field doesn't exist on
+            the source
         """
         if source is None:
             source = self.record.data
@@ -180,7 +181,7 @@ class RecordGraphBuilder(object):
         """
         Yields triples which describe this RDF output, i.e. a meta-metadata description.
 
-        :return: yields triples
+        :returns: yields triples
         """
         metadata_uri = '{}.{}'.format(self.base_object_uri, self.output_format)
         meta_ref = URIRef(metadata_uri)
@@ -198,7 +199,7 @@ class RecordGraphBuilder(object):
         CETAF CSPP recommendations, for more info see here:
         https://cetafidentifiers.biowikifarm.net/wiki/CSPP.
 
-        :return: yields triples
+        :returns: yields triples
         """
         yield (
             self.record_ref,
@@ -280,7 +281,7 @@ class RecordGraphBuilder(object):
         connection and then the image is described in its own set of triples where the
         image URI is used as the subject.
 
-        :return: yields triples
+        :returns: yields triples
         """
         for image in self.record.images:
             image_uri = URIRef(image.url)
@@ -308,7 +309,7 @@ class RecordGraphBuilder(object):
         Yields triples describing the record using the GBIF record data associated with
         it.
 
-        :return: yields triples
+        :returns: yields triples
         """
         if self.gbif_record is not None:
             # assert equivalence with the GBIF record
@@ -332,7 +333,7 @@ class RecordGraphBuilder(object):
         """
         Yields triples describing the record using DWC (DarWin Core) terms.
 
-        :return: yields triples
+        :returns: yields triples
         """
         yield (
             self.record_ref,
@@ -420,7 +421,7 @@ class RecordGraphBuilder(object):
         """
         Yield simple version information about the record.
 
-        :return: yields triples
+        :returns: yields triples
         """
         yield (
             self.record_ref,
@@ -447,7 +448,7 @@ class RecordGraphBuilder(object):
         Yields some additional triples that don't really fit under any of the other
         existing method groupings.
 
-        :return: yields triples
+        :returns: yields triples
         """
         yield (
             self.record_ref,

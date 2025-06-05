@@ -15,7 +15,7 @@ def extract_ranks(record):
     from the record are not omitted.
 
     :param record: the record dict
-    :return: the ranks as an OrderedDict in rank order.
+    :returns: the ranks as an OrderedDict in rank order.
     """
     ranks = [
         ('kingdom', extract_kingdom),
@@ -36,7 +36,7 @@ def extract_kingdom(record):
     Extract the kingdom value from the given record.
 
     :param record: the record dict
-    :return: the kingdom value, or None if it is not present
+    :returns: the kingdom value, or None if it is not present
     """
     return record.get('kingdom', None)
 
@@ -46,7 +46,7 @@ def extract_phylum(record):
     Extract the phylum value from the given record.
 
     :param record: the record dict
-    :return: the phylum value, or None if it is not present
+    :returns: the phylum value, or None if it is not present
     """
     return record.get('phylum', None)
 
@@ -56,7 +56,7 @@ def extract_class(record):
     Extract the class value from the given record.
 
     :param record: the record dict
-    :return: the class value, or None if it is not present
+    :returns: the class value, or None if it is not present
     """
     return record.get('class', None)
 
@@ -66,7 +66,7 @@ def extract_family(record):
     Extract the family value from the given record.
 
     :param record: the record dict
-    :return: the family value, or None if it is not present
+    :returns: the family value, or None if it is not present
     """
     return record.get('family', None)
 
@@ -76,7 +76,7 @@ def extract_genus(record):
     Extract the genus value from the given record.
 
     :param record: the record dict
-    :return: the genus value, or None if it is not present
+    :returns: the genus value, or None if it is not present
     """
     return record.get('genus', None)
 
@@ -88,7 +88,7 @@ def extract_species(record):
     removal of any extra details (such as the author) from this value.
 
     :param record: the record dict
-    :return: the species value, or None if it is not present
+    :returns: the species value, or None if it is not present
     """
     # try extracting the species from the scientific name, which starts with the species but often
     # has an author or date after it
@@ -106,9 +106,10 @@ def find_author_split(value, record_dict):
     defined. If an author is found then this will return the index the author part
     starts, otherwise returns None.
 
-    :param value:           the value to search in
-    :param record_dict:     the record dictionary to use as a supplementary source of information
-    :return: the index at the start of the author part or None
+    :param value: the value to search in
+    :param record_dict: the record dictionary to use as a supplementary source of
+        information
+    :returns: the index at the start of the author part or None
     """
     first_space = re.search(r'\s', value)
     if not first_space:
@@ -142,7 +143,7 @@ class BaseParserStage(object):
 
         :param body: the tag body to search in
         :param record_dict: the full record
-        :return: boolean for pass/fail
+        :returns: boolean for pass/fail
         """
         return True
 
@@ -153,7 +154,7 @@ class BaseParserStage(object):
 
         :param body: the tag body
         :param record_dict: the full record
-        :return: a character index
+        :returns: a character index
         """
         return 0
 
@@ -163,7 +164,7 @@ class BaseParserStage(object):
 
         :param body: the tag body
         :param record_dict: the full record
-        :return: character index if criteria met, None if not
+        :returns: character index if criteria met, None if not
         """
         if self._meets_criteria(body, record_dict):
             return self._extract(body, record_dict)
@@ -185,7 +186,7 @@ class AuthorParserStage(BaseParserStage):
         Searches for the full author string, then breaks it up into smaller pieces
         (sections in brackets, individual names) if that's not found.
 
-        :return: the start index of the author string if found, otherwise None
+        :returns: the start index of the author string if found, otherwise None
         """
         full_author = record_dict['scientificNameAuthorship']
         author_strings = [full_author] + [
@@ -224,7 +225,7 @@ class SimpleFieldParserStage(BaseParserStage):
         If the value is at the end of the string, there is no point in continuing;
         otherwise, it looks for the first capitalised word after that value.
 
-        :return: the start index of the estimated author string if found, else None.
+        :returns: the start index of the estimated author string if found, else None.
         """
         field_value = record_dict[self.field_name]
         if re.search(f'{re.escape(field_value)}$', body):

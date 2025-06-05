@@ -151,9 +151,9 @@ class Record:
         :param resource_id: the resource ID this record comes from
         :param package_id: the package ID this record comes from
         :param package_name: the package name this record comes from
-        :param package_id_or_name: the package ID or name. These are often used interchangeably in
-                                   the CKAN action API so if you don't know which package identifier
-                                   you have, use this.
+        :param package_id_or_name: the package ID or name. These are often used
+            interchangeably in the CKAN action API so if you don't know which package
+            identifier you have, use this.
         :param resource: the resource this record is from as a dict
         :param package: the package this record is from as a dict
         :param context: a context to use for any action API calls
@@ -264,9 +264,9 @@ class Record:
         Returns the URL for this record. If the version is present it is included in the
         URL.
 
-        :param use_package_id: whether to use the package ID in the URL or the package name, the
-                               default is the package name (i.e. use_package_id=False)
-        :return: the record URL
+        :param use_package_id: whether to use the package ID in the URL or the package
+            name, the default is the package name (i.e. use_package_id=False)
+        :returns: the record URL
         """
         name_or_id = self.package_id if use_package_id else self.package_name
         create_url = partial(
@@ -287,7 +287,7 @@ class Record:
         Retrieves the default image license for the record based on the image licence
         field set on the resource.
 
-        :return: the licence model object
+        :returns: the licence model object
         """
         if not self._image_license:
             license_registry = model.Package.get_license_register()
@@ -312,8 +312,8 @@ class Record:
         associated_media field and use it if we find it. If no field name can be
         resolved, return None.
 
-        :return: the name of the field in the record containing the image data or None if there
-                 isn't one
+        :returns: the name of the field in the record containing the image data or None
+            if there isn't one
         """
         return self.resource.get(
             IMAGE_FIELD, DWC_ASSOCIATED_MEDIA if self.is_dwc else None
@@ -324,7 +324,7 @@ class Record:
         """
         Retrieves a list of RecordImages associated with this record.
 
-        :return: a list of RecordImage objects
+        :returns: a list of RecordImage objects
         """
         if self._images is None:
             self._images = []
@@ -386,8 +386,8 @@ class Record:
         extract the values from the record data and return a GeoJSON compatible Point
         where the record is located.
 
-        :return: None if the latitude and longitude couldn't be identified or a GeoJSON
-                 Point
+        :returns: None if the latitude and longitude couldn't be identified or a GeoJSON
+            Point
         """
         lat_field = self.resource.get(
             LATITUDE_FIELD, DWC_LATITUDE if self.is_dwc else None
