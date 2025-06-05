@@ -4,7 +4,7 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-'''
+"""
 Routes for handling stable objects - those with GUIDs in KE EMu
 
 If someone accesses URL:
@@ -22,15 +22,15 @@ returned. For example:
 otherwise the current version is returned.
 
 Old style /specimen urls are also supported to ensure backwards compatibility.
-'''
+"""
 
 import logging
 
 from ckan.plugins import toolkit
-from ckanext.dcat.utils import CONTENT_TYPES, check_access_header
 from flask import Blueprint, Response, redirect, url_for
 
-from ckanext.nhm.lib.record import get_record_by_uuid, Record
+from ckanext.dcat.utils import CONTENT_TYPES, check_access_header
+from ckanext.nhm.lib.record import Record, get_record_by_uuid
 
 log = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ specimen_blueprint = Blueprint(
 )
 
 # add to the default rdf content types to include json-ld as an alias for jsonld
-rdf_content_types = {**CONTENT_TYPES, "json-ld": CONTENT_TYPES["jsonld"]}
+rdf_content_types = {**CONTENT_TYPES, 'json-ld': CONTENT_TYPES['jsonld']}
 
 
 def _context():
@@ -163,7 +163,7 @@ def abyssline_object_redirect(uuid, version):
         'resource_id': resource_id,
         'version': version,
     }
-    version = toolkit.get_action("vds_version_round")(_context(), data_dict)
+    version = toolkit.get_action('vds_version_round')(_context(), data_dict)
 
     # search for the record
     search_data_dict = {'resource_id': resource_id, 'filters': {'catalogNumber': uuid}}

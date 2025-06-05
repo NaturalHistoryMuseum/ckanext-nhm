@@ -8,8 +8,9 @@ import logging
 from importlib.metadata import distributions
 from typing import Dict
 
+from ckan.plugins import plugin_loaded, toolkit
+
 import ckanext.nhm.logic.schema as nhm_schema
-from ckan.plugins import toolkit, plugin_loaded
 from ckanext.nhm.dcat.specimen_records import ObjectSerializer
 from ckanext.nhm.lib import helpers
 from ckanext.nhm.lib.record import get_record_by_uuid
@@ -121,7 +122,7 @@ def get_permanent_url(context, data_dict):
         uuid = records[0]['occurrenceID']
         if include_version:
             # figure out the latest rounded version of the specimen resource data
-            version = toolkit.get_action("vds_version_round")(
+            version = toolkit.get_action('vds_version_round')(
                 context, {'resource_id': helpers.get_specimen_resource_id()}
             )
             # create a path with the version included
@@ -226,18 +227,18 @@ def datastore_search(original_action, context, data_dict):
     # check for include_urls and the resource_id before calling the original action just
     # to make sure we get a view of them before the vds action potentially changes them
     should_add_urls = (
-        "include_urls" in data_dict
-        and helpers.get_specimen_resource_id() == data_dict.get("resource_id")
+        'include_urls' in data_dict
+        and helpers.get_specimen_resource_id() == data_dict.get('resource_id')
     )
 
     # call vds action
     result = original_action(context, data_dict)
 
     if should_add_urls:
-        for record in result["records"]:
-            if "occurrenceID" in record:
-                record["permanentUrl"] = toolkit.url_for(
-                    "object_view", uuid=record["occurrenceID"]
+        for record in result['records']:
+            if 'occurrenceID' in record:
+                record['permanentUrl'] = toolkit.url_for(
+                    'object_view', uuid=record['occurrenceID']
                 )
 
     return result

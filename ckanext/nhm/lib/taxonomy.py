@@ -239,10 +239,10 @@ class SimpleFieldParserStage(BaseParserStage):
 
 
 class CapitalisedParserStage(BaseParserStage):
-    '''
+    """
     The last resort stage in the search for authors - searches for the second capitalised word in
     the tag body.
-    '''
+    """
 
     def _meets_criteria(self, body, record_dict):
         """

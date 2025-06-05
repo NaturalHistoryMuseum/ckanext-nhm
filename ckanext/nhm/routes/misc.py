@@ -4,7 +4,6 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
-from ckan.plugins import toolkit
 from flask import Blueprint, jsonify, redirect
 
 # create a flask blueprint with a prefix

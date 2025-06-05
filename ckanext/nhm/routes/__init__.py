@@ -6,15 +6,15 @@
 
 from . import (
     about,
-    legal,
-    statistics,
-    record,
-    object,
-    help,
     bbcm,
     beetle_iiif,
-    misc,
+    help,
+    legal,
     liv,
+    misc,
+    object,
+    record,
+    statistics,
     user,
 )
 

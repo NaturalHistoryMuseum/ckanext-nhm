@@ -32,13 +32,13 @@ class TaxonomyFormatExtension(Extension):
     }
 
     def parse(self, parser):
-        '''The main function of the tag - mostly Jinja2 logic.
+        """The main function of the tag - mostly Jinja2 logic.
 
         :param parser:
 
         :returns: the HTML-formatted body of the tag
 
-        '''
+        """
         lineno = next(parser.stream).lineno
 
         args = [parser.parse_expression()]
@@ -247,6 +247,6 @@ class TaxonomyFormatExtension(Extension):
         ix = find_author_split(body, record_dict)
         if ix:
             authors = body[ix:]
-            return f'{body[:ix]}' + self.common_strings["deitalicise"].format(authors)
+            return f'{body[:ix]}' + self.common_strings['deitalicise'].format(authors)
         else:
             return body

@@ -3,18 +3,19 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+from contextlib import suppress
 from dataclasses import dataclass
-from typing import Optional, List
+from functools import partial
+from typing import List, Optional
 
 import ckan.model as model
-from cachetools import cached, TTLCache
+from cachetools import TTLCache, cached
 from ckan.lib.helpers import url_for
 from ckan.model.license import DefaultLicense
 from ckan.plugins import toolkit
+
 from ckanext.nhm.dcat.utils import rdf_resources
 from ckanext.nhm.lib.helpers import get_specimen_resource_id, is_collection_resource_id
-from contextlib import suppress
-from functools import partial
 
 
 def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
@@ -36,7 +37,7 @@ def get_record_by_uuid(uuid, version=None) -> Optional['Record']:
                 'version': version,
             }
             # retrieve datastore record
-            search_result = toolkit.get_action("vds_basic_query")(
+            search_result = toolkit.get_action('vds_basic_query')(
                 context, search_data_dict
             )
             records = search_result['records']
@@ -184,7 +185,7 @@ class Record:
             data_dict = dict(record_id=self.id, resource_id=self.resource_id)
             if self.version is not None:
                 data_dict['version'] = self.version
-            self._data = toolkit.get_action("vds_data_get")(self._context, data_dict)[
+            self._data = toolkit.get_action('vds_data_get')(self._context, data_dict)[
                 'data'
             ]
         return self._data
@@ -406,4 +407,4 @@ class Record:
 
         # create a piece of GeoJSON to point at the specific record location on a map
         # (note the longitude then latitude ordering required by GeoJSON)
-        return dict(type="Point", coordinates=[longitude, latitude])
+        return dict(type='Point', coordinates=[longitude, latitude])

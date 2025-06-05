@@ -23,26 +23,26 @@ def modify_field_groups(field_groups):
     :param field_groups: a FieldGroups object
     """
     # forces
-    field_groups.force("scientificName")
-    field_groups.force("identifier")
-    field_groups.force("preparationType")
-    field_groups.force("preparationContents")
-    field_groups.force("preparationProcess")
-    field_groups.force("preservation")
-    field_groups.force("preparationDate")
-    field_groups.force("barcode")
-    field_groups.force("occurrenceID")
-    field_groups.force("associatedOccurrences")
-    field_groups.force("associatedMediaCount")
-    field_groups.force("order")
-    field_groups.force("identifiedBy")
-    field_groups.force("locality")
-    field_groups.force("decimalLatitude")
-    field_groups.force("decimalLongitude")
+    field_groups.force('scientificName')
+    field_groups.force('identifier')
+    field_groups.force('preparationType')
+    field_groups.force('preparationContents')
+    field_groups.force('preparationProcess')
+    field_groups.force('preservation')
+    field_groups.force('preparationDate')
+    field_groups.force('barcode')
+    field_groups.force('occurrenceID')
+    field_groups.force('associatedOccurrences')
+    field_groups.force('associatedMediaCount')
+    field_groups.force('order')
+    field_groups.force('identifiedBy')
+    field_groups.force('locality')
+    field_groups.force('decimalLatitude')
+    field_groups.force('decimalLongitude')
     # ignores
-    field_groups.ignore("created")
-    field_groups.ignore("modified")
-    field_groups.ignore("associatedMedia.*")
+    field_groups.ignore('created')
+    field_groups.ignore('modified')
+    field_groups.ignore('associatedMedia.*')
 
 
 class SampleView(DefaultView):
@@ -50,14 +50,14 @@ class SampleView(DefaultView):
     Controller for displaying a sample record.
     """
 
-    resource_id = toolkit.config.get("ckanext.nhm.sample_resource_id")
+    resource_id = toolkit.config.get('ckanext.nhm.sample_resource_id')
 
     field_facets = [
-        "project",
-        "order",
-        "preparationType",
-        "preparationContents",
-        "preparationProcess",
+        'project',
+        'order',
+        'preparationType',
+        'preparationContents',
+        'preparationProcess',
     ]
 
     # Additional search filter options
@@ -66,50 +66,50 @@ class SampleView(DefaultView):
     field_groups = OrderedDict(
         [
             (
-                "Project",
+                'Project',
                 OrderedDict(
                     [
-                        ("project", "Project"),
+                        ('project', 'Project'),
                     ]
                 ),
             ),
             (
-                "Preparation",
+                'Preparation',
                 OrderedDict(
                     [
-                        ("preparationDate", "Preparation Date"),
-                        ("preparationType", "Preparation Type"),
-                        ("preparationProcess", "Preparation Process"),
-                        ("identifier", "Preparation Number"),
-                        ("preservation", "Preservation"),
-                        ("preparationContents", "Preparation Contents"),
-                        ("occurrenceID", "Occurrence ID"),
+                        ('preparationDate', 'Preparation Date'),
+                        ('preparationType', 'Preparation Type'),
+                        ('preparationProcess', 'Preparation Process'),
+                        ('identifier', 'Preparation Number'),
+                        ('preservation', 'Preservation'),
+                        ('preparationContents', 'Preparation Contents'),
+                        ('occurrenceID', 'Occurrence ID'),
                     ]
                 ),
             ),
             (
-                "Specimen",
+                'Specimen',
                 OrderedDict(
                     [
-                        ("associatedOccurrences", "Voucher specimen"),
-                        ("associatedMediaCount", "Image Count"),
-                        ("barcode", "Barcode"),
-                        ("scientificName", "Scientific Name"),
-                        ("order", "Order"),
-                        ("identifiedBy", "Identified By"),
-                        ("locality", "Locality"),
-                        ("decimalLatitude", "Decimal Latitude"),
-                        ("decimalLongitude", "Decimal Longitude"),
+                        ('associatedOccurrences', 'Voucher specimen'),
+                        ('associatedMediaCount', 'Image Count'),
+                        ('barcode', 'Barcode'),
+                        ('scientificName', 'Scientific Name'),
+                        ('order', 'Order'),
+                        ('identifiedBy', 'Identified By'),
+                        ('locality', 'Locality'),
+                        ('decimalLatitude', 'Decimal Latitude'),
+                        ('decimalLongitude', 'Decimal Longitude'),
                     ]
                 ),
             ),
             (
-                "Record",
+                'Record',
                 OrderedDict(
                     [
-                        ("GUID", "GUID"),
-                        ("modified", "Modified"),
-                        ("created", "Created"),
+                        ('GUID', 'GUID'),
+                        ('modified', 'Modified'),
+                        ('created', 'Created'),
                     ]
                 ),
             ),
@@ -123,4 +123,4 @@ class SampleView(DefaultView):
 
         """
         c.field_groups = self.field_groups
-        return toolkit.render("record/collection.html")
+        return toolkit.render('record/collection.html')

@@ -26,26 +26,26 @@ def modify_field_groups(field_groups):
     :param field_groups: a FieldGroups object
     """
     # forces
-    field_groups.force("scientificName")
-    field_groups.force("family")
-    field_groups.force("typeStatus")
-    field_groups.force("locality")
-    field_groups.force("country")
-    field_groups.force("recordedBy")
-    field_groups.force("catalogNumber")
-    field_groups.force("associatedMediaCount")
-    field_groups.force("preservative")
-    field_groups.force("collectionCode")
-    field_groups.force("year")
-    field_groups.force("month")
-    field_groups.force("day")
+    field_groups.force('scientificName')
+    field_groups.force('family')
+    field_groups.force('typeStatus')
+    field_groups.force('locality')
+    field_groups.force('country')
+    field_groups.force('recordedBy')
+    field_groups.force('catalogNumber')
+    field_groups.force('associatedMediaCount')
+    field_groups.force('preservative')
+    field_groups.force('collectionCode')
+    field_groups.force('year')
+    field_groups.force('month')
+    field_groups.force('day')
     # ignores
-    field_groups.ignore("created")
-    field_groups.ignore("modified")
-    field_groups.ignore("basisOfRecord")
-    field_groups.ignore("institutionCode")
-    field_groups.ignore("associatedMedia.*")
-    field_groups.ignore("barcode")
+    field_groups.ignore('created')
+    field_groups.ignore('modified')
+    field_groups.ignore('basisOfRecord')
+    field_groups.ignore('institutionCode')
+    field_groups.ignore('associatedMedia.*')
+    field_groups.ignore('barcode')
 
 
 class SpecimenView(DefaultView):
@@ -317,25 +317,25 @@ class SpecimenView(DefaultView):
             'registeredWeightUnit', None
         ):
             # Create custom filter which acts on both weight and units
-            c.custom_filters[
-                'registeredWeight'
-            ] = f'registeredWeight:{c.record_dict["registeredWeight"]}|registeredWeightUnit:{c.record_dict["registeredWeightUnit"]}'
+            c.custom_filters['registeredWeight'] = (
+                f'registeredWeight:{c.record_dict["registeredWeight"]}|registeredWeightUnit:{c.record_dict["registeredWeightUnit"]}'
+            )
             # Merge unit into the field
-            c.record_dict[
-                'registeredWeight'
-            ] += f' {c.record_dict["registeredWeightUnit"]}'
+            c.record_dict['registeredWeight'] += (
+                f' {c.record_dict["registeredWeightUnit"]}'
+            )
 
         # add a meters unit to the coordinateUncertaintyInMeters value
         coordinate_uncertainty_in_meters = c.record_dict.get(
             'coordinateUncertaintyInMeters'
         )
         if coordinate_uncertainty_in_meters is not None:
-            c.record_dict[
-                'coordinateUncertaintyInMeters'
-            ] = f'{coordinate_uncertainty_in_meters}m'
-            c.custom_filters[
-                'coordinateUncertaintyInMeters'
-            ] = f'coordinateUncertaintyInMeters:{coordinate_uncertainty_in_meters}'
+            c.record_dict['coordinateUncertaintyInMeters'] = (
+                f'{coordinate_uncertainty_in_meters}m'
+            )
+            c.custom_filters['coordinateUncertaintyInMeters'] = (
+                f'coordinateUncertaintyInMeters:{coordinate_uncertainty_in_meters}'
+            )
 
         collection_date = []
         collection_date_filter = []

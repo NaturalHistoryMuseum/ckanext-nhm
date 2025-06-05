@@ -11,13 +11,15 @@ function to view objects.
 
 import json
 import logging
+
 from ckan.lib.helpers import link_to
 from ckan.plugins import toolkit
+from flask import Blueprint, current_app, redirect
+
 from ckanext.nhm.lib.helpers import resource_view_get_view
 from ckanext.nhm.lib.jinja_extensions import TaxonomyFormatExtension
 from ckanext.nhm.lib.record import Record, RecordImage
 from ckanext.nhm.views import DarwinCoreView
-from flask import Blueprint, current_app, redirect
 
 log = logging.getLogger(__name__)
 

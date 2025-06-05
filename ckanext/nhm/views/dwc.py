@@ -48,11 +48,11 @@ class DarwinCoreView(DefaultView):
     }
 
     def render_record(self, c):
-        '''
+        """
 
         :param c:
 
-        '''
+        """
 
         if c.resource['format'].lower() != 'dwc':
             toolkit.abort(404, toolkit._('Record not in Darwin Core format'))

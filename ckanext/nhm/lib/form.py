@@ -20,7 +20,6 @@ def list_to_form_options(values, allow_empty=False, allow_empty_text='None'):
         options.append({'value': '', 'text': allow_empty_text or None})
 
     for value in values:
-
         if isinstance(value, str):
             name = value
         else:
