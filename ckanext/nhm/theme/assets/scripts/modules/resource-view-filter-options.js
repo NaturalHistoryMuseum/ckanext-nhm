@@ -12,7 +12,9 @@ ckan.module('resource-view-filter-options', function ($) {
         continue;
       }
       var label = self.options.filterOptions[name]['label'];
-      var $label = $('<label>').text(label).addClass('resource-view-filter-option');
+      var $label = $('<label>')
+        .text(label)
+        .addClass('resource-view-filter-option');
       var $input = $('<input type="checkbox">')
         .attr({
           value: '1',

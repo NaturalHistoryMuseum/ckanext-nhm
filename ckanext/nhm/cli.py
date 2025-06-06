@@ -22,7 +22,7 @@ def get_commands():
     """
     Returns the list of commands the nhm plugin exposes.
 
-    :return: a list of click commands
+    :returns: a list of click commands
     """
     return [nhm]
 
@@ -39,7 +39,7 @@ def create_context():
     """
     Creates a new context dict with the site user set as the user and returns it.
 
-    :return: a new context dict
+    :returns: a new context dict
     """
     user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
     return {'user': user['name']}
@@ -51,8 +51,10 @@ def get_vocabulary(context, create_if_missing=True):
     doesn't exist, optionally creates it.
 
     :param context: the context dict to use when calling actions
-    :param create_if_missing: whether to create the vocabulary if it doesn't exists, default: True.
-    :return: the vocabulary dict or None if it doesn't exist and create_if_missing is False
+    :param create_if_missing: whether to create the vocabulary if it doesn't exists,
+        default: True.
+    :returns: the vocabulary dict or None if it doesn't exist and create_if_missing is
+        False
     """
     try:
         data = {'id': DATASET_TYPE_VOCABULARY}

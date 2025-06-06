@@ -78,29 +78,31 @@ const store = new Vuex.Store({
       })
         .then((data) => {
           if (data.success) {
-            context.dispatch('results/query/setRequestBody', data.result).then(() => {
-              let page = 0;
-              if (pageParam !== undefined) {
-                try {
-                  let compressedString = Buffer.from(pageParam, 'base64');
-                  let afterList = JSON.parse(
-                    pako.inflate(compressedString, { to: 'string' }),
-                  );
-                  if (afterList.length > 1) {
-                    afterList.forEach((a) => {
-                      context.commit('results/addPage', a);
-                    });
-                    page = afterList.length - 1;
+            context
+              .dispatch('results/query/setRequestBody', data.result)
+              .then(() => {
+                let page = 0;
+                if (pageParam !== undefined) {
+                  try {
+                    let compressedString = Buffer.from(pageParam, 'base64');
+                    let afterList = JSON.parse(
+                      pako.inflate(compressedString, { to: 'string' }),
+                    );
+                    if (afterList.length > 1) {
+                      afterList.forEach((a) => {
+                        context.commit('results/addPage', a);
+                      });
+                      page = afterList.length - 1;
+                    }
+                  } catch (error) {
+                    console.log(error);
                   }
-                } catch (error) {
-                  console.log(error);
                 }
-              }
-              if (viewParam !== undefined) {
-                context.commit('results/display/setView', viewParam);
-              }
-              context.dispatch('results/runSearch', page);
-            });
+                if (viewParam !== undefined) {
+                  context.commit('results/display/setView', viewParam);
+                }
+                context.dispatch('results/runSearch', page);
+              });
           } else {
             throw Error;
           }

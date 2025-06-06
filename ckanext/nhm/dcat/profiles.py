@@ -6,10 +6,11 @@
 
 import rdflib
 from ckan.plugins import toolkit
+from rdflib import OWL, BNode, Literal, URIRef
+from rdflib.namespace import FOAF, RDF, SKOS, XSD, Namespace
+
 from ckanext.dcat.profiles import RDFProfile
 from ckanext.dcat.utils import catalog_uri, resource_uri
-from rdflib import BNode, Literal, OWL, URIRef
-from rdflib.namespace import FOAF, Namespace, RDF, SKOS, XSD
 
 ADMS = Namespace('http://www.w3.org/ns/adms#')
 AIISO = Namespace('http://purl.org/vocab/aiiso/schema#')
@@ -59,10 +60,11 @@ class NHMDCATProfile(RDFProfile):
         return f'{catalog_uri().rstrip("/")}/user/{user_id}'
 
     def get_context(self):
-        '''
-        Set up context
-        :return: context dict
-        '''
+        """
+        Set up context.
+
+        :returns: context dict
+        """
         user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
         context = {'user': user['name']}
         return context
@@ -201,7 +203,6 @@ class NHMDCATProfile(RDFProfile):
 
         author = dataset_dict.get('author', None)
         if author:
-
             if author == 'Natural History Museum':
                 g.add((dataset_uri, DC.creator, nhm_uri))
             else:
@@ -265,7 +266,6 @@ class NHMDCATProfile(RDFProfile):
         g = self.g
 
         for resource_dict in dataset_dict.get('resources', []):
-
             distribution = URIRef(resource_uri(resource_dict))
 
             g.add((dataset_uri, DCAT.distribution, distribution))

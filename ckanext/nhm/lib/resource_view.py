@@ -39,7 +39,6 @@ def resource_view_get_filter_options(resource):
     Return additional filter options for a resource view.
 
     :param resource: resource dict
-
     :returns: OrderedDict of filter options
     """
     view_cls = resource_view_get_view(resource)

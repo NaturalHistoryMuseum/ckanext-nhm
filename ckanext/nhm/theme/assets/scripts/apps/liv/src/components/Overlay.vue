@@ -8,7 +8,10 @@
       >close
     </zoa-button>
     <Viewer v-show="showOverlay" />
-    <div :class="$style.record" v-if="showOverlay && (currentRecord || currentImage)">
+    <div
+      :class="$style.record"
+      v-if="showOverlay && (currentRecord || currentImage)"
+    >
       <div :class="$style.header">
         <h2 :class="$style.title">
           {{ currentRecord ? currentRecord.title : currentImage.name }}
@@ -36,7 +39,9 @@
               <div :class="$style.shareLinks">
                 <span>Record</span>
                 <Copyable v-model="shareUrlRecord">
-                  <a :href="currentRecord.imageViewerUrl">{{ shareUrlRecord }}</a>
+                  <a :href="currentRecord.imageViewerUrl">{{
+                    shareUrlRecord
+                  }}</a>
                 </Copyable>
                 <span>Image</span>
                 <Copyable v-model="shareUrlImage">
@@ -81,9 +86,11 @@
           <template v-for="item in currentImage.displayData">
             <dt>{{ useOriginalLabels ? item.key : sentenceCase(item.key) }}</dt>
             <dd>
-              <a :href="item.value" v-if="item.value.toString().startsWith('http')">{{
-                item.value
-              }}</a>
+              <a
+                :href="item.value"
+                v-if="item.value.toString().startsWith('http')"
+                >{{ item.value }}</a
+              >
               <template v-else>{{ item.value }}</template>
             </dd>
           </template>

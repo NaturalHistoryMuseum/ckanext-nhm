@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from ckan.plugins import toolkit
+
 from ..settings import COLLECTION_CONTACTS
 
 
@@ -34,7 +35,7 @@ def create_department_email(mail_dict: dict, department: str):
         mail_dict['recipient_name'] = department
         mail_dict['body'] += (
             f'\nThe contactee has chosen to send this to the {department} '
-            f'department. Our apologies if this enquiry isn\'t '
+            f"department. Our apologies if this enquiry isn't "
             f'relevant - please forward this onto data@nhm.ac.uk '
             f'and we will respond.\nMany thanks, Data Portal '
             f'team\n\n'
@@ -115,7 +116,7 @@ def create_package_email(mail_dict: dict, package: dict):
     mail_dict['body'] += (
         '\n\nYou have been sent this enquiry via the data portal '
         f'as you are the author of dataset {package_title}.  Our apologies '
-        'if this isn\'t relevant - please forward this onto '
+        "if this isn't relevant - please forward this onto "
         'data@nhm.ac.uk and we will respond.\nMany thanks, '
         'Data Portal team\n\n'
     )

@@ -1,6 +1,10 @@
 <template>
   <div :class="$style.list" ref="listContainer">
-    <div :class="$style.item" v-for="record in store.allRecords" :key="record.id">
+    <div
+      :class="$style.item"
+      v-for="record in store.allRecords"
+      :key="record.id"
+    >
       <div :class="$style.header">
         <span :class="$style.title">{{ record.title }}</span>
         <span :class="$style.subtitle">{{ record.subtitle }}</span>
@@ -43,7 +47,12 @@ const listContainer = ref(null);
 useInfiniteScroll(
   listContainer,
   () => {
-    if (listContainer.value && store.more && !store.pending && !store.disableAutoLoad) {
+    if (
+      listContainer.value &&
+      store.more &&
+      !store.pending &&
+      !store.disableAutoLoad
+    ) {
       store.getRecords();
     }
   },

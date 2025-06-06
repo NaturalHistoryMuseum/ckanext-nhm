@@ -136,7 +136,9 @@ let display = {
             .rollup((l) => {
               let licence = l[0];
               licence.url =
-                licence.url === '' ? 'https://opensource.org/licenses' : licence.url;
+                licence.url === ''
+                  ? 'https://opensource.org/licenses'
+                  : licence.url;
               return licence;
             })
             .object(data.result);

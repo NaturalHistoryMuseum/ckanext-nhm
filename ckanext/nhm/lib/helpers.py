@@ -101,7 +101,7 @@ def get_record_stats() -> List[dict]:
     Returns a list of dictionaries containing statistics about the number of records
     available each week starting from 01/08/2017 and ending now.
 
-    :return: a list of dicts
+    :returns: a list of dicts
     """
     # 01/08/2017 as ms epoch
     start_version = 1501545600000
@@ -295,7 +295,8 @@ def is_collection_resource_id(resource_id: str) -> bool:
     collection IDs.
 
     :param resource_id: the resource ID
-    :return: True if the resource ID is one of the collection resource IDs, False if not
+    :returns: True if the resource ID is one of the collection resource IDs, False if
+        not
     """
     resource_ids = {
         get_artefact_resource_id(),
@@ -333,7 +334,7 @@ def get_beetle_iiif_resource_id():
     """
     Get the ID for the beetle IIIF resource.
 
-    :return: the resource id
+    :returns: the resource id
     """
     value = toolkit.config.get('ckanext.nhm.beetle_iiif_resource_id')
     return str(value) if value is not None else None
@@ -432,12 +433,9 @@ def api_doc_link():
 def persistent_follow_button(obj_type, obj_id):
     """
     Replaces ckan.lib.follow_button which returns an empty string for anonymous users.
+
     For anon users this function outputs a follow button which links through to the
     login page.
-
-    :param obj_type:
-    :param obj_id:
-    :returns:
     """
     obj_type = obj_type.lower()
     assert obj_type in toolkit.h._follow_objects
@@ -464,8 +462,8 @@ def filter_and_format_resource_items(resource):
     format them.
 
     :param resource: the resource dict
-    :return: a list of made up of 2-tuples containing formatted keys and values from the
-        resource
+    :returns: a list of made up of 2-tuples containing formatted keys and values from
+        the resource
     """
     blacklist = {
         '_image_field',
@@ -549,7 +547,7 @@ def get_resource_fields(resource, version=None, use_request_version=False):
     :param version: the version to request (default: None)
     :param use_request_version: whether to look in the request parameters to find a
         version in the filters (default: False)
-    :return: a list of field names
+    :returns: a list of field names
     """
     if not resource.get('datastore_active'):
         return []
@@ -572,7 +570,7 @@ def resource_view_state(resource_view_json, resource_json):
     """
     Alter the recline view resource, adding in state info.
 
-    :param resource_view_json: return:
+    :param resource_view_json:
     :param resource_json:
     """
     resource_view = json.loads(resource_view_json)
@@ -741,7 +739,7 @@ def get_allowed_view_types(resource, package):
 
     We want to edit some of the options - remove Image and change Tiled Map to Map
 
-    :param resource: param package:
+    :param resource:
     :param package:
     """
 
@@ -813,7 +811,8 @@ def get_creator_id_facet_label(facet):
 
 
 def field_name_label(field_name):
-    """Convert a field name into a label - replacing _s and upper casing first character
+    """
+    Convert a field name into a label - replacing _s and upper casing first character.
 
     :param field_name:
     :returns: str label
@@ -826,7 +825,7 @@ def field_name_label(field_name):
 
 def field_is_link(value):
     """
-    Is a field a link (starts with http and is a valid URL)
+    Is a field a link (starts with http and is a valid URL).
 
     :param value:
     :returns: boolean
@@ -912,7 +911,8 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     """
     Generate social share text for a package.
 
-    @param pkg_dict: @return:
+    :param pkg_dict:
+    :returns:
     """
     text = []
     if rec_dict:
@@ -1104,7 +1104,7 @@ def remove_url_filter(field, value, extras=None):
     :param field: the field to remove the filter for
     :param value: the value of the field to remove the filter for
     :param extras: extra parameters to include in the created URL
-    :return: a URL
+    :returns: a URL
     """
 
     params = dict(toolkit.request.params)
@@ -1191,7 +1191,7 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     We don't want the field group pills - these are handled separately in
     get_resource_field_groups
 
-    :param resource: param package:
+    :param resource:
     :param package:
     :param resource_view:  (optional, default: None)
     """
@@ -1246,7 +1246,7 @@ def resource_view_get_filterable_fields(resource):
     """
     Retrieves the fields that can be filtered on.
 
-    @return: a list of sorted fields
+    :returns: a list of sorted fields
     """
     # if this isn't a datastore resource, return an empty list
     if not resource.get('datastore_active'):
@@ -1282,7 +1282,7 @@ def _get_latest_update(package_or_resource_dicts):
     datetime available from them, or None if there is no update datetime found.
 
     :param package_or_resource_dicts: a sequence of the package or resource dicts
-    :return: a 2-tuple containing the latest datetime and the dict from which it came,
+    :returns: a 2-tuple containing the latest datetime and the dict from which it came,
         if no times are found then (None, None) is returned
     """
     # a list of fields on the resource that should contain update dates
@@ -1322,7 +1322,7 @@ def get_latest_update_for_package(pkg_dict, date_format=None):
 
     :param pkg_dict: the package dict
     :param date_format: date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime
+    :returns: 'unknown' or a string containing the rendered datetime
     """
     latest_date, _ = _get_latest_update(
         itertools.chain([pkg_dict], pkg_dict.get('resources', []))
@@ -1341,7 +1341,7 @@ def get_latest_update_for_package_resources(pkg_dict, date_format=None):
 
     :param pkg_dict: the package dict
     :param date_format: date format for the return datetime
-    :return: 'unknown' or a string containing the rendered datetime and the resource
+    :returns: 'unknown' or a string containing the rendered datetime and the resource
         name
     """
     latest_date, latest_resource = _get_latest_update(pkg_dict.get('resources', []))
@@ -1359,7 +1359,7 @@ def get_external_sites(record: dict) -> List[Site]:
     these sites, links can be generated which are relevant to the record.
 
     :param record: a record dict
-    :return: a list of Site objects
+    :returns: a list of Site objects
     """
     return external_links.get_sites(record)
 
@@ -1379,7 +1379,7 @@ def render_epoch(
     :param date_format: the output format. This will be passed straight to datetime's
         strftime function and therefore uses its keywords etc. Defaults to: %Y-%m-%d
         %H:%M:%S (UTC)
-    :return: a string rendering of the timestamp using the
+    :returns: a string rendering of the timestamp using the
     """
     if in_milliseconds:
         epoch_timestamp = epoch_timestamp / 1000
@@ -1400,7 +1400,7 @@ def get_object_url(resource_id, guid, version=None, include_version=True):
     :param version: the version (default: None which means use the latest version)
     :param include_version: whether to include the version in the object URL or not. If
         this is False the version parameter is ignored (default: True)
-    :return: the object url
+    :returns: the object url
     """
     if include_version:
         rounded_version = toolkit.get_action('vds_version_round')(
@@ -1426,7 +1426,7 @@ def build_specimen_nav_items(package_name, resource_id, record_id, version=None)
     :param resource_id: the resource id
     :param record_id: the record id
     :param version: the version of the record, or None if no version is present
-    :return: a list of nav items
+    :returns: a list of nav items
     """
     link_definitions = [
         ('record.view', toolkit._('Normal view')),
@@ -1454,7 +1454,7 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     :param html_string: a literal or string of HTML code
     :param classes: CSS classes to add to each item
     :param kwargs: other attributes to add to each item
-    :return: a literal of HTML code where all the <li> nodes have "nav-item" added to
+    :returns: a literal of HTML code where all the <li> nodes have "nav-item" added to
         their classes
     """
     if classes is None:
@@ -1477,7 +1477,7 @@ def build_nav_main(*args):
     elements.
 
     :param args: tuples of (menu type, title) eg ('login', _('Login'))
-    :return: literal - <li class="nav-item"><a href="...">title</a></li>
+    :returns: literal - <li class="nav-item"><a href="...">title</a></li>
     """
     from_core = core_helpers.build_nav_main(*args)
     return _add_nav_item_class(from_core)
@@ -1490,7 +1490,7 @@ def get_specimen_jsonld(uuid, version=None):
 
     :param uuid: the uuid of the specimen record
     :param version: optional version for the record data
-    :return: string of dumped json-ld data
+    :returns: string of dumped json-ld data
     """
     data_dict = {
         'uuid': uuid,
@@ -1598,7 +1598,7 @@ def get_record_iiif_manifest_url(resource_id: str, record_id: int) -> str:
 
     :param resource_id: the resource ID
     :param record_id: the record ID
-    :return: the fully qualified URL
+    :returns: the fully qualified URL
     """
     manifest_id = toolkit.get_action('build_iiif_identifier')(
         {},
@@ -1611,7 +1611,7 @@ def get_status_indicator():
     """
     Check if we need to display a status indicator, and if so what type.
 
-    :return: 'red', 'amber', or None (if no alerts)
+    :returns: 'red', 'amber', or None (if no alerts)
     """
     # is there a status message?
     status_message = toolkit.config.get('ckanext.status.message', None)
@@ -1640,7 +1640,7 @@ def route_exists(route):
     Simple helper for checking if a flask route exists.
 
     :param route: endpoint name, as passed to url_for
-    :return: bool
+    :returns: bool
     """
     try:
         url = toolkit.url_for(route)
@@ -1655,7 +1655,7 @@ def get_sample_voucher_guid(associated_occurrence_value: str) -> str:
     specimen GUID.
 
     :param associated_occurrence_value: the associatedOccurrence value
-    :return: the voucher specimen GUID
+    :returns: the voucher specimen GUID
     """
     _, guid = associated_occurrence_value.split(':', 1)
     return guid.strip()
