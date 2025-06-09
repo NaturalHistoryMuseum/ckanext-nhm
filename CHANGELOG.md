@@ -1,3 +1,38 @@
+## v7.0.5 (2025-06-09)
+
+### Fix
+
+- add an id to hidden org field
+
+### Docs
+
+- docstring tidying
+- replace return with returns in docstrings
+- use variable logo, update tests badge
+
+### Style
+
+- remove space
+- ruff formatting
+- prettier formatting
+
+### Build System(s)
+
+- update ckantools
+
+### CI System(s)
+
+- set ruff target py version, add more ignores - avoid using fixes that don't work for python 3.8 (our current version) - ignore recommended ruff formatter conflicts - ignore more docstring rules
+- remove pylint, add ruff lint rules Primarily the defaults plus pydocstyle and isort.
+- update pre-commit repo versions
+- add pull request validation workflow new workflow to check commit format and code style against pre-commit config
+- update workflow files standardise format, change name of tests file
+
+### Chores/Misc
+
+- add pull request template
+- update tool details in contributing guide
+
 ## v7.0.4 (2025-05-27)
 
 ### Fix
