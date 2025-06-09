@@ -24,7 +24,7 @@ def dwc_terms(fields):
     display.
 
     :param fields: list of fields for this record
-    :return: dict, keyed by groups
+    :returns: dict, keyed by groups
     """
     fields = list(fields)
     dynamic_properties_uri = None

@@ -4,25 +4,23 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
+from ckan.plugins import toolkit
 from rdflib import namespace
 
-from ckan.plugins import toolkit
 from ckanext.nhm.lib.helpers import get_specimen_resource_id
 
 
 def object_uri(uuid, version=None):
-    '''
-    Returns an URI for an object
-    :return:
-    '''
+    """
+    Returns an URI for an object.
+    """
     return toolkit.url_for('object.view', uuid=uuid, version=version, qualified=True)
 
 
 def rdf_resources():
-    '''
-    Return list of resource IDs with RDF records
-    :return:
-    '''
+    """
+    Return list of resource IDs with RDF records.
+    """
     # FIXME - Need to add in indexlots and artefacts
     return [get_specimen_resource_id()]
 
@@ -32,9 +30,9 @@ def as_dwc_list(objects):
     Returns the given objects as a list using the DwC standard | style separator.
 
     :param objects: the objects
-    :return: a | separated string
+    :returns: a | separated string
     """
-    return " | ".join(objects)
+    return ' | '.join(objects)
 
 
 class Namespaces:
@@ -43,9 +41,9 @@ class Namespaces:
     """
 
     def __init__(self, graph):
-        '''
+        """
         :param graph: the graph object to bind the used namespaces to
-        '''
+        """
         self.graph = graph
 
         self.bound = set()
@@ -84,8 +82,9 @@ class Namespaces:
         Returns the namespace associated with the given prefix and ensures it is bound
         to the graph if it hasn't been already.
 
-        :param prefix: the namespace prefix as defined in the known_namespaces dict attribute
-        :return: the namespace object
+        :param prefix: the namespace prefix as defined in the known_namespaces dict
+            attribute
+        :returns: the namespace object
         """
         if prefix in self.known_namespaces:
             ns = self.known_namespaces[prefix]

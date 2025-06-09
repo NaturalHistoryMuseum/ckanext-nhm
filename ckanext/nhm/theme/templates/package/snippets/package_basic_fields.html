@@ -25,7 +25,7 @@
     {% set existing_org = data.owner_org or data.group_id %}
 
     {% if organizations_available|length == 1 %}
-        {{ form.hidden('owner_org', value=organizations_available[0].id) }}
+        <input type="hidden" name="owner_org" value="{{ organizations_available[0].id }}" id="field-organizations" />
         {% set dataset_has_organization = True %}
     {% else %}
         <div class="form-group">

@@ -3,17 +3,16 @@
 #
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
+import base64
 import json
 import zlib
-import base64
 from collections import OrderedDict
-from datetime import datetime
 
 import ckan.model as model
 from ckan.lib.search import make_connection
 from ckan.plugins import toolkit
 from flask import Blueprint
-from sqlalchemy import func, false
+from sqlalchemy import false, func
 
 from ckanext.nhm.lib.helpers import get_record_stats
 
@@ -33,7 +32,7 @@ def _context():
 @blueprint.before_request
 def before_request():
     """
-    set context and check authorization.
+    Set context and check authorization.
     """
     try:
         toolkit.check_access('site_read', _context())
@@ -112,7 +111,7 @@ def contributors():
                 'facet.pivot': 'id,author',
                 'facet.pivot.mincount': 1,
                 'facet.limit': -1,
-            }
+            },
         )
         .facets.get('facet_pivot', {})
         .get('id,author', [])

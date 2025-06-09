@@ -23,28 +23,28 @@ def modify_field_groups(field_groups):
     :param field_groups: a FieldGroups object
     """
     # forces
-    field_groups.force("scientificName")
-    field_groups.force("family")
-    field_groups.force("type")
-    field_groups.force("taxonRank")
-    field_groups.force("associatedMediaCount")
-    field_groups.force("kindOfMaterial")
-    field_groups.force("kingdom")
-    field_groups.force("phylum")
-    field_groups.force("class")
-    field_groups.force("order")
-    field_groups.force("family")
-    field_groups.force("genus")
-    field_groups.force("specificEpithet")
-    field_groups.force("infraspecificEpithet")
+    field_groups.force('scientificName')
+    field_groups.force('family')
+    field_groups.force('type')
+    field_groups.force('taxonRank')
+    field_groups.force('associatedMediaCount')
+    field_groups.force('kindOfMaterial')
+    field_groups.force('kingdom')
+    field_groups.force('phylum')
+    field_groups.force('class')
+    field_groups.force('order')
+    field_groups.force('family')
+    field_groups.force('genus')
+    field_groups.force('specificEpithet')
+    field_groups.force('infraspecificEpithet')
     # ignores
-    field_groups.ignore("created")
-    field_groups.ignore("modified")
-    field_groups.ignore("associatedMedia.*")
-    field_groups.ignore("suborder")
-    field_groups.ignore("superfamily")
-    field_groups.ignore("subfamily")
-    field_groups.ignore("subgenus")
+    field_groups.ignore('created')
+    field_groups.ignore('modified')
+    field_groups.ignore('associatedMedia.*')
+    field_groups.ignore('suborder')
+    field_groups.ignore('superfamily')
+    field_groups.ignore('subfamily')
+    field_groups.ignore('subgenus')
 
 
 class IndexLotView(DefaultView):
@@ -126,10 +126,10 @@ class IndexLotView(DefaultView):
     )
 
     def render_record(self, c):
-        '''
+        """
 
         :param c:
 
-        '''
+        """
         c.field_groups = self.field_groups
         return toolkit.render('record/collection.html')

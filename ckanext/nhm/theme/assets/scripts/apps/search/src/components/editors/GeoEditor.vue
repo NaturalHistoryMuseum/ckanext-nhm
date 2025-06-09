@@ -80,8 +80,8 @@
       <div class="flex-container">
         <small>
           Click on the map to add polygon points. Try
-          <a id="geojson-link" href="https://geojson.net">geojson.net</a> for editing
-          more complex MultiPolygon queries.
+          <a id="geojson-link" href="https://geojson.net">geojson.net</a> for
+          editing more complex MultiPolygon queries.
         </small>
         <label for="useGeoJson">Paste GeoJSON</label>
         <input type="checkbox" v-model="useGeoJson" id="useGeoJson" />
@@ -158,7 +158,8 @@ export default {
         .rollup((d) => d[0].value.enum)
         .object(
           d3.entries(
-            this.schema.raw.definitions.term.properties.geo_named_area.properties,
+            this.schema.raw.definitions.term.properties.geo_named_area
+              .properties,
           ),
         );
     },
@@ -174,7 +175,9 @@ export default {
         mm: (x) => x / 1000,
         nmi: (x) => x / 0.00053996,
       };
-      return conversions[this.values.point.radius_unit](this.values.point.radius);
+      return conversions[this.values.point.radius_unit](
+        this.values.point.radius,
+      );
     },
   },
   methods: {
@@ -186,7 +189,11 @@ export default {
 
       if (this.comparisonType !== 'custom_area') {
         d3.keys(this.values[this.comparisonType]).forEach((k) => {
-          this.$set(this.values[this.comparisonType], k, existing.content[k] || null);
+          this.$set(
+            this.values[this.comparisonType],
+            k,
+            existing.content[k] || null,
+          );
         });
       } else {
         this.$set(this.values, 'custom_area', existing.content);
@@ -334,7 +341,9 @@ export default {
       handler: function (namedArea) {
         let entries = d3.entries(namedArea);
         if (
-          entries.map((e) => (e.value !== null ? 1 : 0)).reduce((a, b) => a + b) > 1
+          entries
+            .map((e) => (e.value !== null ? 1 : 0))
+            .reduce((a, b) => a + b) > 1
         ) {
           entries.forEach((e) => {
             this.$set(this.values.named_area, e.key, null);

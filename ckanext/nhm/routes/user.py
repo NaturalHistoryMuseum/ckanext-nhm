@@ -16,7 +16,7 @@ def orgs(username):
     Render a list of organisations that this user is a member of.
 
     :param username: The username
-    :return: str
+    :returns: str
     """
     try:
         toolkit.check_access('user_show', {}, {'id': username})

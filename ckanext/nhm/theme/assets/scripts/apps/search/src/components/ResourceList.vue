@@ -1,5 +1,7 @@
 <template>
-  <div class="fields resourceid-list floating flex-container flex-column flex-left">
+  <div
+    class="fields resourceid-list floating flex-container flex-column flex-left"
+  >
     <div>
       <input
         type="checkbox"

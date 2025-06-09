@@ -10,7 +10,7 @@ from ckan.logic.schema import (
 )
 from ckan.plugins import toolkit
 
-from ckanext.nhm.logic.validators import string_max_length, uuid_validator
+from ckanext.nhm.logic.validators import string_max_length
 
 not_empty = toolkit.get_validator('not_empty')
 ignore_missing = toolkit.get_validator('ignore_missing')

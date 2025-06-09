@@ -1624,7 +1624,9 @@ select {
 .btn-group {
   &,
   & + .btn {
-    margin-top: floor((@min-pad / 3)); // to center it - looks better than halving
+    margin-top: floor(
+      (@min-pad / 3)
+    ); // to center it - looks better than halving
   }
 
   &.open .btn-primary.dropdown-toggle {
@@ -2233,7 +2235,8 @@ select,
 .masthead {
   .palette-header();
   .palette-header-txt();
-  background-image: linear-gradient(to bottom, transparent, @primary3),
+  background-image:
+    linear-gradient(to bottom, transparent, @primary3),
     url('@{images}/header-bg.jpg');
   background-repeat: no-repeat;
   background-position: top center;

@@ -14,7 +14,9 @@ function importFolder(context) {
   context.keys().forEach(context);
 }
 
-importFolder(require.context('leaflet/dist/images/', true, /\.(png|jpe?g|gif)$/i));
+importFolder(
+  require.context('leaflet/dist/images/', true, /\.(png|jpe?g|gif)$/i),
+);
 
 // plugins
 Vue.use(VueClipboard);
@@ -49,7 +51,10 @@ Vue.directive('dismiss', {
 
   unbind(el, binding, vnode) {
     document.removeEventListener('click', outsideClick[vnode.context._uid]);
-    document.removeEventListener('touchstart', outsideClick[vnode.context._uid]);
+    document.removeEventListener(
+      'touchstart',
+      outsideClick[vnode.context._uid],
+    );
   },
 });
 

@@ -6,7 +6,11 @@
       v-if="fieldType !== 'geo'"
     >
       <div class="flex-container flex-wrap flex-wrap-spacing field-list">
-        <span class="fields" v-for="(field, index) in newFields" v-bind:key="field.id">
+        <span
+          class="fields"
+          v-for="(field, index) in newFields"
+          v-bind:key="field.id"
+        >
           {{ field }}
           <i
             class="delete-field fas fa-times-circle fa-xs"
@@ -28,7 +32,11 @@
           title="Select what type to treat the field's contents as"
           @change="comparisonType = schema.terms[fieldType][0]"
         >
-          <option v-for="(v, k) in readableFieldTypes" v-bind:key="v.id" :value="k">
+          <option
+            v-for="(v, k) in readableFieldTypes"
+            v-bind:key="v.id"
+            :value="k"
+          >
             {{ v }}
           </option>
         </select>
@@ -68,7 +76,9 @@
         />
       </div>
       <div class="query-submit">
-        <button @click="submitTerm" class="btn btn-primary no-icon">Save</button>
+        <button @click="submitTerm" class="btn btn-primary no-icon">
+          Save
+        </button>
       </div>
     </div>
   </div>
@@ -129,7 +139,8 @@ export default {
     terms: function () {
       let schemaTerms = this.schema.terms[this.fieldType];
       let emptyTerms =
-        schemaTerms.length === 1 && (schemaTerms[0] === '' || schemaTerms[0] === null);
+        schemaTerms.length === 1 &&
+        (schemaTerms[0] === '' || schemaTerms[0] === null);
       return emptyTerms ? [] : schemaTerms;
     },
     queryType: function () {

@@ -40,8 +40,14 @@ ckan.module('stats_graphs', function ($) {
         let x = d3.map(data, (d) => d[0]);
         let y = d3.map(data, (d) => d[1]);
         let xScale = d3.scaleUtc(d3.extent(x), [marginH, width - marginH]);
-        let yScale = d3.scaleLinear([0, d3.max(y)], [height - marginV, marginV]);
-        let xAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(1)).tickSizeOuter(0);
+        let yScale = d3.scaleLinear(
+          [0, d3.max(y)],
+          [height - marginV, marginV],
+        );
+        let xAxis = d3
+          .axisBottom(xScale)
+          .ticks(d3.timeYear.every(1))
+          .tickSizeOuter(0);
         let yAxis = d3.axisLeft(yScale).ticks(10);
 
         let line = d3
@@ -124,14 +130,21 @@ ckan.module('stats_graphs', function ($) {
               let month = (pointX.getMonth() + 1).toString().padStart(2, '0');
               let year = pointX.getFullYear();
               let dateString = `${year}-${month}`;
-              return dateGrouping === 'day' ? `${dateString}-${day}` : dateString;
+              return dateGrouping === 'day'
+                ? `${dateString}-${day}`
+                : dateString;
             });
 
           yText.attr('x', 5).text(() => pointY);
 
           let text = tooltip.selectAll('text');
 
-          const { x: boxX, y: boxY, width: boxW, height: boxH } = text.node().getBBox();
+          const {
+            x: boxX,
+            y: boxY,
+            width: boxW,
+            height: boxH,
+          } = text.node().getBBox();
           box
             .attr('width', boxW + 10)
             .attr('height', boxH * 2 + 10)

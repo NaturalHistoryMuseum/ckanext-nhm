@@ -15,9 +15,12 @@
           ignore: ['#fields-dropdown-' + _uid],
         }"
       >
-        <span class="fields" v-for="field in fields || []" v-bind:key="field.id">{{
-          field
-        }}</span>
+        <span
+          class="fields"
+          v-for="field in fields || []"
+          v-bind:key="field.id"
+          >{{ field }}</span
+        >
       </div>
     </transition>
   </div>

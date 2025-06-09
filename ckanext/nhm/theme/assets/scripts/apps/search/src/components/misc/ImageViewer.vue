@@ -26,7 +26,11 @@
           <i class="fas fa-cloud-download-alt fa-2x"></i>
         </a>
       </div>
-      <a class="image-viewer-icon" title="Close image viewer" @click="hideImage">
+      <a
+        class="image-viewer-icon"
+        title="Close image viewer"
+        @click="hideImage"
+      >
         <i class="fas fa-times fa-2x"></i>
       </a>
     </div>
@@ -109,7 +113,8 @@ export default {
     },
     changeImage(index) {
       this.loading =
-        this.viewerImage.image.preview !== this.viewerImagePage[index].image.preview;
+        this.viewerImage.image.preview !==
+        this.viewerImagePage[index].image.preview;
       this.setViewerImage(index);
     },
     keyListener(event) {
