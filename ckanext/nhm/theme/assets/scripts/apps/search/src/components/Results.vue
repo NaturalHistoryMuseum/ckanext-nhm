@@ -15,6 +15,12 @@
         if you think you've found a problem.
       </p>
     </LoadError>
+    <Warning v-if="queryState.warnings.length > 0">
+      <p v-if="queryState.querySource">
+        <b>Saved search: {{ queryState.querySource }}</b>
+      </p>
+      <p v-for="w in queryState.warnings" :key="w">{{ w }}</p>
+    </Warning>
     <div
       class="flex-container flex-left flex-stretch-first results-header"
       v-if="hasResult"
@@ -145,6 +151,7 @@ import Editable from './misc/Editable.vue';
 import Download from './popups/Download.vue';
 import Share from './popups/Share.vue';
 import Cite from './popups/Cite.vue';
+import Warning from './Warning.vue';
 
 export default {
   name: 'Results',
@@ -160,6 +167,7 @@ export default {
     Download,
     Share,
     Cite,
+    Warning,
   },
   data: function () {
     return {
@@ -176,7 +184,7 @@ export default {
       'unfilteredTotal',
     ]),
     ...mapState('results/display', ['view', 'headers']),
-    ...mapState('appState', ['status']),
+    ...mapState('appState', { status: 'status', queryState: 'query' }),
     ...mapGetters('results', [
       'total',
       'hasResult',

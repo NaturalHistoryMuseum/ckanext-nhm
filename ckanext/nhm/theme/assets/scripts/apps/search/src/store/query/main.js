@@ -57,6 +57,9 @@ let query = {
   },
   actions: {
     setRequestBody(context, newBody) {
+      Vue.set(context.rootState.appState.query, 'querySource', null);
+      Vue.set(context.rootState.appState.query, 'warnings', []);
+
       let resourceIdsPromise = new Promise((resolve, reject) => {
         Vue.set(
           context.rootState.appState.query.parsingError,

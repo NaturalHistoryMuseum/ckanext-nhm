@@ -219,8 +219,12 @@ export default {
       }
     },
     watchedRequestBody: {
-      handler() {
-        this.invalidate();
+      handler(newBody, oldBody) {
+        if (JSON.stringify(newBody) !== JSON.stringify(oldBody)) {
+          this.invalidate();
+          this.$set(this.$store.state.appState.query, 'querySource', null);
+          this.$set(this.$store.state.appState.query, 'warnings', []);
+        }
       },
       deep: true,
     },
