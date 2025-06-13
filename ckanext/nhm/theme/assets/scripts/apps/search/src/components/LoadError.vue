@@ -1,7 +1,7 @@
 <template>
-  <div class="flex-container flex-center flex-column alert-error full-width">
+  <div class="flex-container flex-center flex-column alert-error search-flash">
     <slot>
-      <h3>Unable to load. Please try again later.</h3>
+      <p>Unable to load. Please try again later.</p>
     </slot>
   </div>
 </template>

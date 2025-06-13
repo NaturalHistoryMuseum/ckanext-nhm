@@ -81,6 +81,7 @@ const store = new Vuex.Store({
             context
               .dispatch('results/query/setRequestBody', data.result)
               .then(() => {
+                Vue.set(context.state.appState.query, 'querySource', slug);
                 let page = 0;
                 if (pageParam !== undefined) {
                   try {
@@ -100,6 +101,13 @@ const store = new Vuex.Store({
                 }
                 if (viewParam !== undefined) {
                   context.commit('results/display/setView', viewParam);
+                }
+                if (data.result.warnings) {
+                  Vue.set(
+                    context.state.appState.query,
+                    'warnings',
+                    data.result.warnings,
+                  );
                 }
                 context.dispatch('results/runSearch', page);
               });

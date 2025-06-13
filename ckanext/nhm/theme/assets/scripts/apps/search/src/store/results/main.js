@@ -373,6 +373,8 @@ let results = {
       context.state.resultData = {};
       Vue.set(context.rootState.appState.status.resultData, 'loading', false);
       Vue.set(context.rootState.appState.status.resultData, 'failed', false);
+      Vue.set(context.rootState.appState.query, 'querySource', null);
+      Vue.set(context.rootState.appState.query, 'warnings', []);
       context.dispatch('resetDownload');
       context.dispatch('invalidate');
     },

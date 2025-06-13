@@ -11,6 +11,8 @@ let appState = {
         resourceIds: null,
         queryBody: null,
       },
+      querySource: null,
+      warnings: [],
     },
     status: {
       resultData: {
