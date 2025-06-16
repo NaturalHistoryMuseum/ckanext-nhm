@@ -1,3 +1,14 @@
+## v7.1.0 (2025-06-16)
+
+### Feature
+
+- display slug resolution warnings in multisearch ui
+- add status indicator for collections dataset import
+
+### Minor UI Changes
+
+- add link to understanding and sharing the collection page
+
 ## v7.0.5 (2025-06-09)
 
 ### Fix
