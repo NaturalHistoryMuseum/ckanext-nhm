@@ -27,7 +27,15 @@
     <p>Please see the {{ api_doc_link }} for full documentation on API methods.</p>
 
     <h2>API limits</h2>
-    <p>Please use common sense when using the API, and cache results wherever possible.  We reserve the right to suspend API access if you continuously make multiple calls per second.</p>
+    <p>Please try to follow these guidelines when using our API or programmatically traversing the site:</p>
+    <ul>
+        <li>Use common sense and be courteous to other users</li>
+        <li>Cache your results wherever possible</li>
+        <li>Keep your request rate below ~20 requests per second</li>
+        <li>Respect the <a href="/robots.txt">robots.txt</a></li>
+        <li>Provide a user agent with your requests; this is both so we can contact you if there's a problem and because we occasionally have to block generic user agents so your requests may be rejected</li>
+    </ul>
+    <p>We reserve the right to suspend API access if you continuously make excessive requests or otherwise cause issues.</p>
     <p>Please see our <a href="/terms-conditions" title="Terms and conditions">terms and conditions</a> for more information.</p>
 
 {% endblock %}
