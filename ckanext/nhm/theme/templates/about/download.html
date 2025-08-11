@@ -9,18 +9,27 @@
 
 {% block about_content %}
 
-{% set api_link = h.link_to(h.url_for('api.get_api', ver=3, qualified=True),
-    h.url_for('api.get_api', ver=3), target='_blank') %}
+{% set api_link = h.link_to(h.url_for('api.get_api', ver=3, qualified=True), h.url_for('api.get_api', ver=3), target='_blank') %}
 {% set api_doc_link = h.api_doc_link() %}
 
 <h1 class="page-heading">{{ title }}</h1>
 
-<p>Datasets can be downloaded via the download button on the dataset page.</p>
-<p>The portal will process the download request, package up the dataset, and email a
-    link to download the data package. If you have not created an account on the Data
-    Portal, you will need to enter your email address</p>
-<p>The data format of the download package is dependent on the dataset data type. For
-    the specimen collections dataset it will be as a Darwin Core Archive.</p>
+<p>Data can be downloaded via:</p>
+<ol>
+    <li>The download button on dataset or resource pages;
+    </li>
+    <li>The download button on the search page;</li>
+    <li>The <a
+        href="https://ckanext-versioned-datastore.readthedocs.io/en/latest/usage/downloads"
+        class="external"><code>vds_download_queue</code></a> API endpoint.
+    </li>
+</ol>
+<p>The search and API download options allow you to download the results of a
+    cross-dataset search, so you can download records from multiple datasets and
+    resources in a single file.</p>
+<p>You do not need to provide any details to download our data. Giving your email
+    address is entirely optional and is only used to notify you when your download is
+    ready.</p>
 
 <h2>Application Programming Interface (API)</h2>
 <p>If you want to use data from the portal in your own software or applications, you can
