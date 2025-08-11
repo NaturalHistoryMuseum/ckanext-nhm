@@ -3,41 +3,54 @@
 {% block subtitle %}{{ title }}{% endblock %}
 
 {% block breadcrumb_content %}
-  <li>{% link_for _('About'), named_route='home.about' %}</li>
-  <li class="active">{% link_for _(title), named_route='about.download' %}</li>
+<li>{% link_for _('About'), named_route='home.about' %}</li>
+<li class="active">{% link_for _(title), named_route='about.download' %}</li>
 {% endblock %}
 
 {% block about_content %}
 
-    {% set api_link = h.link_to(h.url_for('api.get_api', ver=3, qualified=True), h.url_for('api.get_api', ver=3), target='_blank') %}
-    {% set api_doc_link = h.api_doc_link() %}
+{% set api_link = h.link_to(h.url_for('api.get_api', ver=3, qualified=True),
+    h.url_for('api.get_api', ver=3), target='_blank') %}
+{% set api_doc_link = h.api_doc_link() %}
 
-    <h1 class="page-heading">{{ title }}</h1>
+<h1 class="page-heading">{{ title }}</h1>
 
-    <p>Datasets can be downloaded via the download button on the dataset page.</p>
-    <p>The portal will process the download request, package up the dataset, and email a link to download the data package. If you have not created an account on the Data Portal, you will need to enter your email address</p>
-    <p>The data format of the download package is dependent on the dataset data type. For the specimen collections dataset it will be as a Darwin Core Archive.</p>
+<p>Datasets can be downloaded via the download button on the dataset page.</p>
+<p>The portal will process the download request, package up the dataset, and email a
+    link to download the data package. If you have not created an account on the Data
+    Portal, you will need to enter your email address</p>
+<p>The data format of the download package is dependent on the dataset data type. For
+    the specimen collections dataset it will be as a Darwin Core Archive.</p>
 
-    <h2>Application Programming Interface (API)</h2>
-    <p>If you want to use data from the portal in your own software or applications, you can access it using the API. You do not need a key to use the API.</p>
+<h2>Application Programming Interface (API)</h2>
+<p>If you want to use data from the portal in your own software or applications, you can
+    access it using the API. You do not need a key to use the API.</p>
 
-    <p>The base URL for the API is: {{ api_link }} </p>
+<p>The base URL for the API is: {{ api_link }} </p>
 
-    <p>The API provides a RESTful interface, returning data in JSON format.</p>
+<p>The API provides a RESTful interface, returning data in JSON format.</p>
 
-    <h3>API Documentation</h3>
-    <p>Our API is not yet fully documented. Most methods are documented in the CKAN {{ api_doc_link }}, and we have <a href="/api.html">partial documentation for our search API</a>.</p>
+<h3>API Documentation</h3>
+<p>Our API is not yet fully documented. Most methods are documented in the CKAN {{
+    api_doc_link }}, and we have <a href="/api.html">partial documentation for our
+        search API</a>.</p>
 
-    <h3>API limits</h3>
-    <p>Please try to follow these guidelines when using our API or programmatically traversing the site:</p>
-    <ul>
-        <li>Use common sense and be courteous to other users</li>
-        <li>Cache your results wherever possible</li>
-        <li>Keep your request rate below ~20 requests per second</li>
-        <li>Respect the <a href="/robots.txt">robots.txt</a></li>
-        <li>Provide a user agent with your requests; this is both so we can contact you if there's a problem and because we occasionally have to block generic user agents so your requests may be rejected</li>
-    </ul>
-    <p>We reserve the right to suspend API access if you continuously make excessive requests or otherwise cause issues.</p>
-    <p>Please see our <a href="/terms-conditions" title="Terms and conditions">terms and conditions</a> for more information.</p>
+<h3>API limits</h3>
+<p>Please try to follow these guidelines when using our API or programmatically
+    traversing the site:</p>
+<ul>
+    <li>Use common sense and be courteous to other users</li>
+    <li>Cache your results wherever possible</li>
+    <li>Keep your request rate below ~20 requests per second</li>
+    <li>Respect the <a href="/robots.txt">robots.txt</a></li>
+    <li>Provide a user agent with your requests; this is both so we can contact you if
+        there's a problem and because we occasionally have to block generic user agents
+        so your requests may be rejected
+    </li>
+</ul>
+<p>We reserve the right to suspend API access if you continuously make excessive
+    requests or otherwise cause issues.</p>
+<p>Please see our <a href="/terms-conditions" title="Terms and conditions">terms and
+    conditions</a> for more information.</p>
 
 {% endblock %}
