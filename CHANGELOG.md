@@ -1,3 +1,17 @@
+## v7.1.1 (2025-08-11)
+
+### Docs
+
+- briefly update download information
+- add to API key statement
+- clarify API docs links
+- remove double spaces
+- expand guidance on API limits
+
+### Style
+
+- wrap html
+
 ## v7.1.0 (2025-06-16)
 
 ### Feature
