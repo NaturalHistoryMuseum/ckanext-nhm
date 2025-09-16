@@ -1,3 +1,9 @@
+## v7.1.2 (2025-09-16)
+
+### Minor UI Changes
+
+- change some of the search placeholders
+
 ## v7.1.1 (2025-08-11)
 
 ### Docs
