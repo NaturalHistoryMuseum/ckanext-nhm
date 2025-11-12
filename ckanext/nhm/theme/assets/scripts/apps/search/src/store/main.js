@@ -73,6 +73,7 @@ const store = new Vuex.Store({
         context.commit('results/query/filters/resetFilters');
         return;
       }
+      Vue.set(context.state.appState.query, 'querySource', slug);
       post('vds_slug_resolve', {
         slug: slug,
       })
@@ -81,7 +82,6 @@ const store = new Vuex.Store({
             context
               .dispatch('results/query/setRequestBody', data.result)
               .then(() => {
-                Vue.set(context.state.appState.query, 'querySource', slug);
                 let page = 0;
                 if (pageParam !== undefined) {
                   try {
@@ -117,6 +117,16 @@ const store = new Vuex.Store({
         })
         .catch((error) => {
           context.commit('results/query/filters/resetFilters');
+          try {
+            Vue.set(context.state.appState.query, 'warnings', [
+              error.response.data.error.message,
+            ]);
+          } catch {
+            Vue.set(context.state.appState.query, 'warnings', [
+              'There was an error loading this saved search. Please check your URL ' +
+                "and contact us if you think you've found a problem.",
+            ]);
+          }
         })
         .finally(() => {
           router.replace({ query: {}, params: {}, path: '/search' });
