@@ -475,6 +475,7 @@ def filter_and_format_resource_items(resource):
         'resource_group_id',
         'revision_id',
         'url_type',
+        'disable_parsing',
     }
     items = []
     for key, value in resource.items():
