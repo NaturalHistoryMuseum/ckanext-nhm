@@ -1,3 +1,10 @@
+## v7.1.3 (2025-11-19)
+
+### Fix
+
+- show warnings if slug resolution fails
+- add new disable_parsing flag to additional info blacklist
+
 ## v7.1.2 (2025-09-16)
 
 ### Minor UI Changes
