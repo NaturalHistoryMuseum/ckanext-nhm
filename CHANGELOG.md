@@ -1,3 +1,9 @@
+## v7.1.4 (2025-12-29)
+
+### Fix
+
+- remove dev warning from prod build of search app
+
 ## v7.1.3 (2025-11-19)
 
 ### Fix
