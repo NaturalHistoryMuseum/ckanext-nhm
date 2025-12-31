@@ -92,6 +92,8 @@ let display = {
   },
   actions: {
     getHeaders(context, payload) {
+      Vue.set(context.rootState.appState.status.resultHeaders, 'loading', true);
+      Vue.set(context.rootState.appState.status.resultHeaders, 'failed', false);
       context.state.headers = [];
       let headers = [];
 
@@ -115,6 +117,19 @@ let display = {
         })
         .catch((e) => {
           console.log(e);
+          headers = [['_id']];
+          Vue.set(
+            context.rootState.appState.status.resultHeaders,
+            'failed',
+            true,
+          );
+          Vue.set(
+            context.rootState.appState.query,
+            'warnings',
+            context.rootState.appState.query.warnings.concat([
+              'There was a problem with loading the field names.',
+            ]),
+          );
         })
         .finally(() => {
           headers.forEach((h) => {
@@ -126,6 +141,11 @@ let display = {
               context.state.headers.push(h);
             }
           });
+          Vue.set(
+            context.rootState.appState.status.resultHeaders,
+            'loading',
+            false,
+          );
         });
     },
     getLicences(context) {

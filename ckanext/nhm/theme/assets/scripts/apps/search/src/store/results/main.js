@@ -95,6 +95,7 @@ let results = {
   actions: {
     runSearch(context, page) {
       const searchId = shortid.generate();
+      Vue.set(context.rootState.appState.query, 'warnings', []);
 
       // if there's already a search being run, cancel it
       if (Object.keys(context.state.searchControllers).length > 0) {
