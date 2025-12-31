@@ -123,13 +123,6 @@ let display = {
             'failed',
             true,
           );
-          Vue.set(
-            context.rootState.appState.query,
-            'warnings',
-            context.rootState.appState.query.warnings.concat([
-              'There was a problem with loading the field names.',
-            ]),
-          );
         })
         .finally(() => {
           headers.forEach((h) => {
