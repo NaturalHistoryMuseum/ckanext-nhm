@@ -22,7 +22,7 @@ dependencies = [
     "importlib-resources",
     "cachetools>=4.2.4",
     "lxml>=4.4.2",
-    "elasticsearch-dsl==8.9.0",
+    "elasticsearch-dsl>=8.13.1",
     "ckanext-contact>=2.3.0",
     "ckanext-doi>=3.1.10",
     "ckanext-gallery>=3.0.0",
