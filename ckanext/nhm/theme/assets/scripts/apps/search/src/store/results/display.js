@@ -109,7 +109,7 @@ let display = {
       payload.request['size'] = 15;
       payload.request['sample'] = 0.1;
 
-      post('vds_multi_fields', payload.request)
+      post('vds_multi_fields', payload.request, 4000)
         .then((data) => {
           if (data.success) {
             headers = headers.concat(data.result.map((f) => d3.keys(f.fields)));
