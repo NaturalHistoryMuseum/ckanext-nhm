@@ -105,6 +105,7 @@ let display = {
       });
 
       payload.request['size'] = 15;
+      payload.request['sample'] = 0.1;
 
       post('vds_multi_fields', payload.request)
         .then((data) => {
