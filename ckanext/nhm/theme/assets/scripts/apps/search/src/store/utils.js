@@ -8,14 +8,14 @@ const api = axios.create({
   },
 });
 
-export function post(action, body) {
-  return api.post(action, body).then((response) => {
+export function post(action, body, timeout) {
+  return api.post(action, body, { timeout }).then((response) => {
     return response.data;
   });
 }
 
-export function get(action) {
-  return api.get(action).then((response) => {
+export function get(action, timeout) {
+  return api.get(action, { timeout }).then((response) => {
     return response.data;
   });
 }

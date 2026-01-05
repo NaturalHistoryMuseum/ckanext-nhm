@@ -1,6 +1,8 @@
 <template>
   <div id="result">
-    <Loading v-if="status.resultData.loading"></Loading>
+    <Loading
+      v-if="status.resultData.loading || status.resultHeaders.loading"
+    ></Loading>
     <LoadError v-if="status.resultData.failed">
       <h3>Something went wrong!</h3>
       <p>
@@ -23,7 +25,7 @@
     </Warning>
     <div
       class="flex-container flex-left flex-stretch-first results-header"
-      v-if="hasResult"
+      v-if="showResults"
       :class="{ disabled: invalidated }"
     >
       <div class="records-total">
@@ -42,7 +44,11 @@
       <Share />
       <Download v-if="total > 0" />
     </div>
-    <div v-show="hasResult" :class="{ disabled: invalidated }" key="resultView">
+    <div
+      v-show="showResults"
+      :class="{ disabled: invalidated }"
+      key="resultView"
+    >
       <div class="flex-container flex-stretch-first flex-center">
         <ul class="nav nav-tabs">
           <li
@@ -84,7 +90,7 @@
         <component :is="viewComponent" v-show="hasRecords"></component>
       </div>
     </div>
-    <div v-if="hasResult && total === 0 && !invalidated" class="pad-h pad-v">
+    <div v-if="showResults && total === 0 && !invalidated" class="pad-h pad-v">
       <small
         >Try removing some filters, or use different search terms. Have a look
         at our <a href="/help/search">search help</a> page to learn more about
@@ -94,7 +100,7 @@
 
     <div
       class="pagination-wrapper"
-      v-if="_after.length > 0 && !invalidated"
+      v-if="showResults && _after.length > 0 && !invalidated"
       :class="{ disabled: invalidated }"
     >
       <ul class="pagination">
@@ -196,6 +202,9 @@ export default {
     ...mapGetters('results/display', ['recordHeader', 'filteredRecordHeader']),
     viewComponent() {
       return this.view + 'View';
+    },
+    showResults() {
+      return this.hasResult && this.headers.length > 0;
     },
   },
   methods: {
