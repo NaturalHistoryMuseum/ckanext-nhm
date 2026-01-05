@@ -109,10 +109,21 @@ let display = {
       payload.request['size'] = 15;
       payload.request['sample'] = 0.05;
 
-      post('vds_multi_fields', payload.request, 4000)
-        .then((data) => {
-          if (data.success) {
-            headers = headers.concat(data.result.map((f) => d3.keys(f.fields)));
+      function _processMultiFields(data) {
+        if (data.success) {
+          headers = headers.concat(data.result.map((f) => d3.keys(f.fields)));
+        }
+      }
+
+      post('vds_multi_fields', payload.request, 10000)
+        .then(_processMultiFields)
+        .then(() => {
+          if (headers.length === 0) {
+            // try again with no sampling
+            payload.request['sample'] = 1;
+            return post('vds_multi_fields', payload.request).then(
+              _processMultiFields,
+            );
           }
         })
         .catch((e) => {
