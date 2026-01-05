@@ -399,7 +399,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         """
         return {
             'title': 'DwC associated media',
-            'resource_type': ['dwc', 'csv', 'tsv'],
+            'resource_type': toolkit.config.get(
+                'ckanext.nhm.gallery.resource_types', 'dwc csv tsv'
+            ).split(' '),
             'field_type': ['json'],
         }
 
