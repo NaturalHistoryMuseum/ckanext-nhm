@@ -1,3 +1,9 @@
+## v7.2.2 (2026-01-05)
+
+### Fix
+
+- make resource types for dwc media configurable
+
 ## v7.2.1 (2026-01-05)
 
 ### Fix
