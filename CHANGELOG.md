@@ -1,3 +1,9 @@
+## v7.2.1 (2026-01-05)
+
+### Fix
+
+- retry without sampling if no headers found
+
 ## v7.2.0 (2026-01-05)
 
 ### Feature
