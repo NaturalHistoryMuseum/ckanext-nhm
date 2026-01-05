@@ -1,3 +1,24 @@
+## v7.2.0 (2026-01-05)
+
+### Feature
+
+- set custom timeout for loading headers
+- integrate vds updates
+
+### Fix
+
+- remove header warnings
+- hide results until headers have loaded
+- allow higher versions of elasticsearch-dsl
+
+### Performance
+
+- decrease sample probability to 0.05
+
+### Build System(s)
+
+- update vds dependency
+
 ## v7.1.4 (2025-12-29)
 
 ### Fix
