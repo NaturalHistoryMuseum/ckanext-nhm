@@ -50,6 +50,11 @@ let appState = {
         failed: false,
         promise: new Promise((resolve) => setTimeout(resolve, 1000)),
       },
+      resultHeaders: {
+        loading: false,
+        failed: false,
+        promise: new Promise((resolve) => setTimeout(resolve, 1000)),
+      },
     },
   },
   getters: {

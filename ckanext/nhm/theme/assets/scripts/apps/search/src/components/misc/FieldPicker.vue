@@ -61,7 +61,7 @@ export default {
   methods: {
     getFieldList() {
       const vue = this;
-      post('vds_multi_autocomplete_field', {
+      post('vds_multi_autocomplete_field_latest', {
         resource_ids: vue.resourceIds,
         text: (vue.fieldSearch || '').toLowerCase(),
         lowercase: true,

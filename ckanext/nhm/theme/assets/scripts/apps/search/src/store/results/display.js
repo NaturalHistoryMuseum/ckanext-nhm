@@ -92,6 +92,8 @@ let display = {
   },
   actions: {
     getHeaders(context, payload) {
+      Vue.set(context.rootState.appState.status.resultHeaders, 'loading', true);
+      Vue.set(context.rootState.appState.status.resultHeaders, 'failed', false);
       context.state.headers = [];
       let headers = [];
 
@@ -105,8 +107,9 @@ let display = {
       });
 
       payload.request['size'] = 15;
+      payload.request['sample'] = 0.05;
 
-      post('vds_multi_fields', payload.request)
+      post('vds_multi_fields', payload.request, 4000)
         .then((data) => {
           if (data.success) {
             headers = headers.concat(data.result.map((f) => d3.keys(f.fields)));
@@ -114,6 +117,12 @@ let display = {
         })
         .catch((e) => {
           console.log(e);
+          headers = [['_id']];
+          Vue.set(
+            context.rootState.appState.status.resultHeaders,
+            'failed',
+            true,
+          );
         })
         .finally(() => {
           headers.forEach((h) => {
@@ -125,6 +134,11 @@ let display = {
               context.state.headers.push(h);
             }
           });
+          Vue.set(
+            context.rootState.appState.status.resultHeaders,
+            'loading',
+            false,
+          );
         });
     },
     getLicences(context) {
