@@ -1,9 +1,7 @@
 <template>
   <div id="result">
-    <Loading
-      v-if="status.resultData.loading || status.resultHeaders.loading"
-    ></Loading>
-    <LoadError v-if="status.resultData.failed">
+    <Loading v-if="isLoading"></Loading>
+    <LoadError v-if="isFailed">
       <h3>Something went wrong!</h3>
       <p>
         Please
@@ -205,6 +203,16 @@ export default {
     },
     showResults() {
       return this.hasResult && this.headers.length > 0;
+    },
+    isLoading() {
+      return (
+        this.status.resultData.loading ||
+        this.status.resultHeaders.loading ||
+        this.status.slug.loading
+      );
+    },
+    isFailed() {
+      return this.status.resultData.failed || this.status.slug.failed;
     },
   },
   methods: {
