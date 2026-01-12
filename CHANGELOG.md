@@ -1,3 +1,9 @@
+## v7.2.3 (2026-01-12)
+
+### Fix
+
+- display spinner while slug is being resolved
+
 ## v7.2.2 (2026-01-05)
 
 ### Fix
