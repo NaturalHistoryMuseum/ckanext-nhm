@@ -74,6 +74,7 @@ const store = new Vuex.Store({
         return;
       }
       Vue.set(context.state.appState.query, 'querySource', slug);
+      Vue.set(context.rootState.appState.status.slug, 'loading', true);
       post('vds_slug_resolve', {
         slug: slug,
       })
@@ -116,6 +117,7 @@ const store = new Vuex.Store({
           }
         })
         .catch((error) => {
+          Vue.set(context.rootState.appState.status.slug, 'failed', true);
           context.commit('results/query/filters/resetFilters');
           try {
             Vue.set(context.state.appState.query, 'warnings', [
@@ -129,6 +131,7 @@ const store = new Vuex.Store({
           }
         })
         .finally(() => {
+          Vue.set(context.rootState.appState.status.slug, 'loading', false);
           router.replace({ query: {}, params: {}, path: '/search' });
         });
     },
