@@ -28,7 +28,7 @@ from ckanext.nhm.lib.mail import (
     create_package_email,
 )
 from ckanext.nhm.lib.record import LATITUDE_FIELD, LONGITUDE_FIELD
-from ckanext.nhm.lib.utils import get_iiif_status, get_ingest_status
+from ckanext.nhm.lib.utils import get_gbif_status, get_iiif_status, get_ingest_status
 from ckanext.nhm.views.artefact import modify_field_groups as artefact_modify_groups
 from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
 from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
@@ -701,6 +701,17 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 )
                 + ingest_status['next_ingest'],
                 'state': ingest_status['state'],
+            }
+        )
+
+        # get the gbif dataset status
+        status_text, status_type = get_gbif_status()
+        status_reports.append(
+            {
+                'label': toolkit._('GBIF updated'),
+                'value': status_text,
+                'help': toolkit._('The last time the GBIF dataset was updated.'),
+                'state': status_type,
             }
         )
 
