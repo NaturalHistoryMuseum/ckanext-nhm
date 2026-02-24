@@ -1,3 +1,13 @@
+## v7.3.0 (2026-02-24)
+
+### Feature
+
+- **status**: adds gbif status card
+
+### Fix
+
+- **status**: code clean up and add user agent to gbif request
+
 ## v7.2.3 (2026-01-12)
 
 ### Fix
