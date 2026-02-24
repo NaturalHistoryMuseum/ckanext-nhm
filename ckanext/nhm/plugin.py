@@ -28,7 +28,7 @@ from ckanext.nhm.lib.mail import (
     create_package_email,
 )
 from ckanext.nhm.lib.record import LATITUDE_FIELD, LONGITUDE_FIELD
-from ckanext.nhm.lib.utils import get_iiif_status, get_ingest_status
+from ckanext.nhm.lib.utils import get_gbif_status, get_iiif_status, get_ingest_status
 from ckanext.nhm.views.artefact import modify_field_groups as artefact_modify_groups
 from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
 from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
@@ -646,46 +646,46 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
 
         # overall image server status
         if iiif_health['ping'] and iiif_health['status'] == ':)':
-            status_text = toolkit._('available')
-            status_type = 'good'
+            iiif_status_text = toolkit._('available')
+            iiif_status_type = 'good'
         elif iiif_health['ping'] and iiif_health['status'] != ':)':
-            status_text = toolkit._('available (issues)')
-            status_type = 'ok'
+            iiif_status_text = toolkit._('available (issues)')
+            iiif_status_type = 'ok'
         else:
-            status_text = toolkit._('unavailable')
-            status_type = 'bad'
+            iiif_status_text = toolkit._('unavailable')
+            iiif_status_type = 'bad'
 
         status_reports.append(
             {
                 'label': toolkit._('Image server'),
-                'value': status_text,
+                'value': iiif_status_text,
                 'group': toolkit._('Images'),
                 'help': toolkit._(
                     'The IIIF server provides most of the images in datasets (some are '
                     'externally hosted)'
                 ),
-                'state': status_type,
+                'state': iiif_status_type,
             }
         )
 
         # specimen images
         if iiif_health['ping'] and iiif_health['specimens'] == ':)':
-            status_text = toolkit._('available')
-            status_type = 'good'
+            specimens_status_text = toolkit._('available')
+            specimens_status_type = 'good'
         else:
-            status_text = toolkit._('unavailable')
-            status_type = 'bad'
+            specimens_status_text = toolkit._('unavailable')
+            specimens_status_type = 'bad'
 
         status_reports.append(
             {
                 'label': toolkit._('Specimen images'),
-                'value': status_text,
+                'value': specimens_status_text,
                 'group': toolkit._('Images'),
                 'help': toolkit._(
                     'Specimen images are a specific subset of images used primarily in '
                     'the Collection specimens and Index lots datasets'
                 ),
-                'state': status_type,
+                'state': specimens_status_type,
             }
         )
 
@@ -701,6 +701,17 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 )
                 + ingest_status['next_ingest'],
                 'state': ingest_status['state'],
+            }
+        )
+
+        # get the gbif dataset status
+        gbif_status_text, gbif_status_type = get_gbif_status()
+        status_reports.append(
+            {
+                'label': toolkit._('GBIF updated'),
+                'value': gbif_status_text,
+                'help': toolkit._('The last time the GBIF dataset was updated.'),
+                'state': gbif_status_type,
             }
         )
 
