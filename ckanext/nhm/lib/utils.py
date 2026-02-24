@@ -83,3 +83,40 @@ def get_ingest_status():
         'state': state,
         'next_ingest': next_ingest.strftime('%Y-%m-%d'),
     }
+
+
+@cached(cache=TTLCache(maxsize=10, ttl=7200))
+def get_gbif_status():
+    gbif_dataset_key = toolkit.config.get('ckanext.gbif.dataset_key')
+    gbif_url = (
+        f'https://api.gbif.org/v1/dataset/{gbif_dataset_key}'
+        if gbif_dataset_key
+        else None
+    )
+
+    status_text = 'unknown'
+    status_type = 'bad'
+
+    if gbif_url:
+        try:
+            headers = {'User-Agent': 'NHMUK dataset status: data [at] nhm.ac.uk'}
+            r = requests.get(gbif_url, timeout=7, headers=headers)
+            if r.ok:
+                response_json = r.json()
+                modified = response_json.get('modified')
+            else:
+                modified = None
+        except Exception as e:
+            modified = None
+
+        if modified:
+            modified_datetime = dt.strptime(str(modified), '%Y-%m-%dT%H:%M:%S.%f%z')
+            now = dt.now(timezone.utc)
+            time_diff = now - modified_datetime
+            # Check if modified date is within last 7 days
+            if time_diff < timedelta(days=7):
+                status_type = 'good'
+            # Display last modified date
+            status_text = modified_datetime.strftime('%Y-%m-%d')
+
+    return status_text, status_type
