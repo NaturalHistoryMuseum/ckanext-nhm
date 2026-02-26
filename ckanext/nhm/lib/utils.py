@@ -5,7 +5,7 @@
 # Created by the Natural History Museum in London, UK
 
 from datetime import datetime as dt
-from datetime import timedelta, timezone
+from datetime import time, timedelta, timezone
 
 import requests
 from cachetools import TTLCache, cached
@@ -43,40 +43,66 @@ def get_ingest_status():
         {},
         {'resource_id': toolkit.config.get('ckanext.nhm.specimen_resource_id')},
     )
-    last_ingest_timestamp = dt.fromtimestamp(current_version / 1000, tz=timezone.utc)
-    last_ingest_date = last_ingest_timestamp.replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-
+    # set last ingest timestamp
+    last_ingest_date = dt.fromtimestamp(current_version / 1000, tz=timezone.utc)
+    # set parameters for check
     right_now = dt.now(timezone.utc)
-    day_of_week = right_now.weekday()
-    today = right_now.replace(hour=0, minute=0, second=0, microsecond=0)
-    is_before_10am = right_now.hour < 10
-    is_before_12pm = right_now.hour < 12  # give it a couple of hours to process
-    expected_offsets_early = [1, 1, 1, 1, 1, 2, 3]
-    expected_offsets_late = [0, 0, 0, 0, 1, 2, 0]
+    ingest_days = {6, 0, 1, 2, 3}
+    ingest_time = time(10, 0)
+    grace_time = timedelta(hours=2)
 
-    last_ingest_date_offset = (last_ingest_date - today).days
-    current_expected_offset = (
-        expected_offsets_early[day_of_week]
-        if is_before_10am
-        else expected_offsets_late[day_of_week]
-    )
-    state = 'good' if last_ingest_date_offset == current_expected_offset else 'bad'
+    # finds the last scheduled ingest
+    temp_day = right_now
+    # if its before 10 start from day before
+    if right_now.hour < 10:
+        temp_day -= timedelta(days=1)
+    # loop back until find last time it was scheduled to ingest
+    while True:
+        if temp_day.weekday() in ingest_days:
+            scheduled = dt.combine(temp_day.date(), ingest_time, tzinfo=timezone.utc)
+            if scheduled <= right_now:
+                last_scheduled = scheduled
+                break
+        temp_day -= timedelta(days=1)
+
+    # find the penultimate scheduled ingest to check if ingest should allow for grace period
+    temp_day = right_now - timedelta(days=1)
+    # if its before 10 start from day before
+    if right_now.hour < 10:
+        temp_day -= timedelta(days=1)
+    while True:
+        if temp_day.weekday() in ingest_days:
+            scheduled = dt.combine(temp_day.date(), ingest_time, tzinfo=timezone.utc)
+            if scheduled <= right_now:
+                penultimate_scheduled = scheduled
+                break
+        temp_day -= timedelta(days=1)
+
+    # find the next scheduled ingest
+    temp_day = right_now
+    while True:
+        if temp_day.weekday() in ingest_days:
+            scheduled = dt.combine(temp_day.date(), ingest_time, tzinfo=timezone.utc)
+            if scheduled > right_now:
+                next_ingest = scheduled
+                break
+        temp_day += timedelta(days=1)
+
+    # check if last ingest is after last scheduled ingest and is on the day expected
     if (
-        (not is_before_10am)
-        and is_before_12pm
-        and last_ingest_date_offset == expected_offsets_early[day_of_week]
+        last_ingest_date >= last_scheduled
+        and last_ingest_date.date() == last_scheduled.date()
     ):
-        state = 'ok'
-
-    next_ingest_offsets_early = [0, 0, 0, 0, 2, 1, 0]
-    next_ingest_offsets_late = [1, 1, 1, 3, 2, 1, 1]
-    next_ingest = today + timedelta(
-        days=next_ingest_offsets_early[day_of_week]
-        if is_before_10am and last_ingest_date_offset != 0
-        else next_ingest_offsets_late[day_of_week]
-    )
+        state = 'good'
+    else:
+        # check if it should allow for grace period
+        if (
+            right_now <= last_scheduled + grace_time
+            and last_ingest_date >= penultimate_scheduled
+        ):
+            state = 'ok'
+        else:
+            state = 'bad'
 
     return {
         'current_version': last_ingest_date.strftime('%Y-%m-%d'),
