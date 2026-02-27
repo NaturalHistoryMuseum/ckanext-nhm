@@ -19,7 +19,8 @@ Example:
           {% set grouped_resources = h.group_resources(resources) %}
           {% for group_name, group_slug, group_items in grouped_resources %}
               {% if group_name %}
-              <div class="flex-container flex-between subgroup-header" data-toggle="collapse"
+                  <div class="flex-container flex-stretch-first subgroup-header">
+                  <div class="flex-container flex-between" data-toggle="collapse"
                    aria-expanded="false" data-target="#grp-{{ group_slug }}">
                   <i class="fas fa-layer-group inline-icon-left"></i>
                 <h3 class="no-margin flex-child-grow">{{ group_name }}</h3>
@@ -28,7 +29,11 @@ Example:
                         data-target="#grp-{{ group_slug }}" aria-expanded="false">
                     <span class="sr-only">Expand {{ group_name }}</span>
                 </button>
+
               </div>
+                  {% snippet 'versioned_datastore/snippets/download_button.html', resources=(group_items|map(attribute="id")|join(",")), icon_class="fas fa-folder", label=_('Download group'), non_datastore=True %}
+                  </div>
+
               {% endif %}
               <div id="grp-{{ group_slug }}" class="collapse {% if group_name %}subgroup{% else %}in{% endif %}" aria-expanded="false">
                   {% for resource in group_items %}
