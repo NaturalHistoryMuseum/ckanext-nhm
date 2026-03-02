@@ -1,3 +1,13 @@
+## v7.4.0 (2026-03-02)
+
+### Feature
+
+- add button to download group of resources
+
+### Minor UI Changes
+
+- **credits**: update about page with current dev team
+
 ## v7.3.0 (2026-02-24)
 
 ### Feature
