@@ -173,7 +173,7 @@ test_cases = [
 
 @pytest.mark.parametrize('test_case', test_cases)
 def test_ingest_date_check(test_case):
-    state = ingest_date_check(test_case['last_ingest_date'], test_case['right_now'])
+    state, next_ingest = ingest_date_check(test_case['last_ingest_date'], test_case['right_now'])
     assert state == test_case['expected_state'], (
         f'Failed test case: {test_case["test_comment"]}'
     )
