@@ -45,8 +45,20 @@ def get_ingest_status():
     )
     # set last ingest timestamp
     last_ingest_date = dt.fromtimestamp(current_version / 1000, tz=timezone.utc)
-    # set parameters for check
+    # set current time
     right_now = dt.now(timezone.utc)
+
+    # check if ingest is complete and when next ingest is expected
+    state, next_ingest = ingest_date_check(last_ingest_date, right_now)
+
+    return {
+        'current_version': last_ingest_date.strftime('%Y-%m-%d'),
+        'state': state,
+        'next_ingest': next_ingest.strftime('%Y-%m-%d'),
+    }
+
+def ingest_date_check(last_ingest_date, right_now):
+    # set parameters for check
     ingest_days = {6, 0, 1, 2, 3}
     ingest_time = time(10, 0)
     grace_time = timedelta(hours=2)
@@ -91,7 +103,6 @@ def get_ingest_status():
     # check if last ingest is after last scheduled ingest and is on the day expected
     if (
         last_ingest_date >= last_scheduled
-        and last_ingest_date.date() == last_scheduled.date()
     ):
         state = 'good'
     else:
@@ -103,13 +114,7 @@ def get_ingest_status():
             state = 'ok'
         else:
             state = 'bad'
-
-    return {
-        'current_version': last_ingest_date.strftime('%Y-%m-%d'),
-        'state': state,
-        'next_ingest': next_ingest.strftime('%Y-%m-%d'),
-    }
-
+    return state, next_ingest
 
 @cached(cache=TTLCache(maxsize=10, ttl=7200))
 def get_gbif_status():
