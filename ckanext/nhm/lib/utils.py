@@ -57,6 +57,7 @@ def get_ingest_status():
         'next_ingest': next_ingest.strftime('%Y-%m-%d'),
     }
 
+
 def ingest_date_check(last_ingest_date, right_now):
     # set parameters for check
     ingest_days = {6, 0, 1, 2, 3}
@@ -101,9 +102,7 @@ def ingest_date_check(last_ingest_date, right_now):
         temp_day += timedelta(days=1)
 
     # check if last ingest is after last scheduled ingest and is on the day expected
-    if (
-        last_ingest_date >= last_scheduled
-    ):
+    if last_ingest_date >= last_scheduled:
         state = 'good'
     else:
         # check if it should allow for grace period
@@ -115,6 +114,7 @@ def ingest_date_check(last_ingest_date, right_now):
         else:
             state = 'bad'
     return state, next_ingest
+
 
 @cached(cache=TTLCache(maxsize=10, ttl=7200))
 def get_gbif_status():
