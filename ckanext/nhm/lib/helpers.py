@@ -1543,6 +1543,10 @@ def group_resources(resource_list):
     ]
 
 
+def is_downloadable_group(resource_list):
+    return all([downloadable(r) for r in resource_list])
+
+
 def get_resource_size(resource_dict):
     # kilo, mega, giga, etc. I could make this a list but what's the point
     prefixes = 'KMGTPEZ'

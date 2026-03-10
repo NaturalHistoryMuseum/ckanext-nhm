@@ -31,7 +31,9 @@ Example:
                 </button>
 
               </div>
-                  {% snippet 'versioned_datastore/snippets/download_button.html', resources=(group_items|map(attribute="id")|join(",")), icon_class="fas fa-folder", label=_('Download group'), non_datastore=True %}
+                  {% if h.is_downloadable_group(group_items) %}
+                    {% snippet 'versioned_datastore/snippets/download_button.html', resources=(group_items|map(attribute="id")|join(",")), icon_class="fas fa-folder", label=_('Download group'), non_datastore=True %}
+                  {% endif %}
                   </div>
 
               {% endif %}
