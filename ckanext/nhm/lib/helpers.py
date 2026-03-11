@@ -853,10 +853,13 @@ def downloadable(resource):
     """
     Is a resource downloadable.
 
-    :param resource: return: bool
+    :param resource:
     :returns: bool
     """
-    return bool(resource['format']) or resource.get('datastore_active', False)
+    # datastore resources and uploads with a format
+    return resource.get('datastore_active', False) or (
+        resource.get('url_type') == 'upload' and bool(resource.get('format'))
+    )
 
 
 def is_sysadmin():
