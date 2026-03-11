@@ -182,7 +182,7 @@ def test_ingest_date_check(test_case):
             return MagicMock(return_value=last_ingest_ts)
         return toolkit.get_action(action_name)
 
-    with freeze_time(test_case['right_now']):
+    with freeze_time(test_case['right_now'], tz_offset=0):
         with patch('ckan.plugins.toolkit.get_action') as mock_get_action:
             mock_get_action.side_effect = _mock_get
             status_dict = get_ingest_status()
