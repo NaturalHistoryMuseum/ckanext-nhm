@@ -1,9 +1,12 @@
 from datetime import datetime as dt
 from datetime import timezone
+from unittest.mock import MagicMock, patch
 
 import pytest
+from ckan.plugins import toolkit
+from freezegun import freeze_time
 
-from ckanext.nhm.lib.utils import ingest_date_check
+from ckanext.nhm.lib.utils import get_ingest_status
 
 test_cases = [
     {
@@ -173,7 +176,15 @@ test_cases = [
 
 @pytest.mark.parametrize('test_case', test_cases)
 def test_ingest_date_check(test_case):
-    state, next_ingest = ingest_date_check(test_case['last_ingest_date'], test_case['right_now'])
-    assert state == test_case['expected_state'], (
-        f'Failed test case: {test_case["test_comment"]}'
-    )
+    def _mock_get(action_name):
+        if action_name == 'vds_version_round':
+            return MagicMock(return_value=test_case['last_ingest_date'])
+        return toolkit.get_action(action_name)
+
+    with freeze_time(test_case['right_now']):
+        with patch('ckan.plugins.toolkit.get_action') as mock_get_action:
+            mock_get_action.side_effect = _mock_get
+            status_dict = get_ingest_status()
+            assert status_dict['state'] == test_case['expected_state'], (
+                f'Failed test case: {test_case["test_comment"]}'
+            )
