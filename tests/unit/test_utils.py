@@ -178,7 +178,8 @@ test_cases = [
 def test_ingest_date_check(test_case):
     def _mock_get(action_name):
         if action_name == 'vds_version_round':
-            return MagicMock(return_value=test_case['last_ingest_date'])
+            last_ingest_ts = test_case['last_ingest_date'].timestamp() * 1000
+            return MagicMock(return_value=last_ingest_ts)
         return toolkit.get_action(action_name)
 
     with freeze_time(test_case['right_now']):
