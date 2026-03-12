@@ -174,7 +174,7 @@ test_cases = [
 ]
 
 
-@pytest.mark.parametrize('test_case', test_cases)
+@pytest.mark.parametrize('test_case', test_cases, ids=lambda x: x['test_comment'])
 def test_ingest_date_check(test_case):
     def _mock_get(action_name):
         if action_name == 'vds_version_round':
@@ -185,6 +185,7 @@ def test_ingest_date_check(test_case):
     with freeze_time(test_case['right_now'], tz_offset=0):
         with patch('ckan.plugins.toolkit.get_action') as mock_get_action:
             mock_get_action.side_effect = _mock_get
+            get_ingest_status.cache_clear()
             status_dict = get_ingest_status()
             assert status_dict['state'] == test_case['expected_state'], (
                 f'Failed test case: {test_case["test_comment"]}'
