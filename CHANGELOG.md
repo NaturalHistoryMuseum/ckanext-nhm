@@ -1,3 +1,31 @@
+## v7.5.0 (2026-03-17)
+
+### Feature
+
+- add robots.txt
+
+### Fix
+
+- removing separate function
+- **status-page**: resolve data ingest returning wrong status
+- also disallow localised dataset and org pages
+- show download link for "lfs" url_type
+- fix downloadable check logic
+
+### Tests
+
+- clear cache of function being tested
+- change date tz offset
+- fix timestamp being passed to function in wrong format
+- add freeze and mock to test whole function instead of just logic
+- fix date checker test
+- fix test function calling
+- **utils**: adds test for utils datechecher function
+
+### Minor UI Changes
+
+- limit group download button
+
 ## v7.4.0 (2026-03-02)
 
 ### Feature
