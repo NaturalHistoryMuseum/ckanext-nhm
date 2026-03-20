@@ -311,7 +311,7 @@ let results = {
     },
     editSlug(context, payload) {
       Vue.set(context.rootState.appState.status.slugEdit, 'loading', true);
-      return post('vds_slug_edit', {
+      return post('vds_slug_reserve', {
         current_slug: context.state.slug,
         new_reserved_slug: payload,
       })
