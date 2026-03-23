@@ -541,6 +541,23 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     }
                 },
             }
+
+        # featured
+        slugs['butterfly-types'] = {
+            'resource_ids': [helpers.get_specimen_resource_id()],
+            'query': {
+                'filters': {
+                    'and': [
+                        {
+                            'string_equals': {
+                                'value': 'papilionoidea new types digitisation project',
+                                'fields': ['project'],
+                            }
+                        }
+                    ]
+                }
+            },
+        }
         return slugs
 
     def vds_modify_field_groups(self, resource_ids, field_groups):
