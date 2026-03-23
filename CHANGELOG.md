@@ -1,3 +1,17 @@
+## v7.5.1 (2026-03-23)
+
+### Fix
+
+- reserve butterfly-types slug
+- rename slug_edit to slug_reserve
+
+### Minor UI Changes
+
+- update butterfly types link
+- add sentence about contacting us for access
+- clarify that the robots.txt is for crawlers
+- correct rate limit
+
 ## v7.5.0 (2026-03-17)
 
 ### Feature
