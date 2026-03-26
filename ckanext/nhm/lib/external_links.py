@@ -46,7 +46,12 @@ class RankedTemplateSite(Site):
 
     def get_links(self, record: dict) -> List[Link]:
         ranks = extract_ranks(record)
-        return [Link(rank, self.url_template.format(rank)) for rank in ranks.values()]
+        used = set()
+        return [
+            Link(rank, self.url_template.format(rank))
+            for rank in ranks.values()
+            if not (rank in used or used.add(rank))
+        ]
 
 
 @cached(cache=TTLCache(maxsize=1024, ttl=300))
@@ -192,6 +197,11 @@ P10K = Phenome10kSite(
     name='Phenome10k',
     icon_url='https://www.phenome10k.org/static/icons/favicon.ico',
 )
+LADL = RankedTemplateSite(
+    name='LA Discovery Layer',
+    icon_url='https://data.nhm.ac.uk/images/icons/favicon-black.svg',
+    url_template='https://nhm.primo.exlibrisgroup.com/discovery/search?query=any,contains,{}&tab=Everything&vid=44NHM_INST:44NHM_V1',
+)
 
 
 def get_sites(record: dict) -> List[Site]:
@@ -201,15 +211,14 @@ def get_sites(record: dict) -> List[Site]:
     :param record: a record dict
     """
     searches = {
-        'BMNH(E)': [BHL, CoL, GBIF, P10K],
-        'BOT': [BHL, CoL, GBIF, P10K],
-        'MIN': [Mindat],
-        'PAL': [PBDB, GBIF, P10K],
-        'ZOO': [BHL, CoL, GBIF, P10K],
+        'BMNH(E)': [BHL, CoL, GBIF, P10K, LADL],
+        'BOT': [BHL, CoL, GBIF, P10K, LADL],
+        'MIN': [Mindat, LADL],
+        'PAL': [PBDB, GBIF, P10K, LADL],
+        'ZOO': [BHL, CoL, GBIF, P10K, LADL],
         # if there is no collection code, just check the BHL and CoL. This catches index
         # lot entries
-        None: [BHL, CoL],
+        None: [BHL, CoL, LADL],
     }
-
     # if no collection code is available, default to None
     return searches.get(record.get('collectionCode', None), [])
