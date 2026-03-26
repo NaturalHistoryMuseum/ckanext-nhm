@@ -47,7 +47,11 @@ class RankedTemplateSite(Site):
     def get_links(self, record: dict) -> List[Link]:
         ranks = extract_ranks(record)
         used = set()
-        return [Link(rank, self.url_template.format(rank)) for rank in ranks.values() if not (rank in used or used.add(rank))]
+        return [
+            Link(rank, self.url_template.format(rank))
+            for rank in ranks.values()
+            if not (rank in used or used.add(rank))
+        ]
 
 
 @cached(cache=TTLCache(maxsize=1024, ttl=300))
@@ -199,6 +203,7 @@ LADL = RankedTemplateSite(
     url_template='https://nhm.primo.exlibrisgroup.com/discovery/search?query=any,contains,{}&tab=Everything&vid=44NHM_INST:44NHM_V1',
 )
 
+
 def get_sites(record: dict) -> List[Site]:
     """
     Given a record, returns a list of sites that may be able to provide relevant links.
@@ -215,6 +220,5 @@ def get_sites(record: dict) -> List[Site]:
         # lot entries
         None: [BHL, CoL, LADL],
     }
-
     # if no collection code is available, default to None
     return searches.get(record.get('collectionCode', None), [])
