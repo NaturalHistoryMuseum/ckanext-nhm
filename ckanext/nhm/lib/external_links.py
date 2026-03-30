@@ -48,9 +48,7 @@ class RankedTemplateSite(Site):
         ranks = extract_ranks(record)
         used = set()
         return [
-            Link(rank, self.url_template.format(rank))
-            for rank in ranks.values()
-            if not (rank in used or used.add(rank))
+            Link(rank, self.url_template.format(rank)) for rank in set(ranks.values())
         ]
 
 
