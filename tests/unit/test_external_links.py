@@ -37,8 +37,8 @@ class TestRankedTemplateSite:
         }
         links = templated.get_links(record)
         assert len(links) == 2
-        assert links[0] == Link('a kingdom', template.format('a kingdom'))
-        assert links[1] == Link('a family', template.format('a family'))
+        assert Link('a kingdom', template.format('a kingdom')) in links
+        assert Link('a family', template.format('a family')) in links
 
     def test_no_rank_data(self):
         template = 'beans/{}'

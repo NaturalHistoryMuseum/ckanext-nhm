@@ -46,7 +46,6 @@ class RankedTemplateSite(Site):
 
     def get_links(self, record: dict) -> List[Link]:
         ranks = extract_ranks(record)
-        used = set()
         return [
             Link(rank, self.url_template.format(rank)) for rank in set(ranks.values())
         ]
