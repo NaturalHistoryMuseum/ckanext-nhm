@@ -1,3 +1,26 @@
+## v7.6.0 (2026-03-30)
+
+### Feature
+
+- **external-links**: adds la discovery layer to the external links
+
+### Fix
+
+- change solution to preserve links list order
+- **external-links**: stops duplication of external links
+
+### Refactor
+
+- simplify removing duplicate sites
+
+### Style
+
+- pre-commit changes
+
+### Tests
+
+- fix test looking for links in certain order
+
 ## v7.5.1 (2026-03-23)
 
 ### Fix
