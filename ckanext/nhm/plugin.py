@@ -410,36 +410,61 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.get_images
         """
         images = []
-        title_field = data_dict['resource_view'].get('image_title', None)
-        for image in raw_images:
-            title = []
-            if title_field and title_field in record:
-                title.append(record[title_field])
-            title.append(image.get('title', str(image['_id'])))
 
-            copyright = f'{toolkit.h.link_to(image["license"], image["license"], target="_blank")}<br />&copy; {image["rightsHolder"]}'
-            image_base_url = image['identifier']
-            images.append(
-                {
-                    'href': f'{image_base_url}/preview',
-                    'thumbnail': f'{image_base_url}/thumbnail',
-                    'download': f'{image_base_url}/original',
-                    'link': toolkit.url_for(
-                        'record.view',
-                        package_name=data_dict['package']['name'],
-                        resource_id=data_dict['resource']['id'],
-                        record_id=record['_id'],
-                    ),
-                    'copyright': copyright,
-                    # Description of image in gallery view
-                    'description': literal(
+        if type(raw_images) is list:
+            title_field = data_dict['resource_view'].get('image_title', None)
+            for image in raw_images:
+                # check dwc type contains identifier
+                image_base_url = image.get('identifier')
+                if image_base_url:
+                    image_obj = {
+                        'href': f'{image_base_url}/preview',
+                        'thumbnail': f'{image_base_url}/thumbnail',
+                        'download': f'{image_base_url}/original',
+                    }
+
+                    # create title
+                    title = []
+                    if title_field and title_field in record:
+                        title.append(record[title_field])
+                    title.append(image.get('title', str(image['_id'])))
+                    # add title
+                    image_obj['description'] = literal(
                         ''.join([f'<span>{t}</span>' for t in title])
-                    ),
-                    'title': ' - '.join(map(str, title)),
-                    'record_id': record['_id'],
-                }
-            )
-        return images
+                    )
+                    image_obj['title'] = ' - '.join(map(str, title))
+
+                    # add copyright
+                    license = image.get('license')
+                    rights_holder = image.get('rightsHolder')
+                    if license and rights_holder:
+                        copyright = f'{toolkit.h.link_to(license, license, target="_blank")}<br />&copy; {rights_holder}'
+                        image_obj['copyright'] = copyright
+
+                    # add id
+                    if record['_id']:
+                        image_obj['record_id'] = record['_id']
+
+                    # add link
+                    if (
+                        data_dict['package']['name']
+                        and data_dict['resource']['id']
+                        and record['_id']
+                    ):
+                        image_obj['link'] = toolkit.url_for(
+                            'record.view',
+                            package_name=data_dict['package']['name'],
+                            resource_id=data_dict['resource']['id'],
+                            record_id=record['_id'],
+                        )
+                    # add object to images
+                    images.append(image_obj)
+                else:
+                    # add empty href
+                    images.append({'href': ''})
+            return images
+        else:
+            return [{'href': ''}]
 
     ## IVersionedDatastore
     def vds_before_search(self, request):
