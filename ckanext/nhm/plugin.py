@@ -403,6 +403,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 'ckanext.nhm.gallery.resource_types', 'dwc csv tsv'
             ).split(' '),
             'field_type': ['json'],
+            'required_fields': [
+                {'field_name': 'associatedMedia', 'field_type': 'array'}
+            ],
         }
 
     def get_images(self, raw_images, record, data_dict):
