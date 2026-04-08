@@ -1,3 +1,15 @@
+## v7.6.1 (2026-04-08)
+
+### Fix
+
+- **ingest-status**: fixes the timezone issue on the collections ingest status
+- add required fields to dwc gallery image
+- **gallery-view**: stops dwc gallery view erroring when data is not in dwc format
+
+### Tests
+
+- adds tests for different timezones
+
 ## v7.6.0 (2026-03-30)
 
 ### Feature
