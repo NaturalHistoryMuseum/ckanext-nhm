@@ -7,6 +7,7 @@
 from datetime import datetime as dt
 from datetime import time, timedelta, timezone
 
+import pytz
 import requests
 from cachetools import TTLCache, cached
 from ckan.plugins import toolkit
@@ -43,10 +44,14 @@ def get_ingest_status():
         {},
         {'resource_id': toolkit.config.get('ckanext.nhm.specimen_resource_id')},
     )
+    # set timezone
+    uk_tz = pytz.timezone('Europe/London')
     # set last ingest timestamp
-    last_ingest_date = dt.fromtimestamp(current_version / 1000, tz=timezone.utc)
+    last_ingest_date_utc = dt.fromtimestamp(current_version / 1000, tz=timezone.utc)
+    last_ingest_date = last_ingest_date_utc.astimezone(uk_tz)
     # set current time
-    right_now = dt.now(timezone.utc)
+    right_now_utc = dt.now(timezone.utc)
+    right_now = right_now_utc.astimezone(uk_tz)
 
     # set parameters for check
     ingest_days = {6, 0, 1, 2, 3}
@@ -61,9 +66,11 @@ def get_ingest_status():
     # loop back until find last time it was scheduled to ingest
     while True:
         if temp_day.weekday() in ingest_days:
-            scheduled = dt.combine(temp_day.date(), ingest_time, tzinfo=timezone.utc)
+            scheduled = uk_tz.localize(
+                dt.combine(temp_day.date(), ingest_time), is_dst=False
+            )
             if scheduled <= right_now:
-                last_scheduled = scheduled
+                last_scheduled = scheduled.replace(second=0, microsecond=0, minute=0)
                 break
         temp_day -= timedelta(days=1)
 
@@ -74,7 +81,9 @@ def get_ingest_status():
         temp_day -= timedelta(days=1)
     while True:
         if temp_day.weekday() in ingest_days:
-            scheduled = dt.combine(temp_day.date(), ingest_time, tzinfo=timezone.utc)
+            scheduled = uk_tz.localize(
+                dt.combine(temp_day.date(), ingest_time), is_dst=False
+            )
             if scheduled <= right_now:
                 penultimate_scheduled = scheduled
                 break
@@ -84,7 +93,9 @@ def get_ingest_status():
     temp_day = right_now
     while True:
         if temp_day.weekday() in ingest_days:
-            scheduled = dt.combine(temp_day.date(), ingest_time, tzinfo=timezone.utc)
+            scheduled = uk_tz.localize(
+                dt.combine(temp_day.date(), ingest_time), is_dst=False
+            )
             if scheduled > right_now:
                 next_ingest = scheduled
                 break
