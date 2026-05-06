@@ -1,3 +1,9 @@
+## v7.6.2 (2026-05-06)
+
+### Minor UI Changes
+
+- temporary change of contact email
+
 ## v7.6.1 (2026-04-08)
 
 ### Fix
