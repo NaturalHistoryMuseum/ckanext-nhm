@@ -10,12 +10,6 @@
 {% set filter_pills = h.get_resource_filter_pills(package, resource, resource_view) %}
 
 <div class="resource-view-filter-form row">
-    {% if resource.get('name') == 'Specimen records' %}
-    <div class="alert alert-warning">
-        <strong>Note:</strong> Please use the
-        <a href="/search">new search page</a> for the best experience.
-    </div>
-    {% endif %}
     <form class="module-content search-form" method="get">
 
             <div class="col-md-9 col-sm-9">
