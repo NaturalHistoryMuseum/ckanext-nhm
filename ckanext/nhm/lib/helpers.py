@@ -1475,16 +1475,38 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
     )
 
 
-def build_nav_main(*args):
+def build_nav_main(*menu_items):
     """
     Build a set of menu items. Overrides core CKAN method to add "nav-item" class to li
-    elements.
+    elements and allow endpoint keyword args.
 
-    :param args: tuples of (menu type, title) eg ('login', _('Login'))
+    :param menu_items: tuples of (endpoint_details, title) e.g. ('home.index', _('Home')) or (('search.view', {'slug': 'everything'}), _('Search'))
     :returns: literal - <li class="nav-item"><a href="...">title</a></li>
     """
-    from_core = core_helpers.build_nav_main(*args)
-    return _add_nav_item_class(from_core)
+    current_endpoint = '.'.join(toolkit.get_endpoint())
+    output = ''
+    for item in menu_items:
+        endpoint_details = item[0]
+        if isinstance(endpoint_details, tuple):
+            endpoint_name, endpoint_kwargs = endpoint_details
+        else:
+            endpoint_name = endpoint_details
+            endpoint_kwargs = {}
+        title = item[1]
+        if len(item) == 3 and not toolkit.check_access(item[2]):
+            continue
+        try:
+            endpoint = toolkit.url_for(endpoint_name, **endpoint_kwargs)
+        except BuildError:
+            raise Exception(f'Endpoint {endpoint_name} cannot be found.')
+        active = endpoint_name == current_endpoint
+        link_text = f'<span>{title}</span>'
+        link = core_helpers.link_to(link_text, endpoint).unescape()
+        if active:
+            output += f'<li class="active nav-item">{link}</li>'
+        else:
+            output += f'<li class="nav-item">{link}</li>'
+    return literal(output)
 
 
 def get_specimen_jsonld(uuid, version=None):
