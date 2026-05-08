@@ -59,7 +59,7 @@
                                     {{ g.record_dict[field] }} (
                                     {{ h.get_department(g.record_dict[field]) }})
                                 {% elif field == 'associatedOccurrences' %}
-                                    {% set voucher_guid = h.get_sample_voucher_guid(g.record_dict[field]) %}
+                                    {% set voucher_guid = h.get_preparation_voucher_guid(g.record_dict[field]) %}
                                     <a href="{{ h.get_object_url(h.get_specimen_resource_id(), voucher_guid) }}">{{ voucher_guid }}</a>
                                 {% elif field == 'created' or field == 'modified' %}
                                     {{ g.record_dict[field] }}

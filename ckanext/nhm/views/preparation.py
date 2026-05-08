@@ -45,12 +45,12 @@ def modify_field_groups(field_groups):
     field_groups.ignore('associatedMedia.*')
 
 
-class SampleView(DefaultView):
+class PreparationView(DefaultView):
     """
-    Controller for displaying a sample record.
+    Controller for displaying a preparation/sample record.
     """
 
-    resource_id = toolkit.config.get('ckanext.nhm.sample_resource_id')
+    resource_id = toolkit.config.get('ckanext.nhm.preparation_resource_id')
 
     field_facets = [
         'project',

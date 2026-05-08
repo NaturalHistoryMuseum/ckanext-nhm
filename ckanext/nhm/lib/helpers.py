@@ -1679,10 +1679,10 @@ def route_exists(route):
         return False
 
 
-def get_sample_voucher_guid(associated_occurrence_value: str) -> str:
+def get_preparation_voucher_guid(associated_occurrence_value: str) -> str:
     """
-    Given an associatedOccurrence value from a Sample record, returns the associated
-    specimen GUID.
+    Given an associatedOccurrence value from a Preparation record, returns the
+    associated specimen GUID.
 
     :param associated_occurrence_value: the associatedOccurrence value
     :returns: the voucher specimen GUID
