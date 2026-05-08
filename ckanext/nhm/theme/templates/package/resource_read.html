@@ -56,10 +56,10 @@
                     <div class="alert alert-warning">
                         {% if h.is_collection_resource_id(resource['id']) %}
                             <strong>Note:</strong> Please use the
-                            <a href="/search/{{slug}}">new search page</a> for the best experience.
+                            <a href="{{ h.url_for('search.view', slug=slug) }}">new search page</a> for the best experience.
                         {% else %}
                             <strong>Note:</strong> You can continue your search on the
-                            <a href="/search/{{slug}}">new search page</a>.
+                            <a href="{{ h.url_for('search.view', slug=slug) }}">new search page</a>.
                         {% endif %}
                     </div>
                 </div>
