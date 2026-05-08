@@ -58,6 +58,21 @@
                     <li><a href="{{ h.url_for('about.credits') }}">Credits</a></li>
                 </ul>
             </li>
+            <li role="presentation" class="dropup">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+                   aria-haspopup="true" aria-expanded="false"
+                   aria-label="Tools popup menu">
+                    Tools
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ h.url_for('search.view', slug='specimens') }}">Specimens search</a></li>
+                    <li><a href="{{ h.url_for('search.view') }}">Cross-dataset search</a></li>
+                    <li><a href="{{ h.url_for('status.index') }}">Service status</a></li>
+                    <li><a href="{{ h.url_for('liv.index') }}">Image viewer</a></li>
+                    <li><a href="{{ h.url_for('search.slug_generator') }}">Slugs</a></li>
+                </ul>
+            </li>
             <li role="presentation">
                 <a href="{{ h.url_for('help.index') }}">
                     Help
