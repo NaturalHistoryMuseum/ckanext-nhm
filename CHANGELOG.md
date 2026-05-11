@@ -1,3 +1,9 @@
+## v7.7.1 (2026-05-11)
+
+### Fix
+
+- only show search redirect banner for datasets where datastore is active
+
 ## v7.7.0 (2026-05-11)
 
 ### Feature
