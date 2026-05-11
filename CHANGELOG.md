@@ -1,3 +1,19 @@
+## v7.7.0 (2026-05-11)
+
+### Feature
+
+- default to specimens search from main nav
+- allow main nav items to use kwargs
+- add a tools popup to the footer
+
+### Minor UI Changes
+
+- change url to conform with internal standards
+- fix div left open
+- move warning message and add slug to keep existing search params during navigation
+- fix search url to redirect to actual search
+- **old-search**: adds a new alert on specimens views to prompt users to go to new search page
+
 ## v7.6.2 (2026-05-06)
 
 ### Minor UI Changes
