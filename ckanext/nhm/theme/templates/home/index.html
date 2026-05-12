@@ -93,7 +93,7 @@
                         </ul>
                         <ul class="list-unstyled list-inline flex-container flex-smallwrap flex-around flex-top" id="scope-collection-stats" style="display: none">
                             <li>
-                                <a class="collection-block" href="/search/specimens">
+                                <a class="collection-block" href="{{ h.url_for('search.view', slug='specimens') }}">
                                     <div class="flex-container flex-smallwrap flex-center">
                                         <svg class="botany collection-icon"></svg>
                                         <span class="collection-code">{{ _('Specimens') }}</span>
@@ -105,7 +105,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="collection-block" href="/search/indexlots">
+                                <a class="collection-block" href="{{ h.url_for('search.view', slug='indexlots') }}">
                                     <div class="flex-container flex-smallwrap flex-center">
                                         <svg class="entomology collection-icon"></svg>
                                         <span class="collection-code">{{ _('Index lots') }}</span>
@@ -117,7 +117,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="collection-block" href="/search/artefacts">
+                                <a class="collection-block" href="{{ h.url_for('search.view', slug='artefacts') }}">
                                     <div class="flex-container flex-smallwrap flex-center">
                                         <svg class="mineralogy collection-icon"></svg>
                                         <span class="collection-code">{{ _('Artefacts') }}</span>
