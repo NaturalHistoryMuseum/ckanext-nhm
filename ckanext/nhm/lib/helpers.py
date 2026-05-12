@@ -327,6 +327,11 @@ def get_indexlot_resource_id():
 
 
 def get_artefact_resource_id():
+    """
+    Get the ID for the artefacts dataset.
+
+    :return: ID for the artefact resource
+    """
     return toolkit.config.get('ckanext.nhm.artefact_resource_id')
 
 
