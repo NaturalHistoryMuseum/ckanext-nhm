@@ -128,6 +128,18 @@
                                     </div>
                                 </a>
                             </li>
+                            <li>
+                                <a class="collection-block" href="{{ h.url_for('search.view', slug='samples') }}">
+                                    <div class="flex-container flex-smallwrap flex-center">
+                                        <svg class="palaeontology collection-icon"></svg>
+                                        <span class="collection-code">{{ _('Samples') }}</span>
+                                    </div>
+                                    <div class="flex-column collection-block-text">
+                                            <span class="collection-count"> {{ h.delimit_number(collection_stats['preparations']) }}</span>
+                                        <span class="collection-name default-text">{{ _('Samples') }}</span>
+                                    </div>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

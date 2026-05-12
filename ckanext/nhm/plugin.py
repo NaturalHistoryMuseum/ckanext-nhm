@@ -31,6 +31,9 @@ from ckanext.nhm.lib.record import LATITUDE_FIELD, LONGITUDE_FIELD
 from ckanext.nhm.lib.utils import get_gbif_status, get_iiif_status, get_ingest_status
 from ckanext.nhm.views.artefact import modify_field_groups as artefact_modify_groups
 from ckanext.nhm.views.indexlot import modify_field_groups as indexlot_modify_groups
+from ckanext.nhm.views.preparation import (
+    modify_field_groups as preparation_modify_groups,
+)
 from ckanext.nhm.views.specimen import modify_field_groups as specimen_modify_groups
 from ckanext.versioned_datastore.interfaces import (
     IVersionedDatastore,
@@ -495,6 +498,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                 helpers.get_specimen_resource_id(),
                 helpers.get_artefact_resource_id(),
                 helpers.get_indexlot_resource_id(),
+                helpers.get_preparation_resource_id(),
             }:
                 request.add_sort('modified', False)
 
@@ -545,6 +549,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             helpers.get_specimen_resource_id(),
             helpers.get_artefact_resource_id(),
             helpers.get_indexlot_resource_id(),
+            helpers.get_preparation_resource_id(),
         ]
         slugs = {
             'collections': dict(resource_ids=collection_resource_ids),
@@ -552,6 +557,7 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             'specimens': dict(resource_ids=[helpers.get_specimen_resource_id()]),
             'indexlots': dict(resource_ids=[helpers.get_indexlot_resource_id()]),
             'artefacts': dict(resource_ids=[helpers.get_artefact_resource_id()]),
+            'samples': dict(resource_ids=[helpers.get_preparation_resource_id()]),
         }
         for collection_code in ('PAL', 'MIN', 'BMNH(E)', 'ZOO', 'BOT'):
             slugs[helpers.get_department(collection_code).lower()] = {
@@ -595,6 +601,8 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
             indexlot_modify_groups(field_groups)
         if helpers.get_artefact_resource_id() in resource_ids:
             artefact_modify_groups(field_groups)
+        if helpers.get_preparation_resource_id() in resource_ids:
+            preparation_modify_groups(field_groups)
         return field_groups
 
     def datastore_before_convert_basic_query(self, query):

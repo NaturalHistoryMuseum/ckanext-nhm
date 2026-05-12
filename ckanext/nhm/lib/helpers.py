@@ -302,6 +302,7 @@ def is_collection_resource_id(resource_id: str) -> bool:
         get_artefact_resource_id(),
         get_indexlot_resource_id(),
         get_specimen_resource_id(),
+        get_preparation_resource_id(),
     }
     return resource_id in resource_ids
 
@@ -335,6 +336,15 @@ def get_artefact_resource_id():
     return toolkit.config.get('ckanext.nhm.artefact_resource_id')
 
 
+def get_preparation_resource_id():
+    """
+    Get the ID for the preparation dataset.
+
+    :return: ID for the preparation resource
+    """
+    return toolkit.config.get('ckanext.nhm.preparation_resource_id')
+
+
 def get_beetle_iiif_resource_id():
     """
     Get the ID for the beetle IIIF resource.
@@ -355,6 +365,7 @@ def collection_stats():
         ('artefacts', get_artefact_resource_id()),
         ('indexlots', get_indexlot_resource_id()),
         ('specimens', get_specimen_resource_id()),
+        ('preparations', get_preparation_resource_id()),
     ]
 
     collections_total = 0
@@ -1363,9 +1374,9 @@ def get_latest_update_for_package_resources(pkg_dict, date_format=None):
 
 def get_external_sites(record: dict) -> List[Site]:
     """
-    Helper called on collection record pages (i.e. records in the specimens, indexlots
-    or artefacts resources) which is expected to return a list of Site objects. From
-    these sites, links can be generated which are relevant to the record.
+    Helper called on collection record pages (i.e. records in the specimens, indexlots,
+    artefacts, or preparations resources) which is expected to return a list of Site
+    objects. From these sites, links can be generated which are relevant to the record.
 
     :param record: a record dict
     :returns: a list of Site objects
