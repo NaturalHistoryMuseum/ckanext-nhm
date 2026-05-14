@@ -263,14 +263,35 @@ body {
 }
 
 .collapse-to-icon {
+  & .fa,
+  & .fas {
+    margin: 0 !important;
+    line-height: 1em;
+    font-size: @font-size-body-l;
+    vertical-align: center;
+  }
+}
+
+.collapse-to-icon-first {
+  @media (max-width: @lg - 1) {
+    font-size: 0;
+    & .fa,
+    & .fas {
+      font-size: @font-size-body-l;
+    }
+  }
+
+  @media (min-width: @lg) {
+    .icon-pad();
+  }
+}
+
+.collapse-to-icon-last {
   @media (max-width: @md - 1) {
     font-size: 0;
     & .fa,
     & .fas {
-      margin: 0 !important;
-      line-height: 1em;
       font-size: @font-size-body-l;
-      vertical-align: middle;
     }
   }
 
@@ -1609,7 +1630,8 @@ select {
   }
 
   &:not(.no-icon) {
-    .collapse-to-icon;
+    .collapse-to-icon-first;
+    .collapse-to-icon-last;
   }
 }
 
