@@ -1,0 +1,103 @@
+{% extends 'page.html' %}
+
+{% block breadcrumb_content %}
+    {{ super() }}
+    <li>
+        <a href="{{ h.url_for('misc.featured_history') }}">{{ title }}</a>
+    </li>
+{% endblock %}
+
+{% block secondary %}
+{% endblock %}
+
+{% block primary %}
+    <article class="module">
+        <div class="module-content">
+            <h1 class="page-heading">{{ title }}</h1>
+
+            <p>This page contains links that have been listed or are currently listed in the "featured" section on the homepage. The "featured" section may change over time, so this page ensures you can still access the older links even if they've been replaced on the homepage.</p>
+
+            <div class="featured-history-grid">
+                {{ featured_dataset(title='Image viewer',
+                img_url='/images/L010225443_small.jpg',
+                img_alt='A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443.',
+                desc='An interactive image viewer allowing users to zoom in on images in our datasets, including high-resolution photographs of pinned insect drawers.',
+                url=h.url_for('liv.index')) }}
+
+                {{ featured_dataset(title='Butterfly types',
+                img_url='/images/Heraclides_rumiko_small.jpg',
+                img_alt='A top-down photograph of a large black and yellow butterfly (Heraclides rumiko). It is pinned to a grey tray and there are a set of small labels to its left.',
+                desc='View some of the Museum’s invaluable butterfly reference material.',
+                img_title='NHMUK012824346, Heraclides rumiko',
+                url=h.url_for('search.view', slug='butterfly-types', view='gallery')) }}
+
+                {{ featured_dataset(title='Index lots',
+                img_url='/images/BeetlesSmall.jpg',
+                img_alt='A tray of collected metallic green beetles, lined up neatly in rows. Each beetle is pinned to a typed label underneath it.',
+                desc='Access the catalogue of index lot records, used to record the presence of some entomological and zoological species in the Museum collection.',
+                img_title='Beetles collected in the Malay Archipelago by Alfred Russel Wallace',
+                url=h.url_for('resource.read', id=id, resource_id=h.get_indexlot_resource_id())) }}
+
+                {{ featured_dataset(title='Aphid slide digitisation',
+                img_url='/images/featured-aphid.jpg',
+                img_alt='A zoomed-in view of a slide for a specimen of the species Myzus (Nectarosiphon) persicae.',
+                desc='Browse the museum\'s fully digitised collection of Aphidoidea slides. In 2023, digitisers at the museum imaged more than 200,000 of these slides.',
+                img_title='NHMUK014801150, Myzus (Nectarosiphon) persicae',
+                img_style='background-position-x: 60%; background-position-y: 2%; background-size: 250%;',
+                url=h.url_for('search.view', slug='aphid-slides')) }}
+
+                {{ featured_dataset(title='Join the Dots',
+                img_url='/images/featured-binders.jpg',
+                img_alt='A stack of cardboard binders filled with papers and notebooks. Some binders are tied with black ribbon.',
+                desc='Join the Dots is an extensive project giving a high-level overview of the Museum\'s collections, including undigitised material.',
+                img_title='seargreyson/unsplash',
+                img_style='background-position-x: 50%;',
+                id='join-the-dots-collection-level-descriptions') }}
+
+                {{ featured_dataset(title='PREDICTS 2022',
+                img_url='/images/cleared-forest-full-width.jpg',
+                img_alt='An aerial view of the edge of a deforestation area. The forest is on the left side, and an agricultural area is on the right side.',
+                desc='This new dataset from the ongoing PREDICTS project contains over a million new records of biodiversity data.',
+                img_title='salajean/Shutterstock',
+                img_style='background-position-x: 50%;',
+                id='release-of-data-added-to-the-predicts-database-november-2022') }}
+
+                {{ featured_dataset(title='Bats',
+                img_url='/images/bat.jpeg',
+                img_alt='Hipposideros corynophyllus skull, lateral view',
+                desc='In the spirit of Hallowe\'en, have a look at some of our digitised bat specimens!',
+                img_title='Hipposideros corynophyllus, NHMUK ZD 1984.1898',
+                url=h.url_for('search.view', slug='bats')) }}
+
+                {{ featured_dataset(title='Bioacoustica',
+                img_url='/images/featured-bioacoustica.jpg',
+                img_alt='A graphic of a sound wave.',
+                desc='A worldwide collection of scientific recordings of animal sounds from the Natural History Museum and our collaborators.',
+                id='bioacoustica') }}
+            </div>
+
+        </div>
+    </article>
+{% endblock %}
+
+{% macro featured_dataset(title, img_url, img_alt, desc, url, id, img_title='', img_style='') %}
+    {% set url = url | default(h.url_for('dataset.read', id=id)) %}
+
+    <a class="media-image" href="{{ url }}" aria-label="{{ title }}">
+        <div class="featured-image"
+             style="background-image:url('{{ img_url }}');{{ img_style }}"
+             role="img"
+             aria-label="{{ img_alt }}"
+             title="{{ img_title }}"
+        ></div>
+    </a>
+
+    <div>
+        <h2 class="featured-title"><a href="{{ url }}">{{ title }}</a></h2>
+        <p>{{ desc }}</p>
+        <p class="text-right"><a class="no-underline view-dataset-link"
+                                 href="{{ url }}"
+                                 title="View dataset">View dataset <i
+            class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
+    </div>
+{% endmacro %}

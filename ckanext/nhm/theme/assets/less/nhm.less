@@ -2278,6 +2278,10 @@ select,
   padding-top: 70%;
 }
 
+.featured-prev-link {
+  padding-top: 20px;
+}
+
 .homepage {
   padding-top: 0;
   padding-bottom: 50px;
@@ -3245,4 +3249,27 @@ select,
   color: @grey4;
 }
 
-// MULTISEARCH FORM VIEWS ------------------------------------------------------------------------
+// FEATURED HISTORY --------------------------------------------------------------------------------
+
+.featured-history-grid {
+  display: grid;
+  grid-template-columns: 25% 1fr;
+  grid-gap: @min-pad * 2;
+  margin-top: 40px;
+
+  @media (max-width: @sm - 1) {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: @sm) {
+    grid-template-columns: 30% 1fr;
+  }
+  @media (min-width: @md) {
+    grid-template-columns: 25% 1fr;
+  }
+  @media (min-width: @lg) {
+    grid-template-columns: 20% 1fr;
+  }
+  @media (min-width: @xl) {
+    grid-template-columns: 15% 1fr;
+  }
+}

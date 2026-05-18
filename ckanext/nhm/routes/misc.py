@@ -4,6 +4,7 @@
 # This file is part of ckanext-nhm
 # Created by the Natural History Museum in London, UK
 
+from ckan.plugins import toolkit
 from flask import Blueprint, jsonify, redirect
 
 # create a flask blueprint with a prefix
@@ -29,3 +30,13 @@ def organisation_redirect(org_path=''):
     :param org_path: additional parts of the path
     """
     return redirect(f'/organization/{org_path}')
+
+
+@blueprint.route('/featured-history')
+def featured_history():
+    """
+    Render the page displaying previously featured datasets.
+    """
+    return toolkit.render(
+        'home/featured_history.html', {'title': 'Previously featured'}
+    )
