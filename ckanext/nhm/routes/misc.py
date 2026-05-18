@@ -38,5 +38,5 @@ def featured_history():
     Render the page displaying previously featured datasets.
     """
     return toolkit.render(
-        'home/featured_history.html', {'title': 'Previously featured'}
+        'home/featured_history.html', {'title': 'Featured datasets and tools'}
     )
