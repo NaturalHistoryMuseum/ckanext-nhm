@@ -28,6 +28,7 @@
                 img_url='/images/L010225443_small.jpg',
                 img_alt='A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443.',
                 desc='An interactive image viewer allowing users to zoom in on images in our datasets, including high-resolution photographs of pinned insect drawers.',
+                view_link='View tool',
                 url=h.url_for('liv.index')) }}
 
                 {{ featured_dataset(title='Butterfly types',
@@ -86,7 +87,7 @@
     </article>
 {% endblock %}
 
-{% macro featured_dataset(title, img_url, img_alt, desc, url, id, img_title='', img_style='') %}
+{% macro featured_dataset(title, img_url, img_alt, desc, url, id, img_title='', img_style='', view_link='View data') %}
     {% set url = url | default(h.url_for('dataset.read', id=id)) %}
 
     <a class="media-image" href="{{ url }}" aria-label="{{ title }}">
@@ -102,8 +103,7 @@
         <h2 class="featured-title"><a href="{{ url }}">{{ title }}</a></h2>
         <p>{{ desc }}</p>
         <p class="text-right"><a class="no-underline view-dataset-link"
-                                 href="{{ url }}"
-                                 title="View dataset">View dataset <i
+                                 href="{{ url }}">{{ view_link }} <i
             class="fas fa-arrow-circle-right inline-icon-right"></i></a></p>
     </div>
 {% endmacro %}
