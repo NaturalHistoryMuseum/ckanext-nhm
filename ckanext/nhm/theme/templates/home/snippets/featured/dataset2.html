@@ -1,17 +1,19 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set title = "Butterfly types" %}
-{% set url="/search/butterfly-types?view=gallery" %}
+{% set id = 'collection-indexlots' %}
+{% set title = "Index lots" %}
+{% set url = h.url_for('resource.read', id=id, resource_id=h.get_indexlot_resource_id()) %}
 
 {% block image %}
 <div class="featured-image"
-     style="background-image:url('/images/Heraclides_rumiko_small.jpg')"
+     style="background-image: url('/images/BeetlesSmall.jpg')"
      role="img"
-     aria-label="A top-down photograph of a large black and yellow butterfly (Heraclides rumiko). It is pinned to a grey tray and there are a set of small labels to its left."
-     title="NHMUK012824346, Heraclides rumiko">
+     aria-label="A tray of collected metallic green beetles, lined up neatly in rows. Each beetle is pinned to a typed label underneath it."
+     title="Beetles collected in the Malay Archipelago by Alfred Russel Wallace">
 </div>
 {% endblock %}
 
 {% block description %}
-View some of the Museum’s invaluable butterfly reference material.
+Access the catalogue of index lot records, used to record the presence of some entomological and
+zoological species in the Museum collection.
 {% endblock %}

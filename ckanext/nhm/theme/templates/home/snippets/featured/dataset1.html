@@ -1,18 +1,18 @@
 {% extends "home/snippets/featured/base.html" %}
 
-{% set url = h.url_for('liv.index') %}
-{% set title = "Image viewer" %}
+{% set id = 'collection-samples' %}
+{% set title = "Samples collection" %}
+{% set url = h.url_for('resource.read', id=id, resource_id=h.get_preparation_resource_id()) %}
 
 {% block image %}
-    <div class="featured-image"
-         style="background-image:url('/images/L010225443_small.jpg')"
-         role="img"
-         aria-label="A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443."
-         title=""
-    ></div>
+<div class="featured-image"
+     style="background-image: url('/images/featured-samples.jpg')"
+     role="img"
+     aria-label="A row of frozen white and orange boxes with attached barcode labels."
+     title="Samples from the Museum's collection">
+</div>
 {% endblock %}
 
 {% block description %}
-    An interactive image viewer allowing users to zoom in on images in our datasets,
-    including high-resolution photographs of pinned insect drawers.
+Access the catalogue of samples in the Museum collections.
 {% endblock %}
