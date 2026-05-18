@@ -18,6 +18,12 @@
             <p>This page contains links that have been listed or are currently listed in the "featured" section on the homepage. The "featured" section may change over time, so this page ensures you can still access the older links even if they've been replaced on the homepage.</p>
 
             <div class="featured-history-grid">
+                {{ featured_dataset(title='Samples collection',
+                img_url='/images/featured-samples.jpg',
+                img_alt='A row of frozen white and orange boxes with attached barcode labels.',
+                desc='Access the catalogue of samples in the Museum collections.',
+                url=h.url_for('resource.read', id='collection-samples', resource_id=h.get_preparation_resource_id())) }}
+
                 {{ featured_dataset(title='Image viewer',
                 img_url='/images/L010225443_small.jpg',
                 img_alt='A top-down view of a white tray containing pinned Goliath beetles. This is from drawer L010225443.',
