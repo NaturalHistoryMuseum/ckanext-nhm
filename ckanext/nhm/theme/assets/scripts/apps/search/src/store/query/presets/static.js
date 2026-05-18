@@ -33,6 +33,21 @@ let staticPresets = {
         },
       ],
     },
+    hasLatLong: {
+      name: 'Has lat/long',
+      content: [
+        {
+          type: 'term',
+          key: 'exists',
+          content: {
+            geo_field: true,
+          },
+          display: {
+            name: 'Has lat/long',
+          },
+        },
+      ],
+    },
   },
   getters: {
     presets: (state) => {
