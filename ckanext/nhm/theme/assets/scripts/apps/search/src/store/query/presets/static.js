@@ -30,6 +30,9 @@ let staticPresets = {
           content: {
             fields: ['gbifIssue'],
           },
+          display: {
+            name: 'GBIF Issues',
+          },
         },
       ],
     },

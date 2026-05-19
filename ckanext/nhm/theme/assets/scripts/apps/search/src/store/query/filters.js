@@ -293,7 +293,7 @@ let filters = {
                   JSON.stringify(p.content) === JSON.stringify(filter.content),
               );
               if (matchTerm) {
-                filter.display.name = preset.name;
+                filter.display.name = preset.display.name;
               }
             });
           });
