@@ -290,7 +290,9 @@ let filters = {
                 (p) =>
                   p.type === 'term' &&
                   p.key === filter.key &&
-                  JSON.stringify(p.content) === JSON.stringify(filter.content),
+                  JSON.stringify(p.content) ===
+                    JSON.stringify(filter.content) &&
+                  p.display?.name,
               );
               if (matchTerm) {
                 filter.display.name = preset.display.name;
