@@ -295,7 +295,7 @@ let filters = {
                   p.display?.name,
               );
               if (matchTerm) {
-                filter.display.name = preset.display.name;
+                filter.display.name = matchTerm.display.name;
               }
             });
           });
