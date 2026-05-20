@@ -1,3 +1,19 @@
+## v7.7.2 (2026-05-20)
+
+### Fix
+
+- **search-ui**: fix wrong variable used to pass display name
+- **search-ui**: adds check for if presets contains display name
+- **search-ui**: add display name for gbif preset and make check use display name
+- **search-ui**: adds geo exists as preset and force check of filters against presets
+- keep resources button open longer and add "filter"
+- only show "best experience" message for specimens
+- change way filter query passed to multisearch
+
+### Style
+
+- move vars into if statement to avoid code running unnecessarily
+
 ## v7.7.1 (2026-05-11)
 
 ### Fix
