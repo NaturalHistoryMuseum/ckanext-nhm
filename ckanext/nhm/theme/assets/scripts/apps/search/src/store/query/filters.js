@@ -279,6 +279,27 @@ let filters = {
           };
 
           let dequeried = dequeryfy([query.filters], null);
+
+          // Get the static presets
+          const presets = Object.values(context.state.staticPresets);
+          // Loop through all filters and presets
+          Object.values(dequeried).forEach((filter) => {
+            presets.forEach((preset) => {
+              // Check if the preset matches the filter
+              const matchTerm = preset.content.find(
+                (p) =>
+                  p.type === 'term' &&
+                  p.key === filter.key &&
+                  JSON.stringify(p.content) ===
+                    JSON.stringify(filter.content) &&
+                  p.display?.name,
+              );
+              if (matchTerm) {
+                filter.display.name = matchTerm.display.name;
+              }
+            });
+          });
+
           context.state.items = { ...dequeried };
         }
         context.state.parsingError = null;

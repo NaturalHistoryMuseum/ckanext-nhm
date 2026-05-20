@@ -25,9 +25,13 @@
             <i class="fas fa-search"></i> <span class="sr-only">Search</span>
           </button>
         </div>
-        <div class="flex-container flex-nowrap">
+        <div class="flex-container flex-nowrap flex-bottom">
           <div class="text-right nowrap" style="margin-left: 10px">
-            <a href="/help/search" target="_blank" class="collapse-to-icon">
+            <a
+              href="/help/search"
+              target="_blank"
+              class="collapse-to-icon collapse-to-icon-first"
+            >
               Help <i class="fas inline-icon-right fa-question"></i>
             </a>
           </div>
@@ -35,7 +39,7 @@
             <a
               href="javascript:void(0);"
               @click="showAdvanced = !showAdvanced"
-              class="collapse-to-icon"
+              class="collapse-to-icon collapse-to-icon-first"
             >
               Advanced
               <i
@@ -48,7 +52,7 @@
             <a
               href="javascript:void(0);"
               @click="toggleQuery"
-              class="collapse-to-icon"
+              class="collapse-to-icon collapse-to-icon-first"
             >
               Query
               <i
@@ -63,7 +67,7 @@
             <a
               href="javascript:void(0);"
               @click="reset"
-              class="collapse-to-icon"
+              class="collapse-to-icon collapse-to-icon-first"
             >
               Reset <i class="inline-icon-right fas fa-trash"></i>
             </a>
@@ -73,9 +77,9 @@
               href="javascript:void(0);"
               @click="showResources = !showResources"
               id="btnResources"
-              class="collapse-to-icon"
+              class="collapse-to-icon collapse-to-icon-last"
             >
-              Resources <i class="fas fa-list inline-icon-right"></i>
+              Filter resources <i class="fas fa-list inline-icon-right"></i>
             </a>
           </div>
           <transition name="slidedown">

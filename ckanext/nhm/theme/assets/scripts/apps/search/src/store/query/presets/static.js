@@ -30,6 +30,24 @@ let staticPresets = {
           content: {
             fields: ['gbifIssue'],
           },
+          display: {
+            name: 'GBIF Issues',
+          },
+        },
+      ],
+    },
+    hasLatLong: {
+      name: 'Has lat/long',
+      content: [
+        {
+          type: 'term',
+          key: 'exists',
+          content: {
+            geo_field: true,
+          },
+          display: {
+            name: 'Has lat/long',
+          },
         },
       ],
     },

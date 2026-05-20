@@ -49,12 +49,14 @@
                         {% trans dataset=package.title, url=h.url_for('dataset.read', id=package['name']) %}
                             Source: <a href="{{ url }}">{{ dataset }}</a>{% endtrans %}
                     {% endif %}
-                    {% set query_params = h.get_query_params() %}
-                    {% set multisearch = h.multisearch(query_params) %}
-                    {% set slug = h.nav_slug(query=multisearch, resource_ids=resource['id'] ) %}
                     {% if res.datastore_active %}
+                        {% set query_q = h.get_query_params().get('q') %}
+                        {% set query_filters = h.parse_request_filters() %}
+                        {% set v0_query = dict([('q', query_q), ('filters', query_filters)]|rejectattr('1', 'none')) %}
+                        {% set multisearch = h.multisearch(v0_query) %}
+                        {% set slug = h.nav_slug(query=multisearch, resource_ids=resource['id'] ) %}
                         <div class="alert alert-warning">
-                            {% if h.is_collection_resource_id(resource['id']) %}
+                            {% if h.get_specimen_resource_id() == resource['id'] %}
                                 <strong>Note:</strong> Please use the
                                 <a href="{{ h.url_for('search.view', slug=slug) }}">new search page</a> for the best experience.
                             {% else %}
