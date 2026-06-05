@@ -267,11 +267,15 @@
 
 // FONTAWESOME FIXES
 // try to avoid using these - just for overriding CKAN if the class is added in a script
-.fa-arrows:before {
+i.fa.fa-arrows:before {
   // now fa-arrows-alt-v
-  content: '\f338' !important;
+  content: '\f07d' !important;
 }
 i.fa.fa-cloud-upload:before {
   // now fa-cloud-arrow-up
   content: '\f0ee' !important;
+}
+// Removes unwanted padding from handle that pushed icon off center
+.resource-list.reordering .resource-item .handle {
+  padding-top: 0px !important;
 }

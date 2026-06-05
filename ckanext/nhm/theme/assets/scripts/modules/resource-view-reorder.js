@@ -22,7 +22,7 @@ this.ckan.module('resource-view-reorder', function ($) {
       ].join('\n'),
       handle: [
         '<a href="javascript:;" class="handle" aria-label="Click and drag this to move the view up or down in the list">',
-        '<i class="fas fa-arrows"></i>',
+        '<i class="fas fa-arrows-alt-v"></i>',
         '</a>',
       ].join('\n'),
       saving: [
