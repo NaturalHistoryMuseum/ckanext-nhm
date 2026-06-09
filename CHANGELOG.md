@@ -1,3 +1,9 @@
+## v7.7.3 (2026-06-09)
+
+### Minor UI Changes
+
+- change inverts contact email back
+
 ## v7.7.2 (2026-05-20)
 
 ### Fix
