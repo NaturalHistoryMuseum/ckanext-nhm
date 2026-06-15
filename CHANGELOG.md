@@ -1,3 +1,14 @@
+## v7.7.4 (2026-06-15)
+
+### Fix
+
+- **upload-icon**: forces update of icon content to the cloud upload icon
+
+### Minor UI Changes
+
+- **fa-icons**: removes icon fix that causes error - moves padding fix to relevant file
+- **reorder-icon**: fixes the reorder icon by forcing content update and changing element
+
 ## v7.7.3 (2026-06-09)
 
 ### Minor UI Changes
