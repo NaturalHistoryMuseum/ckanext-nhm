@@ -271,7 +271,7 @@
               : ['fa-download']
           "
         ></i>
-        Request Download
+        Start download
       </a>
     </div>
   </Popup>
