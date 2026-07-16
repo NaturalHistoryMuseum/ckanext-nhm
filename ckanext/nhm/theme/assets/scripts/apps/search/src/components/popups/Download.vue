@@ -183,12 +183,15 @@
             v-model="downloadForm.notifier.type"
             @change="setNotifierDefaults"
           >
+            <option :value="null" disabled>
+              Choose how you'd like to be notified
+            </option>
             <option value="email">Email</option>
             <option value="webhook">
               External webhook (e.g. IFTTT, Discord)
             </option>
             <option value="none">
-              None; I'll check the download status manually
+              No notification (check status manually)
             </option>
           </select>
         </div>
@@ -257,7 +260,8 @@
     <div class="text-right" v-if="download === null">
       <a
         href="javascript:void(0);"
-        class="btn btn-primary text-right"
+        class="btn text-right"
+        :class="!!downloadForm.notifier.type ? 'btn-primary' : 'btn-disabled'"
         @click="submitForm"
         ><i
           class="fas"
@@ -292,7 +296,7 @@ export default {
           format_args: {},
         },
         notifier: {
-          type: 'email',
+          type: null,
           type_args: {},
         },
       },
@@ -398,6 +402,9 @@ export default {
       this.$set(this.downloadForm.notifier, 'type_args', typeArgs);
     },
     validateForm() {
+      if (this.downloadForm.notifier.type == null) {
+        return false;
+      }
       this.formErrors = [];
       if (this.downloadForm.notifier.type === 'email') {
         if (
