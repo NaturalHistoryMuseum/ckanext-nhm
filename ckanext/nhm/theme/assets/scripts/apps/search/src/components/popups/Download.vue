@@ -411,7 +411,7 @@ export default {
           !this.downloadForm.notifier.type_args ||
           !this.downloadForm.notifier.type_args.emails
         ) {
-          this.formErrors.push('Email address must be provided');
+          this.formErrors.push('Email field is blank');
         } else {
           let emails = this.downloadForm.notifier.type_args.emails
             .split(',')
