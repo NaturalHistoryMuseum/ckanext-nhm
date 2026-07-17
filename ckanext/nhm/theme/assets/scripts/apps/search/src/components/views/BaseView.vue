@@ -1,8 +1,7 @@
 <template>
   <pre>
         {{ resultData.result }}
-    </pre
-  >
+  </pre>
 </template>
 
 <script>
