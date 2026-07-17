@@ -175,7 +175,12 @@
         <div class="form-row">
           <label for="download-notifier"> Notification type </label>
           <p>
-            <small>How should we notify you when your download is ready?</small>
+            <small
+              >Downloads are not instant. Depending on size and server load,
+              your file may take some time to generate. We can automatically
+              notify you when your download is ready, or you can choose to check
+              the queue yourself.</small
+            >
           </p>
           <select
             id="download-notifier"
