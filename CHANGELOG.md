@@ -1,3 +1,27 @@
+## v7.7.5 (2026-07-20)
+
+### Fix
+
+- force notifier choice
+
+### Style
+
+- fix formatting for pre tag
+
+### Build System(s)
+
+- add clean steps to build commands for search ui
+
+### Chores/Misc
+
+- rebuild search app
+
+### Minor UI Changes
+
+- clarify that downloads aren't instant
+- change blank email error message
+- change request download to start download
+
 ## v7.7.4 (2026-06-15)
 
 ### Fix
