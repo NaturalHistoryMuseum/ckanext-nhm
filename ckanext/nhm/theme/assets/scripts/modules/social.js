@@ -4,6 +4,10 @@
  */
 this.ckan.module('social', function ($, _) {
   return {
+    /* Initialises the module setting up elements and event listeners.
+    *
+    * Returns nothing.
+    */
     initialize: function () {
       self = this;
       $('a', this.el).each(function () {
@@ -15,13 +19,17 @@ this.ckan.module('social', function ($, _) {
         }
       });
     },
-
+    /*
+     * Opens share link in a new window
+     */
     _on_click: function (e) {
       e.preventDefault();
       window.open(this.href, this.title, 'width=600,height=400');
       return false;
     },
-
+    /*
+     * Copies URL to clipboard and displays message
+     */
     _on_copy_click: function (e) {
       e.preventDefault();
       // Get the URL from the element
