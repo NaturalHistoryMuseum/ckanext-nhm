@@ -5,9 +5,9 @@
 this.ckan.module('social', function ($, _) {
   return {
     /* Initialises the module setting up elements and event listeners.
-    *
-    * Returns nothing.
-    */
+     *
+     * Returns nothing.
+     */
     initialize: function () {
       self = this;
       $('a', this.el).each(function () {
