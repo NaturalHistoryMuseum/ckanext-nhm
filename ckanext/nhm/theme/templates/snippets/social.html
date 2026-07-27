@@ -3,31 +3,31 @@
 {% block social_title %}
 <div class="flex-container flex-between flex-stretch-first nav-simple-heading">
     <h2 class="module-heading"><i class="fas fa-share-alt inline-icon-left"></i>{{
-                                                                                 _('Share')
-                                                                                 }} </h2>
-    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-            data-target="#nav-social" aria-expanded="false">
+        _('Share')
+        }} </h2>
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-social"
+        aria-expanded="false">
         <span class="sr-only">expand</span>
     </button>
 </div>{% endblock %}
 
 {% block social_nav %}
 
-{% set text = h.social_share_text(g.pkg_dict, res_dict, rec_dict) %}
+{% set text = h.social_share_text(g.pkg_dict, res_dict, rec_dict, current_url) %}
 <ul class="nav nav-simple navbar-collapse collapse" data-module="social" id="nav-social">
     <li class="nav-item">
-        <a href="#" data-copy-text="{{ current_url }}">
+        <a href="#" data-copy-text="{{ current_url }}" title="Copy Link">
             <i class="fa fa-link inline-icon-left"></i>Copy link
         </a>
     </li>
     <li class="nav-item">
-        <a href="mailto:?body={{ text + ' Link: ' + current_url }}">
+        <a href="mailto:?body={{ text + ' Link: ' + current_url }}" title="Share via Email">
             <i class="fa fa-envelope inline-icon-left"></i>Email
         </a>
     </li>
     <li class="nav-item">
-        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ current_url }}"
-        target="_blank" title="Share on LinkedIn">
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ current_url }}" target="_blank"
+            title="Share on LinkedIn">
             <i class="fab fa-linkedin-square inline-icon-left"></i>LinkedIn
         </a>
     </li>
