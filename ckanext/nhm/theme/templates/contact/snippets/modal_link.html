@@ -2,15 +2,12 @@
 
 {% block modal_link %}
 
-    <a class="btn btn-primary" title="{{ _('Contact') }}" data-module="modal-contact"
-       data-module-template="contact_form.html"
-       {% if pkg %} data-module-package_id="{{ pkg.id }}" {% endif %}
-       {% if res %} data-module-resource_id="{{ res.id }}" {% endif %}
-       {% if rec %} data-module-record_id="{{ rec._id }}" {% endif %}
-       data-module-action="{{ recaptcha_v3_action }}"
-       data-module-key="{{ recaptcha_v3_key }}">
-        <i class="fas fa-envelope"></i>{{ link_text if link_text else _('Contact dataset curator') }}
-    </a>
+<a class="btn btn-primary" title="{{ _('Contact') }}" href="/contact" data-module-template="contact_form.html" {% if pkg
+    %} data-module-package_id="{{ pkg.id }}" {% endif %} {% if res %} data-module-resource_id="{{ res.id }}" {% endif %}
+    {% if rec %} data-module-record_id="{{ rec._id }}" {% endif %} data-module-action="{{ recaptcha_v3_action }}"
+    data-module-key="{{ recaptcha_v3_key }}">
+    <i class="fas fa-envelope"></i>{{ link_text if link_text else _('Contact dataset curator') }}
+</a>
 
-    {% asset 'ckanext-contact/main' %}
+{% asset 'ckanext-contact/main' %}
 {% endblock %}
