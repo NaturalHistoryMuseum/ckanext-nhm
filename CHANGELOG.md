@@ -1,3 +1,9 @@
+## v7.7.6 (2026-07-27)
+
+### Fix
+
+- **contact-form**: changes contact button to redirect to contact form instead of opening modal
+
 ## v7.7.5 (2026-07-20)
 
 ### Fix
