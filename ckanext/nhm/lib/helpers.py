@@ -924,32 +924,40 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None, url=None):
         item_type = 'Record'
         title_field = res_dict.get('_title_field', None)
         if title_field and rec_dict.get(title_field, None):
-            item_name = rec_dict[title_field]
+            item_name = f'{rec_dict[title_field]} - {res_dict["name"]}'
         else:
-            item_name = rec_dict['_id']
+            item_name = f'{rec_dict["_id"]} - {res_dict["name"]}'
     elif res_dict:
         item_type = 'Resource'
         item_name = res_dict['name']
     elif pkg_dict:
         item_type = 'Dataset'
         item_name = pkg_dict['title'] or pkg_dict['name']
+    else:
+        # Ensure item is not undefined
+        item_name = None
+        item_type = 'Item'
 
     # Build text
     text.append(item_type)
-    text.append(
-        'from the  the Natural History Museum Data Portal (https://data.nhm.ac.uk) :'
-    )
-    text.append(item_name)
-    if item_type != 'Dataset':
-        text.append(f'(from {pkg_dict["title"] or pkg_dict["name"]})')
-    # Add link to item
-    try:
-        if pkg_dict['doi']:
-            text.append(f'- DOI: {"/".join(["https://doi.org", pkg_dict["doi"]])}')
+    text.append('from the Natural History Museum Data Portal (https://data.nhm.ac.uk):')
+    if item_name:
+        text.append(item_name)
+        if item_type == 'Dataset':
+            # Add link to item
+            if pkg_dict['doi']:
+                text.append(f'- DOI: {"/".join(["https://doi.org", pkg_dict["doi"]])}')
+            else:
+                text.append(f'- Link: {url}')
         else:
+            if pkg_dict:
+                text.append(f'(from {pkg_dict["title"] or pkg_dict["name"]})')
+            # Add link to item
             text.append(f'- Link: {url}')
-    except KeyError:
-        pass
+    elif url:
+        # Add link to item
+        text.append(f'Link: {url}')
+
     return quote(' '.join(map(str, text)).encode('utf8'))
 
 
