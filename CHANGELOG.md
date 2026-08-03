@@ -1,3 +1,23 @@
+## v7.8.0 (2026-08-03)
+
+### Feature
+
+- **socials**: replace social links with copy url, email, linkedin share
+
+### Fix
+
+- resolve share text issues and cleans up code, adding redunancies
+- remove duplicate share link added in email share tab
+- change social text sent when sharing to updated format
+
+### Refactor
+
+- **socials**: add comments into social asset
+
+### Chores/Misc
+
+- fix prettier formatting
+
 ## v7.7.6 (2026-07-27)
 
 ### Fix
