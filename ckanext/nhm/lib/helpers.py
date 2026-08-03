@@ -911,7 +911,7 @@ def get_image_licence_options():
     return [{'value': value, 'text': text} for text, value in licenses]
 
 
-def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
+def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None, url=None):
     """
     Generate social share text for a package.
 
@@ -919,23 +919,44 @@ def social_share_text(pkg_dict=None, res_dict=None, rec_dict=None):
     :returns:
     """
     text = []
+    # Set the item name and type
     if rec_dict:
+        item_type = 'Record'
         title_field = res_dict.get('_title_field', None)
         if title_field and rec_dict.get(title_field, None):
-            text.append(rec_dict[title_field])
+            item_name = f'{rec_dict[title_field]} - {res_dict["name"]}'
         else:
-            text.append('Record {}'.format(rec_dict['_id']))
+            item_name = f'{rec_dict["_id"]} - {res_dict["name"]}'
     elif res_dict:
-        text.append(res_dict['name'])
+        item_type = 'Resource'
+        item_name = res_dict['name']
     elif pkg_dict:
-        text.append(pkg_dict['title'] or pkg_dict['name'])
+        item_type = 'Dataset'
+        item_name = pkg_dict['title'] or pkg_dict['name']
+    else:
+        # Ensure item is not undefined
+        item_name = None
+        item_type = 'Item'
 
-    text.append('on the @NHM_London Data Portal')
-
-    try:
-        text.append(f'DOI: {"/".join(["https://doi.org", pkg_dict["doi"]])}')
-    except KeyError:
-        pass
+    # Build text
+    text.append(item_type)
+    text.append('from the Natural History Museum Data Portal (https://data.nhm.ac.uk):')
+    if item_name:
+        text.append(item_name)
+        if item_type == 'Dataset':
+            # Add link to item
+            if pkg_dict['doi']:
+                text.append(f'- DOI: {"/".join(["https://doi.org", pkg_dict["doi"]])}')
+            else:
+                text.append(f'- Link: {url}')
+        else:
+            if pkg_dict:
+                text.append(f'(from {pkg_dict["title"] or pkg_dict["name"]})')
+            # Add link to item
+            text.append(f'- Link: {url}')
+    elif url:
+        # Add link to item
+        text.append(f'Link: {url}')
 
     return quote(' '.join(map(str, text)).encode('utf8'))
 
