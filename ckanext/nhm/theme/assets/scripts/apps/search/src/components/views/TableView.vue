@@ -120,19 +120,6 @@ export default {
     tableGrid() {
       return $(this.$refs.tableGrid);
     },
-    versionParam() {
-      // check if the requestBody is defined
-      if (this.requestBody == undefined) {
-        return '';
-      }
-      // return the version if exists
-      const queryRequestBody = this.requestBody(false);
-      if (queryRequestBody.version) {
-        return `/${queryRequestBody.version}`;
-      } else {
-        return '';
-      }
-    },
   },
   methods: {
     tableScroll(amount) {

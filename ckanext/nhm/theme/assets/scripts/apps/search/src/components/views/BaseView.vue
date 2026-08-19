@@ -26,6 +26,19 @@ export default {
     ...mapGetters('results/images', ['loadedImageRecords']),
     ...mapGetters('results/query', ['requestBody']),
     ...mapGetters('results/query/resources', ['resourceDetails']),
+    versionParam() {
+      // check if the requestBody is defined
+      if (this.requestBody == undefined) {
+        return '';
+      }
+      // return the version if exists
+      const queryRequestBody = this.requestBody(false);
+      if (queryRequestBody.version) {
+        return `/${queryRequestBody.version}`;
+      } else {
+        return '';
+      }
+    },
   },
   methods: {
     ...mapMutations('results/display', [
