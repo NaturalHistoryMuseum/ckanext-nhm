@@ -24,6 +24,7 @@ export default {
     ...mapGetters('results', ['total', 'records']),
     ...mapGetters('results/display', ['licenceFromId']),
     ...mapGetters('results/images', ['loadedImageRecords']),
+    ...mapGetters('results/query', ['requestBody']),
     ...mapGetters('results/query/resources', ['resourceDetails']),
   },
   methods: {

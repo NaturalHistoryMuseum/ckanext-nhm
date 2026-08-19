@@ -84,7 +84,7 @@
           <a
             :href="`${resourceDetails[item.resource].resourceUrl}/record/${
               item.data._id
-            }`"
+            }${versionParam}`"
             :title="`View record ${item.data._id}`"
           >
             <i class="fas fa-eye inline-icon-left"></i>View
@@ -119,6 +119,19 @@ export default {
   computed: {
     tableGrid() {
       return $(this.$refs.tableGrid);
+    },
+    versionParam() {
+      // check if the requestBody is defined
+      if (this.requestBody == undefined) {
+        return '';
+      }
+      // return the version if exists
+      const queryRequestBody = this.requestBody(false);
+      if (queryRequestBody.version) {
+        return `/${queryRequestBody.version}`;
+      } else {
+        return '';
+      }
     },
   },
   methods: {
