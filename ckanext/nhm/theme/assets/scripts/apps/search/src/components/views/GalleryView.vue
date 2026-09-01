@@ -68,7 +68,9 @@
         role="img"
       >
         <small class="gallery-tile-title">
-          <a :href="record.recordUrl">{{ record.recordTitle }}</a>
+          <a :href="record.recordUrl + versionParam">{{
+            record.recordTitle
+          }}</a>
         </small>
         <small class="gallery-tile-number"
           >{{ record.recordImageIndex + 1 }} / {{ record.imageTotal }}</small
