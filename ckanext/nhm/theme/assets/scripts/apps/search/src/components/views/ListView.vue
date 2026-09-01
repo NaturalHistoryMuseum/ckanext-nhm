@@ -10,7 +10,7 @@
           <a
             :href="`${resourceDetails[item.resource].resourceUrl}/record/${
               item.data._id
-            }`"
+            }${versionParam}`"
           >
             {{
               item.data[resourceDetails[item.resource].titleField] ||

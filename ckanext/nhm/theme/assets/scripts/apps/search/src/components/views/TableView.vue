@@ -84,7 +84,7 @@
           <a
             :href="`${resourceDetails[item.resource].resourceUrl}/record/${
               item.data._id
-            }`"
+            }${versionParam}`"
             :title="`View record ${item.data._id}`"
           >
             <i class="fas fa-eye inline-icon-left"></i>View
