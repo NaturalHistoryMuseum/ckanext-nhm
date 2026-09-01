@@ -1,3 +1,14 @@
+## v7.8.1 (2026-09-01)
+
+### Fix
+
+- adds version param to gallery and list view
+- adds version to table view link if present in search query
+
+### Build System(s)
+
+- undo changes with search vue packagae
+
 ## v7.8.0 (2026-08-03)
 
 ### Feature
