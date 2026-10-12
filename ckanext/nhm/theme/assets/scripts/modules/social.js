@@ -3,6 +3,8 @@
  * copy-link button which copies the current URL to clipboard
  */
 this.ckan.module('social', function ($, _) {
+  let self;
+
   return {
     /* Initialises the module setting up elements and event listeners.
      *
