@@ -1,3 +1,9 @@
+## v7.8.2 (2026-10-12)
+
+### Fix
+
+- initialise self in social module and restore modal form
+
 ## v7.8.1 (2026-09-01)
 
 ### Fix
