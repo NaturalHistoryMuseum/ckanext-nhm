@@ -18,6 +18,8 @@ COLLECTION_CONTACTS = OrderedDict(
         ('Mineral & Planetary Sciences', 'm.rumsey@nhm.ac.uk'),
         ('Vertebrates', 'simon.loader@nhm.ac.uk'),
         ('Biodiversity Intactness Index', 'biodiversityfuturesexplorer@nhm.ac.uk'),
+        ('Life Sciences Identification', 'bug@nhm.ac.uk'),
+        ('Earth Sciences Identification', 'esid@nhm.ac.uk'),
         ('Data Portal / Other', 'data@nhm.ac.uk'),
     ]
 )
