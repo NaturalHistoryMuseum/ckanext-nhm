@@ -1,3 +1,17 @@
+## v7.8.3 (2026-10-19)
+
+### CI System(s)
+
+- update action versions update the actions to the latest versions
+
+### Chores/Misc
+
+- update team names
+
+### Minor UI Changes
+
+- add contacts for identification services
+
 ## v7.8.2 (2026-10-12)
 
 ### Fix
