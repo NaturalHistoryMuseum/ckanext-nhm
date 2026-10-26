@@ -165,7 +165,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         """
         ..seealso:: ckan.plugins.interfaces.IFacets.dataset_facets
         """
-
         # Remove organisations and groups
         del facets_dict['organization']
         del facets_dict['groups']
@@ -252,7 +251,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         ..seealso:: ckan.plugins.interfaces.IRoutes.before_map
         :param _map:
         """
-
         # Dataset metrics
         _map.connect(
             'dataset_metrics',
@@ -282,7 +280,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         """
         ..seealso:: ckan.plugins.interfaces.ITemplateHelpers.get_helpers
         """
-
         h = {}
 
         #  Build a list of helpers from import ckanext.nhm.lib.helpers as nhmhelpers
@@ -301,7 +298,6 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
         """
         ..seealso:: ckanext.contact.interfaces.IContact.mail_alter
         """
-
         # Get the submitted data values
         package_id = data_dict.get('package_id', None)
         package_name = data_dict.get('package_name', None)
@@ -392,8 +388,9 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
     ## IGalleryImage
     def image_info(self):
         """
-        Return info for this plugin. If resource type is set, only dataset of that type
-        will be available.
+        Return info for this plugin.
+
+        If resource type is set, only dataset of that type will be available.
 
         ..seealso:: ckanext.gallery.plugins.interfaces.IGalleryImage.image_info
         """

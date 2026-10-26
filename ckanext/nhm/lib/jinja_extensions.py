@@ -156,8 +156,9 @@ class TaxonomyFormatExtension(Extension):
     @property
     def _ent(self):
         """
-        Entomology-specific rules. Will almost always follow zoology rules but can
-        override them if necessary.
+        Entomology-specific rules.
+
+        Will almost always follow zoology rules but can override them if necessary.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
             and corresponding field names, and a list of fields to be parsed
@@ -167,8 +168,9 @@ class TaxonomyFormatExtension(Extension):
     @property
     def _pal(self):
         """
-        Palaeontology-specific rules. Will almost always follow zoology rules but can
-        override them if necessary.
+        Palaeontology-specific rules.
+
+        Will almost always follow zoology rules but can override them if necessary.
 
         :returns: a tuple of collections; a dictionary of string formatting functions
             and corresponding field names, and a list of fields to be parsed

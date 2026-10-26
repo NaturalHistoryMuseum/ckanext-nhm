@@ -261,8 +261,9 @@ class Record:
 
     def url(self, use_package_id=False) -> str:
         """
-        Returns the URL for this record. If the version is present it is included in the
-        URL.
+        Returns the URL for this record.
+
+        If the version is present it is included in the URL.
 
         :param use_package_id: whether to use the package ID in the URL or the package
             name, the default is the package name (i.e. use_package_id=False)
@@ -307,8 +308,9 @@ class Record:
     @property
     def image_field(self) -> Optional[str]:
         """
-        Returns the name of the field in the record that contains the image data. If no
-        field is specified at the resource level then we check for a DwC
+        Returns the name of the field in the record that contains the image data.
+
+        If no field is specified at the resource level then we check for a DwC
         associated_media field and use it if we find it. If no field name can be
         resolved, return None.
 

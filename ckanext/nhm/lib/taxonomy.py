@@ -11,8 +11,9 @@ from collections import OrderedDict
 
 def extract_ranks(record):
     """
-    Extracts the values for each rank (if present) in the given record. Ranks missing
-    from the record are not omitted.
+    Extracts the values for each rank (if present) in the given record.
+
+    Ranks missing from the record are not omitted.
 
     :param record: the record dict
     :returns: the ranks as an OrderedDict in rank order.
@@ -83,9 +84,11 @@ def extract_genus(record):
 
 def extract_species(record):
     """
-    Extract the species value from the given record. This is achieved by extracting the
-    species from the `scientificName` field of the record (if there is one) and the
-    removal of any extra details (such as the author) from this value.
+    Extract the species value from the given record.
+
+    This is achieved by extracting the species from the `scientificName` field of the
+    record (if there is one) and the removal of any extra details (such as the author)
+    from this value.
 
     :param record: the record dict
     :returns: the species value, or None if it is not present

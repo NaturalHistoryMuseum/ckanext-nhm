@@ -23,7 +23,6 @@ def string_max_length(max_length):
         :param value: the input string
         :param context: the context
         """
-
         if len(value) > max_length:
             raise toolkit.Invalid(
                 toolkit._(f'Length must be less than {max_length} characters')
@@ -39,8 +38,9 @@ uuid_re = re.compile(r'^[\w]{40}$')
 
 def uuid_validator(value, context):
     """
-    Checks if a UUID is valid (used for MAM asset IDs). We check with a regex as MAM
-    assets ids aren't valid UUIDs.
+    Checks if a UUID is valid (used for MAM asset IDs).
+
+    We check with a regex as MAM assets ids aren't valid UUIDs.
 
     :param value:
     :param context:
