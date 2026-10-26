@@ -45,7 +45,6 @@ def resources():
     """
     Render the resources statistics page.
     """
-
     # segment by day (further grouping can be done by d3)
     toolkit.c.date_interval = 'day'
 
@@ -76,7 +75,6 @@ def records():
     """
     Render the records stats page.
     """
-
     toolkit.c.datastore_stats = toolkit.get_action('dataset_statistics')(_context(), {})
 
     record_stats = get_record_stats()
@@ -95,7 +93,6 @@ def contributors():
     """
     Render the contributors statistics page.
     """
-
     graph_data = []
 
     # we use solr to get the number of authors for the front page statistics so we'll use it again

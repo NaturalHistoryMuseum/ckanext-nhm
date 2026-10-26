@@ -104,15 +104,12 @@ Retrieve an individual record.
 from ckan.plugins import toolkit
 
 data_dict = {
-                'resource_id': RESOURCE_ID,
-                'record_id': RECORD_ID,
-                'version': OPTIONAL_RECORD_VERSION
-            }
+    'resource_id': RESOURCE_ID,
+    'record_id': RECORD_ID,
+    'version': OPTIONAL_RECORD_VERSION,
+}
 
-toolkit.get_action('record_show')(
-    context,
-    data_dict
-)
+toolkit.get_action('record_show')(context, data_dict)
 ```
 
 ### `object_rdf`
@@ -121,15 +118,9 @@ Get record RDF from its occurrence ID.
 ```python
 from ckan.plugins import toolkit
 
-data_dict = {
-                'uuid': OCCURRENCE_ID,
-                'version': OPTIONAL_RECORD_VERSION
-            }
+data_dict = {'uuid': OCCURRENCE_ID, 'version': OPTIONAL_RECORD_VERSION}
 
-toolkit.get_action('object_rdf')(
-    context,
-    data_dict
-)
+toolkit.get_action('object_rdf')(context, data_dict)
 ```
 
 ## Commands

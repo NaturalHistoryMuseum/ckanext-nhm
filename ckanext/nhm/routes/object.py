@@ -120,8 +120,10 @@ def rdf(uuid, _format, version):
 @blueprint.route('/<uuid>/<int:version>')
 def view(uuid, version):
     """
-    View object. If this is normal HTTP request, this will redirect to the record,
-    otherwise if the request is for RDF (content negotiation) return the rdf.
+    View object.
+
+    If this is normal HTTP request, this will redirect to the record, otherwise if the
+    request is for RDF (content negotiation) return the rdf.
 
     :param uuid: the uuid of the object
     :param version: the version of the object, or None for current version

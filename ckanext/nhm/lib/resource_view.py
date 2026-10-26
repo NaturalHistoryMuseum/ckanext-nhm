@@ -9,15 +9,15 @@ import ckanext.nhm.views as nhm_views
 
 def resource_view_get_view(resource):
     """
-    Retrieve the controller for a resource. Try and match on resource ID, or on.
+    Retrieve the controller for a resource.
 
-    format so we can provide a custom controller for all format types - e.g. DwC.
+    Try and match on resource ID, or on.
+        format so we can provide a custom controller for all format types - e.g. DwC.
 
-    :param resource:
+        :param resource:
 
-    :returns: controller class
+        :returns: controller class
     """
-
     subclasses = nhm_views.DefaultView.__subclasses__()
 
     for cls in subclasses:
