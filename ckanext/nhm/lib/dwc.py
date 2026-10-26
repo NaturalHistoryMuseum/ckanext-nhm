@@ -19,9 +19,10 @@ with open(path, 'r') as xml_f:
 
 def dwc_terms(fields):
     """
-    Get DwC terms and groups, parsed from tdwg_dwcterms. Even though we use simple DwC
-    terms, we use this XSD as it allows us to group terms into events etc., on record
-    display.
+    Get DwC terms and groups, parsed from tdwg_dwcterms.
+
+    Even though we use simple DwC terms, we use this XSD as it allows us to group terms
+    into events etc., on record display.
 
     :param fields: list of fields for this record
     :returns: dict, keyed by groups

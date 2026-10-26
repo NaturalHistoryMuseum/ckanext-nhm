@@ -225,14 +225,14 @@ def url_for_indexlot_view():
 
 def url_for_resource_view(resource_id, view_type=None, filters={}):
     """
-    Get URL to link to resource view. If no view type is specified, the first view will
-    be used.
+    Get URL to link to resource view.
+
+    If no view type is specified, the first view will be used.
 
     :param resource_id:
     :param filters: (optional, default: {})
     :param view_type: (optional, default: None)
     """
-
     try:
         views = toolkit.get_action('resource_view_list')({}, {'id': resource_id})
     except toolkit.ObjectNotFound:
@@ -528,14 +528,15 @@ def resource_view_get_field_groups(resource):
 
 def get_resource_fields(resource, version=None, use_request_version=False):
     """
-    Retrieves the fields for the given resource. This is done using the datastore_search
-    action. By default, the field names from the latest version of the resource are
-    returned. However, this can be altered by either passing a version (must be an
-    integer) or by having a version filter in the request and then passing
-    use_request_version=True. The version is extracted from the __version__ filter as
-    defined by the versioned-datastore plugin. If we can start passing the version as a
-    parameter in its own right rather than as part of the filters then we can change
-    this code.
+    Retrieves the fields for the given resource.
+
+    This is done using the datastore_search action. By default, the field names from the
+    latest version of the resource are returned. However, this can be altered by either
+    passing a version (must be an integer) or by having a version filter in the request
+    and then passing use_request_version=True. The version is extracted from the
+    __version__ filter as defined by the versioned-datastore plugin. If we can start
+    passing the version as a parameter in its own right rather than as part of the
+    filters then we can change this code.
 
     If the resource isn't a datastore resource then an empty list is returned.
 
@@ -726,7 +727,6 @@ def get_resource_gbif_errors(resource):
 
     :param resource: return:
     """
-
     # If this is a
     if resource.get('id') == get_specimen_resource_id():
         return GBIF_ERRORS
@@ -743,7 +743,6 @@ def get_allowed_view_types(resource, package):
     :param resource:
     :param package:
     """
-
     view_types = core_helpers.get_allowed_view_types(resource, package)
     blacklisted_types = ['image']
 
@@ -878,7 +877,6 @@ def record_display_field(field_name, value):
     :param value:
     :returns: bool - true to display field; false not to
     """
-
     # If this is a string, strip it before evaluating
     if isinstance(value, str):
         value = value.strip()
@@ -894,7 +892,6 @@ def group_fields_have_data(record_dict, fields):
     :param fields: fields to test
     :returns: bool
     """
-
     for field in fields:
         if record_dict.get(field, None):
             return True
@@ -904,7 +901,6 @@ def get_image_licence_options():
     """
     Return list of image licences Currently this is the same list as dataset licences.
     """
-
     licenses = [('', '')] + model.Package.get_license_options()
 
     # Format licences as form options list of dicts
@@ -996,7 +992,6 @@ def dataset_author_truncate(author_str):
         :param separator:  (optional, default: None)
 
         """
-
         # If we have a separator, split string on it
         if separator:
             shortened = ';'.join(author_str.split(separator)[0:4])
@@ -1083,7 +1078,7 @@ def get_resource_facets(resource):
     # doesn't have a
     # formatter defined then the value is just used as is
     facet_field_label_formatters = defaultdict(
-        lambda: (lambda v: v.capitalize()), **{'collectionCode': get_department}
+        lambda: lambda v: v.capitalize(), **{'collectionCode': get_department}
     )
 
     # Loop through original facets to ensure order is preserved
@@ -1131,7 +1126,6 @@ def remove_url_filter(field, value, extras=None):
     :param extras: extra parameters to include in the created URL
     :returns: a URL
     """
-
     params = dict(toolkit.request.params)
     try:
         del params['filters']
@@ -1177,7 +1171,6 @@ def add_url_filter(field, value, extras=None):
     :param extras:
     :param value:
     """
-
     params = {k: v for k, v in toolkit.request.params.items() if k != 'page'}
     url_filter = f'{field}:{value}'
     filters = [
@@ -1193,7 +1186,6 @@ def parse_request_filters():
     Get the filters from the request object.
     """
     filter_dict = {}
-
     try:
         filter_params = toolkit.request.params.get('filters').split('|')
     except AttributeError:
@@ -1220,7 +1212,6 @@ def get_resource_filter_pills(package, resource, resource_view=None):
     :param package:
     :param resource_view:  (optional, default: None)
     """
-
     if not isinstance(package, dict):
         package = package.as_dict()
 
@@ -1393,8 +1384,9 @@ def render_epoch(
     epoch_timestamp, in_milliseconds=True, date_format='%Y-%m-%d %H:%M:%S (UTC)'
 ):
     """
-    Renders an epoch timestamp in the given date format. The timestamp is rendered in
-    UTC.
+    Renders an epoch timestamp in the given date format.
+
+    The timestamp is rendered in UTC.
 
     :param epoch_timestamp: the timestamp, represented as the number of seconds (or
         milliseconds if in_milliseconds is True) since the UNIX epoch
@@ -1498,8 +1490,9 @@ def _add_nav_item_class(html_string, classes=None, **kwargs):
 
 def build_nav_main(*menu_items):
     """
-    Build a set of menu items. Overrides core CKAN method to add "nav-item" class to li
-    elements and allow endpoint keyword args.
+    Build a set of menu items.
+
+    Overrides core CKAN method to add "nav-item" class to li elements and allow endpoint keyword args.
 
     :param menu_items: tuples of (endpoint_details, title) e.g. ('home.index', _('Home')) or (('search.view', {'slug': 'everything'}), _('Search'))
     :returns: literal - <li class="nav-item"><a href="...">title</a></li>
@@ -1532,8 +1525,10 @@ def build_nav_main(*menu_items):
 
 def get_specimen_jsonld(uuid, version=None):
     """
-    Returns the rdf representation of the given specimen uuid. The returned data is a
-    string of json-ld data. If something goes wrong, an empty string is returned.
+    Returns the rdf representation of the given specimen uuid.
+
+    The returned data is a string of json-ld data. If something goes wrong, an empty
+    string is returned.
 
     :param uuid: the uuid of the specimen record
     :param version: optional version for the record data

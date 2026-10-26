@@ -48,8 +48,8 @@ class ObjectSerializer(RDFSerializer):
         """
         Given a record dict, returns an RDF serialization.
 
-        The serialization format can be defined using the `_format` parameter. It must be one of the
-        ones supported by RDFLib, defaults to `xml`.
+        The serialization format can be defined using the `_format` parameter. It must
+        be one of the ones supported by RDFLib, defaults to `xml`.
 
         Returns a string with the serialized dataset
         """
@@ -159,10 +159,11 @@ class RecordGraphBuilder(object):
 
     def _get_value(self, field, source=None):
         """
-        Retrieve a value from the given source and yield it wrapped in a Literal. The
-        default source is the self.record.data dict. This function works in conjunction
-        with the __iter__ function above which filters out triples containing a None as
-        the object (the 3rd value).
+        Retrieve a value from the given source and yield it wrapped in a Literal.
+
+        The default source is the self.record.data dict. This function works in
+        conjunction with the __iter__ function above which filters out triples
+        containing a None as the object (the 3rd value).
 
         :param field: the field to get the value of
         :param source: the source dict to retrieve the field's value from

@@ -47,8 +47,9 @@ def create_context():
 
 def get_vocabulary(context, create_if_missing=True):
     """
-    Retrieves the dataset categories vocabulary if one exists and returns it. If it
-    doesn't exist, optionally creates it.
+    Retrieves the dataset categories vocabulary if one exists and returns it.
+
+    If it doesn't exist, optionally creates it.
 
     :param context: the context dict to use when calling actions
     :param create_if_missing: whether to create the vocabulary if it doesn't exists,

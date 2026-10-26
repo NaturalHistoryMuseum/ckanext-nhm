@@ -298,7 +298,6 @@ class SpecimenView(DefaultView):
         :param c:
         :returns: html
         """
-
         occurrence_id = c.record_dict.get('occurrenceID')
 
         log.info(f'Viewing record {occurrence_id}')

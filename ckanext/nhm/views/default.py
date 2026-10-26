@@ -73,7 +73,6 @@ class DefaultView(object):
 
         :param c:
         """
-
         # The record_dict does not have fields in the correct order
         # So load the fields, and create an OrderedDict with field: value
         toolkit.c.field_data = OrderedDict()

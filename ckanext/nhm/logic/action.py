@@ -26,7 +26,6 @@ def object_rdf(context, data_dict):
     :param context:
     :param data_dict:
     """
-
     # Validate the data
     context = {'user': toolkit.c.user or toolkit.c.author}
     schema = context.get('schema', nhm_schema.object_rdf_schema())
