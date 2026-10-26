@@ -1,3 +1,13 @@
+## v7.8.4 (2026-10-26)
+
+### Refactor
+
+- run pre-commit and refactor all files
+
+### CI System(s)
+
+- update pre-commit config
+
 ## v7.8.3 (2026-10-19)
 
 ### CI System(s)
