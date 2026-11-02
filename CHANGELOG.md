@@ -1,3 +1,9 @@
+## v7.8.5 (2026-11-02)
+
+### Fix
+
+- remove download url from resource api response
+
 ## v7.8.4 (2026-10-26)
 
 ### Refactor
