@@ -245,6 +245,20 @@ class NHMPlugin(SingletonPlugin, toolkit.DefaultDatasetForm):
                     for _cache in cache_managers.values():
                         _cache.clear()
 
+    def after_show(self, context, pkg_dict):
+        """
+        Make changes to the package and resource dicts displayed by the API.
+
+        ..seealso:: ckan.plugins.interfaces.IPackageController.after_show
+        """
+        # remove download URLs from resources; this also affects resource_show
+        for i in range(len(pkg_dict['resources'])):
+            try:
+                del pkg_dict['resources'][i]['url']
+            except KeyError:
+                continue
+        return pkg_dict
+
     ## IRoutes
     def before_map(self, _map):
         """
