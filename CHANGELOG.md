@@ -1,3 +1,9 @@
+## v7.8.7 (2026-11-23)
+
+### Fix
+
+- remove google tag manager
+
 ## v7.8.6 (2026-11-02)
 
 ### Fix
